@@ -1,0 +1,1 @@
+javah -o "SnSDriver_ht01sv_c\SnSDriver_ht01sv.h" -classpath "SnSDriver_ht01sv_java\build\classes;D:\1_Project\IoT\1_Project\SnSDKBuild\dist\SnSDK.jar" "SnSDK.ExternalDevice.Sensing.TempHumi.SnSDriver_ht01sv"

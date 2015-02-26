@@ -43,12 +43,19 @@ LapThings프로젝트의 핵심 요소 중 하나이다. IoT 환경에서 운영
 * ***usr***
 	- 프레임워크 개발 및 사용에 필요한 라이브러리
 
-## Development Information
+# Getting Start
+## 1. Install the SnSDK to Beagle Bone Black
+### [SnSDK Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/11)
+## 2. Development Information
 ### Link for [Framework Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/8)
 ### Link for [Driver Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/9)
 ### Link for [Application Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/10)
+## 3. Project
+### 3.1 Driver Project
+1. HT01SV Sensor Driver Example Project -> [SnSDK_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/SnSDK_Example_Driver-HT01SV)
 
-[프레임워크, 디바이스, 어플리케이션 개발자를 위한 개발 방법](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/8) << 클릭
+### 3.2 Application Project
+1. Application Example Project -> [SnSDK_Exam_Application](http://sn.kangwon.ac.kr/marsberry/SnSDK_Exam_Application)
 
 ## Latest Edit
-> 02/22/2015
+> 02/26/2015
