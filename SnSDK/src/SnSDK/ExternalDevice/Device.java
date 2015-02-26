@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ExternalDevice;
+package SnSDK.ExternalDevice;
 
 /**
  *
@@ -32,6 +32,10 @@ public class Device {
 
     private void initPort(int[] _port) {
         port = _port;
+    }
+    
+    public void initDevice(){
+        LoadLibrary();
     }
     
     /**
@@ -61,4 +65,5 @@ public class Device {
         else
             return false;
     }
+    
 }
