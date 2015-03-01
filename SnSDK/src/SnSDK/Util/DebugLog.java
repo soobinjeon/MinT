@@ -14,13 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK.ExternalDevice;
+package SnSDK.Util;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface DeviceImpl {
-    public void initDevice();
+public class DebugLog {
+    private final String Logname;
+    public DebugLog(){
+        Logname = "NONAME";
+    }
+    /**
+     * DebugLoger name
+     * @param name DebugLog name
+     */
+    public DebugLog(String name){
+        Logname = name;
+    }
+    /**
+     * 콘솔에 메시지 출력
+     * @param str 출력할 메시지
+     */
+    public void printMessage(String str){
+        System.out.println(Logname+": "+str);
+    }
 }
