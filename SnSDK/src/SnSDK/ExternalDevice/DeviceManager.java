@@ -106,6 +106,7 @@ public class DeviceManager {
         int DeviceID;
         DeviceID = makeID();
         devicemap.put(DeviceID, _device);
+        System.out.println(getClass().getName());
         log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
     }
 

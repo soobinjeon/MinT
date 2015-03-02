@@ -55,7 +55,7 @@ LapThings프로젝트의 핵심 요소 중 하나이다. IoT 환경에서 운영
 1. HT01SV Sensor Driver Example Project -> [SnSDK_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/SnSDK_Example_Driver-HT01SV)
 
 ### 3.2 Application Project
-1. Application Example Project -> [SnSDK_Exam_Application](http://sn.kangwon.ac.kr/marsberry/SnSDK_Exam_Application)
+1. Application Example Project -> [SnSDK_Exam_Application](http://marsberry@sn.kangwon.ac.kr/LabThings/SnSDK_Exam_Application)
 
 ## Latest Edit
 > 02/26/2015

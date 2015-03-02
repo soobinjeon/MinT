@@ -21,7 +21,7 @@ package SnSDK.ExternalDevice;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Device implements DeviceImpl{
+public class Device implements DeviceImpl,DeviceCallbackImpl{
     private int[] port;
     private String Library_Name = null;
     
@@ -63,6 +63,16 @@ public class Device implements DeviceImpl{
             return true;
         else
             return false;
+    }
+
+    @Override
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setcallback(DeviceCallbackMsg msg){
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     
