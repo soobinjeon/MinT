@@ -16,16 +16,19 @@
  */
 package SnSDK.ExternalDevice;
 
+import SnSDK.Scheduler;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Device implements DeviceImpl,DeviceCallbackImpl{
+public class Device extends Scheduler implements DeviceImpl{
     private int[] port;
     private String Library_Name = null;
     
     public Device(String _LibName, int[] port){
+        super();
         Library_Name = _LibName;
         initPort(port);
     }
@@ -64,16 +67,4 @@ public class Device implements DeviceImpl,DeviceCallbackImpl{
         else
             return false;
     }
-
-    @Override
-    public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void setcallback(DeviceCallbackMsg msg){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
 }

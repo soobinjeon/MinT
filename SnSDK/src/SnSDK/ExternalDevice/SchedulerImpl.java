@@ -21,6 +21,7 @@ package SnSDK.ExternalDevice;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface DeviceCallbackMsg {
-    public void DeviceCallbackMsg();
+public interface SchedulerImpl {
+    public void SchedulerRunning();
+    public void setcallback(SchedulerCallbackMsg msg);
 }
