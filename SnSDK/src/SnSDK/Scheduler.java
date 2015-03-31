@@ -16,25 +16,56 @@
  */
 package SnSDK;
 
-import SnSDK.ExternalDevice.SchedulerCallbackMsg;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Scheduler {
-    boolean isUsing = false;
-    boolean isBackgroundRun = false;
-    int scheduleID = -1;
-    public Scheduler(){
-        
+
+    private static final int MAX_THREAD = 5;
+    private AppRequest[] requestQueue;
+    private int tail;
+    private int head;
+    private int count;
+    private ScheduleWorkerThread[] threadPool;
+
+    public Scheduler() {
+        this.requestQueue = new AppRequest[MAX_THREAD];
+        this.head = 0;
+        this.tail = 0;
+        this.count = 0;
+
+        threadPool = new ScheduleWorkerThread[MAX_THREAD];
+        for (int i = 0; i < threadPool.length; i++) {
+            threadPool[i] = new ScheduleWorkerThread("Worker-" + i, this);
+        }
     }
-    public void SchedulerRunning(){
-        
+
+    public void SchedulerRunning() {
+        for (ScheduleWorkerThread threadPool1 : threadPool) {
+            threadPool1.start();
+        }
     }
-    
-    public void setcallback(SchedulerCallbackMsg _msg){
-        
+
+    public synchronized void putRequest(AppRequest request) {
+        requestQueue[tail] = request;
+        tail = (tail + 1) % requestQueue.length;
+        count++;
+        notifyAll();
+    }
+
+    public synchronized AppRequest takeRequest() {
+        while (count <= 0) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+        AppRequest request = requestQueue[head];
+        head = (head + 1) % requestQueue.length;
+        count--;
+        notifyAll();
+        return request;
     }
 }

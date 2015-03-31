@@ -16,15 +16,29 @@
  */
 package SnSDK;
 
+import SnSDK.ExternalDevice.Device;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-interface SnSFrameImpl {
+public class AppRequest implements AppRequestImpl {
 
-    void prevRun();
+    protected final Device device;
+    protected final int number;
 
-    void nextRun();
+    public AppRequest(Device device, int number) {
+        this.device = device;
+        this.number = number;
+    }
 
+    @Override
+    public void execute() {
+        System.out.println(Thread.currentThread().getName() + " executes " + this);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+    }
 }

@@ -14,13 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK.ExternalDevice;
+package SnSDK;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface SchedulerCallbackMsg {
-    public void SchedulerCallbackMsg();
+public class ScheduleWorkerThread extends Thread {
+
+    private final Scheduler scheduler;
+
+    public ScheduleWorkerThread(String name, Scheduler scheduler) {
+        super(name);
+        this.scheduler = scheduler;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            AppRequest request = scheduler.takeRequest();
+            request.execute();
+        }
+    }
 }

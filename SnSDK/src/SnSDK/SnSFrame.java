@@ -17,45 +17,37 @@
 package SnSDK;
 
 import SnSDK.ExternalDevice.*;
-import java.util.ArrayList;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class SnSFrame {
+
     protected DeviceManager devicemanager;
-    private ArrayList<SchedulerImpl> schedules = new ArrayList<SchedulerImpl>();
- 
-    public SnSFrame(){
+    protected Scheduler scheduler;
+
+    public SnSFrame() {
         devicemanager = new DeviceManager();
+        scheduler = new Scheduler();
     }
-    
-    
-    public void run(){
+
+    public void run() {
         prevRun();
-        
-        while(true){
-            SchedRun();
-            break;//temporary
-        }
-        
+        SchedRun();
         nextRun();
     }
 
     protected void prevRun() {
-        
+
     }
 
     protected void nextRun() {
-      
+
     }
 
     protected void SchedRun() {
-        
-    }
-
-    public void addSchedule(SchedulerImpl _sched) {
-        
+        scheduler.SchedulerRunning();
     }
 }

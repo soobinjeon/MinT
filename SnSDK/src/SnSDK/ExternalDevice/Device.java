@@ -23,7 +23,7 @@ import SnSDK.Scheduler;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Device extends Scheduler implements DeviceImpl{
+public class Device{
     private int[] port;
     private String Library_Name = null;
     
@@ -36,7 +36,7 @@ public class Device extends Scheduler implements DeviceImpl{
     private void initPort(int[] _port) {
         port = _port;
     }
-    @Override
+    
     /**
      * 센서 초기화
      */
@@ -67,4 +67,5 @@ public class Device extends Scheduler implements DeviceImpl{
         else
             return false;
     }
+
 }

@@ -22,22 +22,28 @@ package SnSDK.Util;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class DebugLog {
+
     private final String Logname;
-    public DebugLog(){
+
+    public DebugLog() {
         Logname = "NONAME";
     }
+
     /**
      * DebugLoger name
+     *
      * @param name DebugLog name
      */
-    public DebugLog(String name){
+    public DebugLog(String name) {
         Logname = name;
     }
+
     /**
      * 콘솔에 메시지 출력
+     *
      * @param str 출력할 메시지
      */
-    public void printMessage(String str){
-        System.out.println(Logname+": "+str);
+    public void printMessage(String str) {
+        System.out.println(Logname + ": " + str);
     }
 }

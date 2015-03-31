@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK.ExternalDevice;
+package SnSDK;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface SchedulerImpl {
-    public void SchedulerRunning();
-    public void setcallback(SchedulerCallbackMsg msg);
+public interface AppRequestImpl {
+
+    public void execute();
 }
