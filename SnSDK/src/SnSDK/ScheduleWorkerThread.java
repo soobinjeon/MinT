@@ -24,17 +24,37 @@ package SnSDK;
 public class ScheduleWorkerThread extends Thread {
 
     private final Scheduler scheduler;
+    private Request request;
+    private int requestId;
 
     public ScheduleWorkerThread(String name, Scheduler scheduler) {
         super(name);
+        this.request = null;
         this.scheduler = scheduler;
+        this.requestId = 0;
+    }
+
+    public synchronized int getRequestId() {
+        return requestId;
+    }
+
+    public synchronized void stopRequest() {
+        this.request = null;
+        this.requestId = 0;
     }
 
     @Override
     public void run() {
         while (true) {
-            AppRequest request = scheduler.takeRequest();
+            this.requestId = 0;
+            this.request = scheduler.takeRequest();
+            this.requestId = request.getID();
             request.execute();
+            /**
+             * *
+             * execute(){ while(true){ //To do something } }
+             */
+
         }
     }
 }

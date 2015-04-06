@@ -23,11 +23,12 @@ import SnSDK.Scheduler;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Device{
+public class Device {
+
     private int[] port;
     private String Library_Name = null;
-    
-    public Device(String _LibName, int[] port){
+
+    public Device(String _LibName, int[] port) {
         super();
         Library_Name = _LibName;
         initPort(port);
@@ -36,36 +37,39 @@ public class Device{
     private void initPort(int[] _port) {
         port = _port;
     }
-    
+
     /**
      * 센서 초기화
      */
-    public void initDevice(){
+    public void initDevice() {
         LoadLibrary();
     }
+
     /**
      * Load Library
+     *
      * @return true, Library Load Success
      */
-    protected boolean LoadLibrary(){
-        try{
+    protected boolean LoadLibrary() {
+        try {
             System.loadLibrary(Library_Name);
             return true;
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
         }
     }
-    
-    protected String getLibraryName(){
+
+    protected String getLibraryName() {
         return this.Library_Name;
     }
-    
-    protected boolean hasPort(){
-        if(port != null && port.length > 0)
+
+    protected boolean hasPort() {
+        if (port != null && port.length > 0) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
 }

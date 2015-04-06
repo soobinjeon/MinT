@@ -43,24 +43,26 @@ public class DeviceManager {
      * Device state Control -Manage the device state -Add -Remove -HasDevice
      * -isDevice -getDeviceID - ~
      */
-    
     /**
      * devicemap : 디바이스 리스트를 저장할 해시맵
      */
     private final HashMap<Integer, Device> devicemap;
     private DebugLog log;
-    
+
     public DeviceManager() {
         devicemap = new HashMap<>();
     }
-    public void loggerOn(){
+
+    public void loggerOn() {
         log = new DebugLog("DeviceManager");
     }
-    private void log(String str){
-        if(log != null){
+
+    private void log(String str) {
+        if (log != null) {
             log.printMessage(str);
         }
     }
+
     /**
      * 디바이스의 아이디 리스트를 반환
      *
@@ -183,13 +185,14 @@ public class DeviceManager {
         devicemap.clear();
         log("clearDeviceList: 디바이스리스트 초기화");
     }
-    
+
     /**
      * 디바이스 리스트에 Key에 해당하는 디바이스가 있는지 검사
+     *
      * @param key
-     * @return 
+     * @return
      */
-    public boolean hasDevice(int key){
+    public boolean hasDevice(int key) {
         return devicemap.containsKey(key);
     }
 }

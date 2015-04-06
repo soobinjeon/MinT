@@ -21,7 +21,7 @@ package SnSDK;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface AppRequestImpl {
+public interface RequestImpl {
 
     public void execute();
 }

@@ -25,12 +25,69 @@ import SnSDK.ExternalDevice.*;
  */
 public class SnSFrame {
 
-    protected DeviceManager devicemanager;
-    protected Scheduler scheduler;
+    private DeviceManager devicemanager;
+    private Scheduler scheduler;
+    static final int DEFAULT_THREAD_NUM = 5;
+    static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
 
+    /**
+     * 프레임 생성 Default number of WorkerThread and Requestqueuelength : 5
+     */
     public SnSFrame() {
         devicemanager = new DeviceManager();
-        scheduler = new Scheduler();
+        scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+    }
+
+    /**
+     * 프레임 생성
+     *
+     * @param requestQueueLength Request 큐의 최대 길이
+     * @param numOfThread WorkerThread의 수
+     */
+    public SnSFrame(int requestQueueLength, int numOfThread) {
+        devicemanager = new DeviceManager();
+        scheduler = new Scheduler(requestQueueLength, numOfThread);
+    }
+
+    public void addDevice(Device device) {
+        devicemanager.addDevice(device);
+    }
+
+    public Device getDevice(int DeviceID) {
+        return devicemanager.getDevice(DeviceID);
+    }
+
+    public void removeDevice(int deviceID) {
+        devicemanager.removeDevice(deviceID);
+    }
+
+    public int[] getDeviceIDList() {
+        return devicemanager.getDeviceList();
+    }
+
+    public boolean hasDevice(int key) {
+        return devicemanager.hasDevice(key);
+    }
+
+    public void initAllDevice() {
+        devicemanager.initAllDevice();
+
+    }
+
+    public void clearDeviceList() {
+        devicemanager.clearDeviceList();
+    }
+
+    public void stopRequest(int requestid) {
+        scheduler.stopRequest(requestid);
+    }
+
+    public void putRequest(Request request) {
+        scheduler.putRequest(request);
+    }
+
+    public void showWorkingThreads() {
+        scheduler.showWorkingThreads();
     }
 
     public void run() {

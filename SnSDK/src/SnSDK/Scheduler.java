@@ -16,6 +16,9 @@
  */
 package SnSDK;
 
+import SnSDK.Util.DebugLog;
+import java.util.HashMap;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -23,22 +26,22 @@ package SnSDK;
  */
 public class Scheduler {
 
-    private static final int MAX_THREAD = 5;
-    private AppRequest[] requestQueue;
+    private Request[] requestQueue;
     private int tail;
     private int head;
     private int count;
     private ScheduleWorkerThread[] threadPool;
+    private DebugLog log = new DebugLog("Scheduler");
 
-    public Scheduler() {
-        this.requestQueue = new AppRequest[MAX_THREAD];
+    public Scheduler(int requestQueueLength, int numOfThread) {
+        this.requestQueue = new Request[requestQueueLength];
         this.head = 0;
         this.tail = 0;
         this.count = 0;
 
-        threadPool = new ScheduleWorkerThread[MAX_THREAD];
+        threadPool = new ScheduleWorkerThread[numOfThread];
         for (int i = 0; i < threadPool.length; i++) {
-            threadPool[i] = new ScheduleWorkerThread("Worker-" + i, this);
+            threadPool[i] = new ScheduleWorkerThread("ScheduleWorker-" + i, this);
         }
     }
 
@@ -48,21 +51,45 @@ public class Scheduler {
         }
     }
 
-    public synchronized void putRequest(AppRequest request) {
+    public void stopRequest(int requestId) {
+        for (ScheduleWorkerThread threadPool1 : threadPool) {
+            if (threadPool1.getRequestId() == requestId) {
+                threadPool1.interrupt();
+                //System.out.println(threadPool1.getName() + " FIND!");
+            }
+        }
+    }
+
+    public synchronized void showWorkingThreads() {
+        for (ScheduleWorkerThread threadPool1 : threadPool) {
+            log.printMessage(threadPool1.getName() + " " + threadPool1.getRequestId());
+        }
+    }
+
+    public synchronized void putRequest(Request request) {
+        while (count >= requestQueue.length) {
+            try {
+                wait();
+                break;
+            } catch (InterruptedException e) {
+            }
+        }
         requestQueue[tail] = request;
+
         tail = (tail + 1) % requestQueue.length;
         count++;
         notifyAll();
     }
 
-    public synchronized AppRequest takeRequest() {
+    public synchronized Request takeRequest() {
         while (count <= 0) {
             try {
                 wait();
             } catch (InterruptedException e) {
             }
         }
-        AppRequest request = requestQueue[head];
+
+        Request request = requestQueue[head];
         head = (head + 1) % requestQueue.length;
         count--;
         notifyAll();

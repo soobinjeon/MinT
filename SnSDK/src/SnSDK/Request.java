@@ -17,20 +17,44 @@
 package SnSDK;
 
 import SnSDK.ExternalDevice.Device;
+import SnSDK.Util.DebugLog;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class AppRequest implements AppRequestImpl {
+public class Request implements RequestImpl {
 
     protected final Device device;
-    protected final int number;
+    private final int id;
+    private final int prior;
 
-    public AppRequest(Device device, int number) {
+    public Request() {
+        device = null;
+        id = 0;
+        prior = 0;
+
+    }
+
+    public Request(Device device, int id) {
         this.device = device;
-        this.number = number;
+        this.id = id;
+        this.prior = 0;
+    }
+
+    public Request(Device device, int id, int prior) {
+        this.device = device;
+        this.id = id;
+        this.prior = prior;
+    }
+
+    public int getPrior() {
+        return this.prior;
+    }
+
+    public int getID() {
+        return this.id;
     }
 
     @Override

@@ -22,5 +22,6 @@ package SnSDK.ExternalDevice;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public interface DeviceImpl {
+
     public void initDevice();
 }
