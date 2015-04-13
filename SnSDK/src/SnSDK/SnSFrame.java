@@ -39,10 +39,9 @@ public class SnSFrame {
     }
 
     /**
-     * 프레임 생성
-     *
-     * @param requestQueueLength Request 큐의 최대 길이
-     * @param numOfThread WorkerThread의 수
+     * 
+     * @param requestQueueLength Maximym request queue length
+     * @param numOfThread number of workerthread in framework
      */
     public SnSFrame(int requestQueueLength, int numOfThread) {
         devicemanager = new DeviceManager();
@@ -78,8 +77,8 @@ public class SnSFrame {
         devicemanager.clearDeviceList();
     }
 
-    public void stopRequest(int requestid) {
-        scheduler.stopRequest(requestid);
+    public void stopRequest(Request request) {
+        scheduler.stopRequest(request);
     }
 
     public void putRequest(Request request) {

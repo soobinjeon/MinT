@@ -17,7 +17,6 @@
 package SnSDK;
 
 import SnSDK.Util.DebugLog;
-import java.util.HashMap;
 
 /**
  *
@@ -45,28 +44,100 @@ public class Scheduler {
         }
     }
 
+    /**
+     * *
+     * Run all thread in threadpool.
+     */
     public void SchedulerRunning() {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
             threadPool1.start();
         }
     }
 
-    public void stopRequest(int requestId) {
+    /**
+     * *
+     * Stop request.
+     *
+     * @param request Request to stop.
+     */
+    public void stopRequest(Request request) {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
-            if (threadPool1.getRequestId() == requestId) {
+            if (threadPool1.getRequestId() == request.getID()) {
                 threadPool1.interrupt();
-                //System.out.println(threadPool1.getName() + " FIND!");
             }
         }
     }
 
+    /**
+     * *
+     * Print all Request ID in thread pool
+     */
     public synchronized void showWorkingThreads() {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
             log.printMessage(threadPool1.getName() + " " + threadPool1.getRequestId());
         }
     }
 
+    /***
+     * Generate unique request ID
+     * @return unique request ID
+     */
+    private synchronized int makeID() {
+        int rid[] = new int[threadPool.length];
+        int newid = 0;
+        boolean idflag = true;
+
+        /**
+         * *
+         * check ThreadPool
+         */
+        for (int i = 0; i < threadPool.length; i++) {
+            rid[i] = threadPool[i].getRequestId();
+            //    System.out.println(rid[i] + "     " + i);
+        }
+        while (idflag) {
+            idflag = false;
+            for (int i = 0; i < rid.length; i++) {
+                if (rid[i] == newid && idflag == false) {
+                    newid++;
+                    idflag = true;
+                }
+            }
+        }
+
+        /**
+         * *
+         * check requestQueue
+         */
+        int rid2[] = new int[requestQueue.length];
+
+        for (int i = 0; i < requestQueue.length; i++) {
+            if (requestQueue[i] != null) {
+                rid2[i] = requestQueue[i].getID();
+            } else {
+                rid2[i] = 0;
+            }
+        }
+        idflag = true;
+        while (idflag) {
+            idflag = false;
+            for (int i = 0; i < rid.length; i++) {
+                if (rid2[i] == newid && idflag == false) {
+                    newid++;
+                    idflag = true;
+                }
+            }
+        }
+        System.out.println("newid : " + newid);
+        return newid;
+    }
+
+    /***
+     * Insert request into requestQueue
+     * @param request request to be inserted in the queue
+     */
     public synchronized void putRequest(Request request) {
+
         while (count >= requestQueue.length) {
             try {
                 wait();
@@ -74,13 +145,24 @@ public class Scheduler {
             } catch (InterruptedException e) {
             }
         }
+
+        request.setID(makeID());
+
         requestQueue[tail] = request;
 
         tail = (tail + 1) % requestQueue.length;
         count++;
         notifyAll();
+
     }
 
+    /***
+     * !!!For workerthread use only!!!
+     * !!!Do not use at Application!!!
+     * 
+     * take request in request queue
+     * @return request 
+     */
     public synchronized Request takeRequest() {
         while (count <= 0) {
             try {
@@ -88,7 +170,6 @@ public class Scheduler {
             } catch (InterruptedException e) {
             }
         }
-
         Request request = requestQueue[head];
         head = (head + 1) % requestQueue.length;
         count--;

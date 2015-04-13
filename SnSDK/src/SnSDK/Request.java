@@ -26,29 +26,19 @@ import SnSDK.Util.DebugLog;
  */
 public class Request implements RequestImpl {
 
-    protected final Device device;
-    private final int id;
-    private final int prior;
+    private int id;
+    private int prior;
 
     public Request() {
-        device = null;
         id = 0;
         prior = 0;
-
     }
-
-    public Request(Device device, int id) {
-        this.device = device;
+    public void setPrior(int pri){
+        this.prior = pri;
+    }
+    public void setID(int id){
         this.id = id;
-        this.prior = 0;
     }
-
-    public Request(Device device, int id, int prior) {
-        this.device = device;
-        this.id = id;
-        this.prior = prior;
-    }
-
     public int getPrior() {
         return this.prior;
     }
@@ -56,7 +46,7 @@ public class Request implements RequestImpl {
     public int getID() {
         return this.id;
     }
-
+    
     @Override
     public void execute() {
         System.out.println(Thread.currentThread().getName() + " executes " + this);

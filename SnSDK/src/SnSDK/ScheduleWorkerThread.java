@@ -26,7 +26,7 @@ public class ScheduleWorkerThread extends Thread {
     private final Scheduler scheduler;
     private Request request;
     private int requestId;
-
+    
     public ScheduleWorkerThread(String name, Scheduler scheduler) {
         super(name);
         this.request = null;
@@ -37,7 +37,9 @@ public class ScheduleWorkerThread extends Thread {
     public synchronized int getRequestId() {
         return requestId;
     }
-
+    /**
+     * Stop request in this thread
+     */
     public synchronized void stopRequest() {
         this.request = null;
         this.requestId = 0;
@@ -50,11 +52,6 @@ public class ScheduleWorkerThread extends Thread {
             this.request = scheduler.takeRequest();
             this.requestId = request.getID();
             request.execute();
-            /**
-             * *
-             * execute(){ while(true){ //To do something } }
-             */
-
         }
     }
 }
