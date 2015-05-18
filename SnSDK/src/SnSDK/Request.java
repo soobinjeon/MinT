@@ -14,13 +14,45 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK.ExternalDevice;
+package SnSDK;
+
+import SnSDK.ExternalDevice.Device;
+import SnSDK.Util.DebugLog;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface SchedulerCallbackMsg {
-    public void SchedulerCallbackMsg();
+public class Request implements RequestImpl {
+
+    private int id;
+    private int prior;
+
+    public Request() {
+        id = 0;
+        prior = 0;
+    }
+    public void setPrior(int pri){
+        this.prior = pri;
+    }
+    public void setID(int id){
+        this.id = id;
+    }
+    public int getPrior() {
+        return this.prior;
+    }
+
+    public int getID() {
+        return this.id;
+    }
+    
+    @Override
+    public void execute() {
+        System.out.println(Thread.currentThread().getName() + " executes " + this);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+    }
 }

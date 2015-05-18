@@ -21,10 +21,7 @@ package SnSDK;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-interface SnSFrameImpl {
+public interface RequestImpl {
 
-    void prevRun();
-
-    void nextRun();
-
+    public void execute();
 }
