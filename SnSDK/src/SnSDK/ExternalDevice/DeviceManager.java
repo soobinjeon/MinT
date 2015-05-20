@@ -47,10 +47,12 @@ public class DeviceManager {
      * devicemap : 디바이스 리스트를 저장할 해시맵
      */
     private final HashMap<Integer, Device> devicemap;
+    private final HashMap<String, Integer> namemap;
     private DebugLog log;
 
     public DeviceManager() {
         devicemap = new HashMap<>();
+        namemap = new HashMap<>();
     }
 
     public void loggerOn() {
@@ -82,7 +84,7 @@ public class DeviceManager {
     }
 
     /**
-     * ID에 해당하는 디바이스 반환
+     * Refurn device for ID
      *
      * @param _deviceid
      * @return ID에 해당하는 디바이스 객체
@@ -98,6 +100,14 @@ public class DeviceManager {
         }
         return d;
     }
+    /**
+     * Return All devices in device manager
+     * @return Device array
+     */
+    public Device[] getAllDevices(){
+        Device[] dlist = new Device[devicemap.size()];
+        return dlist;
+    }
 
     /**
      * 디바이스를 리스트에 추가
@@ -111,7 +121,7 @@ public class DeviceManager {
         System.out.println(getClass().getName());
         log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
     }
-
+    
     /**
      * 디바이스맵에서 디바이스 제거
      *
@@ -187,12 +197,12 @@ public class DeviceManager {
     }
 
     /**
-     * 디바이스 리스트에 Key에 해당하는 디바이스가 있는지 검사
+     * 디바이스 리스트에 deviceID에 해당하는 디바이스가 있는지 검사
      *
      * @param key
      * @return
      */
-    public boolean hasDevice(int key) {
-        return devicemap.containsKey(key);
+    public boolean hasDevice(int deviceID) {
+        return devicemap.containsKey(deviceID);
     }
 }

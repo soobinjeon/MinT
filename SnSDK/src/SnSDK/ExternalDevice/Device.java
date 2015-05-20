@@ -23,11 +23,13 @@ import java.util.ArrayList;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Device {
+public abstract class Device {
 
     protected ArrayList<PortPinSet> ppSet = new ArrayList<>();
     private String Library_Name = null;
-
+    
+    abstract protected void setPortPin();
+    
     public Device(String _LibName) {
         super();
         Library_Name = _LibName;
@@ -39,8 +41,9 @@ public class Device {
      */
     public void initDevice() {
         LoadLibrary();
+        setPortPin();
     }
-
+    
     /**
      * Load Library
      *

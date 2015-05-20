@@ -31,7 +31,8 @@ public class SnSFrame {
     static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
 
     /**
-     * 프레임 생성 Default number of WorkerThread and Requestqueuelength : 5
+     * Framework Constructor
+     * Default number of WorkerThread and Requestqueuelength : 5
      */
     public SnSFrame() {
         devicemanager = new DeviceManager();
@@ -47,52 +48,96 @@ public class SnSFrame {
         devicemanager = new DeviceManager();
         scheduler = new Scheduler(requestQueueLength, numOfThread);
     }
-
+    /**
+     * Add device to device manager
+     * @param device device that want to add
+     */
     public void addDevice(Device device) {
         devicemanager.addDevice(device);
     }
-
+    
+    /**
+     * Return device for the ID.
+     * @param DeviceID 
+     * @return device for ID
+     */
     public Device getDevice(int DeviceID) {
         return devicemanager.getDevice(DeviceID);
     }
 
+    /**
+     * Remove device for the ID.
+     * @param deviceID 
+     */
     public void removeDevice(int deviceID) {
         devicemanager.removeDevice(deviceID);
     }
 
+    /**
+     * Get Array of device IDs
+     * @return Array of device IDs
+     */
     public int[] getDeviceIDList() {
         return devicemanager.getDeviceList();
     }
-
-    public boolean hasDevice(int key) {
-        return devicemanager.hasDevice(key);
+    /**
+     * Return all devices in device manager
+     * @return array of device
+     */
+    public Device[] getAllDevices(){
+        return devicemanager.getAllDevices();
     }
-
+    /**
+     * Check whether device manager has device for ID.
+     * @param deviceID Device ID to check
+     * @return 
+     */
+    public boolean hasDevice(int deviceID) {
+        return devicemanager.hasDevice(deviceID);
+    }
+    /**
+     * Initializing all of the devices in the device manager
+     */
     public void initAllDevice() {
         devicemanager.initAllDevice();
 
     }
-
+    /**
+     * Remove all of the devices in the device manager
+     */
     public void clearDeviceList() {
         devicemanager.clearDeviceList();
     }
-
+    /**
+     * Remove request in Scheduler
+     * @param request Request object to remove from scheduler
+     */
     public void stopRequest(Request request) {
         scheduler.stopRequest(request);
     }
-
+    /**
+     * Add request in Scheduler
+     * @param request Request object to add to scheduler
+     */
     public void putRequest(Request request) {
         scheduler.putRequest(request);
     }
 
+    /**
+     * Print request name and id in thread in scheduler
+     */
     public void showWorkingThreads() {
         scheduler.showWorkingThreads();
     }
-
+    /**
+     * Start framework
+     */
     public void Start() {
         SchedRun();
     }
-
+    /**
+     * Start scheduler
+     */
     protected void SchedRun() {
         scheduler.SchedulerRunning();
     }

@@ -15,30 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package SnSDK;
-
-import SnSDK.ExternalDevice.Device;
-import SnSDK.Util.DebugLog;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Request implements RequestImpl{
+public abstract class Request {
 
     private int id;
     private int prior;
-
+    /**
+     * Request Constructor
+     * Deafult id=0, prior = 0;
+     */
     public Request() {
         id = 0;
         prior = 0;
     }
+    /**
+     * set Request Prior
+     * NOT USED UNTIL NOW
+     * @param pri 
+     */
     public void setPrior(int pri){
         this.prior = pri;
     }
     public void setID(int id){
         this.id = id;
     }
+    
     public int getPrior() {
         return this.prior;
     }
@@ -46,9 +51,9 @@ public class Request implements RequestImpl{
     public int getID() {
         return this.id;
     }
-
-    @Override
-    public void execute() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    /**
+     * Scheduler execute this method
+     * App develper must 
+     */
+    abstract public void execute();
 }
