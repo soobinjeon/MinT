@@ -89,18 +89,8 @@ public class SnSFrame {
         scheduler.showWorkingThreads();
     }
 
-    public void run() {
-        prevRun();
+    public void Start() {
         SchedRun();
-        nextRun();
-    }
-
-    protected void prevRun() {
-
-    }
-
-    protected void nextRun() {
-
     }
 
     protected void SchedRun() {

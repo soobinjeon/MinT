@@ -24,7 +24,7 @@ import SnSDK.Util.DebugLog;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Request implements RequestImpl {
+public class Request implements RequestImpl{
 
     private int id;
     private int prior;
@@ -46,13 +46,9 @@ public class Request implements RequestImpl {
     public int getID() {
         return this.id;
     }
-    
+
     @Override
     public void execute() {
-        System.out.println(Thread.currentThread().getName() + " executes " + this);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
