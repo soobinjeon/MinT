@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK.ExternalDevice;
+package MinTFramework.ExternalDevice;
 
-import SnSDK.Util.DebugLog;
+import MinTFramework.Util.DebugLog;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,7 +44,8 @@ public class DeviceManager {
      * -isDevice -getDeviceID - ~
      */
     /**
-     * devicemap : 디바이스 리스트를 저장할 해시맵
+     * devicemap : HashMap stored devices
+     * namemap : HashMap stored device names
      */
     private final HashMap<Integer, Device> devicemap;
     private final HashMap<String, Integer> namemap;
@@ -66,8 +67,7 @@ public class DeviceManager {
     }
 
     /**
-     * 디바이스의 아이디 리스트를 반환
-     *
+     * return device ID list
      * @return Device ID List
      */
     public int[] getDeviceList() {
@@ -87,7 +87,7 @@ public class DeviceManager {
      * Refurn device for ID
      *
      * @param _deviceid
-     * @return ID에 해당하는 디바이스 객체
+     * @return device object for ID
      */
     public Device getDevice(int _deviceid) {
         Device d;
@@ -101,7 +101,21 @@ public class DeviceManager {
         return d;
     }
     /**
-     * Return All devices in device manager
+     * Return device for name
+     * @param name name for device
+     * @return Device object for name
+     */
+    public Device getDevice(String name){
+        Device d;
+        if(namemap.containsKey(name)){
+            d = devicemap.get(namemap.get(name));
+        } else {
+            d = null;
+        }
+        return d;
+    }
+    /**
+     * Return All devices in devicemap
      * @return Device array
      */
     public Device[] getAllDevices(){
@@ -110,8 +124,7 @@ public class DeviceManager {
     }
 
     /**
-     * 디바이스를 리스트에 추가
-     *
+     * Add device to devicemap with unique ID
      * @param _device 추가할 디바이스 객체
      */
     public void addDevice(Device _device) {
@@ -121,10 +134,22 @@ public class DeviceManager {
         System.out.println(getClass().getName());
         log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
     }
-    
     /**
-     * 디바이스맵에서 디바이스 제거
-     *
+     * Add device to devicemap with unique ID
+     * and add device to namemap with name
+     * @param _device device that want to add
+     * @param name name that want to name
+     */
+    public void addDevice(Device _device, String name){
+        int DeviceID;
+        DeviceID = makeID();
+        devicemap.put(DeviceID, _device);
+        namemap.put(name, DeviceID);
+        System.out.println(getClass().getName());
+        log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
+    }
+    /**
+     * Remove device from devicemap for device ID
      * @param _deviceid 제거할 디바이스 아이디
      */
     public void removeDevice(int _deviceid) {
@@ -132,13 +157,14 @@ public class DeviceManager {
         if (devicemap.containsKey(_deviceid)) {
             log("removeDevice : " + _deviceid + ", " + devicemap.get(_deviceid).getLibraryName() + " is deleted");
             devicemap.remove(_deviceid);
+            namemap.remove(_deviceid);
         } else {
             System.out.println("removeDevice : Threre is no device id : " + _deviceid);
         }
     }
 
     /**
-     * 디바이스 리스트를 콘솔에 출력
+     * Print device list on console
      */
     public void showDeviceList() {
         log("showDeviceList : map size is " + devicemap.size());
@@ -159,9 +185,8 @@ public class DeviceManager {
     }
 
     /**
-     * Device의 ID를 생성 후 반환
-     *
-     * @return 디바이스의 ID
+     * Generate unique ID for device
+     * @return device ID
      */
     private int makeID() {
         int i = 1;
@@ -172,7 +197,7 @@ public class DeviceManager {
     }
 
     /**
-     * 디바이스 리스트의 모든 디바이스 init 작업 실행
+     * Initializing all device in devicemap
      */
     public void initAllDevice() {
         if (devicemap.isEmpty()) {

@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package SnSDK;
+package MinTFramework;
 
-import SnSDK.ExternalDevice.*;
+import MinTFramework.ExternalDevice.DeviceManager;
+import MinTFramework.ExternalDevice.Device;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SnSFrame {
+public class MinT {
 
     private DeviceManager devicemanager;
     private Scheduler scheduler;
@@ -34,7 +35,7 @@ public class SnSFrame {
      * Framework Constructor
      * Default number of WorkerThread and Requestqueuelength : 5
      */
-    public SnSFrame() {
+    public MinT() {
         devicemanager = new DeviceManager();
         scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
     }
@@ -44,7 +45,7 @@ public class SnSFrame {
      * @param requestQueueLength Maximym request queue length
      * @param numOfThread number of workerthread in framework
      */
-    public SnSFrame(int requestQueueLength, int numOfThread) {
+    public MinT(int requestQueueLength, int numOfThread) {
         devicemanager = new DeviceManager();
         scheduler = new Scheduler(requestQueueLength, numOfThread);
     }
@@ -55,16 +56,31 @@ public class SnSFrame {
     public void addDevice(Device device) {
         devicemanager.addDevice(device);
     }
+    /**
+     * Add device to device manager
+     * @param device device that wnat to add
+     * @param name name that want to name
+     */
+    public void addDevice(Device device, String name){
+        devicemanager.addDevice(device, name);
+    }
     
     /**
      * Return device for the ID.
      * @param DeviceID 
-     * @return device for ID
+     * @return Device for ID
      */
     public Device getDevice(int DeviceID) {
         return devicemanager.getDevice(DeviceID);
     }
-
+    /**
+     * Return device for name
+     * @param name name for device
+     * @return Device for name
+     */
+    public Device getDevice(String name){
+        return devicemanager.getDevice(name);
+    }
     /**
      * Remove device for the ID.
      * @param deviceID 
@@ -72,6 +88,7 @@ public class SnSFrame {
     public void removeDevice(int deviceID) {
         devicemanager.removeDevice(deviceID);
     }
+
 
     /**
      * Get Array of device IDs
@@ -100,7 +117,6 @@ public class SnSFrame {
      */
     public void initAllDevice() {
         devicemanager.initAllDevice();
-
     }
     /**
      * Remove all of the devices in the device manager
