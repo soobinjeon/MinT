@@ -16,8 +16,8 @@
 # alias rm='rm -i'
 # alias cp='cp -i'
 # alias mv='mv -i'
-export SNSDK_HOME=/SnSDK
-export SNSDK_USR=$SNSDK_HOME/usr
-export JAVA_HOME=$SNSDK_USR/jdk1.7.0_60
+export MINT_HOME=/MinT
+export MINT_USR=$MINT_HOME/usr
+export JAVA_HOME=$MINT_USR/jdk1.7.0_60
 export PATH=$PATH:$JAVA_HOME/bin
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SNSDK_USR/BBBio:$SNSDK_HOME/driver
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$MINT_USR/BBBio:MINT_HOME/driver

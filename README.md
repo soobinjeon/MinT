@@ -21,7 +21,7 @@ LapThings프로젝트의 핵심 요소 중 하나이다. IoT 환경에서 운영
 
 ## Git을 이용하여 Framework 저장소 가져오기
 * Linux
-	> git clone http://요비ID@sn.kangwon.ac.kr/LabThings/SnSDK
+	> git clone http://요비ID@sn.kangwon.ac.kr/LabThings/MinT
 
 * Window
 	> git을 설치한 후 원하는 폴더에 마우스 오른쪽 버튼을 눌러 Clone
@@ -44,18 +44,18 @@ LapThings프로젝트의 핵심 요소 중 하나이다. IoT 환경에서 운영
 	- 프레임워크 개발 및 사용에 필요한 라이브러리
 
 # Getting Start
-## 1. Install the SnSDK to Beagle Bone Black
-### [SnSDK Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/11)
+## 1. Install the MinT to Beagle Bone Black
+### [MinT Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/LabThings/MinT/post/11)
 ## 2. Development Information
-### Link for [Framework Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/8)
-### Link for [Driver Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/9)
-### Link for [Application Developer](http://sn.kangwon.ac.kr/LabThings/SnSDK/post/10)
+### Link for [Framework Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/8)
+### Link for [Driver Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/9)
+### Link for [Application Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/10)
 ## 3. Project
 ### 3.1 Driver Project
-1. HT01SV Sensor Driver Example Project -> [SnSDK_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/SnSDK_Example_Driver-HT01SV)
+1. HT01SV Sensor Driver Example Project -> [MinT_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/MinT_Example_Driver-HT01SV)
 
 ### 3.2 Application Project
-1. Application Example Project -> [SnSDK_Exam_Application](http://marsberry@sn.kangwon.ac.kr/LabThings/SnSDK_Exam_Application)
+1. Application Example Project -> [MinT_Exam_Application](http://marsberry@sn.kangwon.ac.kr/LabThings/MinT_Exam_Application)
 
 ## Latest Edit
 > 02/26/2015

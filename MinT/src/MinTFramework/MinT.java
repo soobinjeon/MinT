@@ -113,12 +113,6 @@ public class MinT {
         return devicemanager.hasDevice(deviceID);
     }
     /**
-     * Initializing all of the devices in the device manager
-     */
-    public void initAllDevice() {
-        devicemanager.initAllDevice();
-    }
-    /**
      * Remove all of the devices in the device manager
      */
     public void clearDeviceList() {
@@ -150,9 +144,12 @@ public class MinT {
      */
     public void Start() {
         SchedRun();
+        devicemanager.initAllDevice();
+        
     }
     /**
      * Start scheduler
+     * Initialize all devices in device manager
      */
     protected void SchedRun() {
         scheduler.SchedulerRunning();
