@@ -55,11 +55,17 @@ public class DeviceManager {
         devicemap = new HashMap<>();
         namemap = new HashMap<>();
     }
-
+    /**
+     * Enable Debug message logger
+     */
     public void loggerOn() {
         log = new DebugLog("DeviceManager");
     }
-
+    /**
+     * if logger is enabled
+     * print log msg
+     * @param str 
+     */
     private void log(String str) {
         if (log != null) {
             log.printMessage(str);
@@ -124,7 +130,8 @@ public class DeviceManager {
     }
 
     /**
-     * Add device to devicemap with unique ID
+     * Add device to devicemap
+     * Generate Unique ID for device
      * @param _device 추가할 디바이스 객체
      */
     public void addDevice(Device _device) {
@@ -135,7 +142,7 @@ public class DeviceManager {
         log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
     }
     /**
-     * Add device to devicemap with unique ID
+     * Add device to devicemap. Generate unique ID for device
      * and add device to namemap with name
      * @param _device device that want to add
      * @param name name that want to name
@@ -145,7 +152,7 @@ public class DeviceManager {
         DeviceID = makeID();
         devicemap.put(DeviceID, _device);
         namemap.put(name, DeviceID);
-        System.out.println(getClass().getName());
+        //System.out.println(getClass().getName());
         log("addDevice : ID : " + DeviceID + ", Library Name : " + _device.getLibraryName() + " ");
     }
     /**
@@ -208,7 +215,7 @@ public class DeviceManager {
         Iterator<Entry<Integer, Device>> it = set.iterator();
         while (it.hasNext()) {
             Map.Entry<Integer, Device> e = (Map.Entry<Integer, Device>) it.next();
-            e.getValue().initDevice();
+            e.getValue().initialize();
         }
         System.out.println("initAllDevice: " + devicemap.size() + " devices Init Complete");
     }

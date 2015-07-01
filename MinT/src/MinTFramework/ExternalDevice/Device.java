@@ -28,7 +28,10 @@ public abstract class Device {
     protected ArrayList<PortPinSet> ppSet = new ArrayList<>();
     private String Library_Name = null;
     
-    abstract protected void setPortPin();
+    /**
+     * Initialize pin number, etc;
+     */
+    abstract protected void initDevice();
     
     public Device(String _LibName) {
         super();
@@ -37,11 +40,10 @@ public abstract class Device {
 
     /**
      * Initiallize Sensor
-     * - It loads library
      */
-    public void initDevice() {
+    public void initialize() {
         LoadLibrary();
-        setPortPin();
+        initDevice();
     }
     
     /**

@@ -45,7 +45,11 @@ public class UDP extends Network {
     int dstPort;
 
     private final DebugLog log = new DebugLog("UDP.java");
-
+    /**
+     * UDP communication structor
+     * @param port port that want to use
+     * @throws SocketException 
+     */
     public UDP(int port) throws SocketException {
         super();
         PORT = port;
@@ -90,13 +94,9 @@ public class UDP extends Network {
     }
 
     @Override
-    public void send(MinTNetworkDataPacket packet) {
-        try {
-            sender.SendMsg(packet, packet.getDst(), packet.getDestPort());
-            
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public void receive(String msg) {
+        
     }
 
+   
 }

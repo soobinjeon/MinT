@@ -12,4 +12,4 @@ tar xzvf $MINTUSR/jdk-7u60-linux-arm-vfp-*.gz -C $TARGET_MINTUSR
 echo "install BBBio"
 cp -rf $MINTUSR/BBBio $TARGET_MINTUSR
 echo "set bashrc"
-cp -rf ./conf/bashrc /root/.bashrc
+cp -rf ./conf/bashrc ~/.bashrc

@@ -23,6 +23,7 @@ package MinTFramework.Network;
  */
 public abstract class Network {
     abstract public void send(String msg);
-    abstract public void send(MinTNetworkDataPacket packet);
+    abstract public void receive(String msg);
+    //abstract public void send(MinTNetworkDataPacket packet);
 }
 
