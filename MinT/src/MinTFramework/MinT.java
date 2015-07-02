@@ -143,10 +143,10 @@ public class MinT {
      * Start framework
      */
     public void Start() {
-        SchedRun();
         devicemanager.initAllDevice();
-        
+        SchedRun();
     }
+    
     /**
      * Start scheduler
      * Initialize all devices in device manager
