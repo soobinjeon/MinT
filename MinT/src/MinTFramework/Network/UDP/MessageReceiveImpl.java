@@ -4,9 +4,7 @@
  * and open the template in the editor.
  */
 package MinTFramework.Network.UDP;
-import java.net.DatagramPacket;
-
 
 public interface MessageReceiveImpl{
-    public void messageReceive(DatagramPacket packet);
+    public void makenewreceiver();
 }

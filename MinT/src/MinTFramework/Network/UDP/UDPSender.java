@@ -15,11 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.UDP;
-import MinTFramework.Network.MinTNetworkDataPacket;
 import java.io.IOException;
 import java.net.*;
 
-public class UDPSender{
+public class UDPSender {
 
     DatagramSocket socket;
     DatagramPacket inPacket;
@@ -39,14 +38,6 @@ public class UDPSender{
         this.address = InetAddress.getByName(dstIP);
         this.dstPort = dstPort;
         outPacket = new DatagramPacket(msg.getBytes(), msg.getBytes().length, address, dstPort);
-        
-        new Thread(new SendMsg(socket, outPacket)).start();
-    }
-    
-    public void SendMsg(MinTNetworkDataPacket packet, String dstIP, int dstPort) throws UnknownHostException{
-        this.address = InetAddress.getByName(dstIP);
-        this.dstPort = dstPort;
-        outPacket = new DatagramPacket(packet.getBytes(), packet.getBytes().length, address, dstPort);
         
         new Thread(new SendMsg(socket, outPacket)).start();
     }

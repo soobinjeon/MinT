@@ -22,7 +22,54 @@ package MinTFramework.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkManager {
-    public NetworkManager(){
-        
+
+    private Network currentNetwork;
+    private String nodename;
+
+    /**
+     * *
+     * Default Network is Null
+     */
+    public NetworkManager() {
+        currentNetwork = null;
     }
+
+    /**
+     * *
+     * Network Set
+     *
+     * @param network
+     */
+    public void setNetwork(Network network) {
+        this.currentNetwork = network;
+    }
+    /**
+     * *
+     *
+     * @param dst
+     * @param msg
+     */
+    public void sendMsg(String dst, String msg) {
+        /**
+         * *
+         * 최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
+         */
+        if (currentNetwork != null) {
+            currentNetwork.send(dst, dst, msg);
+        }
+    }
+
+    public void setNodeName(String name) {
+        this.nodename = name;
+    }
+
+    /**
+     * Return node name
+     *
+     * @return
+     */
+    public String getNodeName() {
+        return nodename;
+    }
+
 }

@@ -23,20 +23,6 @@ import MinTFramework.MinT;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Network {
-    
-    protected Observation observation;
-    protected Handler handler;
-    protected MinT frame;
-    
-    abstract public void send(String dst, String fdst, String msg);
-    
-    public Network(MinT frame, Handler handler){
-        this.handler = handler;
-        this.frame = frame;
-        observation = new Observation(frame, handler);
-        
-        
-    }
+public abstract class Handler {
+    abstract public void callRequest(String src, String msg, MinT frame);
 }
-

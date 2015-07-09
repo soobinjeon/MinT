@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.UDP;
 
+import MinTFramework.Network.Observation;
 import java.io.IOException;
 import java.net.*;
 
@@ -25,16 +26,20 @@ import java.net.*;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDPReceiver implements Runnable {
+
     /**
      * @param args the command line arguments
      */
     DatagramSocket socket;
     DatagramPacket inPacket;
+    Observation ob;
     MessageReceiveImpl msgReceiveImpl;
     byte[] inbuf;
 
-    public UDPReceiver(DatagramSocket socket) throws SocketException {
+    public UDPReceiver(DatagramSocket socket, Observation ob) throws SocketException {
         this.socket = socket;
+        this.ob = ob;
+        //this.observation = ob;
     }
 
     public void setReceive(MessageReceiveImpl msimpl) {
@@ -43,16 +48,16 @@ public class UDPReceiver implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            try {
-                byte[] inbuf = new byte[256];
-                inPacket = new DatagramPacket(inbuf, inbuf.length);
-                socket.receive(inPacket);
-                new Thread(new RecvMsg(inPacket, msgReceiveImpl)).start();
+        try {
+            byte[] inbuf = new byte[256];
+            inPacket = new DatagramPacket(inbuf, inbuf.length);
+            socket.receive(inPacket);
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            msgReceiveImpl.makenewreceiver();
+            ob.callHandler(inPacket.getAddress().toString(), new String(inPacket.getData()));
+            
+        } catch (IOException e) {
         }
+
     }
 }
