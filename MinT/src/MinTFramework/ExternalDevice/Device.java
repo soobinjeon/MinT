@@ -100,6 +100,32 @@ public abstract class Device {
         ppSet.add(uartTx);
         ppSet.add(uartRx);
     }
+    public void regisI2CPortPin(int i2cNumber)
+    {
+        PortPinSet i2c_sclA = null;
+        PortPinSet i2c_sdaA = null;
+        PortPinSet i2c_sclB = null;
+        PortPinSet i2c_sdaB = null;
+        switch(i2cNumber)
+        {
+            case 1:
+                i2c_sclA = new PortPinSet(9, 17);
+                i2c_sdaA = new PortPinSet(9, 18);
+                i2c_sclB = new PortPinSet(9, 24);
+                i2c_sdaB = new PortPinSet(9, 26);
+                break;
+            case 2:
+                i2c_sclA = new PortPinSet(9, 19);
+                i2c_sdaA = new PortPinSet(9, 20);
+                i2c_sclB = new PortPinSet(9, 21);
+                i2c_sdaB = new PortPinSet(9, 22);
+                break;
+        }
+        ppSet.add(i2c_sclA);
+        ppSet.add(i2c_sdaA);
+        ppSet.add(i2c_sclB);
+        ppSet.add(i2c_sdaB);
+    }
     
     public void registADCPortPin(int adcNumber)
     {
