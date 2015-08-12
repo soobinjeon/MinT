@@ -16,7 +16,9 @@
  */
 package MinTFramework.Network.UDP;
 
+import MinTFramework.Network.Network;
 import MinTFramework.Network.Observation;
+import MinTFramework.Network.MinTPacket;
 import java.io.IOException;
 import java.net.*;
 
@@ -32,29 +34,49 @@ public class UDPReceiver implements Runnable {
      */
     DatagramSocket socket;
     DatagramPacket inPacket;
-    Observation ob;
     MessageReceiveImpl msgReceiveImpl;
+    UDP udp;
     byte[] inbuf;
+    byte[] data;
+    byte[] mintPacket;
 
-    public UDPReceiver(DatagramSocket socket, Observation ob) throws SocketException {
+    /***
+     * UDP Receiver Thread Constructor
+     * @param socket
+     * @param udp
+     * @throws SocketException 
+     */
+    public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
         this.socket = socket;
-        this.ob = ob;
+        this.udp = udp;
         //this.observation = ob;
     }
 
+    /***
+     * make new thread msg impl
+     * @param msimpl 
+     */
     public void setReceive(MessageReceiveImpl msimpl) {
         this.msgReceiveImpl = msimpl;
     }
 
+    /***
+     * Waiting until something received
+     * when message received, make new Thread using msgReceivedImpl
+     */
     @Override
     public void run() {
         try {
-            byte[] inbuf = new byte[256];
+            inbuf = new byte[512];
             inPacket = new DatagramPacket(inbuf, inbuf.length);
             socket.receive(inPacket);
-
-            msgReceiveImpl.makenewreceiver();
-            ob.callHandler(inPacket.getAddress().toString(), new String(inPacket.getData()));
+            msgReceiveImpl.makeNewReceiver();
+            
+            String recvPacketString = new String(inPacket.getData(), 0, inPacket.getLength());
+            
+            mintPacket = MinTPacket.makeMinTPacket(inPacket.getAddress().getHostAddress()+":"+inPacket.getPort(), recvPacketString);
+            
+            udp.MatcherSerializerAndObservation(mintPacket);
             
         } catch (IOException e) {
         }

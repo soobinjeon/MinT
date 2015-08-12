@@ -24,5 +24,5 @@ import MinTFramework.MinT;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Handler {
-    abstract public void callRequest(String src, String msg, MinT frame);
+    abstract public void callPacketHandleRequest(String src, String msg, MinT frame);
 }

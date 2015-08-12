@@ -6,5 +6,5 @@
 package MinTFramework.Network.UDP;
 
 public interface MessageReceiveImpl{
-    public void makenewreceiver();
+    public void makeNewReceiver();
 }

@@ -26,16 +26,20 @@ import MinTFramework.MinT;
 public abstract class Network {
     
     protected Observation observation;
-    protected Handler handler;
     protected MinT frame;
     
     abstract public void send(String dst, String fdst, String msg);
     
-    public Network(MinT frame, Handler handler){
-        this.handler = handler;
+    public Network(MinT frame){
         this.frame = frame;
-        observation = new Observation(frame, handler);
-        
+        observation = new Observation(frame);   
+    }
+    public void MatcherSerializerAndObservation(byte[] packet){
+        System.out.println(new String(packet));
+        /**
+         * Todo
+         * 수신한 바이트 배열을 송신측, 메시지로 나누어 Observation 호출하기
+         */
         
     }
 }

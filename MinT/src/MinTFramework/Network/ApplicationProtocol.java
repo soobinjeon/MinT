@@ -16,42 +16,11 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.MinT;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Observation {
-    private final Handler handler;
-    private final MinT frame;
-    
-    
-    public Observation(MinT frame){
-        this.frame = frame;
-        this.handler = frame.getNetworkHandler();
-    }
-    
-    public void receive(String src, String fdst, String msg){
-        if(isFinalDestinyHere(fdst)){
-            handler.callPacketHandleRequest(src, msg, frame);
-        }
-        else {
-            /**
-             * Todo:
-             * 라우팅 테이블에서 다음 목표를 받아와야함
-             */
-            frame.sendMessage(fdst, msg);
-        }
-    }
-    
-    public void callHandler(String src, String msg){
-        handler.callPacketHandleRequest(src, msg, frame);
-    }
-    
-    public boolean isFinalDestinyHere(String dst){
-        return frame.getNodeName().equals(dst);
-    }
+public abstract class ApplicationProtocol {
+    //abstract public byte[] makeApplicationPacket();
 }
-

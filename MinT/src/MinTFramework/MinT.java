@@ -32,6 +32,7 @@ public class MinT {
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
+    private Handler networkHandler;
     static final int DEFAULT_THREAD_NUM = 5;
     static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
 
@@ -43,6 +44,7 @@ public class MinT {
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager();
         scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+        networkHandler = null;
     }
 
     /**
@@ -150,6 +152,12 @@ public class MinT {
      */
     public void setNetwork(Network network){
         networkmanager.setNetwork(network);
+    }
+    public void setNetworkHandler(Handler nhandler){
+        this.networkHandler = nhandler;
+    }
+    public Handler getNetworkHandler(){
+        return this.networkHandler;
     }
     public void setNodeName(String name){
         networkmanager.setNodeName(name);
