@@ -3,20 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/UDP/UDPSender.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/Network.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/nbproject/build-impl.xml</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/UDP/SendMsg.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/NetworkManager.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/UDP/UDPReceiver.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/nbproject/remote-platform-impl.xml</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/nbproject/project.xml</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Util/DebugLog.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/MinTNetworkDataPacket.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/nbproject/project.properties</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Util/OSUtil.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/src/MinTFramework/Network/UDP/UDP.java</file>
-            <file>file:/D:/Project/LabThing/code/MinT/MinT/nbproject/genfiles.properties</file>
+            <file>file:/D:/LabData/LabThings/MinT/MinT/MinT/src/MinTFramework/DeviceType.java</file>
+            <file>file:/D:/LabData/LabThings/MinT/MinT/MinT/src/MinTFramework/DeviceClassification.java</file>
+            <file>file:/D:/LabData/LabThings/MinT/MinT/MinT/src/MinTFramework/MinT.java</file>
         </group>
     </open-files>
 </project-private>
