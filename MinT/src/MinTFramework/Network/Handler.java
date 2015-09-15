@@ -23,24 +23,6 @@ import MinTFramework.MinT;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Network {
-    
-    protected Observation observation;
-    protected MinT frame;
-    
-    abstract public void send(String dst, String fdst, String msg);
-    
-    public Network(MinT frame){
-        this.frame = frame;
-        observation = new Observation(frame);   
-    }
-    public void MatcherSerializerAndObservation(byte[] packet){
-        System.out.println(new String(packet));
-        /**
-         * Todo
-         * 수신한 바이트 배열을 송신측, 메시지로 나누어 Observation 호출하기
-         */
-        
-    }
+public abstract class Handler {
+    abstract public void callPacketHandleRequest(String src, String msg, MinT frame);
 }
-

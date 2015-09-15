@@ -18,6 +18,9 @@ package MinTFramework;
 
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
+import MinTFramework.Network.Handler;
+import MinTFramework.Network.Network;
+import MinTFramework.Network.NetworkManager;
 
 /**
  *
@@ -27,7 +30,9 @@ import MinTFramework.ExternalDevice.Device;
 public class MinT {
 
     private DeviceManager devicemanager;
+    private NetworkManager networkmanager;
     private Scheduler scheduler;
+    private Handler networkHandler;
     static final int DEFAULT_THREAD_NUM = 5;
     static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
     DeviceClassification deviceClassification;
@@ -39,7 +44,9 @@ public class MinT {
      */
     public MinT() {
         devicemanager = new DeviceManager();
+        networkmanager = new NetworkManager();
         scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+        networkHandler = null;
     }
 
     /**
@@ -118,8 +125,7 @@ public class MinT {
     public void removeDevice(int deviceID) {
         devicemanager.removeDevice(deviceID);
     }
-
-
+    
     /**
      * Get Array of device IDs
      * @return Array of device IDs
@@ -169,6 +175,34 @@ public class MinT {
     public void showWorkingThreads() {
         scheduler.showWorkingThreads();
     }
+    
+    /**
+     * Setting Network
+     * @param network 
+     */
+    public void setNetwork(Network network){
+        networkmanager.setNetwork(network);
+    }
+    public void setNetworkHandler(Handler nhandler){
+        this.networkHandler = nhandler;
+    }
+    public Handler getNetworkHandler(){
+        return this.networkHandler;
+    }
+    public void setNodeName(String name){
+        networkmanager.setNodeName(name);
+    }
+    public String getNodeName(){
+        return networkmanager.getNodeName();
+    }
+    /**
+     * Send Message
+     * @param dst
+     * @param msg 
+     */
+    public void sendMessage(String dst, String msg){
+        networkmanager.sendMsg(dst, msg);
+    }
     /**
      * Start framework
      */
@@ -176,7 +210,6 @@ public class MinT {
         devicemanager.initAllDevice();
         SchedRun();
     }
-    
     /**
      * Start scheduler
      * Initialize all devices in device manager
@@ -184,4 +217,7 @@ public class MinT {
     protected void SchedRun() {
         scheduler.SchedulerRunning();
     }
+    
+    
+    
 }

@@ -16,14 +16,14 @@
  */
 package MinTFramework.Network.UDP;
 
-import MinTFramework.Network.MinTNetworkDataPacket;
+import MinTFramework.MinT;
+import MinTFramework.Network.Handler;
 import MinTFramework.Network.Network;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,65 +38,113 @@ public class UDP extends Network {
     UDPReceiver receiver;
     UDPSender sender;
     final int PORT;
-    MessageReceiveImpl impl;
+    MessageReceiveImpl msgimpl;
     Thread receiverThread;
     String cmd;
     String dstIP;
+    UDP self;
     int dstPort;
 
     private final DebugLog log = new DebugLog("UDP.java");
+
     /**
      * UDP communication structor
+     *
      * @param port port that want to use
-     * @throws SocketException 
+     * @param frame
      */
-    public UDP(int port) throws SocketException {
-        super();
-        PORT = port;
-        impl = null;
-        socket = new DatagramSocket(PORT);
-        receiver = new UDPReceiver(socket);
-        sender = new UDPSender(socket);
+    @SuppressWarnings("LeakingThisInConstructor")
+    public UDP(int port, MinT frame) {
+        super(frame);
         
+        PORT = port;
+        this.setUDPSocket();
+        this.setReceiverCallback();
+        this.portOpen(); 
+        this.startReceiveThread();
+        
+        self = this;
+    }
+    /**
+     * set Receiver Callback Msg
+     * !!Important!! ** must call after 'setSocket' method **
+     * @param frame
+     * @param handler 
+     */
+    private void setReceiverCallback(){
+        msgimpl = new MessageReceiveImpl() {
+            @Override
+            public void makeNewReceiver() {
+                 try {
+                    UDPReceiver receiver = new UDPReceiver(socket, self);
+                    Thread nThread;
+                    receiver.setReceive(msgimpl);
+
+                    nThread = new Thread(receiver);
+                    nThread.start();
+
+                } catch (SocketException ex) {
+                }
+            }
+        };
+        
+        receiver.setReceive(msgimpl);
+    }
+    /**
+     * set DatagramSocket
+     * make Sender and Receiver
+     */
+    private void setUDPSocket(){
+        try {
+            socket = new DatagramSocket(PORT);
+            receiver = new UDPReceiver(socket, this);
+            sender = new UDPSender(socket);
+        } catch (SocketException ex) {
+            Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    /**
+     * For Linux
+     * make open port
+     * @param port 
+     */
+    private void portOpen(){
         String OS = System.getProperty("os.name").toLowerCase();
         log.printMessage(OS);
-        
+
         if (OS.contains("nix") || OS.contains("nux") || OS.indexOf("aix") > 0) {
             log.printMessage(OS);
-            OSUtil.linuxShellCommand("iptables -I INPUT 1 -p udp --dport " + port + " -j ACCEPT");
-            OSUtil.linuxShellCommand("iptables -I OUTPUT 1 -p udp --dport " + port + " -j ACCEPT");
+            OSUtil.linuxShellCommand("iptables -I INPUT 1 -p udp --dport " + PORT + " -j ACCEPT");
+            OSUtil.linuxShellCommand("iptables -I OUTPUT 1 -p udp --dport " + PORT + " -j ACCEPT");
         }
+    }
+    /**
+     * Make and start Receiver thread
+     */
+    private void startReceiveThread(){
         receiverThread = new Thread(receiver);
         receiverThread.start();
     }
-
-    public void setMessageReceiveImpl(MessageReceiveImpl impl) {
-        receiver.setReceive(impl);
-    }
-
-    public void sendMessage(String msg, String dstIP, int dstPort) {
-        this.dstIP = dstIP;
-        this.dstPort = dstPort;
-        send(msg);
-    }
-
+    
+    /**
+     * Send message to dst
+     * @param dst destination for msg {ip}:{port}/ example "192.168.7.2:55"
+     * @param fdst not used
+     * @param msg message want to send
+     */
     @Override
-    public void send(String msg) {
+    public void send(String dst, String fdst, String msg) {
         try {
-            
+
+            String[] adst = dst.split(":");
+            this.dstIP = adst[0];
+            this.dstPort = Integer.parseInt(adst[1]);
             sender.SendMsg(msg, dstIP, dstPort);
-            
+
         } catch (SocketException ex) {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    @Override
-    public void receive(String msg) {
-        
-    }
-
-   
 }

@@ -16,6 +16,9 @@
  */
 package MinTFramework.Network.UDP;
 
+import MinTFramework.Network.Network;
+import MinTFramework.Network.Observation;
+import MinTFramework.Network.MinTPacket;
 import java.io.IOException;
 import java.net.*;
 
@@ -25,34 +28,58 @@ import java.net.*;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDPReceiver implements Runnable {
+
     /**
      * @param args the command line arguments
      */
     DatagramSocket socket;
     DatagramPacket inPacket;
     MessageReceiveImpl msgReceiveImpl;
+    UDP udp;
     byte[] inbuf;
+    byte[] data;
+    byte[] mintPacket;
 
-    public UDPReceiver(DatagramSocket socket) throws SocketException {
+    /***
+     * UDP Receiver Thread Constructor
+     * @param socket
+     * @param udp
+     * @throws SocketException 
+     */
+    public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
         this.socket = socket;
+        this.udp = udp;
+        //this.observation = ob;
     }
 
+    /***
+     * make new thread msg impl
+     * @param msimpl 
+     */
     public void setReceive(MessageReceiveImpl msimpl) {
         this.msgReceiveImpl = msimpl;
     }
 
+    /***
+     * Waiting until something received
+     * when message received, make new Thread using msgReceivedImpl
+     */
     @Override
     public void run() {
-        while (true) {
-            try {
-                byte[] inbuf = new byte[256];
-                inPacket = new DatagramPacket(inbuf, inbuf.length);
-                socket.receive(inPacket);
-                new Thread(new RecvMsg(inPacket, msgReceiveImpl)).start();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            inbuf = new byte[512];
+            inPacket = new DatagramPacket(inbuf, inbuf.length);
+            socket.receive(inPacket);
+            msgReceiveImpl.makeNewReceiver();
+            
+            String recvPacketString = new String(inPacket.getData(), 0, inPacket.getLength());
+            
+            mintPacket = MinTPacket.makeMinTPacket(inPacket.getAddress().getHostAddress()+":"+inPacket.getPort(), recvPacketString);
+            
+            udp.MatcherSerializerAndObservation(mintPacket);
+            
+        } catch (IOException e) {
         }
+
     }
 }

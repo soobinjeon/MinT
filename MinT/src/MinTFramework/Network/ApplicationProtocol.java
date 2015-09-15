@@ -14,28 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.UDP;
-
-import java.net.DatagramPacket;
+package MinTFramework.Network;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RecvMsg implements Runnable{
-     
-        DatagramPacket inPacket;
-        MessageReceiveImpl msgReceiveImpl;
-
-        public RecvMsg(DatagramPacket inPacket, MessageReceiveImpl msgReceiveImpl) {
-            super();
-            this.inPacket = inPacket;
-            this.msgReceiveImpl = msgReceiveImpl;
-        }
-        
-        @Override
-        public void run() {
-            msgReceiveImpl.messageReceive(inPacket);
-        }
+public abstract class ApplicationProtocol {
+    //abstract public byte[] makeApplicationPacket();
 }

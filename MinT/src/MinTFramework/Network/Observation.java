@@ -16,60 +16,42 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinT;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class NetworkManager {
-
-    private Network currentNetwork;
-    private String nodename;
-
-    /**
-     * *
-     * Default Network is Null
-     */
-    public NetworkManager() {
-        currentNetwork = null;
+public class Observation {
+    private final Handler handler;
+    private final MinT frame;
+    
+    
+    public Observation(MinT frame){
+        this.frame = frame;
+        this.handler = frame.getNetworkHandler();
     }
-
-    /**
-     * *
-     * Network Set
-     *
-     * @param network
-     */
-    public void setNetwork(Network network) {
-        this.currentNetwork = network;
-    }
-    /**
-     * *
-     *
-     * @param dst
-     * @param msg
-     */
-    public void sendMsg(String dst, String msg) {
-        /**
-         * *
-         * 최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
-         */
-        if (currentNetwork != null) {
-            currentNetwork.send(dst, dst, msg);
+    
+    public void receive(String src, String fdst, String msg){
+        if(isFinalDestinyHere(fdst)){
+            handler.callPacketHandleRequest(src, msg, frame);
+        }
+        else {
+            /**
+             * Todo:
+             * 라우팅 테이블에서 다음 목표를 받아와야함
+             */
+            frame.sendMessage(fdst, msg);
         }
     }
-
-    public void setNodeName(String name) {
-        this.nodename = name;
+    
+    public void callHandler(String src, String msg){
+        handler.callPacketHandleRequest(src, msg, frame);
     }
-
-    /**
-     * Return node name
-     *
-     * @return
-     */
-    public String getNodeName() {
-        return nodename;
+    
+    public boolean isFinalDestinyHere(String dst){
+        return frame.getNodeName().equals(dst);
     }
-
 }
+

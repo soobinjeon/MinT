@@ -51,6 +51,7 @@ public class ScheduleWorkerThread extends Thread {
             this.requestId = 0;
             this.request = scheduler.takeRequest();
             this.requestId = request.getID();
+            System.out.println(Thread.currentThread().getName() + " Thread catched Request id : ");
             request.execute();
         }
     }
