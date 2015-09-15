@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package MinTFramework.Network.UDP;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.Handler;
 import MinTFramework.Network.Network;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
@@ -56,26 +55,29 @@ public class UDP extends Network {
     @SuppressWarnings("LeakingThisInConstructor")
     public UDP(int port, MinT frame) {
         super(frame);
-        
+
         PORT = port;
         this.setUDPSocket();
         this.setReceiverCallback();
-        this.portOpen(); 
+        this.portOpen();
         this.startReceiveThread();
-        
+
         self = this;
     }
+
     /**
-     * set Receiver Callback Msg
-     * !!Important!! ** must call after 'setSocket' method **
+     * set Receiver Callback Msg !!Important!! ** must call after 'setSocket'
+     * method
+     *
+     **
      * @param frame
-     * @param handler 
+     * @param handler
      */
-    private void setReceiverCallback(){
+    private void setReceiverCallback() {
         msgimpl = new MessageReceiveImpl() {
             @Override
             public void makeNewReceiver() {
-                 try {
+                try {
                     UDPReceiver receiver = new UDPReceiver(socket, self);
                     Thread nThread;
                     receiver.setReceive(msgimpl);
@@ -87,14 +89,13 @@ public class UDP extends Network {
                 }
             }
         };
-        
         receiver.setReceive(msgimpl);
     }
+
     /**
-     * set DatagramSocket
-     * make Sender and Receiver
+     * set DatagramSocket make Sender and Receiver
      */
-    private void setUDPSocket(){
+    private void setUDPSocket() {
         try {
             socket = new DatagramSocket(PORT);
             receiver = new UDPReceiver(socket, this);
@@ -103,12 +104,13 @@ public class UDP extends Network {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     /**
-     * For Linux
-     * make open port
-     * @param port 
+     * For Linux make open port
+     *
+     * @param port
      */
-    private void portOpen(){
+    private void portOpen() {
         String OS = System.getProperty("os.name").toLowerCase();
         log.printMessage(OS);
 
@@ -118,33 +120,37 @@ public class UDP extends Network {
             OSUtil.linuxShellCommand("iptables -I OUTPUT 1 -p udp --dport " + PORT + " -j ACCEPT");
         }
     }
-    /**
+
+    /***
      * Make and start Receiver thread
      */
-    private void startReceiveThread(){
+    private void startReceiveThread() {
         receiverThread = new Thread(receiver);
         receiverThread.start();
     }
-    
+
     /**
-     * Send message to dst
+     * Setting Destination
+     *
      * @param dst destination for msg {ip}:{port}/ example "192.168.7.2:55"
-     * @param fdst not used
-     * @param msg message want to send
+     */
+
+    @Override
+    public void setDestination(String dst) {
+        String[] adst = dst.split(":");
+        this.dstIP = adst[0];
+        this.dstPort = Integer.parseInt(adst[1]);
+    }
+    /***
+     * Sending Message
+     * @param packet 
      */
     @Override
-    public void send(String dst, String fdst, String msg) {
+    protected void send(byte[] packet) {
         try {
-
-            String[] adst = dst.split(":");
-            this.dstIP = adst[0];
-            this.dstPort = Integer.parseInt(adst[1]);
-            sender.SendMsg(msg, dstIP, dstPort);
-
+            sender.SendMsg(packet, dstIP, dstPort);
         } catch (SocketException ex) {
-            Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

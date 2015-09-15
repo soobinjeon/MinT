@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,23 +24,44 @@ import MinTFramework.MinT;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Network {
-    
-    protected Observation observation;
+
     protected MinT frame;
+    private ApplicationProtocol ap;
+    private MinTApplicationPacket matchedPacket;
+
+    abstract public void setDestination(String dst);
+    abstract protected void send(byte[] packet);
     
-    abstract public void send(String dst, String fdst, String msg);
-    
-    public Network(MinT frame){
+
+    public Network(MinT frame) {
         this.frame = frame;
-        observation = new Observation(frame);   
+        ap = null;
     }
-    public void MatcherSerializerAndObservation(byte[] packet){
-        System.out.println(new String(packet));
-        /**
-         * Todo
-         * 수신한 바이트 배열을 송신측, 메시지로 나누어 Observation 호출하기
+    public void setApplicationProtocol(ApplicationProtocol ap){
+        this.ap = ap;
+    }
+    public void MatcherAndObservation(byte[] packet) {
+        matchedPacket = ap.getApplicationPacket(packet);
+        if (isFinalDestinyHere(matchedPacket.getDst())) {
+            frame.getNetworkHandler().callPacketHandleRequest(matchedPacket.getSrc(), matchedPacket.getData(), frame);  
+        } else {
+            /**
+             * Todo: 
+             * 라우팅 테이블에서 다음 목표를 받아와야함
+             */
+            frame.sendMessage(matchedPacket.getDst(), matchedPacket.getData());
+        }
+    }
+    public void send(String dst, String msg){
+        /***
+         * Todo : 
+         * String dst를 라우팅 테이블에서 실제 주소로 변환할 루틴 필요
          */
-        
+        this.setDestination(dst);
+        this.send(ap.makeApplicationPacket(frame.getNodeName(), dst, msg));
+    }
+
+    private boolean isFinalDestinyHere(String dst) {
+        return frame.getNodeName().equals(dst);
     }
 }
-

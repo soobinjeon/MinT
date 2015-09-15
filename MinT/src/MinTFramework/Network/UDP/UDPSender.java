@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ public class UDPSender {
     DatagramPacket outPacket;
     InetAddress address;
     int dstPort;
-    String msg;
+    byte[] msg;
     int seq;
 
     public UDPSender(DatagramSocket socket) throws SocketException {
@@ -33,12 +33,13 @@ public class UDPSender {
         this.dstPort = 0;
     }
 
-    public void SendMsg(String msg, String dstIP, int dstPort) throws UnknownHostException, SocketException, IOException {
+    public void SendMsg(byte[] msg, String dstIP, int dstPort) throws UnknownHostException, SocketException, IOException {
         this.msg = msg;
         this.address = InetAddress.getByName(dstIP);
         this.dstPort = dstPort;
-        outPacket = new DatagramPacket(msg.getBytes(), msg.getBytes().length, address, dstPort);
+        outPacket = new DatagramPacket(this.msg, this.msg.length, address, dstPort);
         
         new Thread(new SendMsg(socket, outPacket)).start();
+        
     }
 }

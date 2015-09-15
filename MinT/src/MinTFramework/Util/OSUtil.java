@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
+ *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class OSUtil {
+
     /**
-     * Linux Shell Command
-     * example) OSUtil.linuxShellCommand("ls -al");
-     * @param cmd 
+     * Linux Shell Command example) OSUtil.linuxShellCommand("ls -al");
+     *
+     * @param cmd
      */
-    public static void linuxShellCommand(String cmd){
+    public static void linuxShellCommand(String cmd) {
         try {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(cmd);
@@ -42,14 +47,39 @@ public class OSUtil {
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             String line;
-            while((line = br.readLine()) != null){
+            while ((line = br.readLine()) != null) {
                 System.out.println(line);
             }
-            
+
         } catch (IOException ex) {
             Logger.getLogger(OSUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
+    public static String getIPAddress() {
+        String hostAddr = "";
+
+        try {
+            Enumeration<NetworkInterface> nienum = NetworkInterface.getNetworkInterfaces();
+            while (nienum.hasMoreElements()) {
+                NetworkInterface ni = nienum.nextElement();
+                Enumeration<InetAddress> kk = ni.getInetAddresses();
+                while (kk.hasMoreElements()) {
+                    InetAddress inetAddress = kk.nextElement();
+                    if (!inetAddress.isLoopbackAddress()
+                            && !inetAddress.isLinkLocalAddress()
+                            && inetAddress.isSiteLocalAddress()) {
+
+                        hostAddr = inetAddress.getHostAddress();
+
+                    }
+                }
+            }
+
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return hostAddr;
+    }
+
 }
