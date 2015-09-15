@@ -38,6 +38,8 @@ public class MinT {
     private ApplicationProtocol ap;
     static final int DEFAULT_THREAD_NUM = 5;
     static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
+    DeviceClassification deviceClassification;
+    DeviceType deviceType;
 
     /**
      * Framework Constructor
@@ -60,6 +62,34 @@ public class MinT {
         devicemanager = new DeviceManager();
         scheduler = new Scheduler(requestQueueLength, numOfThread);
     }
+    
+    /**
+     * 
+     * @param deviceClassification Class of deivce (Sensor or Network)
+     * @param deviceType Type of device (Temperature, Humidity, etc)
+     */
+    public MinT(DeviceClassification deviceClassification, DeviceType deviceType) {
+        devicemanager = new DeviceManager();
+        this.deviceClassification = deviceClassification;
+        this.deviceType = deviceType;
+        scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+    }
+    
+    /**
+     * 
+     * @param requestQueueLength Maximym request queue length
+     * @param numOfThread number of workerthread in framework
+     * @param deviceClassification Class of deivce (Sensor or Network)
+     * @param deviceType Type of device (Temperature, Humidity, etc)
+     */
+    public MinT(int requestQueueLength, int numOfThread, 
+            DeviceClassification deviceClassification, DeviceType deviceType) {
+        devicemanager = new DeviceManager();
+        this.deviceClassification = deviceClassification;
+        this.deviceType = deviceType;
+        scheduler = new Scheduler(requestQueueLength, numOfThread);
+    }
+    
     /**
      * Add device to device manager
      * @param device device that want to add

@@ -100,7 +100,7 @@ public abstract class Device {
         ppSet.add(uartTx);
         ppSet.add(uartRx);
     }
-    public void regisI2CPortPin(int i2cNumber)
+    public void registI2CPortPin(int i2cNumber)
     {
         PortPinSet i2c_sclA = null;
         PortPinSet i2c_sdaA = null;
