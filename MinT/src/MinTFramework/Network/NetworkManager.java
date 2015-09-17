@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,21 @@ package MinTFramework.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkManager {
-
     private Network currentNetwork;
     private String nodename;
-
+    private ApplicationProtocol ap;
     /**
-     * *
+     * 
      * Default Network is Null
      */
     public NetworkManager() {
         currentNetwork = null;
+        ap = new MinTApplicationPacketProtocol();
     }
 
+    public void setApplicationProtocol(ApplicationProtocol ap){
+        this.ap = ap;
+    }
     /**
      * *
      * Network Set
@@ -42,6 +45,7 @@ public class NetworkManager {
      */
     public void setNetwork(Network network) {
         this.currentNetwork = network;
+        currentNetwork.setApplicationProtocol(ap);
     }
     /**
      * *
@@ -51,11 +55,11 @@ public class NetworkManager {
      */
     public void sendMsg(String dst, String msg) {
         /**
-         * *
-         * 최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
+         * 
+         * Todo:최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
          */
         if (currentNetwork != null) {
-            currentNetwork.send(dst, dst, msg);
+            currentNetwork.send(dst, msg);
         }
     }
 

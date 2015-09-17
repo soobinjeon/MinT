@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,5 +22,6 @@ package MinTFramework.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class ApplicationProtocol {
-    //abstract public byte[] makeApplicationPacket();
+    abstract public byte[] makeApplicationPacket(String src, String fdst, String msg);
+    abstract public MinTApplicationPacket getApplicationPacket(byte[] packet);
 }

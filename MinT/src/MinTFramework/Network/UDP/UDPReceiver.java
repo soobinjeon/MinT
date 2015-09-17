@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>, youngtak Han <gksdudxkr@gmail.com>
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,6 @@
  */
 package MinTFramework.Network.UDP;
 
-import MinTFramework.Network.Network;
-import MinTFramework.Network.Observation;
-import MinTFramework.Network.MinTPacket;
 import java.io.IOException;
 import java.net.*;
 
@@ -49,7 +46,7 @@ public class UDPReceiver implements Runnable {
     public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
         this.socket = socket;
         this.udp = udp;
-        //this.observation = ob;
+        
     }
 
     /***
@@ -71,12 +68,8 @@ public class UDPReceiver implements Runnable {
             inPacket = new DatagramPacket(inbuf, inbuf.length);
             socket.receive(inPacket);
             msgReceiveImpl.makeNewReceiver();
-            
-            String recvPacketString = new String(inPacket.getData(), 0, inPacket.getLength());
-            
-            mintPacket = MinTPacket.makeMinTPacket(inPacket.getAddress().getHostAddress()+":"+inPacket.getPort(), recvPacketString);
-            
-            udp.MatcherSerializerAndObservation(mintPacket);
+
+            udp.MatcherAndObservation(inPacket.getData());
             
         } catch (IOException e) {
         }

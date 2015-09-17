@@ -18,7 +18,9 @@ package MinTFramework;
 
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
+import MinTFramework.Network.ApplicationProtocol;
 import MinTFramework.Network.Handler;
+import MinTFramework.Network.MinTApplicationPacketProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 
@@ -33,6 +35,7 @@ public class MinT {
     private NetworkManager networkmanager;
     private Scheduler scheduler;
     private Handler networkHandler;
+    private ApplicationProtocol ap;
     static final int DEFAULT_THREAD_NUM = 5;
     static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
     DeviceClassification deviceClassification;
@@ -47,6 +50,7 @@ public class MinT {
         networkmanager = new NetworkManager();
         scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
         networkHandler = null;
+        ap = new MinTApplicationPacketProtocol();
     }
 
     /**
@@ -176,12 +180,17 @@ public class MinT {
         scheduler.showWorkingThreads();
     }
     
+    
+    /*************************
+     * Network
+     ************************/
     /**
      * Setting Network
      * @param network 
      */
     public void setNetwork(Network network){
         networkmanager.setNetwork(network);
+        networkmanager.setApplicationProtocol(ap);
     }
     public void setNetworkHandler(Handler nhandler){
         this.networkHandler = nhandler;
@@ -203,6 +212,11 @@ public class MinT {
     public void sendMessage(String dst, String msg){
         networkmanager.sendMsg(dst, msg);
     }
+    
+    public void setApplicationProtocol(ApplicationProtocol ap){
+        networkmanager.setApplicationProtocol(ap);
+    }
+    
     /**
      * Start framework
      */
