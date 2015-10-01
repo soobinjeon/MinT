@@ -16,7 +16,8 @@
  */
 package MinTFramework.Network;
 
-/**
+/***
+ * Default Applicaton Protocol
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
@@ -54,14 +55,17 @@ public class MinTApplicationPacketProtocol extends ApplicationProtocol {
 
     @Override
     public MinTApplicationPacket getApplicationPacket(byte[] packet) {
-        /***
-         * Todo: Packet Separation
-         * byte[] packet = {src:$(ADDRESS)}{msg:$(MESSAGE)} 
-         * to
-         * MinTApplicationPacket.address = $(ADDRESS)
-         * MinTAPplicationPacket.data = $(MESSAGE)
-         */
         
-        return null;
+        MinTApplicationPacket rpacket;
+        String spacket = new String(packet);
+        String[] spacket_s = spacket.split("}");
+
+        String src = spacket_s[0].substring(5);
+        String fdst = spacket_s[1].substring(6);
+        String msg = spacket_s[2].substring(5);
+
+        rpacket = new MinTApplicationPacket(src, fdst, msg);
+
+        return rpacket;
     }
 }

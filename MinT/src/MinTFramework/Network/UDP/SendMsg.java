@@ -31,6 +31,11 @@ public class SendMsg implements Runnable {
     DatagramSocket socket;
     MessageReceiveImpl msgReceiveImpl;
 
+    /***
+     * send datagram packet to datagram socket
+     * @param socket
+     * @param outPacket 
+     */
     public SendMsg(DatagramSocket socket, DatagramPacket outPacket) {
         this.socket = socket;
         this.outPacket = outPacket;

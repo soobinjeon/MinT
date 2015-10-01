@@ -106,7 +106,7 @@ public class UDP extends Network {
     }
 
     /**
-     * For Linux make open port
+     * For Linux make port open
      *
      * @param port
      */
