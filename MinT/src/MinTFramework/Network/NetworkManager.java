@@ -39,7 +39,7 @@ public class NetworkManager {
     }
     /**
      * *
-     * Network Set
+     * Network Setter
      *
      * @param network
      */

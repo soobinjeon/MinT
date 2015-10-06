@@ -25,40 +25,29 @@ public class MinTApplicationPacket {
 
     private String src;
     private String dst;
-    private int srcport;
-    private int dstport;
-    private String data;
-
+    private String msg;
+    
     public MinTApplicationPacket() {
         src = "";
         dst = "";
-        data = "";
+        msg = "";
     }
 
-    public MinTApplicationPacket(String data, String dst, int dstport) {
+    public MinTApplicationPacket(String src, String dst, String msg) {
+        this.src = src;
         this.dst = dst;
-        this.data = data;
-        this.dstport = dstport;
+        this.msg = msg;
     }
 
     public void setDst(String dst) {
         this.dst = dst;
     }
-
     public void setSrc(String src) {
         this.src = src;
     }
 
     public void setData(String data) {
-        this.data = data;
-    }
-
-    public void setDestPort(int port) {
-        this.dstport = port;
-    }
-
-    public void setSrcPort(int port) {
-        this.srcport = port;
+        this.msg = data;
     }
 
     public String getDst() {
@@ -69,17 +58,10 @@ public class MinTApplicationPacket {
         return src;
     }
 
-    public String getData() {
-        return data;
+    public String getMessage() {
+        return msg;
     }
 
-    public int getDestPort() {
-        return dstport;
-    }
-
-    public int getSrcPort() {
-        return srcport;
-    }
 //
 //    public byte[] getBytes() {
 //        byte[] bytes = null;
