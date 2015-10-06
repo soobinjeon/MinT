@@ -21,7 +21,7 @@ package MinTFramework;
  * @author HanYoungTak
  */
 public enum DeviceClassification {
-    SENSOR("SENSOR"), NETWORK("NETWORK");
+    SENSOR("SENSOR"), NETWORK("NETWORK"), CONTROL("CONTROL");
     
     private String deviceClassification;
     
