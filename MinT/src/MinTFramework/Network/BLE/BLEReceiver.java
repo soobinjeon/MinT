@@ -14,38 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.UDP;
+package MinTFramework.Network.BLE;
 
-import java.io.IOException;
-import java.net.*;
+import MinTFramework.ExternalDevice.DeviceBLE;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class UDPReceiver implements Runnable {
+public class BLEReceiver implements Runnable {
 
     /**
      * @param args the command line arguments
      */
-    DatagramSocket socket;
-    DatagramPacket inPacket;
     MessageReceiveImpl msgReceiveImpl;
-    UDP udp;
+    BLE ble;
+    String tempbuf;
     byte[] inbuf;
     byte[] mintPacket;
+    DeviceBLE deviceBLE;
 
     /***
-     * UDP Receiver Thread Constructor
-     * @param socket
-     * @param udp
-     * @throws SocketException 
+     * BLE Receiver Thread Constructor
+     * @param deviceBLE
+     * @param ble
      */
-    public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
-        this.socket = socket;
-        this.udp = udp;
-        
+    public BLEReceiver(DeviceBLE deviceBLE, BLE ble) {
+        this.deviceBLE = deviceBLE;
+        this.ble = ble;
     }
 
     /***
@@ -62,16 +59,12 @@ public class UDPReceiver implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            inbuf = new byte[512];
-            inPacket = new DatagramPacket(inbuf, inbuf.length);
-            socket.receive(inPacket);
-            msgReceiveImpl.makeNewReceiver();
-
-            udp.MatcherAndObservation(inPacket.getData());
-            
-        } catch (IOException e) {
-        }
-
+        
+        tempbuf = deviceBLE.readUARTString();
+        inbuf = tempbuf.getBytes();
+        msgReceiveImpl.makeNewReceiver();
+        
+        ble.MatcherAndObservation(inbuf);
+        
     }
 }

@@ -14,37 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Network.BLE;
+
+import MinTFramework.ExternalDevice.DeviceBLE;
 
 /**
  *
  * @author HanYoungTak
  */
-public enum DeviceType {
-    TEMPERATURE("TEMPERATURE"), 
-    HUMIDITY("HUMIDITY"), 
-    TEMPHUMI("TEMPHUMI"), 
-    ULTRASONIC("ULTRASONIC"), 
-    MAGNETIC("MAGNETIC"), 
-    GYRO("GYRO"), 
-    SERVMOTOR("SERVMOTOR"), 
-    DUST("DUST"),
-    CO2("CO2"),
-    
-    BLE("BLE"),
-    WIFI("WIFI"), 
-    NFC("NFC"), 
-    BLUETOOTH("BLUETOOTH");
-    
-    private String deviceType;
-    
-    private DeviceType(String deviceType)
-    {
-        this.deviceType = deviceType;
+public class SendMsg implements Runnable {
+
+    byte[] outPacket;
+    DeviceBLE deviceBLE;
+    MessageReceiveImpl msgReceiveImpl;
+
+    /***
+     * send datagram packet to datagram socket
+     * @param deviceBLE 
+     * @param outPacket 
+     */
+    public SendMsg(DeviceBLE deviceBLE, byte[] outPacket) {
+        this.deviceBLE = deviceBLE;
+        this.outPacket = outPacket;
     }
-    
-    public String getDeviceType()
-    {
-        return deviceType;
+
+    @Override
+    public void run() {
+        //Convert Byte to String
+        deviceBLE.writeUART(new String(outPacket));
     }
+
 }
+

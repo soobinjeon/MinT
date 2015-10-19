@@ -32,6 +32,7 @@ public abstract class Device {
      * Initialize pin number, etc;
      */
     abstract protected void initDevice();
+    abstract protected void freeDevice();
     
     public Device(String _LibName) {
         super();

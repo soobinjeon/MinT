@@ -16,6 +16,8 @@
  */
 package MinTFramework;
 
+import MinTFramework.ExternalDevice.DeviceClassification;
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
 import MinTFramework.Network.ApplicationProtocol;
