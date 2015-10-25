@@ -41,7 +41,9 @@ public class SendMsg implements Runnable {
     @Override
     public void run() {
         //Convert Byte to String
-        deviceBLE.writeUART(new String(outPacket));
+        deviceBLE.writeUART(new String(outPacket), "#");
+        deviceBLE.disconnect();
+        deviceBLE.setRole(0);
     }
 
 }

@@ -49,34 +49,9 @@ public class BLE extends Network {
         this.deviceBLE = deviceBLE;
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);
-        this.setReceiverCallback();
         this.startReceiveThread();
 
         self = this;
-    }
-
-    /**
-     * set Receiver Callback Msg !!Important!! ** must call after 'setSocket'
-     * method
-     *
-     **
-     * @param frame
-     * @param handler
-     */
-    private void setReceiverCallback() {
-        msgimpl = new MessageReceiveImpl() {
-            @Override
-            public void makeNewReceiver() {
-                
-                BLEReceiver receiver = new BLEReceiver(deviceBLE, self);
-                Thread nThread;
-                receiver.setReceive(msgimpl);
-
-                nThread = new Thread(receiver);
-                nThread.start();
-            }
-        };
-        receiver.setReceive(msgimpl);
     }
 
     /***
@@ -96,7 +71,19 @@ public class BLE extends Network {
     @Override
     public void setDestination(String dst) {
         this.dst = dst;
-        deviceBLE.connect(dst);
+        deviceBLE.setRole(1);
+                
+        if(deviceBLE.connect(dst))
+        {
+            System.out.println("Success : Connect");
+            //return true;
+        }
+        else
+        {
+            System.out.println("Fail : Connect");
+            //return false;
+        }
+        
     }
     /***
      * Sending Message
@@ -104,6 +91,6 @@ public class BLE extends Network {
      */
     @Override
     protected void send(byte[] packet) {
-       sender.SendMsg(packet, dst);
+       sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 }

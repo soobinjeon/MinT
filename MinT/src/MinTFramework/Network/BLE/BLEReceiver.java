@@ -17,6 +17,8 @@
 package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -28,7 +30,6 @@ public class BLEReceiver implements Runnable {
     /**
      * @param args the command line arguments
      */
-    MessageReceiveImpl msgReceiveImpl;
     BLE ble;
     String tempbuf;
     byte[] inbuf;
@@ -46,25 +47,24 @@ public class BLEReceiver implements Runnable {
     }
 
     /***
-     * make new thread msg impl
-     * @param msimpl 
-     */
-    public void setReceive(MessageReceiveImpl msimpl) {
-        this.msgReceiveImpl = msimpl;
-    }
-
-    /***
      * Waiting until something received
      * when message received, make new Thread using msgReceivedImpl
      */
     @Override
     public void run() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        while(true)
+        {
+            System.out.println("Reading Start...");
+            tempbuf = deviceBLE.readUARTString("#");
+            tempbuf = tempbuf.substring(tempbuf.indexOf("{src"));
+            inbuf = tempbuf.getBytes();
         
-        tempbuf = deviceBLE.readUARTString();
-        inbuf = tempbuf.getBytes();
-        msgReceiveImpl.makeNewReceiver();
-        
-        ble.MatcherAndObservation(inbuf);
-        
+            ble.MatcherAndObservation(inbuf);
+        }
     }
 }

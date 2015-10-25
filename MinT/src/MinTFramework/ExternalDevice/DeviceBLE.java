@@ -36,12 +36,16 @@ public abstract class DeviceBLE extends Device{
     abstract public String initBLE(int mode);        //Ready for work
     abstract public String discovery();                //Discovery BLE device
     abstract public String setName(String name);     //Set name
+    abstract public String getName(String name);
     abstract public String getAddress();               //Get address
     abstract public String setRole(int mode);        //Set role
-    abstract public String connect(String address);  //Connect to other device
+    abstract public String getRole();
+    abstract public boolean connect(String address);  //Connect to other device
     abstract public String disconnect();               //Disconnect
-    abstract public void writeUART(String command);
+    abstract public void writeUART(String data);
+    abstract public void writeUART(String data, String regex);
     abstract public String readUARTString();
+    abstract public String readUARTString(String regex);
     abstract public Byte[] readUARTBytes(int length);
     
     
