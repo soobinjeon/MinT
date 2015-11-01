@@ -17,6 +17,9 @@
 package MinTFramework.ExternalDevice;
 
 /**
+ * This class is used for BLE Device.
+ * You can easily create BLE driver operating in MinT
+ * by inheriting and implementing these abstract functions.
  *
  * @author HanYoungTak
  */
@@ -33,20 +36,20 @@ public abstract class DeviceBLE extends Device{
         this.uartNumber = uartNumber;
     }
 
-    abstract public String initBLE(int mode);        //Ready for work
+    abstract public String initBLE(int mode);          //Ready for start
+                                                        //Check, Set role
     abstract public String discovery();                //Discovery BLE device
-    abstract public String setName(String name);     //Set name
-    abstract public String getName(String name);
+    abstract public String setName(String name);       //Set name
+    abstract public String getName(String name);       //Get name
     abstract public String getAddress();               //Get address
-    abstract public String setRole(int mode);        //Set role
-    abstract public String getRole();
-    abstract public boolean connect(String address);  //Connect to other device
+    abstract public String setRole(int mode);           //Set role
+    abstract public String getRole();                   //Get role
+    abstract public boolean connect(String address);    //Connect to other device
     abstract public String disconnect();               //Disconnect
-    abstract public void writeUART(String data);
-    abstract public void writeUART(String data, String regex);
-    abstract public String readUARTString();
-    abstract public String readUARTString(String regex);
-    abstract public Byte[] readUARTBytes(int length);
-    
-    
+    abstract public void writeUART(String data);        //Write UART String and Bytes
+    abstract public void writeUART(String data, String regex);//Write Uart String with regex
+    abstract public String readUARTString();            //Read UART String
+    abstract public String readUARTString(String regex);//Read UART String until regex
+    abstract public Byte[] readUARTBytes(int length);   //Read UART Bytes
+        
 }

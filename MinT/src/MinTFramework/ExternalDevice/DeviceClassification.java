@@ -17,6 +17,8 @@
 package MinTFramework.ExternalDevice;
 
 /**
+ * Classification the all devices.
+ * Sensor, Network, Control
  *
  * @author HanYoungTak
  */
