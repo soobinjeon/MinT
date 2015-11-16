@@ -1,7 +1,16 @@
 # Middleware for Cooperative Interactions of Things
 
 ## Introduction
-LapThings프로젝트의 핵심 요소 중 하나이다. IoT 환경에서 운영되는 센서모듈 또는 노드의 설계 및 제작을 쉽게 할 수 있는 프레임워크 개발을 목적으로 하는 프로젝트. BeagleBone Black을 기반으로 한다.
+다양한 시스템 환경에서 사물들이 서로 상호작용 할 수 있는 통합 미들웨어 플랫폼.
+본 프레임워크는 다양한 종류의 센서 및 네트워크 디바이스를 적용할 수 있는 개발 환경을 제공 한다. 
+개발된 드라이버와 Application API를 통해 쉽게 IoT 어플리케이션을 제작 할 수 있다. 
+다양한 플랫폼에 적용 가능하기 때문에 IoT 환경에 적합한 디바이스 모듈 제작이 가능하다.
+
+* 개발 가능 플랫폼
+	1. Beagle Bone Black
+	2. Raspberry PI(I, II)
+	3. Android Platform
+	4. Linux Based Platform
 
 ## Build Server
 * Server IP : -
