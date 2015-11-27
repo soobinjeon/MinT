@@ -16,8 +16,6 @@
  */
 package MinTFramework;
 
-import MinTFramework.ExternalDevice.Device;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -28,9 +26,10 @@ public abstract class Request {
     private int id;
     private int prior;
     protected final MinT frame;
-    /**
+    /***
      * Request Constructor
      * Deafult id=0, prior = 0;
+     * @param _frame 
      */
     public Request(MinT _frame) {
         id = 0;
