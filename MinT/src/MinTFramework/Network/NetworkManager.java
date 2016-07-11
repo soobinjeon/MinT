@@ -16,6 +16,9 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
+import MinTFramework.Util.DebugLog;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -25,6 +28,7 @@ public class NetworkManager {
     private Network currentNetwork;
     private String nodename;
     private ApplicationProtocol ap;
+    private DebugLog dl = new DebugLog("NetworkManager");
     /**
      * 
      * Default Network is Null
@@ -61,7 +65,8 @@ public class NetworkManager {
         if (currentNetwork != null) {
             currentNetwork.send(dst, msg);
         }else{
-            
+            dl.printMessage("Error : There are no Networks");
+            System.out.println("Error : There are no Networks");
         }
     }
 

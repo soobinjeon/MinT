@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.syspacket.MinTApplicationPacket;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,

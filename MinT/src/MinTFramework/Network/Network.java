@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.syspacket.MinTApplicationPacket;
 import MinTFramework.MinT;
 
 /**

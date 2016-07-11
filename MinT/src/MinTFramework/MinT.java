@@ -22,7 +22,7 @@ import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
 import MinTFramework.Network.ApplicationProtocol;
 import MinTFramework.Network.Handler;
-import MinTFramework.Network.MinTApplicationPacketProtocol;
+import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 
@@ -180,6 +180,10 @@ public abstract class MinT {
         scheduler.showWorkingThreads();
     }
     
+    /**
+     * get Number of Working Threads
+     * @return 
+     */
     public int getNumberofWorkingThreads(){
         return scheduler.getNumberofWorkingThreads();
     }
