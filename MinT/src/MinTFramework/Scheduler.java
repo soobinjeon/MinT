@@ -25,6 +25,7 @@ import MinTFramework.Util.DebugLog;
  */
 public class Scheduler {
 
+    //for Request Queue
     private Request[] requestQueue;
     private int tail;
     private int head;
@@ -77,6 +78,19 @@ public class Scheduler {
             log.printMessage(threadPool1.getName() + " " + threadPool1.getRequestId());
         }
     }
+    
+    /**
+     * get Number of Walking Threads
+     * @return 
+     */
+    public int getNumberofWorkingThreads(){
+        int num = 0;
+        for(ScheduleWorkerThread threadPool1 : threadPool){
+            if(threadPool1.isWorking())
+                num ++;
+        }
+        return num;
+    }
 
     /***
      * Generate unique request ID
@@ -128,7 +142,7 @@ public class Scheduler {
                 }
             }
         }
-        System.out.println("newid : " + newid);
+//        System.out.println("newid : " + newid);
         return newid;
     }
 

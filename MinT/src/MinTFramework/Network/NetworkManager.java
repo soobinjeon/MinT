@@ -60,6 +60,8 @@ public class NetworkManager {
          */
         if (currentNetwork != null) {
             currentNetwork.send(dst, msg);
+        }else{
+            
         }
     }
 

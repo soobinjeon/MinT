@@ -14,37 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Util;
+package MinTFramework;
 
-import MinTFramework.MinTConfig;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class DebugLog {
-
-    private final String Logname;
-    public DebugLog() {
-        Logname = "NONAME";
-    }
-
-    /**
-     * DebugLoger name
-     *
-     * @param name DebugLog name
-     */
-    public DebugLog(String name) {
-        Logname = name;
-    }
-
-    /**
-     * 콘솔에 메시지 출력
-     *
-     * @param str 출력할 메시지
-     */
-    public void printMessage(String str) {
-        if(MinTConfig.DebugMode)
-            System.out.println(Logname + ": " + str);
-    }
+public class MinTConfig {
+    static public final int DEFAULT_THREAD_NUM = 500;
+    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
+    static public boolean DebugMode = false;
 }

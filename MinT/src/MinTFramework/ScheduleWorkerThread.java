@@ -16,6 +16,8 @@
  */
 package MinTFramework;
 
+import MinTFramework.Util.DebugLog;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -26,12 +28,14 @@ public class ScheduleWorkerThread extends Thread {
     private final Scheduler scheduler;
     private Request request;
     private int requestId;
+    private DebugLog dl;
     
     public ScheduleWorkerThread(String name, Scheduler scheduler) {
         super(name);
         this.request = null;
         this.scheduler = scheduler;
         this.requestId = 0;
+        dl = new DebugLog(name);
     }
 
     public synchronized int getRequestId() {
@@ -44,14 +48,22 @@ public class ScheduleWorkerThread extends Thread {
         this.request = null;
         this.requestId = 0;
     }
-
+    
+    /**
+     * Is Thread Walking For Request?
+     * @return 
+     */
+    public synchronized boolean isWorking(){
+        return requestId != 0;
+    }
+    
     @Override
     public void run() {
         while (true) {
             this.requestId = 0;
             this.request = scheduler.takeRequest();
             this.requestId = request.getID();
-            System.out.println(Thread.currentThread().getName() + " Thread catched Request id : ");
+            dl.printMessage(" Thread catched Request id : "+requestId);
             request.execute();
         }
     }

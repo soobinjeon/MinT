@@ -72,7 +72,7 @@ public abstract class Network {
     public void MatcherAndObservation(byte[] packet) {
         matchedPacket = ap.getApplicationPacket(packet);
         if (isFinalDestinyHere(matchedPacket.getDst())) {
-            frame.getNetworkHandler().callPacketHandleRequest(matchedPacket.getSrc(), matchedPacket.getMessage(), frame);
+            frame.getNetworkHandler().callPacketHandleRequest(matchedPacket.getSrc(), matchedPacket.getMessage());
         } else {
             /**
              * Todo: 라우팅 테이블에서 다음 목표를 받아와야함

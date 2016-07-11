@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.MinT;
+import MinTFramework.*;
 
 /**
  *
@@ -42,4 +42,13 @@ public abstract class Handler {
      * @param msg pakcet message
      */
     abstract public void callPacketHandleRequest(String src, String msg);
+    
+//    protected void allhadle(String src, String msg){
+//        SystemCall(src, msg);
+//        callPacketHandleRequest(src, msg);
+//    }
+//    
+//    private void SystemCall(String src, String msg){
+//        
+//    }
 }

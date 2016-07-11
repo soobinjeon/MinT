@@ -31,18 +31,16 @@ import MinTFramework.Network.NetworkManager;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinT {
+public abstract class MinT {
 
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
     private Handler networkHandler;
     private ApplicationProtocol ap;
-    static final int DEFAULT_THREAD_NUM = 5;
-    static final int DEFAULT_REQEUSTQUEUE_LENGTH = 5;
     DeviceClassification deviceClassification;
     DeviceType deviceType;
-
+    
     /**
      * Framework Constructor
      * Default number of WorkerThread and Requestqueuelength : 5
@@ -50,7 +48,7 @@ public class MinT {
     public MinT() {
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager();
-        scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+        scheduler = new Scheduler(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
         networkHandler = null;
         ap = new MinTApplicationPacketProtocol();
     }
@@ -74,7 +72,7 @@ public class MinT {
         devicemanager = new DeviceManager();
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
-        scheduler = new Scheduler(DEFAULT_REQEUSTQUEUE_LENGTH, DEFAULT_THREAD_NUM);
+        scheduler = new Scheduler(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
     }
     
     /**
@@ -182,6 +180,9 @@ public class MinT {
         scheduler.showWorkingThreads();
     }
     
+    public int getNumberofWorkingThreads(){
+        return scheduler.getNumberofWorkingThreads();
+    }
     
     /*************************
      * Network
@@ -234,6 +235,8 @@ public class MinT {
         scheduler.SchedulerRunning();
     }
     
-    
+    protected void isDebug(boolean isdebug){
+        MinTConfig.DebugMode = isdebug;
+    }
     
 }
