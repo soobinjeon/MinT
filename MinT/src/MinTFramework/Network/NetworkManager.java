@@ -16,8 +16,13 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.*;
+import MinTFramework.Network.*;
+import MinTFramework.Network.UDP.UDP;
 import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
 import MinTFramework.Util.DebugLog;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -25,32 +30,76 @@ import MinTFramework.Util.DebugLog;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkManager {
-    private Network currentNetwork;
-    private String nodename;
+    private MinT frame = null;
+    private ArrayList<NetworkType> networkList = new ArrayList<NetworkType>();
+    private HashMap<NetworkType,Network> networks = new HashMap<NetworkType,Network>();
+    private String nodename = null;
+    
+    private Handler networkHandler = null;
     private ApplicationProtocol ap;
     private DebugLog dl = new DebugLog("NetworkManager");
+    
     /**
-     * 
-     * Default Network is Null
+     * Auto Set Network Manager as possible
+     * @param frame
      */
-    public NetworkManager() {
-        currentNetwork = null;
+    public NetworkManager(MinT frame) {
+        this.frame = frame;
         ap = new MinTApplicationPacketProtocol();
+        networkHandler = new Handler(frame) {
+            @Override
+            public void userHandler(String src, String msg) {
+            }
+        };
+        
+        setNodeName();
     }
 
-    public void setApplicationProtocol(ApplicationProtocol ap){
-        this.ap = ap;
+    /**
+     * add network
+     * @param ntype 
+     */
+    public void AddNetwork(NetworkType ntype){
+        networkList.add(ntype);
+    }
+    
+    /**
+     * Turn on All Networks!
+     */
+    public void TurnOnNetwork(){
+        for(NetworkType ty : networkList){
+            setOnNetwork(ty);
+        }
     }
     /**
      * *
-     * Network Setter
-     *
-     * @param network
+     * Set Up the networks
+     * Available Networks : UDP, BLE, COAP(asap)
+     * @param ntype type of Network NetworkType
+     * @param port Internet port for (UDP,TCP/IP,COAP), null for others
      */
-    public void setNetwork(Network network) {
-        this.currentNetwork = network;
-        currentNetwork.setApplicationProtocol(ap);
+    public void setOnNetwork(NetworkType ntype) {
+        if(ntype == NetworkType.UDP){
+            networks.put(ntype, new UDP(ntype.getPort(),ap,this.frame));
+            dl.printMessage("Turned on UDP: "+ntype.getPort());
+        }
+        else if(ntype == NetworkType.BLE){
+//            networks.put(ntype, new BLE())
+            dl.printMessage("Turned on BLE");
+        }
+        else if(ntype == NetworkType.COAP){
+            dl.printMessage("Turned on COAP");
+        }
     }
+    
+    public void setApplicationProtocol(ApplicationProtocol ap){
+        this.ap = ap;
+        
+        for(Network n:networks.values()){
+            n.setApplicationProtocol(ap);
+        }
+    }
+    
     /**
      * *
      *
@@ -59,19 +108,42 @@ public class NetworkManager {
      */
     public void sendMsg(String dst, String msg) {
         /**
-         * 
+         * UDP만 지윈
          * Todo:최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
          */
-        if (currentNetwork != null) {
-            currentNetwork.send(dst, msg);
+        Network cn = networks.get(NetworkType.UDP);
+        if (cn != null) {
+            cn.send(dst, msg);
         }else{
             dl.printMessage("Error : There are no Networks");
             System.out.println("Error : There are no Networks");
         }
     }
 
+    /**
+     * set Network Handler in network manager
+     * @param nhandler 
+     */
+    public void setNetworkHandler(Handler nhandler){
+        if(nhandler != null)
+            this.networkHandler = nhandler;
+    }
+    
+    /**
+     * get Network Handler
+     * @return 
+     */
+    public Handler getNetworkHandler(){
+        return this.networkHandler;
+    }
+    
+    /**
+     * set Node Name
+     * @param name 
+     */
     public void setNodeName(String name) {
-        this.nodename = name;
+        if(name != null)
+            this.nodename = name;
     }
 
     /**
@@ -81,6 +153,13 @@ public class NetworkManager {
      */
     public String getNodeName() {
         return nodename;
+    }
+
+    /**
+     * set automatically Node Name
+     */
+    private void setNodeName() {
+        nodename = "node1";
     }
 
 }

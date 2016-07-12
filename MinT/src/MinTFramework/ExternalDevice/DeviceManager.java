@@ -90,7 +90,7 @@ public class DeviceManager {
     }
 
     /**
-     * Refurn device for ID
+     * Return device for ID
      *
      * @param _deviceid
      * @return device object for ID

@@ -17,6 +17,7 @@
 package MinTFramework.Network.UDP;
 
 import MinTFramework.MinT;
+import MinTFramework.Network.ApplicationProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
@@ -53,8 +54,8 @@ public class UDP extends Network {
      * @param frame
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public UDP(int port, MinT frame) {
-        super(frame);
+    public UDP(int port, ApplicationProtocol _ap, MinT frame) {
+        super(frame,_ap);
 
         PORT = port;
         this.setUDPSocket();

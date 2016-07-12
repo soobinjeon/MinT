@@ -18,6 +18,7 @@ package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.MinT;
+import MinTFramework.Network.ApplicationProtocol;
 import MinTFramework.Network.Network;
 
 /**
@@ -43,9 +44,9 @@ public class BLE extends Network {
      * @param frame
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public BLE(DeviceBLE deviceBLE, MinT frame) {
-        super(frame);
-
+    public BLE(DeviceBLE deviceBLE, ApplicationProtocol _ap, MinT frame) {
+        super(frame,_ap);
+        
         this.deviceBLE = deviceBLE;
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);

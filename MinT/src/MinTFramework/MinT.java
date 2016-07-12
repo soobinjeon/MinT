@@ -25,6 +25,7 @@ import MinTFramework.Network.Handler;
 import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.NetworkType;
 
 /**
  *
@@ -36,47 +37,41 @@ public abstract class MinT {
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
-    private Handler networkHandler;
-    private ApplicationProtocol ap;
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
-    /**
-     * Framework Constructor
-     * Default number of WorkerThread and Requestqueuelength : 5
-     */
-    public MinT() {
-        devicemanager = new DeviceManager();
-        networkmanager = new NetworkManager();
-        scheduler = new Scheduler(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
-        networkHandler = null;
-        ap = new MinTApplicationPacketProtocol();
-    }
-
     /**
      * 
      * @param requestQueueLength Maximym request queue length
      * @param numOfThread number of workerthread in framework
      */
     public MinT(int requestQueueLength, int numOfThread) {
-        devicemanager = new DeviceManager();
         scheduler = new Scheduler(requestQueueLength, numOfThread);
+        devicemanager = new DeviceManager();
+        networkmanager = new NetworkManager(this);
     }
     
     /**
-     * 
+     * Framework Constructor
+     * Default number of WorkerThread and Requestqueuelength : 5
+     */
+    public MinT() {
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+    }
+
+    /**
+     * @deprecated not yet used
      * @param deviceClassification Class of deivce (Sensor or Network)
      * @param deviceType Type of device (Temperature, Humidity, etc)
      */
     public MinT(DeviceClassification deviceClassification, DeviceType deviceType) {
+        this();
         devicemanager = new DeviceManager();
         this.deviceClassification = deviceClassification;
-        this.deviceType = deviceType;
-        scheduler = new Scheduler(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
     }
     
     /**
-     * 
+     * @deprecated not yet used
      * @param requestQueueLength Maximym request queue length
      * @param numOfThread number of workerthread in framework
      * @param deviceClassification Class of deivce (Sensor or Network)
@@ -84,11 +79,10 @@ public abstract class MinT {
      */
     public MinT(int requestQueueLength, int numOfThread, 
             DeviceClassification deviceClassification, DeviceType deviceType) {
-        devicemanager = new DeviceManager();
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
-        scheduler = new Scheduler(requestQueueLength, numOfThread);
-    }
+        }
     
     /**
      * Add device to device manager
@@ -191,26 +185,68 @@ public abstract class MinT {
     /*************************
      * Network
      ************************/
+   
     /**
-     * Setting Network
-     * @param network 
+     * set network user configuration
+     * @param name node Name
+     * @param nhandler User Handler
      */
-    public void setNetwork(Network network){
-        networkmanager.setNetwork(network);
-        networkmanager.setApplicationProtocol(ap);
-    }
-    public void setNetworkHandler(Handler nhandler){
-        this.networkHandler = nhandler;
-    }
-    public Handler getNetworkHandler(){
-        return this.networkHandler;
-    }
-    public void setNodeName(String name){
+    public void setNetwork(String name, Handler nhandler){
+        networkmanager.setNetworkHandler(nhandler);
         networkmanager.setNodeName(name);
     }
+    
+    /**
+     * set network user configuration (only Name)
+     * @param name node Name 
+     */
+    public void setNetwork(String name){
+        setNetwork(name, null);
+    }
+    
+    /**
+     * set network user configuration (only Name)
+     * @param nhandler user Handler
+     */
+    public void setNetwork(Handler nhandler){
+        setNetwork(null,nhandler);
+    }
+    
+    /**
+     * set Network Handler for APP
+     * @param nhandler 
+     */
+    public Handler getNetworkHandler(){
+        return networkmanager.getNetworkHandler();
+    }
+    
+    /**
+     * get NodeName
+     * @return 
+     */
     public String getNodeName(){
         return networkmanager.getNodeName();
     }
+    
+    /**
+     * add Network
+     * @param ntype 
+     */
+    public void addNetwork(NetworkType ntype){
+        networkmanager.AddNetwork(ntype);
+    }
+    
+    /**
+     * add Network with Port
+     * !!Caution!! Network Port was fixed
+     * @param ntype
+     * @param port  Internet Port for UDP, TCP/IP or CoAP
+     */
+    public void addNetwork(NetworkType ntype, Integer port){
+        ntype.setPort(port);
+        addNetwork(ntype);
+    }
+    
     /**
      * Send Message
      * @param dst
@@ -229,13 +265,7 @@ public abstract class MinT {
      */
     public void Start() {
         devicemanager.initAllDevice();
-        SchedRun();
-    }
-    /**
-     * Start scheduler
-     * Initialize all devices in device manager
-     */
-    protected void SchedRun() {
+        networkmanager.TurnOnNetwork();
         scheduler.SchedulerRunning();
     }
     

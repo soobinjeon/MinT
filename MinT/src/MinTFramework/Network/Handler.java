@@ -36,19 +36,43 @@ public abstract class Handler {
      */
     @Deprecated
     public void callPacketHandleRequest(String src, String msg, MinT frame){};
+    
     /***
-     * Call Packet Handler
+     * Call Packet Handler::
+     * You should use UserHandler(String src, String msg);
      * @param src packet source
      * @param msg pakcet message
      */
-    abstract public void callPacketHandleRequest(String src, String msg);
+    @Deprecated
+    public void callPacketHandleRequest(String src, String msg){};
     
-//    protected void allhadle(String src, String msg){
-//        SystemCall(src, msg);
-//        callPacketHandleRequest(src, msg);
-//    }
-//    
-//    private void SystemCall(String src, String msg){
-//        
-//    }
+    /**
+     * Handler for User request
+     * @param src
+     * @param msg 
+     */
+    abstract public void userHandler(String src, String msg);
+    
+    /**
+     * call Handler
+     * @param src
+     * @param msg 
+     */
+    protected void callhadler(String src, String msg){
+        SystemHandler(src, msg);
+        userHandler(src,msg);
+        callPacketHandleRequest(src, msg);
+    }
+    
+    /**
+     * System Handler can handle navigator for 
+     * discovering searched sensor nodes (?) <- would need to routing protocol,
+     * information searching <- need to storages,
+     * ,and so on
+     * @param src
+     * @param msg 
+     */
+    private void SystemHandler(String src, String msg){
+        
+    }
 }

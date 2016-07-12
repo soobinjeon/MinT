@@ -30,6 +30,8 @@ public enum DeviceType {
     SERVMOTOR("SERVMOTOR"), 
     DUST("DUST"),
     CO2("CO2"),
+    PHOTOGRAPH("PHOTOGRAPH"),
+    LED("LED"),
     
     BLE("BLE"),
     WIFI("WIFI"), 

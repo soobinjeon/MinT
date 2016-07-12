@@ -46,9 +46,9 @@ public abstract class Network {
      *
      * @param frame MinT Framework Object
      */
-    public Network(MinT frame) {
+    public Network(MinT frame, ApplicationProtocol _ap) {
         this.frame = frame;
-        ap = null;
+        ap = _ap;
     }
 
     /***
@@ -73,7 +73,7 @@ public abstract class Network {
     public void MatcherAndObservation(byte[] packet) {
         matchedPacket = ap.getApplicationPacket(packet);
         if (isFinalDestinyHere(matchedPacket.getDst())) {
-            frame.getNetworkHandler().callPacketHandleRequest(matchedPacket.getSrc(), matchedPacket.getMessage());
+            frame.getNetworkHandler().callhadler(matchedPacket.getSrc(), matchedPacket.getMessage());
         } else {
             /**
              * Todo: 라우팅 테이블에서 다음 목표를 받아와야함

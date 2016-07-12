@@ -25,4 +25,8 @@ public class MinTConfig {
     static public final int DEFAULT_THREAD_NUM = 500;
     static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
     static public boolean DebugMode = false;
+    
+    //for Network
+    static public final int INTERNET_TCPUDP_PORT = 6513;
+    static public final int INTERNET_COAP_PORT = 6514;
 }
