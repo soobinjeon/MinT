@@ -20,12 +20,14 @@ import MinTFramework.ExternalDevice.DeviceClassification;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
-import MinTFramework.Network.ApplicationProtocol;
+import MinTFramework.ExternalDevice.DeviceBLE;
+import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Handler;
-import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.Profile;
+import java.util.ArrayList;
 
 /**
  *
@@ -116,6 +118,29 @@ public abstract class MinT {
     public Device getDevice(String name){
         return devicemanager.getDevice(name);
     }
+    
+    /**
+     * return device list by DeviceType
+     * @param dtype
+     * @return 
+     */
+    public ArrayList<Device> getDevices(DeviceType dtype){
+        return devicemanager.getDevicesbyDeviceType(dtype);
+    }
+    
+    /**
+     * get BLE Device
+     * @return 
+     */
+    public DeviceBLE getBLEDevice(){
+        ArrayList<Device> dlist = devicemanager.getDevicesbyDeviceType(DeviceType.BLE);
+        if(dlist != null){
+            return (DeviceBLE)dlist.get(0);
+        }
+        else
+            return null;
+    }
+    
     /**
      * Remove device for the ID.
      * @param deviceID 
@@ -132,6 +157,8 @@ public abstract class MinT {
         return devicemanager.getDeviceList();
     }
     /**
+     * not completed source
+     * @deprecated 
      * Return all devices in device manager
      * @return array of device
      */
@@ -256,8 +283,12 @@ public abstract class MinT {
         networkmanager.sendMsg(dst, msg);
     }
     
-    public void setApplicationProtocol(ApplicationProtocol ap){
-        networkmanager.setApplicationProtocol(ap);
+    /**
+     * set Application Protocol
+     * @param ap 
+     */
+    public void setRoutingProtocol(RoutingProtocol ap){
+        networkmanager.setRoutingProtocol(ap);
     }
     
     /**

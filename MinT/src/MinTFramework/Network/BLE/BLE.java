@@ -18,8 +18,10 @@ package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.MinT;
-import MinTFramework.Network.ApplicationProtocol;
+import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
+import MinTFramework.Network.Profile;
+import MinTFramework.Util.DebugLog;
 
 /**
  *
@@ -34,25 +36,55 @@ public class BLE extends Network {
     Thread receiverThread;
     String cmd;
     String dst;
-    BLE self;
-    DeviceBLE deviceBLE;
-
+    DeviceBLE deviceBLE = null;
+    DebugLog dl = new DebugLog("BLE Network");
+    
     /**
-     * BLE communication structor
-     *
+     * Do not support in v2.02 and later
+     * BLE communication structure
+     * @deprecated 
      * @param deviceBLE
      * @param frame
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public BLE(DeviceBLE deviceBLE, ApplicationProtocol _ap, MinT frame) {
-        super(frame,_ap);
-        
-        this.deviceBLE = deviceBLE;
+    public BLE(DeviceBLE deviceBLE, RoutingProtocol _ap, MinT frame) {
+        super(frame,new Profile(frame.getNodeName(),"Need to Network Address!!!"),_ap);
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);
         this.startReceiveThread();
-
-        self = this;
+    }
+    
+    /**
+     * BLE Communication Structure
+     * Do not support under v2.03
+     * @param _ap
+     * @param frame 
+     */
+    public BLE(RoutingProtocol _ap, MinT frame){
+        super(frame,new Profile(frame.getNodeName(),"Need to Network Address!!!"),_ap);
+        if(!setBLEDevice()){
+            String str = "BLE devices are not detected in the MinT: Please check it out";
+            System.err.println(str);
+            dl.printMessage(str);
+            isWorking(false);
+            return;
+        }
+            
+        receiver = new BLEReceiver(deviceBLE, this);
+        sender = new BLESender(deviceBLE);
+        this.startReceiveThread();
+    }
+    
+    /**
+     * set BLE Device, if there are no BLE devices, return false
+     * @return BLE existence
+     */
+    private boolean setBLEDevice() {
+        deviceBLE = frame.getBLEDevice();
+        if(deviceBLE == null)
+            return false;
+        else
+            return true;
     }
 
     /***

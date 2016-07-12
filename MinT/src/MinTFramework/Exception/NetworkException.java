@@ -14,19 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Exception;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 100;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
-    static public boolean DebugMode = false;
+public class NetworkException extends Exception{
+    public static enum NE{
+        NetworkNotWorking("Network is not Working"),
+        NoNetworkDevice("There are no network devices");
+        
+        String n;
+        NE(String name){
+            n = name;
+        }
+        
+        public String Print(){
+            return n;
+        }
+    }
     
-    //for Network
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
+    private NE ex;
+    
+    public NetworkException(NetworkException.NE ex){
+        super(ex.Print());
+    }
+    
+    public NE getException(){
+        return ex;
+    }
 }

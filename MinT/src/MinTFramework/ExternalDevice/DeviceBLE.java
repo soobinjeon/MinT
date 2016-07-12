@@ -28,14 +28,14 @@ public abstract class DeviceBLE extends Device{
     public int uartNumber;
     
     public DeviceBLE(String _LibName) {
-        super(_LibName);
+        super(_LibName,DeviceType.BLE);
     }
     
     public DeviceBLE(String _LibName, int uartNumber) {
-        super(_LibName);
+        this(_LibName);
         this.uartNumber = uartNumber;
     }
-
+    
     abstract public String initBLE(int mode);          //Ready for start
                                                         //Check, Set role
     abstract public String discovery();                //Discovery BLE device

@@ -36,7 +36,9 @@ public enum DeviceType {
     BLE("BLE"),
     WIFI("WIFI"), 
     NFC("NFC"), 
-    BLUETOOTH("BLUETOOTH");
+    BLUETOOTH("BLUETOOTH"),
+    
+    NONE("NONE");
     
     private String deviceType;
     

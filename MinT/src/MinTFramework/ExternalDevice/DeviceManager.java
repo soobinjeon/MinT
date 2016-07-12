@@ -17,6 +17,7 @@
 package MinTFramework.ExternalDevice;
 
 import MinTFramework.Util.DebugLog;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -120,7 +121,25 @@ public class DeviceManager {
         }
         return d;
     }
+    
     /**
+     * get Devices by DeviceType
+     * @param dtype
+     * @return 
+     */
+    public ArrayList<Device> getDevicesbyDeviceType(DeviceType dtype){
+        ArrayList<Device> dlist = new ArrayList<Device>();
+        for(Device d : devicemap.values()){
+            if(d.getDeviceType() == dtype)
+                dlist.add(d);
+        }
+        
+        return dlist;
+    }
+    
+    /**
+     * @deprecated 
+     * not completed source
      * Return All devices in devicemap
      * @return Device array
      */

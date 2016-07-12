@@ -16,27 +16,16 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.syspacket.MinTApplicationPacket;
+import java.util.ArrayList;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class ApplicationProtocol {
-    /***
-     * Make Source, Destination, Message to byte array
-     * @param src source of message
-     * @param fdst destination of message 
-     * @param msg message
-     * @return packet byte array 
-     */
-    abstract public byte[] makeApplicationPacket(String src, String fdst, String msg);
-    /***
-     * make byte array to MinTApplicatinPacket
-     * 
-     * @param packet packet byte array
-     * @return MinTApplicationPacket
-     */
-    abstract public MinTApplicationPacket getApplicationPacket(byte[] packet);
+public class RoutingProtocol {
+    
+    public RoutingProtocol(){
+        
+    }
 }

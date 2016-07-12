@@ -17,8 +17,9 @@
 package MinTFramework.Network.UDP;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.ApplicationProtocol;
+import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
+import MinTFramework.Network.Profile;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
@@ -54,8 +55,8 @@ public class UDP extends Network {
      * @param frame
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public UDP(int port, ApplicationProtocol _ap, MinT frame) {
-        super(frame,_ap);
+    public UDP(int port, RoutingProtocol _ap, MinT frame) {
+        super(frame,new Profile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port),_ap);
 
         PORT = port;
         this.setUDPSocket();
@@ -137,7 +138,7 @@ public class UDP extends Network {
      */
 
     @Override
-    public void setDestination(String dst) {
+    public void setDestination(Profile dst) {
         String[] adst = dst.split(":");
         this.dstIP = adst[0];
         this.dstPort = Integer.parseInt(adst[1]);

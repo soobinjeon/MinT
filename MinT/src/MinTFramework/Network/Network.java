@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.syspacket.MinTApplicationPacket;
+import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 
 /**
@@ -27,13 +27,15 @@ import MinTFramework.MinT;
 public abstract class Network {
 
     protected MinT frame;
-    private ApplicationProtocol ap;
-    private MinTApplicationPacket matchedPacket;
+    private RoutingProtocol routing;
+    private Profile profile;
+    
+    private boolean isworking = true;
     /***
      * set destination of packet
      * @param dst 
      */
-    abstract protected void setDestination(String dst);
+    abstract protected void setDestination(Profile dst);
     /***
      * send packet
      * @param packet 
@@ -46,21 +48,22 @@ public abstract class Network {
      *
      * @param frame MinT Framework Object
      */
-    public Network(MinT frame, ApplicationProtocol _ap) {
+    public Network(MinT frame, Profile npro, RoutingProtocol _routing) {
         this.frame = frame;
-        ap = _ap;
+        routing = _routing;
+        profile = npro;
     }
 
     /***
      * 
-     * Setting ApplicationProtocol 
-     * !!! Not Network Procotol !!! 
-     * Default: "MinTApplicationProtocol"
+     * Setting RoutingProtocol 
+ !!! Not Network Procotol !!! 
+ Default: "MinTApplicationProtocol"
      *
-     * @param ap ApplicationProtocol
+     * @param ap RoutingProtocol
      */
-    public void setApplicationProtocol(ApplicationProtocol ap) {
-        this.ap = ap;
+    public void setApplicationProtocol(RoutingProtocol routing) {
+        this.routing = routing;
     }
 
     /**
@@ -71,8 +74,8 @@ public abstract class Network {
      * @param packet
      */
     public void MatcherAndObservation(byte[] packet) {
-        matchedPacket = ap.getApplicationPacket(packet);
-        if (isFinalDestinyHere(matchedPacket.getDst())) {
+        PacketProtocol matchedPacket = new PacketProtocol(packet);
+        if (isFinalDestiny(matchedPacket.getDestinationNode())) {
             frame.getNetworkHandler().callhadler(matchedPacket.getSrc(), matchedPacket.getMessage());
         } else {
             /**
@@ -88,24 +91,36 @@ public abstract class Network {
      *
      * @param dst destination of message
      * @param msg message to send
+     * @throws MinTFramework.Exception.NetworkException
      */
-    public void send(String dst, String msg) {
+    public void send(PacketProtocol packet) throws NetworkException{
         /**
          * *
          * Todo : dst로 가는 경로 중 다음 목적지를 설정하는 루틴 필요
          */
-        this.setDestination(dst);
-        this.send(ap.makeApplicationPacket(frame.getNodeName(), dst, msg));
+        if(!isWorking())
+            throw new NetworkException(NetworkException.NE.NetworkNotWorking);
+        else{
+            this.setDestination(packet.getNextNode());
+            this.send(packet.getPacket());
+        }
     }
 
     /**
-     * *
      * Check whether destination is here
      *
      * @param dst
      * @return
      */
-    private boolean isFinalDestinyHere(String dst) {
+    private boolean isFinalDestiny(Profile dst) {
         return frame.getNodeName().equals(dst);
+    }
+    
+    protected void isWorking(boolean is){
+        this.isworking = is;
+    }
+    
+    protected boolean isWorking(){
+        return isworking;
     }
 }

@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +57,7 @@ public class OSUtil {
         }
     }
 
-    public static String getIPAddress() {
+    private static String getLinuxIPAddress() {
         String hostAddr = "";
 
         try {
@@ -69,17 +70,37 @@ public class OSUtil {
                     if (!inetAddress.isLoopbackAddress()
                             && !inetAddress.isLinkLocalAddress()
                             && inetAddress.isSiteLocalAddress()) {
-
                         hostAddr = inetAddress.getHostAddress();
-
                     }
                 }
             }
-
         } catch (SocketException e) {
             e.printStackTrace();
         }
         return hostAddr;
     }
-
+    
+    private static String getWindowsIPAddress(){
+      InetAddress ip = null;
+        try {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
+        }  
+        return ip!=null ? ip.getHostAddress() : null;
+    }
+    
+    public static String getIPAddress() {
+        if (OSValidator.isWindows()) {
+            return getWindowsIPAddress();
+        } else if (OSValidator.isMac()) {
+            return getLinuxIPAddress();
+        } else if (OSValidator.isUnix()) {
+            return getLinuxIPAddress();
+        } else if (OSValidator.isSolaris()) {
+            return getLinuxIPAddress();
+        } else {
+            return getLinuxIPAddress();
+        }
+    }
 }

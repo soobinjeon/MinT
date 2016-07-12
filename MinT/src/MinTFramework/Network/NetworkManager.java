@@ -17,12 +17,15 @@
 package MinTFramework.Network;
 
 import MinTFramework.*;
+import MinTFramework.Exception.NetworkException;
 import MinTFramework.Network.*;
+import MinTFramework.Network.BLE.BLE;
 import MinTFramework.Network.UDP.UDP;
-import MinTFramework.Network.syspacket.MinTApplicationPacketProtocol;
 import MinTFramework.Util.DebugLog;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -33,10 +36,10 @@ public class NetworkManager {
     private MinT frame = null;
     private ArrayList<NetworkType> networkList = new ArrayList<NetworkType>();
     private HashMap<NetworkType,Network> networks = new HashMap<NetworkType,Network>();
-    private String nodename = null;
+    private String NodeName = null;
     
     private Handler networkHandler = null;
-    private ApplicationProtocol ap;
+    private RoutingProtocol routing;
     private DebugLog dl = new DebugLog("NetworkManager");
     
     /**
@@ -45,7 +48,7 @@ public class NetworkManager {
      */
     public NetworkManager(MinT frame) {
         this.frame = frame;
-        ap = new MinTApplicationPacketProtocol();
+        routing = new RoutingProtocol();
         networkHandler = new Handler(frame) {
             @Override
             public void userHandler(String src, String msg) {
@@ -80,20 +83,20 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
-            networks.put(ntype, new UDP(ntype.getPort(),ap,this.frame));
+            networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame));
             dl.printMessage("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
-//            networks.put(ntype, new BLE())
+            networks.put(ntype, new BLE(routing, frame));
             dl.printMessage("Turned on BLE");
         }
-        else if(ntype == NetworkType.COAP){
+        else if(ntype == NetworkType.COAP){ // for CoAP, need to add
             dl.printMessage("Turned on COAP");
         }
     }
     
-    public void setApplicationProtocol(ApplicationProtocol ap){
-        this.ap = ap;
+    public void setRoutingProtocol(RoutingProtocol ap){
+        this.routing = ap;
         
         for(Network n:networks.values()){
             n.setApplicationProtocol(ap);
@@ -113,7 +116,11 @@ public class NetworkManager {
          */
         Network cn = networks.get(NetworkType.UDP);
         if (cn != null) {
-            cn.send(dst, msg);
+            try {
+                cn.send(dst, msg);
+            } catch (NetworkException ex) {
+                ex.printStackTrace();
+            }
         }else{
             dl.printMessage("Error : There are no Networks");
             System.out.println("Error : There are no Networks");
@@ -143,7 +150,7 @@ public class NetworkManager {
      */
     public void setNodeName(String name) {
         if(name != null)
-            this.nodename = name;
+            this.NodeName = name;
     }
 
     /**
@@ -152,14 +159,14 @@ public class NetworkManager {
      * @return
      */
     public String getNodeName() {
-        return nodename;
+        return NodeName;
     }
 
     /**
      * set automatically Node Name
      */
     private void setNodeName() {
-        nodename = "node1";
+        NodeName = "temporary Node";
     }
 
 }

@@ -14,19 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Util;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 100;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
-    static public boolean DebugMode = false;
-    
-    //for Network
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
+public class OSValidator {
+  
+    private static String OS = System.getProperty("os.name").toLowerCase();
+  
+    public static boolean isWindows() {
+  
+        return (OS.indexOf("win") >= 0);
+  
+    }
+  
+    public static boolean isMac() {
+  
+        return (OS.indexOf("mac") >= 0);
+  
+    }
+  
+    public static boolean isUnix() {
+  
+        return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
+  
+    }
+  
+    public static boolean isSolaris() {
+  
+        return (OS.indexOf("sunos") >= 0);
+  
+    }
 }

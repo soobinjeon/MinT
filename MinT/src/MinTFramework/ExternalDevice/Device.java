@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public abstract class Device {
 
     protected ArrayList<PortPinSet> ppSet = new ArrayList<>();
+    protected DeviceType dtype = null;
     private String Library_Name = null;
     
     /**
@@ -34,11 +35,25 @@ public abstract class Device {
     abstract protected void initDevice();
     abstract protected void freeDevice();
     
-    public Device(String _LibName) {
-        super();
+    /**
+     * initialize device
+     * @param _LibName
+     * @param dtype 
+     */
+    public Device(String _LibName, DeviceType dtype){
         Library_Name = _LibName;
     }
-
+    
+    /**
+     * Do not support in v2.02 and later
+     * @deprecated 
+     * @param _LibName 
+     */
+    public Device(String _LibName) {
+        this(_LibName, DeviceType.NONE);
+    }
+    
+    
     /**
      * Initiallize Sensor
      */
@@ -163,5 +178,20 @@ public abstract class Device {
     {
         return ppSet;
     }
-
+    
+    /**
+     * set Device Type
+     * @param dt 
+     */
+    public void setDeviceType(DeviceType dt){
+        dtype = dt;
+    }
+    
+    /**
+     * get Device Type
+     * @return 
+     */
+    public DeviceType getDeviceType(){
+        return dtype;
+    }
 }

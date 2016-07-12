@@ -14,19 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Network;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 100;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
-    static public boolean DebugMode = false;
+public class Profile {
+    String name;
+    String address;
+    String Split = "|";
     
-    //for Network
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
+    public Profile(String name, String address){
+        this.name = name;
+        this.address = address;
+    }
+    
+    public Profile(String bytearray){
+        String[] temp = bytearray.split("\\"+Split);
+        if(temp.length > 1){
+            name = temp[0];
+            address = temp[1];
+        }
+    }
+    
+    public String getName(){
+        return name;
+    }
+    
+    public String getAddress(){
+        return address;
+    }
+    
+    public String getProfile(){
+        return name+Split+address;
+    }
 }
