@@ -23,20 +23,23 @@ import MinTFramework.MinTConfig;
  * @author HanYoungTak
  */
 public enum NetworkType {
-    BLE("BLE",null),
-    UDP("UDP",MinTConfig.INTERNET_TCPUDP_PORT),
-    TCPIP("TCP/IP",MinTConfig.INTERNET_TCPUDP_PORT),
-    COAP("COAP",MinTConfig.INTERNET_COAP_PORT),
-    NFC("NFC",null), 
-    BLUETOOTH("BLUETOOTH",null);
+    BLE(1,"BLE",null),
+    UDP(2,"UDP",MinTConfig.INTERNET_TCPUDP_PORT),
+    TCPIP(3,"TCP/IP",MinTConfig.INTERNET_TCPUDP_PORT),
+    COAP(4,"COAP",MinTConfig.INTERNET_COAP_PORT),
+    NFC(5,"NFC",null), 
+    BLUETOOTH(6,"BLUETOOTH",null),
+    NONE(0,"NONE",null);
     
     private String networkType;
     private Integer port;
+    private int id;
     
-    private NetworkType(String networkType, Integer port)
+    private NetworkType(int id, String networkType, Integer port)
     {
         this.networkType = networkType;
         this.port = port;
+        this.id = id;
     }
     
     public String getDeviceType()
@@ -46,7 +49,7 @@ public enum NetworkType {
     
     /**
      * Caution!!! Port number is set up to constant value for Network.
-     * UDP사용 시 포트가 여러개면, 민티 초기 설정 떄 연결 가능 포트 리스트를 저장해주고 해당 포트를 모두 검색하는 것도 좋은 방법인거 같음? (쓸데없는 것일수도)
+     * UDP사용 시 포트가 여러개면, MinT 초기 설정 떄 연결 가능 포트 리스트를 저장해주고 해당 포트를 모두 검색하는 것도 좋은 방법인거 같음? (쓸데없는 것일수도)
      * @param port 
      */
     public void setPort(Integer port){
@@ -59,5 +62,18 @@ public enum NetworkType {
      */
     public Integer getPort(){
         return port;
+    }
+    
+    public int getID(){
+        return id;
+    }
+    
+    public static NetworkType getNetworkType(int id){
+        for(NetworkType nt : NetworkType.values()){
+            if(nt.getID() == id)
+                return nt;
+        }
+        
+        return NetworkType.NONE;
     }
 }

@@ -29,7 +29,7 @@ public abstract class Handler {
         this.frame = _frame;
     }
     /***
-     * Call Packet Handler
+     * Call Packet Handler: Do not supprot upper v2.03
      * @param src packet source
      * @param msg pakcet message
      * @param frame MinTFramework
@@ -38,7 +38,7 @@ public abstract class Handler {
     public void callPacketHandleRequest(String src, String msg, MinT frame){};
     
     /***
-     * Call Packet Handler::
+     * Call Packet Handler:: Do not support upper v2.03
      * You should use UserHandler(String src, String msg);
      * @param src packet source
      * @param msg pakcet message
@@ -51,17 +51,16 @@ public abstract class Handler {
      * @param src
      * @param msg 
      */
-    abstract public void userHandler(String src, String msg);
+    abstract public void userHandler(Profile src, String msg);
     
     /**
      * call Handler
      * @param src
      * @param msg 
      */
-    protected void callhadler(String src, String msg){
-        SystemHandler(src, msg);
-        userHandler(src,msg);
-        callPacketHandleRequest(src, msg);
+    protected void callhadler(PacketProtocol packet){
+        SystemHandler(packet.getSource(), packet.getMsgData());
+        userHandler(packet.getSource(),packet.getMsgData());
     }
     
     /**
@@ -72,7 +71,7 @@ public abstract class Handler {
      * @param src
      * @param msg 
      */
-    private void SystemHandler(String src, String msg){
+    private void SystemHandler(Profile src, String msg){
         
     }
 }

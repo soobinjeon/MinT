@@ -25,6 +25,7 @@ import MinTFramework.MinTConfig;
 public class DebugLog {
 
     private final String Logname;
+    private boolean localDebugMode = true;
     public DebugLog() {
         Logname = "NONAME";
     }
@@ -37,14 +38,18 @@ public class DebugLog {
     public DebugLog(String name) {
         Logname = name;
     }
-
+    
+    public DebugLog(String name,boolean isdebug) {
+        this(name);
+        localDebugMode = isdebug;
+    }
     /**
      * 콘솔에 메시지 출력
      *
      * @param str 출력할 메시지
      */
     public void printMessage(String str) {
-        if(MinTConfig.DebugMode)
+        if(localDebugMode && MinTConfig.DebugMode)
             System.out.println(Logname + ": " + str);
     }
 }

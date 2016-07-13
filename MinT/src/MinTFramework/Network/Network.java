@@ -18,7 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
-
+import MinTFramework.Util.DebugLog;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -27,9 +27,10 @@ import MinTFramework.MinT;
 public abstract class Network {
 
     protected MinT frame;
+    protected NetworkManager networkmanager;
+    protected Profile profile;
     private RoutingProtocol routing;
-    private Profile profile;
-    
+    private DebugLog dl = new DebugLog("Network",false);
     private boolean isworking = true;
     /***
      * set destination of packet
@@ -48,8 +49,9 @@ public abstract class Network {
      *
      * @param frame MinT Framework Object
      */
-    public Network(MinT frame, Profile npro, RoutingProtocol _routing) {
+    public Network(MinT frame, NetworkManager nm, Profile npro, RoutingProtocol _routing) {
         this.frame = frame;
+        this.networkmanager = nm;
         routing = _routing;
         profile = npro;
     }
@@ -74,14 +76,13 @@ public abstract class Network {
      * @param packet
      */
     public void MatcherAndObservation(byte[] packet) {
+        dl.printMessage(new String(packet));
         PacketProtocol matchedPacket = new PacketProtocol(packet);
+        dl.printMessage(matchedPacket.getPacketString());
         if (isFinalDestiny(matchedPacket.getDestinationNode())) {
-            frame.getNetworkHandler().callhadler(matchedPacket.getSrc(), matchedPacket.getMessage());
-        } else {
-            /**
-             * Todo: 라우팅 테이블에서 다음 목표를 받아와야함
-             */
-            frame.sendMessage(matchedPacket.getDst(), matchedPacket.getMessage());
+            frame.getNetworkHandler().callhadler(matchedPacket);
+        } else { //If stopover, through to stopover method in networkmanager
+            networkmanager.stopOver(matchedPacket);
         }
     }
 
@@ -94,10 +95,6 @@ public abstract class Network {
      * @throws MinTFramework.Exception.NetworkException
      */
     public void send(PacketProtocol packet) throws NetworkException{
-        /**
-         * *
-         * Todo : dst로 가는 경로 중 다음 목적지를 설정하는 루틴 필요
-         */
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
@@ -113,7 +110,7 @@ public abstract class Network {
      * @return
      */
     private boolean isFinalDestiny(Profile dst) {
-        return frame.getNodeName().equals(dst);
+        return this.profile.equals(dst);
     }
     
     protected void isWorking(boolean is){
@@ -122,5 +119,13 @@ public abstract class Network {
     
     protected boolean isWorking(){
         return isworking;
+    }
+    
+    public Profile getProfile(){
+        return profile;
+    }
+    
+    public NetworkType getNetworkType(){
+        return profile.getNetworkType();
     }
 }

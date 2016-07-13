@@ -22,13 +22,23 @@ package MinTFramework.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Profile {
-    String name;
-    String address;
-    String Split = "|";
+    private String id;
+    private String name="";
+    private String address="";
+    private NetworkType ntype;
+    private String Split = "|";
     
-    public Profile(String name, String address){
+    /**
+     * new Network Profile for current, next or final destination nodes
+     * @param name Name of Node
+     * @param address Address of Node (ex : Internet based:ip address, BLE:bluetooth address and so on)
+     * @param ntype type of Network
+     */
+    public Profile(String name, String address, NetworkType ntype){
         this.name = name;
         this.address = address;
+        this.ntype = ntype;
+        makeID();
     }
     
     public Profile(String bytearray){
@@ -36,6 +46,12 @@ public class Profile {
         if(temp.length > 1){
             name = temp[0];
             address = temp[1];
+            ntype = null;
+            id = name+address;
+        }
+        
+        if(temp.length > 2){
+            ntype = NetworkType.getNetworkType(Integer.parseInt(temp[2]));
         }
     }
     
@@ -47,7 +63,54 @@ public class Profile {
         return address;
     }
     
+    public String getId(){
+        return id;
+    }
+    
+    public NetworkType getNetworkType(){
+        return ntype;
+    }
+    
+    public void setAddress(String add){
+        address = add;
+        makeID();
+    }
+    
+    public void setName(String name){
+        this.name = name;
+        makeID();
+    }
+    
     public String getProfile(){
-        return name+Split+address;
+        String str;
+        str = name+Split+address;
+        if(ntype!=null)
+            str += Split+ntype.getID();
+        return str;
+    }
+    
+    public boolean isNameProfile(){
+        return !name.equals("")&&(address == null || address.equals(""));
+    }
+    
+    /**
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj){
+        Profile ep = (Profile)obj;
+        if(this.id.equals(ep.getId()))
+            return true;
+        else
+            return false;
+    }
+
+    private void makeID() {
+        if(address==null || address.equals(""))
+            id = name + "";
+        else
+            id = name+address;
     }
 }

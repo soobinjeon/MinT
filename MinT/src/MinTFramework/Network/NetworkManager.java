@@ -40,7 +40,7 @@ public class NetworkManager {
     
     private Handler networkHandler = null;
     private RoutingProtocol routing;
-    private DebugLog dl = new DebugLog("NetworkManager");
+    private DebugLog dl = new DebugLog("NetworkManager",false);
     
     /**
      * Auto Set Network Manager as possible
@@ -51,7 +51,7 @@ public class NetworkManager {
         routing = new RoutingProtocol();
         networkHandler = new Handler(frame) {
             @Override
-            public void userHandler(String src, String msg) {
+            public void userHandler(Profile src, String msg) {
             }
         };
         
@@ -83,11 +83,11 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
-            networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame));
+            networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame,this));
             dl.printMessage("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
-            networks.put(ntype, new BLE(routing, frame));
+            networks.put(ntype, new BLE(routing, frame, this));
             dl.printMessage("Turned on BLE");
         }
         else if(ntype == NetworkType.COAP){ // for CoAP, need to add
@@ -104,20 +104,62 @@ public class NetworkManager {
     }
     
     /**
+     * send Direct Message
+     * @param dst
+     * @param msg 
+     */
+    public void sendDirectMessage(Profile dst, String msg) {
+        Profile fdst=null;
+        if(dst.isNameProfile()){
+            //라우팅 스토어에서 검색
+            fdst = dst;
+        }else
+            fdst = dst;
+        sendMsg(new PacketProtocol(null, null, getNextNode(fdst), fdst, msg));
+    }
+    
+    /**
+     * Stop Over Processor
+     * @param packet 
+     */
+    public void stopOver(PacketProtocol packet){
+        
+    }
+    
+    /**
+     * Routing Protocol
+     * @param fdst
+     * @return 
+     */
+    private Profile getNextNode(Profile fdst){
+        //Serch Routing Protocol
+        return fdst;
+    }
+    
+    /**
      * *
-     *
+     * 얘는 프로토콜에서 목적지의 프로토콜에 따라 보내는 네트워크를 선택
      * @param dst
      * @param msg
      */
-    public void sendMsg(String dst, String msg) {
-        /**
-         * UDP만 지윈
-         * Todo:최종 dst를 protocol에서 찾아 중간지점을 지정하는 루틴 필요
-         */
-        Network cn = networks.get(NetworkType.UDP);
-        if (cn != null) {
+    private void sendMsg(PacketProtocol packet) {
+        NetworkType nnodetype = packet.getNextNode().getNetworkType();
+        Network sendNetwork = networks.get(nnodetype);
+        
+        //set Source Node
+        if(packet.getSource() == null)
+            packet.setSource(sendNetwork.getProfile());
+        
+        //set Previous Node
+        if(packet.getPreviosNode() == null)
+            packet.setPrevNode(sendNetwork.getProfile());
+        
+        //Send Message
+        if (sendNetwork != null) {
             try {
-                cn.send(dst, msg);
+                dl.printMessage("Send Network"+sendNetwork.getNetworkType());
+                dl.printMessage("Packet :"+packet.getPacketString());
+                sendNetwork.send(packet);
             } catch (NetworkException ex) {
                 ex.printStackTrace();
             }
@@ -168,5 +210,4 @@ public class NetworkManager {
     private void setNodeName() {
         NodeName = "temporary Node";
     }
-
 }

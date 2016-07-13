@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.UDP;
+import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -30,7 +31,7 @@ public class SendMsg implements Runnable {
     DatagramPacket outPacket;
     DatagramSocket socket;
     MessageReceiveImpl msgReceiveImpl;
-
+    DebugLog dl = new DebugLog("SendMsg");
     /***
      * send datagram packet to datagram socket
      * @param socket
@@ -45,6 +46,7 @@ public class SendMsg implements Runnable {
     public void run() {
         try {
             socket.send(outPacket);
+            dl.printMessage("Send Success");
         } catch (IOException ex) {
         }
     }

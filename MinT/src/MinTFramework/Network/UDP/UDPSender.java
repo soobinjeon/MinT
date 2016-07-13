@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.UDP;
+import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.*;
 
@@ -27,7 +28,7 @@ public class UDPSender {
     int dstPort;
     byte[] msg;
     int seq;
-
+    DebugLog dl = new DebugLog("UDPSender");
     public UDPSender(DatagramSocket socket) throws SocketException {
         this.socket = socket;
         this.dstPort = 0;
@@ -38,7 +39,8 @@ public class UDPSender {
         this.address = InetAddress.getByName(dstIP);
         this.dstPort = dstPort;
         outPacket = new DatagramPacket(this.msg, this.msg.length, address, dstPort);
-        
+        dl.printMessage("msg : "+msg);
+        dl.printMessage("address : "+dstIP+", dstPort:"+dstPort); 
         new Thread(new SendMsg(socket, outPacket)).start();
         
     }

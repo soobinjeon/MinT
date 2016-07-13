@@ -276,12 +276,18 @@ public abstract class MinT {
     
     /**
      * Send Message
+     * @deprecated 
      * @param dst
      * @param msg 
      */
-    public void sendMessage(String dst, String msg){
-        networkmanager.sendMsg(dst, msg);
+    public void sendMessage(String dst, NetworkType nt, String msg){
+        sendDirectMessage(new Profile("noname",dst,nt),msg);
     }
+    
+    public void sendDirectMessage(Profile dst, String msg){
+        networkmanager.sendDirectMessage(dst,msg);
+    }
+    
     
     /**
      * set Application Protocol

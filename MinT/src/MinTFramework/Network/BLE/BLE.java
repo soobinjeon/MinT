@@ -20,6 +20,8 @@ import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.MinT;
 import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
+import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.Profile;
 import MinTFramework.Util.DebugLog;
 
@@ -40,28 +42,14 @@ public class BLE extends Network {
     DebugLog dl = new DebugLog("BLE Network");
     
     /**
-     * Do not support in v2.02 and later
-     * BLE communication structure
-     * @deprecated 
-     * @param deviceBLE
-     * @param frame
-     */
-    @SuppressWarnings("LeakingThisInConstructor")
-    public BLE(DeviceBLE deviceBLE, RoutingProtocol _ap, MinT frame) {
-        super(frame,new Profile(frame.getNodeName(),"Need to Network Address!!!"),_ap);
-        receiver = new BLEReceiver(deviceBLE, this);
-        sender = new BLESender(deviceBLE);
-        this.startReceiveThread();
-    }
-    
-    /**
      * BLE Communication Structure
      * Do not support under v2.03
      * @param _ap
      * @param frame 
+     * @param nm 
      */
-    public BLE(RoutingProtocol _ap, MinT frame){
-        super(frame,new Profile(frame.getNodeName(),"Need to Network Address!!!"),_ap);
+    public BLE(RoutingProtocol _ap, MinT frame, NetworkManager nm){
+        super(frame,nm,new Profile(frame.getNodeName(),null,NetworkType.BLE),_ap);
         if(!setBLEDevice()){
             String str = "BLE devices are not detected in the MinT: Please check it out";
             System.err.println(str);
@@ -69,7 +57,9 @@ public class BLE extends Network {
             isWorking(false);
             return;
         }
-            
+        //set Address
+        profile.setAddress(deviceBLE.getAddress());
+        
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);
         this.startReceiveThread();
@@ -102,8 +92,8 @@ public class BLE extends Network {
      */
 
     @Override
-    public void setDestination(String dst) {
-        this.dst = dst;
+    public void setDestination(Profile _dst) {
+        this.dst = _dst.getAddress();
         deviceBLE.setRole(1);
                 
         if(deviceBLE.connect(dst))
