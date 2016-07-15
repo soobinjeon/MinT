@@ -130,7 +130,7 @@ public class DeviceManager {
     public ArrayList<Device> getDevicesbyDeviceType(DeviceType dtype){
         ArrayList<Device> dlist = new ArrayList<Device>();
         for(Device d : devicemap.values()){
-            if(d.getDeviceType() == dtype)
+            if(d.getDeviceType() != null && d.getDeviceType() == dtype)
                 dlist.add(d);
         }
         
