@@ -42,6 +42,7 @@ public abstract class Device {
      */
     public Device(String _LibName, DeviceType dtype){
         Library_Name = _LibName;
+        this.dtype = dtype;
     }
     
     /**
