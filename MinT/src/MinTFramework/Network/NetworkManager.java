@@ -18,14 +18,11 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
-import MinTFramework.Network.*;
 import MinTFramework.Network.BLE.BLE;
 import MinTFramework.Network.UDP.UDP;
 import MinTFramework.Util.DebugLog;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -34,19 +31,22 @@ import java.util.logging.Logger;
  */
 public class NetworkManager {
     private MinT frame = null;
-    private ArrayList<NetworkType> networkList = new ArrayList<NetworkType>();
-    private HashMap<NetworkType,Network> networks = new HashMap<NetworkType,Network>();
+    private final ArrayList<NetworkType> networkList;
+    private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
     
     private Handler networkHandler = null;
     private RoutingProtocol routing;
-    private DebugLog dl = new DebugLog("NetworkManager",false);
+    private final DebugLog dl;
     
     /**
      * Auto Set Network Manager as possible
      * @param frame
      */
     public NetworkManager(MinT frame) {
+        this.dl = new DebugLog("NetworkManager",false);
+        this.networkList = new ArrayList<>();
+        this.networks = new HashMap<>();
         this.frame = frame;
         routing = new RoutingProtocol();
         networkHandler = new Handler(frame) {
