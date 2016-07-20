@@ -18,14 +18,17 @@ package MinTFramework.CacheMap;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * to be a CacheMap for MinT, use this interface
  * @author soobin
  */
 public interface CacheMap {
-    public void put(CacheData data);
+    public void put(String name, CacheData data);
     public CacheData get(String name);
     public ArrayList<CacheData> getResourcebyDeviceType(DeviceType type);
-    public ArrayList<?> getCacheType();
+    public ArrayList<DeviceType> getAllDeviceType();
+    public ArrayList<String> getAllResourceName();
+    public ArrayList<HashMap> getAllResource();
 }

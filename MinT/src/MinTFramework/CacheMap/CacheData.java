@@ -17,48 +17,189 @@
 package MinTFramework.CacheMap;
 
 import MinTFramework.ExternalDevice.DeviceType;
+import MinTFramework.Util.TypeCaster;
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * need to Convert to byte!!
+ * Cache Data Class for Local Cache
+ * Insert DataType
+ *   - All DataType
+ * return
+ *   - incorrect type : null
  * @author soobin
  */
 public class CacheData {
     private DeviceType dtype;
-    private Object res;
+    private byte[] res;
+    private boolean isStringvalue = true;
     
     public CacheData(DeviceType dtype, Object _res){
-        setResource(_res);
-        System.out.println(dtype.toString()+" "+res);
+        this.dtype = dtype;
+        try {
+            setResource(_res);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
-    public void setResource(Object setres){
-        res = String.valueOf(setres);
+    public void setResource(Object setres) throws IOException{
+        if(setres instanceof Boolean){
+            res = TypeCaster.zipStringToBytes(Boolean.toString((Boolean)setres));
+        }else if(setres instanceof String)
+            res = TypeCaster.zipStringToBytes((String) setres);
+        else{
+            res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
+            isStringvalue = false;
+        }
+    }
+    
+    private double getNumberResource(){
+        return TypeCaster.byteToDouble(res, ByteOrder.BIG_ENDIAN);
+    }
+    
+    private String getStringResource(){
+        String str = null;
+        try {
+            str =  TypeCaster.unzipStringFromBytes(res);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        
+        return str;
     }
 
+    /**
+     * get Resource by Object
+     * @return object Type Resource
+     */
     public Object getResource(){
-        return res;
+        if(isStringvalue)
+            return getStringResource();
+        else
+            return getNumberResource();
     }
+    
+    /**
+     * get String type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
     public String getResourceString(){
-        return String.valueOf(res);
+        if(isStringvalue)
+            return getStringResource();
+        else
+            return String.valueOf(getResource());
     }
     
-    public int getResourceInt(){
-        return Integer.parseInt(getResourceString());
+    /**
+     * get Integer type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Integer getResourceInt(){
+        if(isStringvalue)
+            return null;
+        else
+            return (int)getNumberResource();
     }
     
-    public float getResourceFloat(){
-        return Float.parseFloat(res);
+    /**
+     * get Float type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Float getResourceFloat(){
+        if(isStringvalue)
+            return null;
+        else
+            return (float)getNumberResource();
     }
     
-    public double getResourceDouble(){
-        return Double.parseDouble(res);
+    /**
+     * get Double type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Double getResourceDouble(){
+        if(isStringvalue)
+            return null;
+        else
+            return (double)getNumberResource();
     }
     
-    public long getResourceLong(){
-        return Long.parseLong(res);
+    /**
+     * get Long type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Long getResourceLong(){
+        if(isStringvalue)
+            return null;
+        else
+            return (long)getNumberResource();
     }
     
-    public boolean getResourceBoolean(){
-        return Boolean.parseBoolean(res);
+    /**
+     * get Short type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Short getResourceShort(){
+        if(isStringvalue)
+            return null;
+        else
+            return (short)getNumberResource();
+    }
+    
+    /**
+     * get Character type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Character getResourceChar(){
+        if(isStringvalue)
+            return null;
+        else
+            return (char)getNumberResource();
+    }
+    
+    /**
+     * get Boolean type Resource
+     * if it is not matched to input data type(numeric <-> String, return null 
+     * @return null, if it is not matched to input data type
+     */
+    public Boolean getResourceBoolean(){
+        if(isStringvalue){
+            return Boolean.parseBoolean(getStringResource());
+        }else{
+            int tf = (int)getNumberResource();
+            if(tf == 0)
+                return false;
+            else
+                return true;
+        }
+    }
+    
+    /**
+     * get Length
+     * @return 
+     */
+    public int getLength(){
+        return res != null ? res.length : 0;
+    }
+    
+    /**
+     * get Device Type
+     * @return type of devices
+     */
+    public DeviceType getDeviceType(){
+        return dtype;
+    }
+
+    public CacheData getClone() {
+        return new CacheData(this.dtype, this.getResource());
     }
 }

@@ -16,6 +16,7 @@
  */
 package MinTFramework;
 
+import MinTFramework.CacheMap.CacheData;
 import MinTFramework.ExternalDevice.DeviceClassification;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
@@ -39,6 +40,7 @@ public abstract class MinT {
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
+    private LocalCache sharedcache;
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
@@ -51,6 +53,7 @@ public abstract class MinT {
         scheduler = new Scheduler(requestQueueLength, numOfThread);
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager(this);
+        sharedcache = new LocalCache();
     }
     
     /**
@@ -296,6 +299,32 @@ public abstract class MinT {
     public void setRoutingProtocol(RoutingProtocol ap){
         networkmanager.setRoutingProtocol(ap);
     }
+    
+    /***************************
+     * Local Shared Cache
+     ****************************/
+    
+    /**
+     * put cache data to Shared Memory
+     * @param name
+     * @param cdata 
+     */
+    public void putSharedCache(String name, CacheData cdata){
+        sharedcache.put(name, cdata);
+    }
+    
+    /**
+     * get Cache Data from Shared Memory
+     * @param cache name
+     * @return 
+     */
+    public CacheData getSharedCache(String name){
+        return sharedcache.get(name);
+    }
+    
+    /***************************
+     * Frame Operation
+     ****************************/
     
     /**
      * Start framework

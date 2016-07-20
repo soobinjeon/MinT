@@ -21,6 +21,8 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -64,5 +66,67 @@ public class TypeCaster {
         byteArrayOutputStream.close();
 
         return byteArrayOutputStream.toString();
+    }
+    
+    public static byte[] ObjectTobyte(Object value, ByteOrder order) {
+        ByteBuffer buff = null;
+        if(value instanceof Integer){
+            buff = ByteBuffer.allocate(Integer.SIZE/8);
+            buff.order(order);
+            buff.putInt((Integer)value);
+        }
+        else if(value instanceof Double){
+            buff = ByteBuffer.allocate(Double.SIZE/8);
+            buff.order(order);
+            buff.putDouble((Double)value);
+        }
+        else if(value instanceof Long){
+            buff = ByteBuffer.allocate(Long.SIZE/8);
+            buff.order(order);
+            buff.putLong((Long)value);
+        }
+        else if(value instanceof Float){
+            buff = ByteBuffer.allocate(Float.SIZE/8);
+            buff.order(order);
+            buff.putFloat((Float)value);
+        }
+        else if(value instanceof Short){
+            buff = ByteBuffer.allocate(Short.SIZE/8);
+            buff.order(order);
+            buff.putShort((Short)value);
+        }
+        else if(value instanceof Character){
+            buff = ByteBuffer.allocate(Character.SIZE/8);
+            buff.order(order);
+            buff.putChar((Character)value);
+        }
+        else
+            return null;
+
+//        System.out.println("intTobyte : " + buff);
+        return buff.array();
+    }
+    
+    
+    public static double byteToDouble(byte[] bytes, ByteOrder order) {
+
+        ByteBuffer buff = ByteBuffer.allocate(bytes.length);
+        buff.order(order);
+
+        // buff사이즈는 4인 상태임
+        // bytes를 put하면 position과 limit는 같은 위치가 됨.
+        buff.put(bytes);
+        // flip()가 실행 되면 position은 0에 위치 하게 됨.
+        buff.flip();
+
+//        System.out.println("byteToInt : " + buff);
+        double result = 0;
+        if(bytes.length == 2)
+            result = (double)buff.getShort();
+        else if(bytes.length == 4)
+            result = (double)buff.getInt();
+        else
+            result = buff.getDouble();
+        return result; // position위치(0)에서 부터 4바이트를 int로 변경하여 반환
     }
 }
