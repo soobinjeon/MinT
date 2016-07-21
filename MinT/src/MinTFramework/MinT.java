@@ -16,7 +16,7 @@
  */
 package MinTFramework;
 
-import MinTFramework.CacheMap.CacheData;
+import MinTFramework.CacheMap.Resource;
 import MinTFramework.ExternalDevice.DeviceClassification;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
@@ -309,7 +309,7 @@ public abstract class MinT {
      * @param name
      * @param cdata 
      */
-    public void putSharedCache(String name, CacheData cdata){
+    public void putSharedCache(String name, lResource cdata){
         sharedcache.put(name, cdata);
     }
     
@@ -318,7 +318,8 @@ public abstract class MinT {
      * @param cache name
      * @return 
      */
-    public CacheData getSharedCache(String name){
+    public lResource getSharedCache(String name){
+        System.out.println("Mem Size : "+sharedcache.getAllResource().size());
         return sharedcache.get(name);
     }
     

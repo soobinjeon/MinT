@@ -31,28 +31,28 @@ import java.util.logging.Logger;
  *   - incorrect type : null
  * @author soobin
  */
-public class CacheData {
-    private DeviceType dtype;
-    private byte[] res;
-    private boolean isStringvalue = true;
+public abstract class Resource {
+    protected DeviceType dtype;
+    protected byte[] res;
+    protected boolean isStringvalue = true;
     
-    public CacheData(DeviceType dtype, Object _res){
+    public Resource(DeviceType dtype, Object _getResource){
         this.dtype = dtype;
-        try {
-            setResource(_res);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        setResource(_getResource);
     }
     
-    public void setResource(Object setres) throws IOException{
-        if(setres instanceof Boolean){
-            res = TypeCaster.zipStringToBytes(Boolean.toString((Boolean)setres));
-        }else if(setres instanceof String)
-            res = TypeCaster.zipStringToBytes((String) setres);
-        else{
-            res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
-            isStringvalue = false;
+    public void setResource(Object setres){
+        try{
+            if(setres instanceof Boolean){
+                res = TypeCaster.zipStringToBytes(Boolean.toString((Boolean)setres));
+            }else if(setres instanceof String)
+                res = TypeCaster.zipStringToBytes((String) setres);
+            else{
+                res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
+                isStringvalue = false;
+        }
+        }catch(Exception e){
+            /**/
         }
     }
     
@@ -198,8 +198,6 @@ public class CacheData {
     public DeviceType getDeviceType(){
         return dtype;
     }
-
-    public CacheData getClone() {
-        return new CacheData(this.dtype, this.getResource());
-    }
+    
+    public abstract Object getClone();
 }

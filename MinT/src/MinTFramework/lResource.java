@@ -14,22 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.CacheMap;
+package MinTFramework;
 
+import MinTFramework.CacheMap.Resource;
 import MinTFramework.ExternalDevice.DeviceType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
- * to be a CacheMap for MinT, use this interface
+ *
  * @author soobin
  */
-public interface CacheMap<T> {
-    public void put(String name, T data);
-    public T get(String name);
-    public ArrayList<T> getResourcebyDeviceType(DeviceType type);
-    public List<DeviceType> getAllDeviceType();
-    public ArrayList<String> getAllResourceName();
-    public HashMap<String,T> getAllResource();
+public class lResource extends Resource{
+
+    public lResource(DeviceType dtype, Object _res) {
+        super(dtype, _res);
+    }
+    
+    @Override
+    public Object getClone() {
+        return new lResource(this.dtype,this.getResource());
+    }
+    
 }
