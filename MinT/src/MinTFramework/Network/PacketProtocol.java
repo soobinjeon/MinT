@@ -47,6 +47,7 @@ public class PacketProtocol {
     private byte[] packetdata = null;
     private String packetdataString = null;
     private final int Numberoftotalpacket = 5;
+    private String Scheme = "mint:";
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -128,7 +129,7 @@ public class PacketProtocol {
      * @param msgdata 
      */
     private void makePacketData(TreeMap<ROUTE, Profile> rlist, String msgdata){
-        String result = "";
+        String result = Scheme;
         String mdata = getProtocolData(msgdata);
         for(Profile pf : rlist.values()){
             if(pf != null)
@@ -185,6 +186,7 @@ public class PacketProtocol {
      */
     private void makeData(String spacket) {
         spacket = spacket.trim();
+        spacket = spacket.split(this.Scheme)[1];
         spacket = spacket.substring(1,spacket.length()-1);
         Pattern p = Pattern.compile("\\}\\{");
         String[] split = p.split(spacket);
