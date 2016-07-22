@@ -41,7 +41,7 @@ public abstract class Network {
      * send packet
      * @param packet 
      */
-    abstract protected void send(byte[] packet);
+    abstract protected void sendProtocol(PacketProtocol packet);
 
     /**
      * *
@@ -99,7 +99,7 @@ public abstract class Network {
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
             this.setDestination(packet.getNextNode());
-            this.send(packet.getPacket());
+            this.sendProtocol(packet);
         }
     }
 

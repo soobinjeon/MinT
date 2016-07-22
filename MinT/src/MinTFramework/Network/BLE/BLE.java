@@ -22,6 +22,7 @@ import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
@@ -124,7 +125,7 @@ public class BLE extends Network {
      * @param packet 
      */
     @Override
-    protected void send(byte[] packet) {
+    protected void sendProtocol(PacketProtocol packet) {
         System.out.println(packet);
        sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }

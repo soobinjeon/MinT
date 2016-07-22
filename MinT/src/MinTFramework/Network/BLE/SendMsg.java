@@ -17,6 +17,7 @@
 package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
+import MinTFramework.Network.PacketProtocol;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class SendMsg implements Runnable {
 
-    byte[] outPacket;
+    PacketProtocol outPacket;
     DeviceBLE deviceBLE;
     MessageReceiveImpl msgReceiveImpl;
 
@@ -36,7 +37,7 @@ public class SendMsg implements Runnable {
      * @param deviceBLE 
      * @param outPacket 
      */
-    public SendMsg(DeviceBLE deviceBLE, byte[] outPacket) {
+    public SendMsg(DeviceBLE deviceBLE, PacketProtocol outPacket) {
         this.deviceBLE = deviceBLE;
         this.outPacket = outPacket;
     }
@@ -44,8 +45,9 @@ public class SendMsg implements Runnable {
     @Override
     public void run() {
         //Convert Byte to String
-        deviceBLE.writeUART(new String(outPacket), "#");
-        System.out.println(new String(outPacket) + "#");
+        System.out.println(outPacket.getPacketString() + "#");
+        deviceBLE.writeUART(outPacket.getPacketString() + "#");
+        
         //테스트 용 지연
         try {
             sleep(1000);
