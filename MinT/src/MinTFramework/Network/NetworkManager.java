@@ -18,14 +18,11 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
-import MinTFramework.Network.*;
 import MinTFramework.Network.BLE.BLE;
 import MinTFramework.Network.UDP.UDP;
 import MinTFramework.Util.DebugLog;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -33,24 +30,28 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkManager {
-
     private MinT frame = null;
-    private ArrayList<NetworkType> networkList = new ArrayList<NetworkType>();
-    private HashMap<NetworkType, Network> networks = new HashMap<NetworkType, Network>();
+    private final ArrayList<NetworkType> networkList;
+    private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
-
+    private NetworkStorage nStorage;
+    
     private Handler networkHandler = null;
     private RoutingProtocol routing;
-    private DebugLog dl = new DebugLog("NetworkManager", false);
-
+    private final DebugLog dl;
+    
     /**
      * Auto Set Network Manager as possible
      *
      * @param frame
      */
     public NetworkManager(MinT frame) {
+        this.dl = new DebugLog("NetworkManager",true);
+        this.networkList = new ArrayList<>();
+        this.networks = new HashMap<>();
         this.frame = frame;
         routing = new RoutingProtocol();
+        nStorage = new NetworkStorage();
         networkHandler = new Handler(frame) {
             @Override
             public void userHandler(Profile src, String msg) {
@@ -86,10 +87,13 @@ public class NetworkManager {
      * @param port Internet port for (UDP,TCP/IP,COAP), null for others
      */
     public void setOnNetwork(NetworkType ntype) {
-        if (ntype == NetworkType.UDP) {
-            networks.put(ntype, new UDP(ntype.getPort(), routing, this.frame, this));
-            dl.printMessage("Turned on UDP: " + ntype.getPort());
-        } else if (ntype == NetworkType.BLE) {
+        if(ntype == NetworkType.UDP){
+            dl.printMessage("Starting UDP... "+ntype.getPort());
+            networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame,this));
+            dl.printMessage("Turned on UDP: "+ntype.getPort());
+        }
+        else if(ntype == NetworkType.BLE){
+            dl.printMessage("Starting BLE...");
             networks.put(ntype, new BLE(routing, frame, this));
             dl.printMessage("Turned on BLE");
         } else if (ntype == NetworkType.COAP) { // for CoAP, need to add
