@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Util.TypeCaster;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -46,6 +47,7 @@ public class PacketProtocol {
     private byte[] packetdata = null;
     private String packetdataString = null;
     private final int Numberoftotalpacket = 5;
+    private String Scheme = "mint:";
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -75,7 +77,7 @@ public class PacketProtocol {
     public PacketProtocol(byte[] packet){
         packetdata = packet;
         try {
-            packetdataString = unzipStringFromBytes(packet);
+            packetdataString = TypeCaster.unzipStringFromBytes(packet);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -127,7 +129,7 @@ public class PacketProtocol {
      * @param msgdata 
      */
     private void makePacketData(TreeMap<ROUTE, Profile> rlist, String msgdata){
-        String result = "";
+        String result = Scheme;
         String mdata = getProtocolData(msgdata);
         for(Profile pf : rlist.values()){
             if(pf != null)
@@ -138,7 +140,7 @@ public class PacketProtocol {
         
         result += mdata;
         try {
-            this.packetdata = zipStringToBytes(result);
+            this.packetdata = TypeCaster.zipStringToBytes(result);
             packetdataString = result;
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -184,6 +186,7 @@ public class PacketProtocol {
      */
     private void makeData(String spacket) {
         spacket = spacket.trim();
+        spacket = spacket.split(this.Scheme)[1];
         spacket = spacket.substring(1,spacket.length()-1);
         Pattern p = Pattern.compile("\\}\\{");
         String[] split = p.split(spacket);
@@ -225,42 +228,5 @@ public class PacketProtocol {
     
     public String getMsgData(){
         return data;
-    }
-    
-    //GZIPOutputStream을 이용하여 문자열 압축하기
-    public byte[] zipStringToBytes(String input) throws IOException {
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
-        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(gzipOutputStream);
-        bufferedOutputStream.write(input.getBytes());
-
-        bufferedOutputStream.close();
-        byteArrayOutputStream.close();
-
-        return byteArrayOutputStream.toByteArray();
-    }
-
-    //GZIPInputStream을 이용하여 byte배열 압축해제하기
-    public String unzipStringFromBytes(byte[] bytes) throws IOException {
-
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(gzipInputStream);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        byte[] buffer = new byte[100];
-
-        int length;
-        while ((length = bufferedInputStream.read(buffer)) > 0) {
-            byteArrayOutputStream.write(buffer, 0, length);
-        }
-
-        bufferedInputStream.close();
-        gzipInputStream.close();
-        byteArrayInputStream.close();
-        byteArrayOutputStream.close();
-
-        return byteArrayOutputStream.toString();
     }
 }

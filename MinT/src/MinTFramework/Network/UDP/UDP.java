@@ -21,6 +21,7 @@ import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
@@ -67,7 +68,7 @@ public class UDP extends Network {
         this.setReceiverCallback();
         this.portOpen();
         this.startReceiveThread();
-
+        System.out.println("Current IP Addr : "+OSUtil.getIPAddress()+":"+port);
         self = this;
     }
 
@@ -152,9 +153,9 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void send(byte[] packet) {
+    protected void sendProtocol(PacketProtocol packet) {
         try {
-            sender.SendMsg(packet, dstIP, dstPort);
+            sender.SendMsg(packet.getPacket(), dstIP, dstPort);
         } catch (SocketException ex) {
         } catch (IOException ex) {
         }

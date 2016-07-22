@@ -16,6 +16,7 @@
  */
 package MinTFramework;
 
+import MinTFramework.CacheMap.Resource;
 import MinTFramework.ExternalDevice.DeviceClassification;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
@@ -39,6 +40,7 @@ public abstract class MinT {
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
+    private LocalCache sharedcache;
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
@@ -51,6 +53,7 @@ public abstract class MinT {
         scheduler = new Scheduler(requestQueueLength, numOfThread);
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager(this);
+        sharedcache = new LocalCache();
     }
     
     /**
@@ -134,7 +137,7 @@ public abstract class MinT {
      */
     public DeviceBLE getBLEDevice(){
         ArrayList<Device> dlist = devicemanager.getDevicesbyDeviceType(DeviceType.BLE);
-        if(dlist != null){
+        if(!dlist.isEmpty()){
             return (DeviceBLE)dlist.get(0);
         }
         else
@@ -297,6 +300,42 @@ public abstract class MinT {
         networkmanager.setRoutingProtocol(ap);
     }
     
+    /***************************
+     * Local Shared Cache
+     ****************************/
+    
+    /**
+     * put cache data to Shared Memory
+     * @param name
+     * @param cdata 
+     */
+    public void putLocalResource(String name, lResource cdata){
+        sharedcache.put(name, cdata);
+    }
+    
+    /**
+     * get Cache Data from Shared Memory
+     * @param cache name
+     * @return 
+     */
+    public lResource getLocalResource(String name){
+        System.out.println("Mem Size : "+sharedcache.getAllResource().size());
+        return sharedcache.get(name);
+    }
+    
+    /**
+     * delete shared data
+     * @param name
+     * @return 
+     */
+    public boolean deleteLocalResource(String name){
+        return sharedcache.delete(name);
+    }
+    
+    /***************************
+     * Frame Operation
+     ****************************/
+    
     /**
      * Start framework
      */
@@ -308,6 +347,7 @@ public abstract class MinT {
     
     protected void isDebug(boolean isdebug){
         MinTConfig.DebugMode = isdebug;
+        System.out.println();
     }
     
 }

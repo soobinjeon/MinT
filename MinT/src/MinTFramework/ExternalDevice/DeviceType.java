@@ -48,8 +48,12 @@ public enum DeviceType {
         this.deviceType = deviceType;
     }
     
-    public String getDeviceType()
+    public String getDeviceTypeString()
     {
         return deviceType;
+    }
+    
+    public DeviceType getDeviceType(DeviceType type){
+        return DeviceType.valueOf(type.getDeviceTypeString());
     }
 }

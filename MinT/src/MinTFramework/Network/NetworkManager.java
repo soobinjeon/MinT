@@ -18,14 +18,11 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
-import MinTFramework.Network.*;
 import MinTFramework.Network.BLE.BLE;
 import MinTFramework.Network.UDP.UDP;
 import MinTFramework.Util.DebugLog;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -34,136 +31,152 @@ import java.util.logging.Logger;
  */
 public class NetworkManager {
     private MinT frame = null;
-    private ArrayList<NetworkType> networkList = new ArrayList<NetworkType>();
-    private HashMap<NetworkType,Network> networks = new HashMap<NetworkType,Network>();
+    private final ArrayList<NetworkType> networkList;
+    private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
+    private NetworkStorage nStorage;
     
     private Handler networkHandler = null;
     private RoutingProtocol routing;
-    private DebugLog dl = new DebugLog("NetworkManager",false);
+    private final DebugLog dl;
     
     /**
      * Auto Set Network Manager as possible
+     *
      * @param frame
      */
     public NetworkManager(MinT frame) {
+        this.dl = new DebugLog("NetworkManager",true);
+        this.networkList = new ArrayList<>();
+        this.networks = new HashMap<>();
         this.frame = frame;
         routing = new RoutingProtocol();
+        nStorage = new NetworkStorage();
         networkHandler = new Handler(frame) {
             @Override
             public void userHandler(Profile src, String msg) {
             }
         };
-        
+
         setNodeName();
     }
 
     /**
      * add network
-     * @param ntype 
+     *
+     * @param ntype
      */
-    public void AddNetwork(NetworkType ntype){
+    public void AddNetwork(NetworkType ntype) {
         networkList.add(ntype);
     }
-    
+
     /**
      * Turn on All Networks!
      */
-    public void TurnOnNetwork(){
-        for(NetworkType ty : networkList){
+    public void TurnOnNetwork() {
+        for (NetworkType ty : networkList) {
             setOnNetwork(ty);
         }
     }
+
     /**
      * *
-     * Set Up the networks
-     * Available Networks : UDP, BLE, COAP(asap)
+     * Set Up the networks Available Networks : UDP, BLE, COAP(asap)
+     *
      * @param ntype type of Network NetworkType
      * @param port Internet port for (UDP,TCP/IP,COAP), null for others
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
+            dl.printMessage("Starting UDP... "+ntype.getPort());
             networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame,this));
             dl.printMessage("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
+            dl.printMessage("Starting BLE...");
             networks.put(ntype, new BLE(routing, frame, this));
             dl.printMessage("Turned on BLE");
-        }
-        else if(ntype == NetworkType.COAP){ // for CoAP, need to add
+        } else if (ntype == NetworkType.COAP) { // for CoAP, need to add
             dl.printMessage("Turned on COAP");
         }
     }
-    
-    public void setRoutingProtocol(RoutingProtocol ap){
+
+    public void setRoutingProtocol(RoutingProtocol ap) {
         this.routing = ap;
-        
-        for(Network n:networks.values()){
+
+        for (Network n : networks.values()) {
             n.setApplicationProtocol(ap);
         }
     }
-    
+
     /**
      * send Direct Message
+     *
      * @param dst
-     * @param msg 
+     * @param msg
      */
     public void sendDirectMessage(Profile dst, String msg) {
-        Profile fdst=null;
-        if(dst.isNameProfile()){
+        Profile fdst = null;
+        if (dst.isNameProfile()) {
             //라우팅 스토어에서 검색
             fdst = dst;
-        }else
+        } else {
             fdst = dst;
+        }
         sendMsg(new PacketProtocol(null, null, getNextNode(fdst), fdst, msg));
     }
-    
+
     /**
      * Stop Over Processor
-     * @param packet 
+     *
+     * @param packet
      */
-    public void stopOver(PacketProtocol packet){
-        
+    public void stopOver(PacketProtocol packet) {
+
     }
-    
+
     /**
      * Routing Protocol
+     *
      * @param fdst
-     * @return 
+     * @return
      */
-    private Profile getNextNode(Profile fdst){
+    private Profile getNextNode(Profile fdst) {
         //Serch Routing Protocol
         return fdst;
     }
-    
+
     /**
      * *
      * 얘는 프로토콜에서 목적지의 프로토콜에 따라 보내는 네트워크를 선택
+     *
      * @param dst
      * @param msg
      */
     private void sendMsg(PacketProtocol packet) {
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
         Network sendNetwork = networks.get(nnodetype);
-        
+
         //set Source Node
-        if(packet.getSource() == null)
+        if (packet.getSource() == null) {
             packet.setSource(sendNetwork.getProfile());
-        
+        }
+
         //set Previous Node
-        if(packet.getPreviosNode() == null)
+        if (packet.getPreviosNode() == null) {
             packet.setPrevNode(sendNetwork.getProfile());
-        
+        }
+
         //Send Message
         if (sendNetwork != null) {
             try {
-                dl.printMessage("Send Network"+sendNetwork.getNetworkType());
-                dl.printMessage("Packet :"+packet.getPacketString());
+                dl.printMessage("Send Network" + sendNetwork.getNetworkType());
+                dl.printMessage("Packet :" + packet.getPacketString());
                 sendNetwork.send(packet);
             } catch (NetworkException ex) {
                 ex.printStackTrace();
             }
-        }else{
+        } else {
             dl.printMessage("Error : There are no Networks");
             System.out.println("Error : There are no Networks");
         }
@@ -171,28 +184,33 @@ public class NetworkManager {
 
     /**
      * set Network Handler in network manager
-     * @param nhandler 
+     *
+     * @param nhandler
      */
-    public void setNetworkHandler(Handler nhandler){
-        if(nhandler != null)
+    public void setNetworkHandler(Handler nhandler) {
+        if (nhandler != null) {
             this.networkHandler = nhandler;
+        }
     }
-    
+
     /**
      * get Network Handler
-     * @return 
+     *
+     * @return
      */
-    public Handler getNetworkHandler(){
+    public Handler getNetworkHandler() {
         return this.networkHandler;
     }
-    
+
     /**
      * set Node Name
-     * @param name 
+     *
+     * @param name
      */
     public void setNodeName(String name) {
-        if(name != null)
+        if (name != null) {
             this.NodeName = name;
+        }
     }
 
     /**
