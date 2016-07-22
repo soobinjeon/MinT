@@ -17,6 +17,8 @@
 package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
+import MinTFramework.Util.TypeCaster;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,10 +66,14 @@ public class BLEReceiver implements Runnable {
             tempbuf = deviceBLE.readUARTString("#");
             //Byte temp = new Byte(tempbuf);
             System.out.println("TEST : " + tempbuf);
-//            tempbuf = tempbuf.substring(tempbuf.indexOf("{src"));
-            inbuf = tempbuf.getBytes();
+            try {
+                //            tempbuf = tempbuf.substring(tempbuf.indexOf("{src"));
+                inbuf = TypeCaster.zipStringToBytes(tempbuf);
+            } catch (IOException ex) {
+                Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
+            }
         
-            //ble.MatcherAndObservation(inbuf);
+            ble.MatcherAndObservation(inbuf);
         }
     }
 }
