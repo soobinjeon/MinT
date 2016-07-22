@@ -308,6 +308,7 @@ public abstract class MinT {
     
     protected void isDebug(boolean isdebug){
         MinTConfig.DebugMode = isdebug;
+        System.out.println();
     }
     
 }
