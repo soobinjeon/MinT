@@ -59,9 +59,12 @@ public class BLEReceiver implements Runnable {
         }
         while(true)
         {
-            System.out.println("Reading Start...");
+            System.out.println("Reading Start!!...");
+//            while(true)
             tempbuf = deviceBLE.readUARTString("#");
-            tempbuf = tempbuf.substring(tempbuf.indexOf("{src"));
+            Byte temp = new Byte(tempbuf);
+            System.out.println("TEST : " + new String(tempbuf));
+//            tempbuf = tempbuf.substring(tempbuf.indexOf("{src"));
             inbuf = tempbuf.getBytes();
         
             ble.MatcherAndObservation(inbuf);

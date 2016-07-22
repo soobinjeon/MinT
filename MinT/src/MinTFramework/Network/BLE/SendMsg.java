@@ -17,6 +17,9 @@
 package MinTFramework.Network.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
+import static java.lang.Thread.sleep;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -42,7 +45,18 @@ public class SendMsg implements Runnable {
     public void run() {
         //Convert Byte to String
         deviceBLE.writeUART(new String(outPacket), "#");
+        System.out.println(new String(outPacket) + "#");
+        //테스트 용 지연
+        try {
+            sleep(1000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SendMsg.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //
         deviceBLE.disconnect();
+        //테스트 용 출력
+        System.out.println("Disconnect");
+        //
         deviceBLE.setRole(0);
     }
 
