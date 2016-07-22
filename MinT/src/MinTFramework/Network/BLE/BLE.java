@@ -22,8 +22,11 @@ import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
 import MinTFramework.Util.DebugLog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -86,8 +89,9 @@ public class BLE extends Network {
     }
 
     /**
-     * Setting Destination
+     * Setting Destination and Connection
      *
+     * @param _dst
      * @param dst destination for msg {MAC} / example ":78A5043F7EC6"
      */
 
@@ -95,15 +99,23 @@ public class BLE extends Network {
     public void setDestination(Profile _dst) {
         this.dst = _dst.getAddress();
         deviceBLE.setRole(1);
-                
+        //테스트용 지연
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(BLE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //
         if(deviceBLE.connect(dst))
         {
             System.out.println("Success : Connect");
+            //deviceBLE.writeUART("AT");
             //return true;
         }
         else
         {
             System.out.println("Fail : Connect");
+            //deviceBLE.writeUART("AT");
             //return false;
         }
         
@@ -113,7 +125,8 @@ public class BLE extends Network {
      * @param packet 
      */
     @Override
-    protected void send(byte[] packet) {
+    protected void sendProtocol(PacketProtocol packet) {
+        System.out.println(packet);
        sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 }

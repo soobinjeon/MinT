@@ -137,7 +137,7 @@ public abstract class MinT {
      */
     public DeviceBLE getBLEDevice(){
         ArrayList<Device> dlist = devicemanager.getDevicesbyDeviceType(DeviceType.BLE);
-        if(dlist != null){
+        if(!dlist.isEmpty()){
             return (DeviceBLE)dlist.get(0);
         }
         else
