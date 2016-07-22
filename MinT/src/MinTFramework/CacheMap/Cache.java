@@ -52,6 +52,19 @@ public class Cache<T> implements CacheMap<T>{
             }
         }
     }
+    
+    /**
+     * delete Selected value
+     * @param name
+     * @return 
+     */
+    public boolean delete(String name) {
+        T value = resources.remove(name);
+        if(value == null)
+            return false;
+        else
+            return true;
+    }
 
     @Override
     public ArrayList<T> getResourcebyDeviceType(DeviceType type) {

@@ -34,6 +34,7 @@ public class NetworkManager {
     private final ArrayList<NetworkType> networkList;
     private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
+    private NetworkStorage nStorage;
     
     private Handler networkHandler = null;
     private RoutingProtocol routing;
@@ -44,11 +45,12 @@ public class NetworkManager {
      * @param frame
      */
     public NetworkManager(MinT frame) {
-        this.dl = new DebugLog("NetworkManager",false);
+        this.dl = new DebugLog("NetworkManager",true);
         this.networkList = new ArrayList<>();
         this.networks = new HashMap<>();
         this.frame = frame;
         routing = new RoutingProtocol();
+        nStorage = new NetworkStorage();
         networkHandler = new Handler(frame) {
             @Override
             public void userHandler(Profile src, String msg) {
@@ -83,10 +85,12 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
+            dl.printMessage("Starting UDP... "+ntype.getPort());
             networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame,this));
             dl.printMessage("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
+            dl.printMessage("Starting BLE...");
             networks.put(ntype, new BLE(routing, frame, this));
             dl.printMessage("Turned on BLE");
         }

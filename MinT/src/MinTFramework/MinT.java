@@ -309,7 +309,7 @@ public abstract class MinT {
      * @param name
      * @param cdata 
      */
-    public void putSharedCache(String name, lResource cdata){
+    public void putLocalResource(String name, lResource cdata){
         sharedcache.put(name, cdata);
     }
     
@@ -318,9 +318,18 @@ public abstract class MinT {
      * @param cache name
      * @return 
      */
-    public lResource getSharedCache(String name){
+    public lResource getLocalResource(String name){
         System.out.println("Mem Size : "+sharedcache.getAllResource().size());
         return sharedcache.get(name);
+    }
+    
+    /**
+     * delete shared data
+     * @param name
+     * @return 
+     */
+    public boolean deleteLocalResource(String name){
+        return sharedcache.delete(name);
     }
     
     /***************************

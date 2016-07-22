@@ -22,6 +22,6 @@ import MinTFramework.CacheMap.Cache;
  *
  * @author soobin
  */
-public class NetworkCache extends Cache<nResource> {
-    public NetworkCache(){}
+public class NetworkStorage extends Cache<nResource> {
+    public NetworkStorage(){}
 }

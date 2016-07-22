@@ -24,15 +24,15 @@ import MinTFramework.ExternalDevice.DeviceType;
  * @author soobin
  */
 public class nResource extends Resource {
-    String name;
-    public nResource(String name, DeviceType dtype, Object _getResource) {
+    String directory;
+    public nResource(String directory, DeviceType dtype, Object _getResource) {
         super(dtype, _getResource);
-        this.name = name;
+        this.directory = directory;
     }
 
     @Override
     public Object getClone() {
-        return new nResource(name, dtype, getResource());
+        return new nResource(directory, dtype, getResource());
     }
     
 }

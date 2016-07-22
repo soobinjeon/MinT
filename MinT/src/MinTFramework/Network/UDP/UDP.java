@@ -67,7 +67,7 @@ public class UDP extends Network {
         this.setReceiverCallback();
         this.portOpen();
         this.startReceiveThread();
-
+        System.out.println("Current IP Addr : "+OSUtil.getIPAddress()+":"+port);
         self = this;
     }
 
