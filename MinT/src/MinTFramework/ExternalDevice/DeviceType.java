@@ -32,6 +32,7 @@ public enum DeviceType {
     CO2("CO2"),
     PHOTOGRAPH("PHOTOGRAPH"),
     LED("LED"),
+    ILLUMINATION("ILLUMINATION"),
     
     BLE("BLE"),
     WIFI("WIFI"), 
