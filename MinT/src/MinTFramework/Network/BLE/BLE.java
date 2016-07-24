@@ -126,7 +126,7 @@ public class BLE extends Network {
      */
     @Override
     protected void sendProtocol(PacketProtocol packet) {
-        System.out.println(packet);
-       sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
+        //System.out.println(packet);
+        sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 }

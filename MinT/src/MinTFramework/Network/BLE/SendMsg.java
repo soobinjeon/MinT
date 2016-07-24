@@ -45,7 +45,7 @@ public class SendMsg implements Runnable {
     @Override
     public void run() {
         //Convert Byte to String
-        System.out.println(outPacket.getPacketString() + "#");
+        //System.out.println(outPacket.getPacketString() + "#");
         deviceBLE.writeUART(outPacket.getPacketString() + "#");
         
         //테스트 용 지연
@@ -57,7 +57,7 @@ public class SendMsg implements Runnable {
         //
         deviceBLE.disconnect();
         //테스트 용 출력
-        System.out.println("Disconnect");
+        //System.out.println("Disconnect");
         //
         deviceBLE.setRole(0);
     }
