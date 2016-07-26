@@ -54,19 +54,20 @@ public class BLEReceiver implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //지연 없어도 될 것 같음
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         System.out.println("Reading Start!!...");
         while(true)
         {
+            tempbuf = "";
             tempbuf = deviceBLE.readUARTString("#");
-            //Byte temp = new Byte(tempbuf);
-            //System.out.println("TEST : " + tempbuf);
             if(tempbuf.length() > 0){
                 try {
+//                    System.out.println("TEST : " + tempbuf);
                     inbuf = TypeCaster.zipStringToBytes(tempbuf);
                 } catch (IOException ex) {
                     Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
