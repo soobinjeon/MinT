@@ -44,9 +44,10 @@ public class ScheduleWorkerThread extends Thread {
     /**
      * Stop service in this thread
      */
+
     public synchronized void stopService() {
         this.service = null;
-        this.serviceId = 0;
+        this.serviceId = -1;
     }
     
     /**
@@ -60,7 +61,7 @@ public class ScheduleWorkerThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            this.serviceId = 0;
+            this.serviceId = -1;
             this.service = scheduler.takeService();
             this.serviceId = service.getID();
             dl.printMessage(" Thread catched Service id : "+serviceId);

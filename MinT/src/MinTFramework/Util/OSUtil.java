@@ -83,11 +83,25 @@ public class OSUtil {
     private static String getWindowsIPAddress(){
       InetAddress ip = null;
         try {
-            ip = InetAddress.getLocalHost();
-        } catch (UnknownHostException ex) {
-            ex.printStackTrace();
-        }  
-        return ip!=null ? ip.getHostAddress() : null;
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                //System.out.println(intf.getDisplayName());
+                if (intf.getDisplayName().startsWith("Real")) {
+                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                        InetAddress inetAddress = enumIpAddr.nextElement();
+                        //System.out.println(inetAddress.getHostAddress().toString());
+                        
+                        if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress()) {
+                            //return inetAddress.getHostAddress().toString();
+                        }
+                        return inetAddress.getHostAddress().toString();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+        }
+        System.err.println("There is no REALTEK adapter");
+        return null;
     }
     
     public static String getIPAddress() {
