@@ -14,18 +14,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Network;
 
-import MinTFramework.CacheMap.*;
+import MinTFramework.storage.Information;
 import MinTFramework.ExternalDevice.DeviceType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
- * Local Cache Memory
+ *
  * @author soobin
  */
-public class LocalCache extends Cache<lResource>{
-    public LocalCache(){}
+public class Request extends Information {
+    String targetRes;
+    
+    /**
+     * 
+     * @param res Resource Name or ID
+     * @param _getResource 
+     */
+    public Request(String res, Object _getResource) {
+        super(_getResource);
+        targetRes = res;
+    }
+
+    @Override
+    public Object getClone() {
+        return new Request(targetRes, getResource());
+    }
+    
+    /**
+     * get Resource Name
+     * @return 
+     */
+    public String getResourceName(){
+        return targetRes;
+    }
 }

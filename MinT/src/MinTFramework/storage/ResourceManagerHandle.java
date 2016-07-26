@@ -14,22 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.CacheMap;
+package MinTFramework.storage;
 
-import MinTFramework.ExternalDevice.DeviceType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import MinTFramework.Network.Request;
 
 /**
- * to be a CacheMap for MinT, use this interface
- * @author soobin
+ *
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface CacheMap<T> {
-    public void put(String name, T data);
-    public T get(String name);
-    public ArrayList<T> getResourcebyDeviceType(DeviceType type);
-    public List<DeviceType> getAllDeviceType();
-    public ArrayList<String> getAllResourceName();
-    public HashMap<String,T> getAllResource();
+public interface ResourceManagerHandle {
+    public void set(Request req, Resource res);
+    public Object get(Request req, Resource res);
+    public void put(Request req, Resource res);
 }

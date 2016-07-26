@@ -21,24 +21,24 @@ package MinTFramework;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Request {
+public abstract class Service {
 
     private int id;
     private int prior;
     protected final MinT frame;
     /***
-     * Request Constructor
+     * Service Constructor
      * Deafult id=0, prior = 0;
      * @param _frame 
      */
-    public Request(MinT _frame) {
+    public Service(MinT _frame) {
         id = 0;
         prior = 0;
         frame = _frame;
     }
     /**
-     * set Request Prior
-     * NOT USED UNTIL NOW
+     * set Service Prior
+ NOT USED UNTIL NOW
      * @param pri 
      */
     public void setPrior(int pri){

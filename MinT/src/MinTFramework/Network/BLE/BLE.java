@@ -99,22 +99,22 @@ public class BLE extends Network {
     public void setDestination(Profile _dst) {
         this.dst = _dst.getAddress();
         deviceBLE.setRole(1);
-        //테스트용 지연
+        //지연 필수******************짧을 시 통신불가, 1초보다 짧을 시 되었다 안되었다함
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Logger.getLogger(BLE.class.getName()).log(Level.SEVERE, null, ex);
         }
         //
         if(deviceBLE.connect(dst))
         {
-            System.out.println("Success : Connect");
+//            System.out.println("Success : Connect");
             //deviceBLE.writeUART("AT");
             //return true;
         }
         else
         {
-            System.out.println("Fail : Connect");
+//            System.out.println("Fail : Connect");
             //deviceBLE.writeUART("AT");
             //return false;
         }

@@ -35,7 +35,7 @@ public abstract class Handler {
      * @param frame MinTFramework
      */
     @Deprecated
-    public void callPacketHandleRequest(String src, String msg, MinT frame){};
+    public void callPacketHandleService(String src, String msg, MinT frame){};
     
     /***
      * Call Packet Handler:: Do not support upper v2.03
@@ -44,10 +44,10 @@ public abstract class Handler {
      * @param msg pakcet message
      */
     @Deprecated
-    public void callPacketHandleRequest(String src, String msg){};
+    public void callPacketHandleService(String src, String msg){};
     
     /**
-     * Handler for User request
+     * Handler for User service
      * @param src
      * @param msg 
      */

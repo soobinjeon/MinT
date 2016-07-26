@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.CacheMap;
+package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.Util.TypeCaster;
@@ -31,13 +31,11 @@ import java.util.logging.Logger;
  *   - incorrect type : null
  * @author soobin
  */
-public abstract class Resource {
-    protected DeviceType dtype;
+public abstract class Information {
     protected byte[] res;
     protected boolean isStringvalue = true;
     
-    public Resource(DeviceType dtype, Object _getResource){
-        this.dtype = dtype;
+    public Information(Object _getResource){
         setResource(_getResource);
     }
     
@@ -45,9 +43,11 @@ public abstract class Resource {
         try{
             if(setres instanceof Boolean){
                 res = TypeCaster.zipStringToBytes(Boolean.toString((Boolean)setres));
-            }else if(setres instanceof String)
+                isStringvalue = true;
+            }else if(setres instanceof String){
                 res = TypeCaster.zipStringToBytes((String) setres);
-            else{
+                isStringvalue = true;
+            }else{
                 res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = false;
         }
@@ -72,8 +72,8 @@ public abstract class Resource {
     }
 
     /**
-     * get Resource by Object
-     * @return object Type Resource
+     * get Information by Object
+     * @return object Type Information
      */
     public Object getResource(){
         if(isStringvalue)
@@ -83,8 +83,8 @@ public abstract class Resource {
     }
     
     /**
-     * get String type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get String type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public String getResourceString(){
@@ -95,8 +95,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Integer type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Integer type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Integer getResourceInt(){
@@ -107,8 +107,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Float type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Float type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Float getResourceFloat(){
@@ -119,8 +119,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Double type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Double type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Double getResourceDouble(){
@@ -131,8 +131,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Long type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Long type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Long getResourceLong(){
@@ -143,8 +143,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Short type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Short type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Short getResourceShort(){
@@ -155,8 +155,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Character type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Character type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Character getResourceChar(){
@@ -167,8 +167,8 @@ public abstract class Resource {
     }
     
     /**
-     * get Boolean type Resource
-     * if it is not matched to input data type(numeric <-> String, return null 
+     * get Boolean type Information
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
     public Boolean getResourceBoolean(){
@@ -189,14 +189,6 @@ public abstract class Resource {
      */
     public int getLength(){
         return res != null ? res.length : 0;
-    }
-    
-    /**
-     * get Device Type
-     * @return type of devices
-     */
-    public DeviceType getDeviceType(){
-        return dtype;
     }
     
     public abstract Object getClone();
