@@ -25,16 +25,16 @@ import MinTFramework.Util.DebugLog;
  */
 public class Scheduler {
 
-    //for Request Queue
-    private Request[] requestQueue;
+    //for Service Queue
+    private Service[] serviceQueue;
     private int tail;
     private int head;
     private int count;
     private ScheduleWorkerThread[] threadPool;
     private DebugLog log = new DebugLog("Scheduler");
 
-    public Scheduler(int requestQueueLength, int numOfThread) {
-        this.requestQueue = new Request[requestQueueLength];
+    public Scheduler(int serviceQueueLength, int numOfThread) {
+        this.serviceQueue = new Service[serviceQueueLength];
         this.head = 0;
         this.tail = 0;
         this.count = 0;
@@ -57,25 +57,25 @@ public class Scheduler {
 
     /**
      * *
-     * Stop request.
+     * Stop service.
      *
-     * @param request Request to stop.
+     * @param service Service to stop.
      */
-    public void stopRequest(Request request) {
+    public void stopService(Service service) {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
-            if (threadPool1.getRequestId() == request.getID()) {
+            if (threadPool1.getServiceId() == service.getID()) {
                 threadPool1.interrupt();
             }
         }
     }
 
     /**
-     * *
-     * Print all Request ID in thread pool
+     * **
+ Print all Service ID in thread pool
      */
     public synchronized void showWorkingThreads() {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
-            log.printMessage(threadPool1.getName() + " " + threadPool1.getRequestId());
+            log.printMessage(threadPool1.getName() + " " + threadPool1.getServiceId());
         }
     }
     
@@ -93,8 +93,8 @@ public class Scheduler {
     }
 
     /***
-     * Generate unique request ID
-     * @return unique request ID
+     * Generate unique service ID
+     * @return unique service ID
      */
     private synchronized int makeID() {
         int rid[] = new int[threadPool.length];
@@ -106,7 +106,7 @@ public class Scheduler {
          * check ThreadPool
          */
         for (int i = 0; i < threadPool.length; i++) {
-            rid[i] = threadPool[i].getRequestId();
+            rid[i] = threadPool[i].getServiceId();
             //    System.out.println(rid[i] + "     " + i);
         }
         while (idflag) {
@@ -121,13 +121,13 @@ public class Scheduler {
 
         /**
          * *
-         * check requestQueue
+         * check serviceQueue
          */
-        int rid2[] = new int[requestQueue.length];
+        int rid2[] = new int[serviceQueue.length];
 
-        for (int i = 0; i < requestQueue.length; i++) {
-            if (requestQueue[i] != null) {
-                rid2[i] = requestQueue[i].getID();
+        for (int i = 0; i < serviceQueue.length; i++) {
+            if (serviceQueue[i] != null) {
+                rid2[i] = serviceQueue[i].getID();
             } else {
                 rid2[i] = 0;
             }
@@ -147,12 +147,12 @@ public class Scheduler {
     }
 
     /***
-     * Insert request into requestQueue
-     * @param request request to be inserted in the queue
+     * Insert service into serviceQueue
+     * @param service service to be inserted in the queue
      */
-    public synchronized void putRequest(Request request) {
+    public synchronized void putService(Service service) {
 
-        while (count >= requestQueue.length) {
+        while (count >= serviceQueue.length) {
             try {
                 wait();
                 break;
@@ -160,11 +160,11 @@ public class Scheduler {
             }
         }
 
-        request.setID(makeID());
+        service.setID(makeID());
 
-        requestQueue[tail] = request;
+        serviceQueue[tail] = service;
 
-        tail = (tail + 1) % requestQueue.length;
+        tail = (tail + 1) % serviceQueue.length;
         count++;
         notifyAll();
 
@@ -174,20 +174,20 @@ public class Scheduler {
      * !!!For workerthread use only!!!
      * !!!Do not use at Application!!!
      * 
-     * take request in request queue
-     * @return request 
+     * take service in service queue
+     * @return service 
      */
-    public synchronized Request takeRequest() {
+    public synchronized Service takeService() {
         while (count <= 0) {
             try {
                 wait();
             } catch (InterruptedException e) {
             }
         }
-        Request request = requestQueue[head];
-        head = (head + 1) % requestQueue.length;
+        Service service = serviceQueue[head];
+        head = (head + 1) % serviceQueue.length;
         count--;
         notifyAll();
-        return request;
+        return service;
     }
 }

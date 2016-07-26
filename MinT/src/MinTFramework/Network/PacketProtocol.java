@@ -57,7 +57,7 @@ public class PacketProtocol {
      * @param prev previous departure = name|address
      * @param next next destination = name|address
      * @param dest final destination = name|address
-     * @param msg msg = request(0:null, other:request)|response() <- need to thinking
+     * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
     public PacketProtocol(Profile src, Profile prev, Profile next, Profile dest, String msg) {

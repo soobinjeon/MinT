@@ -14,24 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
-
-import MinTFramework.CacheMap.Resource;
-import MinTFramework.ExternalDevice.DeviceType;
+package MinTFramework.storage;
 
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class lResource extends Resource{
-
-    public lResource(DeviceType dtype, Object _res) {
-        super(dtype, _res);
-    }
-    
-    @Override
-    public Object getClone() {
-        return new lResource(this.dtype,this.getResource());
-    }
-    
+public interface ResourceThreadHandle {
+    public void getResourceData(Object object);
+    public void ThreadEndHandle();
 }

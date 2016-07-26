@@ -14,25 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.storage;
 
-import MinTFramework.CacheMap.Resource;
 import MinTFramework.ExternalDevice.DeviceType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
- *
+ * to be a CacheMap for MinT, use this interface
  * @author soobin
  */
-public class nResource extends Resource {
-    String directory;
-    public nResource(String directory, DeviceType dtype, Object _getResource) {
-        super(dtype, _getResource);
-        this.directory = directory;
-    }
-
-    @Override
-    public Object getClone() {
-        return new nResource(directory, dtype, getResource());
-    }
-    
+public interface CacheMap<T> {
+    public void put(String name, T data);
+    public T get(String name);
+    public ArrayList<T> getResourcebyDeviceType(DeviceType type);
+    public List<DeviceType> getAllDeviceType();
+    public ArrayList<String> getAllResourceName();
+    public HashMap<String,T> getAllResource();
 }

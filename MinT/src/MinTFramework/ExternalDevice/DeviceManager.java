@@ -32,7 +32,7 @@ import java.util.Set;
 public class DeviceManager {
 
     /**
-     * App Request Interpreter -Analysis the App request information -Process
+     * App service Interpreter -Analysis the App service information -Process
      * controlling the device or initializing the device
      *
      * Device initialization -Initialize the device -Set the device port
