@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.CacheMap;
+package MinTFramework.storage;
 
 import MinTFramework.*;
-import MinTFramework.CacheMap.*;
 import MinTFramework.ExternalDevice.DeviceType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +44,8 @@ public class Cache<T> implements CacheMap<T>{
         }
         else{
             try {
-                return (T)result.getClass().getMethod("getClone").invoke(result);
+                return result;
+//                return (T)result.getClass().getMethod("getClone").invoke(result);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return null;
@@ -71,8 +71,10 @@ public class Cache<T> implements CacheMap<T>{
         ArrayList<T> res = new ArrayList<>();
         for(T cd : resources.values()){
             try{
-                if(cd.getClass().getMethod("getDeviceType").invoke(cd).equals(type))
-                    res.add((T)cd.getClass().getMethod("getClone").invoke(cd));    
+                if(cd.getClass().getMethod("getDeviceType").invoke(cd).equals(type)){
+//                    res.add((T)cd.getClass().getMethod("getClone").invoke(cd));    
+                    res.add(cd);    
+                }
             }catch(Exception e){
                 
             }

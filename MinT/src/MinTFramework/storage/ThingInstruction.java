@@ -14,14 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.storage;
 
-import MinTFramework.storage.Cache;
+import MinTFramework.ExternalDevice.DeviceType;
+import MinTFramework.MinT;
+import MinTFramework.Network.Request;
+import MinTFramework.Service;
 
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class NetworkStorage extends Cache<Request> {
-    public NetworkStorage(){}
+public abstract class ThingInstruction extends Resource{
+    
+    public ThingInstruction(String name, DeviceType dtype) {
+        super(name, dtype);
+    }
+
+    /**
+     *
+     * @param info
+     */
+    @Override
+    abstract public void set(Request info);
+
+    /**
+     *
+     * @param info
+     * @return
+     */
+    @Override
+    abstract public Object get(Request info);
 }

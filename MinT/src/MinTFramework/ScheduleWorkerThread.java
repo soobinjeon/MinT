@@ -26,45 +26,45 @@ import MinTFramework.Util.DebugLog;
 public class ScheduleWorkerThread extends Thread {
 
     private final Scheduler scheduler;
-    private Request request;
-    private int requestId;
+    private Service service;
+    private int serviceId;
     private DebugLog dl;
     
     public ScheduleWorkerThread(String name, Scheduler scheduler) {
         super(name);
-        this.request = null;
+        this.service = null;
         this.scheduler = scheduler;
-        this.requestId = 0;
+        this.serviceId = 0;
         dl = new DebugLog(name);
     }
 
-    public synchronized int getRequestId() {
-        return requestId;
+    public synchronized int getServiceId() {
+        return serviceId;
     }
     /**
-     * Stop request in this thread
+     * Stop service in this thread
      */
-    public synchronized void stopRequest() {
-        this.request = null;
-        this.requestId = 0;
+    public synchronized void stopService() {
+        this.service = null;
+        this.serviceId = 0;
     }
     
     /**
-     * Is Thread Walking For Request?
+     * Is Thread Walking For Service?
      * @return 
      */
     public synchronized boolean isWorking(){
-        return requestId != 0;
+        return serviceId != 0;
     }
     
     @Override
     public void run() {
         while (true) {
-            this.requestId = 0;
-            this.request = scheduler.takeRequest();
-            this.requestId = request.getID();
-            dl.printMessage(" Thread catched Request id : "+requestId);
-            request.execute();
+            this.serviceId = 0;
+            this.service = scheduler.takeService();
+            this.serviceId = service.getID();
+            dl.printMessage(" Thread catched Service id : "+serviceId);
+            service.execute();
         }
     }
 }

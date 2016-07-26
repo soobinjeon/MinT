@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
-
-import MinTFramework.storage.Cache;
+package MinTFramework.storage;
 
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class NetworkStorage extends Cache<Request> {
-    public NetworkStorage(){}
+public class ResData extends Information{
+
+    public ResData(Object _getResource) {
+        super(_getResource);
+    }
+
+    @Override
+    public Object getClone() {
+        return new ResData(this.getResource());
+    }
+    
 }

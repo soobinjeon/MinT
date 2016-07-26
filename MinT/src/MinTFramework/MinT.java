@@ -16,7 +16,9 @@
  */
 package MinTFramework;
 
-import MinTFramework.CacheMap.Resource;
+import MinTFramework.storage.PropertyManager;
+import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.InstructionManager;
 import MinTFramework.ExternalDevice.DeviceClassification;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
@@ -28,6 +30,9 @@ import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.Profile;
+import MinTFramework.storage.Resource;
+import MinTFramework.storage.ThingInstruction;
+import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
 
 /**
@@ -40,25 +45,29 @@ public abstract class MinT {
     private DeviceManager devicemanager;
     private NetworkManager networkmanager;
     private Scheduler scheduler;
-    private LocalCache sharedcache;
+    private ResourceStorage resourceStorage;
+    private PropertyManager PM;
+    private InstructionManager IM;
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
     /**
      * 
-     * @param requestQueueLength Maximym request queue length
+     * @param serviceQueueLength Maximym service queue length
      * @param numOfThread number of workerthread in framework
      */
-    public MinT(int requestQueueLength, int numOfThread) {
-        scheduler = new Scheduler(requestQueueLength, numOfThread);
+    public MinT(int serviceQueueLength, int numOfThread) {
+        scheduler = new Scheduler(serviceQueueLength, numOfThread);
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager(this);
-        sharedcache = new LocalCache();
+        resourceStorage = new ResourceStorage();
+        PM = new PropertyManager(this,resourceStorage);
+        IM = new InstructionManager(this, resourceStorage);
     }
     
     /**
      * Framework Constructor
-     * Default number of WorkerThread and Requestqueuelength : 5
+     * Default number of WorkerThread and Servicequeuelength : 5
      */
     public MinT() {
         this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
@@ -77,12 +86,12 @@ public abstract class MinT {
     
     /**
      * @deprecated not yet used
-     * @param requestQueueLength Maximym request queue length
+     * @param serviceQueueLength Maximym service queue length
      * @param numOfThread number of workerthread in framework
      * @param deviceClassification Class of deivce (Sensor or Network)
      * @param deviceType Type of device (Temperature, Humidity, etc)
      */
-    public MinT(int requestQueueLength, int numOfThread, 
+    public MinT(int serviceQueueLength, int numOfThread, 
             DeviceClassification deviceClassification, DeviceType deviceType) {
         this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
         this.deviceClassification = deviceClassification;
@@ -183,22 +192,22 @@ public abstract class MinT {
         devicemanager.clearDeviceList();
     }
     /**
-     * Remove request in Scheduler
-     * @param request Request object to remove from scheduler
+     * Remove service in Scheduler
+     * @param service Service object to remove from scheduler
      */
-    public void stopRequest(Request request) {
-        scheduler.stopRequest(request);
+    public void stopService(Service service) {
+        scheduler.stopService(service);
     }
     /**
-     * Add request in Scheduler
-     * @param request Request object to add to scheduler
+     * Add service in Scheduler
+     * @param service Service object to add to scheduler
      */
-    public void putRequest(Request request) {
-        scheduler.putRequest(request);
+    public void putService(Service service) {
+        scheduler.putService(service);
     }
 
     /**
-     * Print request name and id in thread in scheduler
+     * Print service name and id in thread in scheduler
      */
     public void showWorkingThreads() {
         scheduler.showWorkingThreads();
@@ -305,32 +314,51 @@ public abstract class MinT {
      ****************************/
     
     /**
-     * put cache data to Shared Memory
-     * @param name
-     * @param cdata 
+     * add Resource to Frame
+     * @param res 
      */
-    public void putLocalResource(String name, lResource cdata){
-        sharedcache.put(name, cdata);
+    public void addResource(Resource res){
+        res.setFrame(this);
+        if(res instanceof ThingProperty)
+            PM.addProperty((ThingProperty)res);
+        else if(res instanceof ThingInstruction)
+            IM.addInstruction((ThingInstruction)res);
     }
     
     /**
-     * get Cache Data from Shared Memory
-     * @param cache name
+     * for Test get Resource Storage
      * @return 
      */
-    public lResource getLocalResource(String name){
-        System.out.println("Mem Size : "+sharedcache.getAllResource().size());
-        return sharedcache.get(name);
+    public ResourceStorage getResStorage(){
+        return this.resourceStorage;
     }
-    
-    /**
-     * delete shared data
-     * @param name
-     * @return 
-     */
-    public boolean deleteLocalResource(String name){
-        return sharedcache.delete(name);
-    }
+//    /**
+//     * put cache data to Shared Memory
+//     * @param name
+//     * @param cdata 
+//     */
+//    public void putLocalResource(String name, lResource cdata){
+//        sharedcache.put(name, cdata);
+//    }
+//    
+//    /**
+//     * get Cache Data from Shared Memory
+//     * @param cache name
+//     * @return 
+//     */
+//    public lResource getLocalResource(String name){
+//        System.out.println("Mem Size : "+sharedcache.getAllResource().size());
+//        return sharedcache.get(name);
+//    }
+//    
+//    /**
+//     * delete shared data
+//     * @param name
+//     * @return 
+//     */
+//    public boolean deleteLocalResource(String name){
+//        return sharedcache.delete(name);
+//    }
     
     /***************************
      * Frame Operation
