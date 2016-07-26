@@ -17,6 +17,7 @@
 package MinTFramework.Network.UDP;
 
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
@@ -62,13 +63,13 @@ public class UDP extends Network {
     @SuppressWarnings("LeakingThisInConstructor")
     public UDP(int port, RoutingProtocol _ap, MinT frame, NetworkManager nm) {
         super(frame,nm, new Profile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port,NetworkType.UDP),_ap);
-
+        
         PORT = port;
         this.setUDPSocket();
         this.setReceiverCallback();
         this.portOpen();
         this.startReceiveThread();
-        System.out.println("Current IP Addr : "+OSUtil.getIPAddress()+":"+port);
+        System.out.println("Current IP Addr : "+this.profile.getAddress()+":"+port);
         self = this;
     }
 

@@ -34,7 +34,7 @@ public class ScheduleWorkerThread extends Thread {
         super(name);
         this.service = null;
         this.scheduler = scheduler;
-        this.serviceId = 0;
+        this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
         dl = new DebugLog(name);
     }
 
@@ -47,21 +47,21 @@ public class ScheduleWorkerThread extends Thread {
 
     public synchronized void stopService() {
         this.service = null;
-        this.serviceId = -1;
+        this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
     }
     
     /**
-     * Is Thread Walking For Service?
+     * Is Thread Working For Service?
      * @return 
      */
     public synchronized boolean isWorking(){
-        return serviceId != 0;
+        return serviceId != MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
     }
     
     @Override
     public void run() {
         while (true) {
-            this.serviceId = -1;
+            this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
             this.service = scheduler.takeService();
             this.serviceId = service.getID();
             dl.printMessage(" Thread catched Service id : "+serviceId);

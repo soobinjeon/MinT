@@ -18,6 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Util.DebugLog;
 /**
  *
@@ -54,6 +55,9 @@ public abstract class Network {
         this.networkmanager = nm;
         routing = _routing;
         profile = npro;
+        if(!MinTConfig.IP_ADDRESS.equals("")){
+            profile.setAddress(MinTConfig.IP_ADDRESS);
+        }
     }
 
     /***
