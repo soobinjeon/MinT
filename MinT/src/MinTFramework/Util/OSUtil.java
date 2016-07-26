@@ -79,31 +79,29 @@ public class OSUtil {
         }
         return hostAddr;
     }
-    
-    private static String getWindowsIPAddress(){
-      InetAddress ip = null;
+
+    private static String getWindowsIPAddress() {
+        InetAddress ip = null;
+        /**
+         * * Real 로 시작하는 어댑터의 IP할당 try { for (Enumeration<NetworkInterface> en =
+         * NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+         * NetworkInterface intf = en.nextElement(); if
+         * (intf.getDisplayName().startsWith("Real")) { for
+         * (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses();
+         * enumIpAddr.hasMoreElements();) { InetAddress inetAddress =
+         * enumIpAddr.nextElement(); return
+         * inetAddress.getHostAddress().toString(); } } } } catch
+         * (SocketException ex) { } System.err.println("There is no REALTEK
+         * adapter");
+         */
         try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                //System.out.println(intf.getDisplayName());
-                if (intf.getDisplayName().startsWith("Real")) {
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        //System.out.println(inetAddress.getHostAddress().toString());
-                        
-                        if (!inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && inetAddress.isSiteLocalAddress()) {
-                            //return inetAddress.getHostAddress().toString();
-                        }
-                        return inetAddress.getHostAddress().toString();
-                    }
-                }
-            }
-        } catch (SocketException ex) {
+            ip = InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            ex.printStackTrace();
         }
-        System.err.println("There is no REALTEK adapter");
-        return null;
+        return ip != null ? ip.getHostAddress() : null;
     }
-    
+
     public static String getIPAddress() {
         if (OSValidator.isWindows()) {
             return getWindowsIPAddress();
