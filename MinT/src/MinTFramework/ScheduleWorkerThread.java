@@ -46,7 +46,7 @@ public class ScheduleWorkerThread extends Thread {
      */
     public synchronized void stopRequest() {
         this.request = null;
-        this.requestId = 0;
+        this.requestId = -1;
     }
     
     /**
@@ -60,7 +60,7 @@ public class ScheduleWorkerThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            this.requestId = 0;
+            this.requestId = -1;
             this.request = scheduler.takeRequest();
             this.requestId = request.getID();
             dl.printMessage(" Thread catched Request id : "+requestId);
