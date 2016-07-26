@@ -45,20 +45,17 @@ public class SendMsg implements Runnable {
     @Override
     public void run() {
         //Convert Byte to String
-        System.out.println(outPacket.getPacketString() + "#");
+        //System.out.println("Write Packet");
         deviceBLE.writeUART(outPacket.getPacketString() + "#");
         
-        //테스트 용 지연
+        //disconnect 지연 필수 200 정도 여기가 문제가 되면 BLE 연결이 끊어지지 않음
         try {
-            sleep(1000);
+            sleep(200);
         } catch (InterruptedException ex) {
             Logger.getLogger(SendMsg.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //
+        //System.out.println("Disconnect");
         deviceBLE.disconnect();
-        //테스트 용 출력
-        System.out.println("Disconnect");
-        //
         deviceBLE.setRole(0);
     }
 
