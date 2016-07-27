@@ -81,7 +81,7 @@ public abstract class Handler extends Service{
          * get, post using resource storage
          */
         dl.printMessage("Processing SystemHandler");
-        Request req = new Request("Device1", 0, src);
+        Request req = new Request("Device2", 0, src);
         
         //if msg = get
         if(msg.equals("get"))

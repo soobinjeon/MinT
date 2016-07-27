@@ -26,7 +26,7 @@ import MinTFramework.storage.ThingProperty.PropertyRole;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class PropertyManager extends ResourceManager{
+public class PropertyManager extends ResourceManager implements ResourceManagerHandle{
     DebugLog dl = new DebugLog("Property Manager");
     
     /**
@@ -36,29 +36,28 @@ public class PropertyManager extends ResourceManager{
      */
     public PropertyManager(MinT _frame, ResourceStorage rs){
         super(_frame,rs);
-        initHandler(new ResourceManagerHandle() {
+        initHandler(this);
+    }
+    
+    @Override
+    public void set(Request req, Resource res) {
 
-            @Override
-            public void set(Request req, Resource res) {
-                
-            }
+    }
 
-            /**
-             * get aperiodic resource data
-             * @param req request data
-             * @param res resource data
-             * @return 
-             */
-            @Override
-            public Object get(Request req, Resource res) {
-                return getResource(req, res);
-            }
+    /**
+     * get aperiodic resource data
+     * @param req request data
+     * @param res resource data
+     * @return 
+     */
+    @Override
+    public Object get(Request req, Resource res) {
+        return getResource(req, res);
+    }
 
-            @Override
-            public void put(Request req, Resource res) {
-                
-            }
-        });
+    @Override
+    public void put(Request req, Resource res) {
+
     }
     
     /**
@@ -96,4 +95,6 @@ public class PropertyManager extends ResourceManager{
         while(rt.isRunning()){}
         return rt.getResource().getResourceData().getResource();
     }
+    
+    
 }

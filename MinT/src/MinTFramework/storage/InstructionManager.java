@@ -24,25 +24,24 @@ import MinTFramework.Network.Request;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class InstructionManager extends ResourceManager{
+public class InstructionManager extends ResourceManager implements ResourceManagerHandle{
     public InstructionManager(MinT _frame, ResourceStorage rs){
         super(_frame,rs);
-        this.initHandler(new ResourceManagerHandle() {
+        initHandler(this);
+    }
+    
+    @Override
+    public void set(Request req, Resource res) {
+        setDevice(req, res);
+    }
 
-            @Override
-            public void set(Request req, Resource res) {
-                setDevice(req, res);
-            }
+    @Override
+    public Object get(Request req, Resource res) {
+        return null;
+    }
 
-            @Override
-            public Object get(Request req, Resource res) {
-                return null;
-            }
-
-            @Override
-            public void put(Request req, Resource res) {
-            }
-        });
+    @Override
+    public void put(Request req, Resource res) {
     }
 
     /**

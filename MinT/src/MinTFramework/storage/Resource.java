@@ -19,7 +19,6 @@ package MinTFramework.storage;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.Request;
-import MinTFramework.Service;
 
 /**
  *
@@ -27,6 +26,14 @@ import MinTFramework.Service;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Resource{
+    private static enum Authority {Private, Protected, Public;}
+    
+    //new property
+    protected int id;
+    protected String sourcelocation;
+    protected Authority auth;
+    
+    //existing property
     protected String name;
     protected DeviceType dtype;
     protected MinT frame = null;
