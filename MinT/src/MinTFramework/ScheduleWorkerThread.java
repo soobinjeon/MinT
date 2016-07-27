@@ -64,8 +64,9 @@ public class ScheduleWorkerThread extends Thread {
             this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
             this.service = scheduler.takeService();
             this.serviceId = service.getID();
-            dl.printMessage(" Thread catched Service id : "+serviceId);
+            dl.printMessage("Service("+service.getClass().getName()+") Start ID("+serviceId+"), ["+scheduler.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
             service.execute();
+            dl.printMessage("Service("+service.getClass().getName()+") End ID("+serviceId+"), ["+(scheduler.getNumberofWorkingThreads()-1)+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }
     }
 }

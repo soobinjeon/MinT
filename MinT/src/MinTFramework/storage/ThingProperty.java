@@ -33,11 +33,19 @@ public abstract class ThingProperty extends Resource{
     private PropertyRole pr;
     private int period = 1000;
     
+    /**
+     * This class can provide the resource data from thing's devices
+     * Property role is aperiodic(default)
+     * @param name Resource Name (it would be resource id)
+     * @param dtype DeviceType
+     */
     public ThingProperty(String name, DeviceType dtype){
         this(name,dtype,PropertyRole.APERIODIC, 0);
     }
     
     /**
+     * This class can provide the resource data from thing's devices
+     * You can choose the property role
      * @param name Resource Name
      * @param dtype Device Type
      * @param pr Property Role (Periodic, aperiodic)
@@ -50,7 +58,7 @@ public abstract class ThingProperty extends Resource{
     }
     
     /**
-     * get Period
+     * get Resource Period
      * @return 
      */
     public int getPeriod(){
@@ -66,14 +74,14 @@ public abstract class ThingProperty extends Resource{
     }
 
     /**
-     *
+     * post or put resource data
      * @param req
      */
     @Override
     abstract public void set(Request req);
 
     /**
-     *
+     * Method to provide resource data
      * @param req
      * @return
      */

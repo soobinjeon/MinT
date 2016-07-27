@@ -17,16 +17,23 @@
 package MinTFramework.Network;
 
 import MinTFramework.*;
+import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.ResourceStorage;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Handler {
+public abstract class Handler extends Service{
     protected MinT frame;
+    protected PacketProtocol recv_packet;
+    protected ResourceStorage resStorage;
+    DebugLog dl = new DebugLog("Handler");
     public Handler(MinT _frame){
+        super(_frame);
         this.frame = _frame;
+        resStorage = this.frame.getResStorage();
     }
     /***
      * Call Packet Handler: Do not supprot upper v2.03
@@ -55,12 +62,10 @@ public abstract class Handler {
     
     /**
      * call Handler
-     * @param src
-     * @param msg 
+     * @param packet
      */
     protected void callhadler(PacketProtocol packet){
-        SystemHandler(packet.getSource(), packet.getMsgData());
-        userHandler(packet.getSource(),packet.getMsgData());
+        recv_packet = packet;
     }
     
     /**
@@ -72,6 +77,27 @@ public abstract class Handler {
      * @param msg 
      */
     private void SystemHandler(Profile src, String msg){
+        /**
+         * get, post using resource storage
+         */
+        dl.printMessage("Processing SystemHandler");
+        Request req = new Request("Device1", 0, src);
         
+        //if msg = get
+        if(msg.equals("get"))
+            resStorage.getProperty(req);
+        
+        //if msg = set
+        
+        //if observing
+        
+//        Object obj = resStorage.getProperty(new Request("Device2", 0));
+//        dl.printMessage("result : "+(double)obj);
+    }
+    
+    @Override
+    public void execute(){
+        SystemHandler(recv_packet.getSource(), recv_packet.getMsgData());
+        userHandler(recv_packet.getSource(),recv_packet.getMsgData());
     }
 }

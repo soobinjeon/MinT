@@ -28,10 +28,11 @@ import MinTFramework.storage.ThingProperty.PropertyRole;
  */
 public class PropertyManager extends ResourceManager{
     DebugLog dl = new DebugLog("Property Manager");
+    
     /**
-     * 
-     * @param _frame
-     * @param rs 
+     * Property Manager
+     * @param _frame MinT frame
+     * @param rs Resource Storage
      */
     public PropertyManager(MinT _frame, ResourceStorage rs){
         super(_frame,rs);
@@ -39,22 +40,34 @@ public class PropertyManager extends ResourceManager{
 
             @Override
             public void set(Request req, Resource res) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                
             }
 
+            /**
+             * get aperiodic resource data
+             * @param req request data
+             * @param res resource data
+             * @return 
+             */
             @Override
             public Object get(Request req, Resource res) {
-                dl.printMessage(" location of");
                 return getResource(req, res);
             }
 
             @Override
             public void put(Request req, Resource res) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                
             }
         });
     }
     
+    /**
+     * Add Property Resources
+     * it can operate resources by their role
+     * Periodic : new Thread and loop by period time
+     * aPeriodic : just added to resource storage
+     * @param pr 
+     */
     public void addProperty(ThingProperty pr){
         dl.printMessage(pr.getName());
         
@@ -70,6 +83,7 @@ public class PropertyManager extends ResourceManager{
     }
     
     /**
+     * get aperiodic resource data
      * @param req
      * @param res
      * @return 

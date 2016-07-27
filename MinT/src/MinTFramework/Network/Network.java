@@ -84,7 +84,9 @@ public abstract class Network {
         PacketProtocol matchedPacket = new PacketProtocol(packet);
         dl.printMessage(matchedPacket.getPacketString());
         if (isFinalDestiny(matchedPacket.getDestinationNode())) {
+//            frame.getNetworkHandler().callhadler(matchedPacket);
             frame.getNetworkHandler().callhadler(matchedPacket);
+            frame.putService(frame.getNetworkHandler());
         } else { //If stopover, through to stopover method in networkmanager
             networkmanager.stopOver(matchedPacket);
         }

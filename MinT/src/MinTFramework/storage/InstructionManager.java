@@ -52,8 +52,14 @@ public class InstructionManager extends ResourceManager{
     public void addInstruction(ThingInstruction is){
         RS.addResource(is);
     }
-    
+
+    /**
+     * operate the thing from request code
+     * @param req
+     * @param res 
+     */
     private void setDevice(Request req, Resource res) {
-        
+        ResourceThread rt = new ResourceThread(frame,res,req);
+        frame.putService(rt);
     }
 }

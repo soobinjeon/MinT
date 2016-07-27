@@ -16,6 +16,7 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.MinT;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ThingProperty.PropertyRole;
@@ -30,11 +31,15 @@ public class ResourceStorage {
     private ResourceManagerHandle PMhandle = null;
     private ResourceManagerHandle IMhandle = null;
     
-    private Cache<Resource> property = new Cache<>();
-    private Cache<Resource> instruction = new Cache<>();
+    private final Cache<Resource> property;
+    private final Cache<Resource> instruction;
+    
+    private MinT frame = null;
     private DebugLog dl = new DebugLog("ResourceStorage");
-    public ResourceStorage(){
-        
+    public ResourceStorage(MinT frame){
+        this.instruction = new Cache<>();
+        this.property = new Cache<>();
+        this.frame = frame;
     }
     
     public void setPropertyHandler(ResourceManagerHandle pmhandle) {
@@ -61,18 +66,29 @@ public class ResourceStorage {
     public Object getProperty(Request req){
         ThingProperty rs = (ThingProperty)property.get(req.getResourceName());
         
+        Object ret = null;
         if(rs != null){
             if(rs.getPropertyRole() == PropertyRole.APERIODIC)
-                return PMhandle.get(req, rs);
+                ret = PMhandle.get(req, rs);
             else
-                return rs.getResourceData().getResource();
+                ret = rs.getResourceData().getResource();
         }
         else
-            return null;
+            ret = null;
         
-        /*response method (send to requester)*/
+        /*response method (send to requester)
+        * fix me
+        * should send router
+        */
+        frame.sendDirectMessage(req.getTargetNode(), String.valueOf(ret));
+        
+        return ret;
     }
     
+    /**
+     * set Instruction
+     * @param req 
+     */
     public void setInstruction(Request req){
         Resource rs = instruction.get(req.getResourceName());
         if(rs != null)

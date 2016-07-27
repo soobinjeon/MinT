@@ -25,20 +25,22 @@ import MinTFramework.ExternalDevice.DeviceType;
  */
 public class Request extends Information {
     String targetRes;
+    Profile targetNode;
     
     /**
      * 
      * @param res Resource Name or ID
      * @param _getResource 
      */
-    public Request(String res, Object _getResource) {
+    public Request(String res, Object _getResource, Profile tn) {
         super(_getResource);
         targetRes = res;
+        targetNode = tn;
     }
 
     @Override
     public Object getClone() {
-        return new Request(targetRes, getResource());
+        return new Request(targetRes, getResource(), targetNode);
     }
     
     /**
@@ -47,5 +49,13 @@ public class Request extends Information {
      */
     public String getResourceName(){
         return targetRes;
+    }
+    
+    /**
+     * get Target Node
+     * @return 
+     */
+    public Profile getTargetNode(){
+        return targetNode;
     }
 }

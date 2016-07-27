@@ -60,7 +60,7 @@ public abstract class MinT {
         scheduler = new Scheduler(serviceQueueLength, numOfThread);
         devicemanager = new DeviceManager();
         networkmanager = new NetworkManager(this);
-        resourceStorage = new ResourceStorage();
+        resourceStorage = new ResourceStorage(this);
         PM = new PropertyManager(this,resourceStorage);
         IM = new InstructionManager(this, resourceStorage);
     }

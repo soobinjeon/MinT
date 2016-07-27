@@ -28,19 +28,25 @@ import MinTFramework.Service;
  */
 public abstract class ThingInstruction extends Resource{
     
+    /**
+     * init instruction set
+     * @param name Resource Name (it is id of this resource)
+     * @param dtype DeviceType
+     */
     public ThingInstruction(String name, DeviceType dtype) {
         super(name, dtype);
     }
 
     /**
-     *
+     * instruction method to operate the thing
      * @param info
      */
     @Override
     abstract public void set(Request info);
 
     /**
-     *
+     * !!Warning!!
+     * Do not use in this class
      * @param info
      * @return
      */

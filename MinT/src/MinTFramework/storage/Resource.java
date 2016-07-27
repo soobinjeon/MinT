@@ -70,6 +70,10 @@ public abstract class Resource{
         this.frame = frame;
     }
     
+    /**
+     * get resource Data
+     * @return 
+     */
     public ResData getResourceData(){
         return data;
     }

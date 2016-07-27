@@ -84,7 +84,7 @@ public class ResourceThread extends Service{
 
     private void processGet() {
         Object result = res.get(req);
-        System.out.println("execute Data : "+res.getResourceData().getResourceString());
+//        System.out.println("execute Data : "+res.getResourceData().getResourceString());
         if(result != null){
             res.data.setResource(result);
         }
