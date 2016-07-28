@@ -19,8 +19,11 @@ package MinTFramework.storage;
 import MinTFramework.MinT;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.List;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -51,10 +54,26 @@ public class ResourceStorage {
     }
     
     public void addResource(Resource res){
+        //set Storage Location for Local
+        if(res.getStorageCategory() == StoreCategory.Local)
+            res.setLocation(setLocalLocation(res));
+        else if(res.getStorageCategory() == StoreCategory.Network){
+            /*do Something*/
+        }
+        
         if(res instanceof ThingProperty)
             property.put(res.getName(), res);
         else if(res instanceof ThingInstruction)
             instruction.put(res.getName(), res);
+    }
+    
+    /**
+     * set Local Location
+     * @param res
+     * @return 
+     */
+    private StorageDirectory setLocalLocation(Resource res) {
+        return new StorageDirectory(StorageDirectory.LOCAL_SOURCE, frame.getResourceGroup(), res.getName());
     }
     
     /**
@@ -99,7 +118,37 @@ public class ResourceStorage {
         return property.getAllResourceName();
     }
     
+    /**
+     * get Observe Resource Data
+     * @return 
+     */
+    public JSONObject OberveLocalResource(){
+        JSONObject obs = new JSONObject();
+        JSONArray jpr = new JSONArray();
+        JSONArray jis = new JSONArray();
+        
+        for(Resource res : getProperties()){
+            jpr.add(res.getResourcetoJSON());
+        }
+        obs.put("property", jpr);
+        
+        for(Resource res : getInstruction()){
+            jis.add(res.getResourcetoJSON());
+        }
+        obs.put("instruction", jis);
+        
+        return obs;
+    }
+    
     public List<String> getInstructionList(){
         return instruction.getAllResourceName();
+    }
+    
+    public List<Resource> getProperties(){
+        return property.getAllResources();
+    }
+    
+    public List<Resource> getInstruction(){
+        return instruction.getAllResources();
     }
 }

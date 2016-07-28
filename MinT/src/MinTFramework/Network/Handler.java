@@ -84,9 +84,15 @@ public abstract class Handler extends Service{
         Request req = new Request("Device2", 0, src);
         
         //if msg = get
-        if(msg.equals("get"))
+        if(msg.equals("get")){
+            dl.printMessage("set get");
             resStorage.getProperty(req);
-        
+        }
+        else if(msg.equals("observe")){
+            dl.printMessage("set Observe");
+            dl.printMessage(resStorage.OberveLocalResource().toJSONString());
+            frame.sendDirectMessage(src, resStorage.OberveLocalResource().toJSONString());
+        }
         //if msg = set
         
         //if observing

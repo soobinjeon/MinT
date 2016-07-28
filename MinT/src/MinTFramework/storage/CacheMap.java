@@ -31,5 +31,6 @@ public interface CacheMap<T> {
     public ArrayList<T> getResourcebyDeviceType(DeviceType type);
     public List<DeviceType> getAllDeviceType();
     public ArrayList<String> getAllResourceName();
-    public HashMap<String,T> getAllResource();
+    public HashMap<String,T> getAllResourceHashMap();
+    public List<T> getAllResources();
 }

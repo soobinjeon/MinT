@@ -16,7 +16,6 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.*;
 import MinTFramework.ExternalDevice.DeviceType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,6 +82,10 @@ public class Cache<T> implements CacheMap<T>{
         return res;
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public List<DeviceType> getAllDeviceType() {
         List<DeviceType> res = new ArrayList<>();
@@ -124,7 +127,25 @@ public class Cache<T> implements CacheMap<T>{
      * @return new extended Resource(DeviceType, getResource())
      */
     @Override
-    public HashMap<String, T> getAllResource() {
+    public HashMap<String, T> getAllResourceHashMap() {
         return this.resources;
+    }
+    
+    @Override
+    public List<T> getAllResources(){
+        return new ArrayList<T>(resources.values());
+    }
+    
+    /**
+     * delete Resource
+     * @param res
+     * @return 
+     */
+    public boolean deleteResource(String res){
+        T ret = resources.remove(res);
+        if(ret != null)
+            return true;
+        else
+            return false;
     }
 }

@@ -26,7 +26,6 @@ import MinTFramework.ExternalDevice.Device;
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Handler;
-import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.Profile;
@@ -310,7 +309,7 @@ public abstract class MinT {
     }
     
     /***************************
-     * Local Shared Cache
+     * Resource & Sharing
      ****************************/
     
     /**
@@ -331,6 +330,14 @@ public abstract class MinT {
      */
     public ResourceStorage getResStorage(){
         return this.resourceStorage;
+    }
+    
+    /**
+     * get Routing group of this node
+     * @return 
+     */
+    public String getResourceGroup(){
+        return this.networkmanager.getCurrentRoutingGroup();
     }
 //    /**
 //     * put cache data to Shared Memory

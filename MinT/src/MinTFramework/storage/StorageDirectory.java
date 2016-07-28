@@ -1,0 +1,72 @@
+/*
+ * Copyright (C) 2015 Software&System Lab. Kangwon National University.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package MinTFramework.storage;
+
+/**
+ *
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
+ */
+public class StorageDirectory {
+    protected static final String LOCAL_SOURCE = "local";
+    private String source = "";
+    private String group = "";
+    private String resource = "";
+    
+    private final String spliter = "/";
+    
+    public StorageDirectory(String source, String group, String resource){
+        this.source = source;
+        this.group = group;
+        this.resource = resource;
+    }
+    
+    /**
+     * new Storage Directory with source Location
+     * @param srcLoc 
+     */
+    public StorageDirectory(String srcLoc){
+        if(srcLoc != null){
+            String sp[] = srcLoc.split(spliter);
+            if(sp.length > 0){
+                group = sp[0];
+                source = sp[1];
+                resource = sp[2];
+            }
+        }
+    }
+    
+    public String getSourceLocation(){
+        return group + spliter + source + spliter + resource;
+    }
+    
+    public String getGroup(){
+        return group;
+    }
+    
+    public String getSource(){
+        return source;
+    }
+    
+    public String getResourceName(){
+        return resource;
+    }
+    
+    public boolean isLocalSource(){
+        return this.source.equals(StorageDirectory.LOCAL_SOURCE);
+    }
+}

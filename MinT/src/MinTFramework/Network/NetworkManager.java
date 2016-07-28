@@ -34,7 +34,6 @@ public class NetworkManager {
     private final ArrayList<NetworkType> networkList;
     private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
-    private NetworkStorage nStorage;
     
     private Handler networkHandler = null;
     private RoutingProtocol routing;
@@ -51,7 +50,6 @@ public class NetworkManager {
         this.networks = new HashMap<>();
         this.frame = frame;
         routing = new RoutingProtocol();
-        nStorage = new NetworkStorage();
         networkHandler = new Handler(frame) {
             @Override
             public void userHandler(Profile src, String msg) {
@@ -227,5 +225,13 @@ public class NetworkManager {
      */
     private void setNodeName() {
         NodeName = "temporary Node";
+    }
+    
+    /**
+     * get Routing group of this node
+     * @return 
+     */
+    public String getCurrentRoutingGroup(){
+        return this.routing.getCurrentRoutingGroup();
     }
 }

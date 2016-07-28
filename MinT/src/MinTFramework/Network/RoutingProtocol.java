@@ -16,8 +16,6 @@
  */
 package MinTFramework.Network;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -27,5 +25,9 @@ public class RoutingProtocol {
     
     public RoutingProtocol(){
         
+    }
+    
+    public String getCurrentRoutingGroup(){
+        return "group";
     }
 }
