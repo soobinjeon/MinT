@@ -22,7 +22,6 @@ import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 /**
  *
@@ -31,6 +30,7 @@ import org.json.simple.parser.JSONParser;
  */
 public abstract class Resource{
     private DebugLog dl = new DebugLog("Resource");
+    
     public static enum Authority {Private, Protected, Public;}
     public static enum StoreCategory {Local, Network;
         boolean isLocal() {return this == Local;}
@@ -38,7 +38,7 @@ public abstract class Resource{
     }
     
     //new property
-    protected int id;
+    protected String id;
     protected StorageDirectory sourcelocation;
     protected Authority auth;
     protected StoreCategory scate;
@@ -80,10 +80,11 @@ public abstract class Resource{
      * JSON String to Resource from other Network
      * @param jtores 
      */
-    public Resource(JSONObject jtores, StoreCategory sc, Profile src){
-        setJSONtoResource(jtores, src.getAddress());
+    public Resource(JSONObject jtores, StoreCategory sc){
+        setJSONtoResource(jtores);
         scate = sc;
         data = new ResData(0);
+        this.setResourceID();
     }
     
     public void put(Request _data){
@@ -109,16 +110,6 @@ public abstract class Resource{
         return dtype;
     }
     
-    
-    /**
-     * set Frame
-     * !!Caution!! just use in frame
-     * @param frame 
-     */
-    public void setFrame(MinT frame){
-        this.frame = frame;
-    }
-    
     /**
      * get resource Data
      * @return 
@@ -129,11 +120,10 @@ public abstract class Resource{
     
     /**
      * !!Caution!! just use in Resource Storage
-     * set ID from Resource Storage
-     * @param id 
+     * set Resource ID
      */
-    public void setID(int id){
-        this.id = id;
+    public void setResourceID() {
+        this.id = this.sourcelocation.getSourceLocation();
     }
     
     /**
@@ -143,6 +133,16 @@ public abstract class Resource{
      */
     public void setLocation(StorageDirectory loc){
         this.sourcelocation = loc;
+        this.setResourceID();
+    }
+    
+    /**
+     * set Frame
+     * !!Caution!! just use in frame
+     * @param frame 
+     */
+    public void setFrame(MinT frame){
+        this.frame = frame;
     }
     
     /**
@@ -170,11 +170,44 @@ public abstract class Resource{
     }
     
     /**
+     * getID
+     * @return 
+     */
+    public String getID() {
+        return this.id;
+    }
+    
+    /**
+     * get Resource Profile
+     * @return 
+     */
+    public Profile getSourceProfile(){
+        return this.sourcelocation.getSrouceProfile();
+    }
+    
+    boolean isSameLocation(Profile destination) {
+        dl.printMessage("src :"+sourcelocation.getSource()+", des : "+destination.getAddress());
+        return this.sourcelocation.getSource().equals(destination.getAddress());
+    }
+    
+    public Resource getCloneforObserve() {
+        return new Resource(this.name, DeviceType.valueOf(this.dtype.toString())
+                , Authority.valueOf(auth.toString()), StoreCategory.valueOf(scate.toString())) {
+            @Override
+            public void set(Request req) {}
+
+            @Override
+            public Object get(Request req) {return null;}
+        };
+    }
+    
+    /**
      * get Resource to JSON
      * @return 
      */
     public JSONObject getResourcetoJSON(){
         JSONObject resObject = new JSONObject();
+        resObject.put(JSONKEY.SOURCELOC, this.sourcelocation.getSrouceProfile().getProfile());
         resObject.put(JSONKEY.NAME, this.name);
         resObject.put(JSONKEY.GROUP, this.getGroup());
         resObject.put(JSONKEY.AUTH, this.auth.toString());
@@ -186,17 +219,18 @@ public abstract class Resource{
      * set JSON to Resource
      * @param jtor 
      */
-    private void setJSONtoResource(JSONObject jtor, String srcAddr){
+    private void setJSONtoResource(JSONObject jtor){
         try{
             this.name = (String)jtor.get(JSONKEY.NAME.toString());
             this.auth = Authority.valueOf((String)jtor.get(JSONKEY.AUTH.toString()));
             this.dtype = DeviceType.valueOf((String)jtor.get(JSONKEY.DEVICETYPE.toString()));
             
-            sourcelocation = new StorageDirectory(srcAddr, (String)jtor.get(JSONKEY.GROUP.toString()), name);
+            sourcelocation = new StorageDirectory(new Profile((String)jtor.get(JSONKEY.SOURCELOC.toString())), 
+                    (String)jtor.get(JSONKEY.GROUP.toString()), name);
         }catch(Exception e){
             
         }
     }
     
-    private enum JSONKEY {NAME, GROUP, AUTH, DEVICETYPE;}
+    private enum JSONKEY {NAME, GROUP, AUTH, DEVICETYPE, SOURCELOC;}
 }    

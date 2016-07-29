@@ -17,7 +17,6 @@
 package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
-import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
 import org.json.simple.JSONObject;
 
@@ -34,8 +33,8 @@ public abstract class ThingInstruction extends Resource{
      * @param sc
      * @param src 
      */
-    public ThingInstruction(JSONObject jtores, StoreCategory sc, Profile src){
-        super(jtores, sc, src);
+    public ThingInstruction(JSONObject jtores, StoreCategory sc){
+        super(jtores, sc);
     }
     
     /**

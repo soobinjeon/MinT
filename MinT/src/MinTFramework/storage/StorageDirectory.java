@@ -16,6 +16,8 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.Network.Profile;
+
 /**
  * Storage Directory
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -23,6 +25,7 @@ package MinTFramework.storage;
  */
 public class StorageDirectory {
     protected static final String LOCAL_SOURCE = "local";
+    private Profile networkProfile;
     private String source = "";
     private String group = "";
     private String resource = "";
@@ -35,8 +38,14 @@ public class StorageDirectory {
      * @param group group address
      * @param resource resource Name
      */
-    public StorageDirectory(String source, String group, String resource){
-        this.source = source;
+    public StorageDirectory(Profile src, String group, String resource){
+        if(src != null){
+            this.networkProfile = src;
+            this.source = src.getAddress();
+        }else{
+            networkProfile = null;
+            source = LOCAL_SOURCE;
+        }
         this.group = group;
         this.resource = resource;
     }
@@ -82,5 +91,9 @@ public class StorageDirectory {
     
     public boolean isLocalSource(){
         return this.source.equals(StorageDirectory.LOCAL_SOURCE);
+    }
+    
+    public Profile getSrouceProfile(){
+        return this.networkProfile;
     }
 }

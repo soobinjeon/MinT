@@ -17,14 +17,12 @@
 package MinTFramework.Network.Routing.MinTSharing;
 
 import MinTFramework.Network.Profile;
-import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseData;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
-import MinTFramework.storage.ThingProperty;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -46,13 +44,7 @@ public class MinTRoutingProtocol extends RoutingProtocol{
                 JSONObject observe = resStorage.getOberveResource(resdata.getResourceString());
                 JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property.toString());
                 for(int i=0;i<jpr.size();i++){
-                    ThingProperty np = new ThingProperty((JSONObject)jpr.get(i), Resource.StoreCategory.Network, resdata.getSourceInfo()) {
-                        @Override
-                        public void set(Request req) {}
-                        @Override
-                        public Object get(Request req) {return null;}
-                    };
-                    resStorage.addResource(np);
+                    resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
                 }
                 
                 for(Resource pl :resStorage.getProperties()){

@@ -16,8 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.storage.Information;
-import MinTFramework.ExternalDevice.DeviceType;
+import MinTFramework.storage.datamap.Information;
 
 /**
  *
@@ -25,7 +24,7 @@ import MinTFramework.ExternalDevice.DeviceType;
  */
 public class Request extends Information {
     String targetRes;
-    Profile targetNode;
+    Profile RequestNode;
     
     /**
      * 
@@ -35,12 +34,12 @@ public class Request extends Information {
     public Request(String res, Object _getResource, Profile tn) {
         super(_getResource);
         targetRes = res;
-        targetNode = tn;
+        RequestNode = tn;
     }
 
     @Override
     public Object getClone() {
-        return new Request(targetRes, getResource(), targetNode);
+        return new Request(targetRes, getResource(), RequestNode);
     }
     
     /**
@@ -55,7 +54,7 @@ public class Request extends Information {
      * get Target Node
      * @return 
      */
-    public Profile getTargetNode(){
-        return targetNode;
+    public Profile getRequestNode(){
+        return RequestNode;
     }
 }

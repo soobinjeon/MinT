@@ -16,6 +16,8 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.storage.datamap.Information;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,

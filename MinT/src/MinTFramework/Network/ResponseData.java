@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.storage.Information;
+import MinTFramework.storage.datamap.Information;
 
 /**
  *
@@ -24,10 +24,15 @@ import MinTFramework.storage.Information;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class ResponseData extends Information{
+    private PacketProtocol recv_packet;
     private Profile source;
-    public ResponseData(Profile src, Object _getResource) {
-        super(_getResource);
-        source = src;
+    public ResponseData(PacketProtocol recv_packet) {
+        this(recv_packet, recv_packet.getMsgData());
+    }
+    public ResponseData(PacketProtocol recv_packet, Object data) {
+        super(data);
+        source = recv_packet.getSource();
+        this.recv_packet = recv_packet;
     }
     
     @Override
@@ -38,10 +43,14 @@ public class ResponseData extends Information{
     public Profile getSourceInfo(){
         return source;
     }
+    
+    public Profile getDestination(){
+        return recv_packet.getDestinationNode();
+    } 
 
     @Override
     public Object getClone() {
-        return new ResponseData(getSourceInfo(), getResource());
+        return new ResponseData(recv_packet, getResource());
     }
     
 }

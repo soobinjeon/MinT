@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.storage;
+package MinTFramework.storage.datamap;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import java.util.List;
  * @author soobin
  */
 public class Cache<T> implements CacheMap<T>{
-    private HashMap<String,T> resources = new HashMap();
+    protected HashMap<String,T> resources = new HashMap();
     
     public Cache(){}
 

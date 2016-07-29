@@ -18,7 +18,10 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -108,7 +111,7 @@ public abstract class Handler extends Service{
             
         }else if(rv_packet.getHeader_Instruction().isObserve()){
             dl.printMessage("set Observe");
-            String ret = resStorage.OberveLocalResource().toJSONString();
+            String ret = resStorage.OberveLocalResource(rv_packet.getDestinationNode()).toJSONString();
             nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.OBSERVE
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }
@@ -119,7 +122,7 @@ public abstract class Handler extends Service{
             dl.printMessage("Response get");
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null)
-                reshandle.Response(new ResponseData(rv_packet.getSource(),rv_packet.getMsgData()));
+                reshandle.Response(new ResponseData(rv_packet));
         }else if(rv_packet.getHeader_Instruction().isSet()){
             
         }else if(rv_packet.getHeader_Instruction().isPost()){
@@ -130,9 +133,40 @@ public abstract class Handler extends Service{
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null){
                 dl.printMessage("Response Observe");
-                reshandle.Response(new ResponseData(rv_packet.getSource(),rv_packet.getMsgData()));
+                ResponseData resdata = new ResponseData(rv_packet);
+                reshandle.Response(resdata);
+                UpdateObserveData(resdata);
             }
 //            dl.printMessage(rv_packet.getMsgData());
+        }
+    }
+    
+    /**
+     * update Observed Data in Storage
+     * @param resdata 
+     */
+    private void UpdateObserveData(ResponseData resdata){
+        JSONObject observe = resStorage.getOberveResource(resdata.getResourceString());
+        JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+        for(int i=0;i<jpr.size();i++){
+            resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
+        }
+        
+        JSONArray jis = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.instruction.toString());
+        for(int i=0;i<jis.size();i++){
+            resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.instruction, (JSONObject)jis.get(i), resdata);
+        }
+        
+        dl.printMessage("Property List");
+        for(Resource pl :resStorage.getProperties()){
+            dl.printMessage("PL : "+pl.getID()+", "
+                    +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
+        }
+        
+        dl.printMessage("Instruction List");
+        for(Resource pl :resStorage.getInstruction()){
+            dl.printMessage("IL : "+pl.getID()+", "
+                    +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
         }
     }
     
