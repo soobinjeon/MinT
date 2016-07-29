@@ -39,7 +39,7 @@ public class RoutingProtocol {
 
     public void setParents(NetworkManager nm, MinT frame, ResourceStorage resourceStorage) {
         this.frame = frame;
-        networkManager = nm;
-        resStorage = resourceStorage;
+        this.networkManager = nm;
+        this.resStorage = resourceStorage;
     }
 }

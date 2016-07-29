@@ -35,7 +35,7 @@ import java.util.HashMap;
  */
 public class NetworkManager {
     private MinT frame = null;
-    private ResourceStorage resourceStorage;
+    private ResourceStorage resourceStorage = null;
     private final ArrayList<NetworkType> networkList;
     private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
@@ -69,6 +69,9 @@ public class NetworkManager {
     }
     
     private void initRoutingSetup(){
+        dl.printMessage("routing init");
+        if(resourceStorage == null)
+            dl.printMessage("resource null");
         routing.setParents(this, frame, resourceStorage);
     }
 

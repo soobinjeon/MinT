@@ -20,6 +20,7 @@ import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
+import MinTFramework.Util.DebugLog;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -29,6 +30,7 @@ import org.json.simple.parser.JSONParser;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Resource{
+    private DebugLog dl = new DebugLog("Resource");
     public static enum Authority {Private, Protected, Public;}
     public static enum StoreCategory {Local, Network;
         boolean isLocal() {return this == Local;}
@@ -78,7 +80,7 @@ public abstract class Resource{
      * JSON String to Resource from other Network
      * @param jtores 
      */
-    public Resource(String jtores, StoreCategory sc, Profile src){
+    public Resource(JSONObject jtores, StoreCategory sc, Profile src){
         setJSONtoResource(jtores, src.getAddress());
         scate = sc;
         data = new ResData(0);
@@ -184,15 +186,13 @@ public abstract class Resource{
      * set JSON to Resource
      * @param jtor 
      */
-    private void setJSONtoResource(String jtor, String srcAddr){
+    private void setJSONtoResource(JSONObject jtor, String srcAddr){
         try{
-            JSONParser jsonParse = new JSONParser();
-            JSONObject jo = (JSONObject)jsonParse.parse(jtor);
-            this.name = (String)jo.get(JSONKEY.NAME);
-            this.auth = Authority.valueOf((String)jo.get(JSONKEY.AUTH));
-            this.dtype = DeviceType.valueOf((String)jo.get(JSONKEY.DEVICETYPE));
+            this.name = (String)jtor.get(JSONKEY.NAME.toString());
+            this.auth = Authority.valueOf((String)jtor.get(JSONKEY.AUTH.toString()));
+            this.dtype = DeviceType.valueOf((String)jtor.get(JSONKEY.DEVICETYPE.toString()));
             
-            sourcelocation = new StorageDirectory(srcAddr, (String)jo.get(JSONKEY.GROUP), name);
+            sourcelocation = new StorageDirectory(srcAddr, (String)jtor.get(JSONKEY.GROUP.toString()), name);
         }catch(Exception e){
             
         }

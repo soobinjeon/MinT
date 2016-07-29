@@ -43,12 +43,10 @@ public class MinTRoutingProtocol extends RoutingProtocol{
         frame.REQUEST_OBSERVE(dts, new ResponseHandler() {
             @Override
             public void Response(ResponseData resdata) {
-                dl.printMessage(resdata.getResourceString());
                 JSONObject observe = resStorage.getOberveResource(resdata.getResourceString());
-                
-                JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property);
+                JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property.toString());
                 for(int i=0;i<jpr.size();i++){
-                    ThingProperty np = new ThingProperty(((JSONObject)jpr.get(i)).toJSONString(), Resource.StoreCategory.Network, resdata.getSourceInfo()) {
+                    ThingProperty np = new ThingProperty((JSONObject)jpr.get(i), Resource.StoreCategory.Network, resdata.getSourceInfo()) {
                         @Override
                         public void set(Request req) {}
                         @Override
@@ -57,8 +55,8 @@ public class MinTRoutingProtocol extends RoutingProtocol{
                     resStorage.addResource(np);
                 }
                 
-                for(String pl :resStorage.getPropertyList()){
-                    dl.printMessage("Property List : "+pl);
+                for(Resource pl :resStorage.getProperties()){
+                    dl.printMessage("PL : "+pl.getName()+", "+pl.getStorageDirectory().getSourceLocation());
                 }
                 
                 /*add instruction*/

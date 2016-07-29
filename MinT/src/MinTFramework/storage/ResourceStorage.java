@@ -141,7 +141,6 @@ public class ResourceStorage {
         try{
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject)jsonParser.parse(data);
-        
         return jsonObject;
         }catch(Exception e){
             e.printStackTrace();
