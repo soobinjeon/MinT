@@ -17,9 +17,8 @@
 package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
-import MinTFramework.MinT;
+import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
-import MinTFramework.Service;
 
 /**
  *
@@ -27,6 +26,16 @@ import MinTFramework.Service;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class ThingInstruction extends Resource{
+    
+    /**
+     * new ThingInstruction from other network
+     * @param jtores
+     * @param sc
+     * @param src 
+     */
+    public ThingInstruction(String jtores, StoreCategory sc, Profile src){
+        super(jtores, sc, src);
+    }
     
     /**
      * init instruction set

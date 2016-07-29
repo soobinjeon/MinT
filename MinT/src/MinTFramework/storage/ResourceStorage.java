@@ -24,6 +24,7 @@ import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  *
@@ -57,6 +58,8 @@ public class ResourceStorage {
         //set Storage Location for Local
         if(res.getStorageCategory() == StoreCategory.Local)
             res.setLocation(setLocalLocation(res));
+        //set Storage Location for Network
+        //fix me
         else if(res.getStorageCategory() == StoreCategory.Network){
             /*do Something*/
         }
@@ -77,7 +80,6 @@ public class ResourceStorage {
     }
     
     /**
-     * fix me
      * @return 
      * @see 
      * @param req 
@@ -87,19 +89,13 @@ public class ResourceStorage {
         
         Object ret = null;
         if(rs != null){
-            if(rs.getPropertyRole() == PropertyRole.APERIODIC)
+            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC)
                 ret = PMhandle.get(req, rs);
             else
                 ret = rs.getResourceData().getResource();
         }
         else
             ret = null;
-        
-        /*response method (send to requester)
-        * fix me
-        * should send router
-        */
-        frame.sendDirectMessage(req.getTargetNode(), String.valueOf(ret));
         
         return ret;
     }
@@ -118,6 +114,7 @@ public class ResourceStorage {
         return property.getAllResourceName();
     }
     
+    public static enum RESOURCE_TYPE {property, instruction;}
     /**
      * get Observe Resource Data
      * @return 
@@ -130,14 +127,26 @@ public class ResourceStorage {
         for(Resource res : getProperties()){
             jpr.add(res.getResourcetoJSON());
         }
-        obs.put("property", jpr);
+        obs.put(RESOURCE_TYPE.property, jpr);
         
         for(Resource res : getInstruction()){
             jis.add(res.getResourcetoJSON());
         }
-        obs.put("instruction", jis);
+        obs.put(RESOURCE_TYPE.instruction, jis);
         
         return obs;
+    }
+    
+    public JSONObject getOberveResource(String data){
+        try{
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject)jsonParser.parse(data);
+        
+        return jsonObject;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
     
     public List<String> getInstructionList(){

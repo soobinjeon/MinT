@@ -16,30 +16,32 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.MinT;
-import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.Information;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingProtocol {
-    protected MinT frame;
-    protected NetworkManager networkManager;
-    protected ResourceStorage resStorage;
-    
-    public RoutingProtocol(){
-        
+public class ResponseData extends Information{
+    private Profile source;
+    public ResponseData(Profile src, Object _getResource) {
+        super(_getResource);
+        source = src;
     }
     
-    public String getCurrentRoutingGroup(){
-        return "group";
+    @Override
+    public void setResource(Object setres){
+        super.setResource(setres);
+    }
+    
+    public Profile getSourceInfo(){
+        return source;
     }
 
-    public void setParents(NetworkManager nm, MinT frame, ResourceStorage resourceStorage) {
-        this.frame = frame;
-        networkManager = nm;
-        resStorage = resourceStorage;
+    @Override
+    public Object getClone() {
+        return new ResponseData(getSourceInfo(), getResource());
     }
+    
 }

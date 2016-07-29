@@ -17,6 +17,7 @@
 package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
+import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
 
 /**
@@ -32,6 +33,16 @@ public abstract class ThingProperty extends Resource{
     
     private PropertyRole pr;
     private int period = 1000;
+    
+    /**
+     * new ThingProperty from other Network
+     * @param jtores
+     * @param sc
+     * @param src 
+     */
+    public ThingProperty(String jtores, StoreCategory sc, Profile src){
+        super(jtores, sc, src);
+    }
     
     /**
      * This class can provide the resource data from thing's devices

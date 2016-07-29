@@ -18,6 +18,7 @@ package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
+import MinTFramework.Network.Profile;
 import MinTFramework.Network.Request;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,7 +30,10 @@ import org.json.simple.parser.JSONParser;
  */
 public abstract class Resource{
     public static enum Authority {Private, Protected, Public;}
-    public static enum StoreCategory {Local, Network;}
+    public static enum StoreCategory {Local, Network;
+        boolean isLocal() {return this == Local;}
+        boolean isNetwork() {return this == Network;}
+    }
     
     //new property
     protected int id;
@@ -74,9 +78,10 @@ public abstract class Resource{
      * JSON String to Resource from other Network
      * @param jtores 
      */
-    public Resource(String jtores, StoreCategory sc){
-        setJSONtoResource(jtores);
+    public Resource(String jtores, StoreCategory sc, Profile src){
+        setJSONtoResource(jtores, src.getAddress());
         scate = sc;
+        data = new ResData(0);
     }
     
     public void put(Request _data){
@@ -168,10 +173,10 @@ public abstract class Resource{
      */
     public JSONObject getResourcetoJSON(){
         JSONObject resObject = new JSONObject();
-        resObject.put("name", this.name);
-        resObject.put("group", this.getGroup());
-        resObject.put("auth", this.auth.toString());
-        resObject.put("devicetype", this.dtype.toString());
+        resObject.put(JSONKEY.NAME, this.name);
+        resObject.put(JSONKEY.GROUP, this.getGroup());
+        resObject.put(JSONKEY.AUTH, this.auth.toString());
+        resObject.put(JSONKEY.DEVICETYPE, this.dtype.toString());
         return resObject;
     }
     
@@ -179,15 +184,19 @@ public abstract class Resource{
      * set JSON to Resource
      * @param jtor 
      */
-    private void setJSONtoResource(String jtor){
+    private void setJSONtoResource(String jtor, String srcAddr){
         try{
             JSONParser jsonParse = new JSONParser();
             JSONObject jo = (JSONObject)jsonParse.parse(jtor);
-            this.name = (String)jo.get("name");
-            this.auth = Authority.valueOf((String)jo.get("auth"));
-            this.dtype = DeviceType.valueOf((String)jo.get("devicetype"));
+            this.name = (String)jo.get(JSONKEY.NAME);
+            this.auth = Authority.valueOf((String)jo.get(JSONKEY.AUTH));
+            this.dtype = DeviceType.valueOf((String)jo.get(JSONKEY.DEVICETYPE));
+            
+            sourcelocation = new StorageDirectory(srcAddr, (String)jo.get(JSONKEY.GROUP), name);
         }catch(Exception e){
             
         }
     }
+    
+    private enum JSONKEY {NAME, GROUP, AUTH, DEVICETYPE;}
 }    

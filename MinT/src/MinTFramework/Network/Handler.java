@@ -29,11 +29,13 @@ public abstract class Handler extends Service{
     protected MinT frame;
     protected PacketProtocol recv_packet;
     protected ResourceStorage resStorage;
+    protected NetworkManager nmanager;
     DebugLog dl = new DebugLog("Handler");
     public Handler(MinT _frame){
         super(_frame);
         this.frame = _frame;
         resStorage = this.frame.getResStorage();
+        nmanager = this.frame.getNetworkManager();
     }
     /***
      * Call Packet Handler: Do not supprot upper v2.03
@@ -58,7 +60,7 @@ public abstract class Handler extends Service{
      * @param src
      * @param msg 
      */
-    abstract public void userHandler(Profile src, String msg);
+    abstract public void userHandler(PacketProtocol rev_packet);
     
     /**
      * call Handler
@@ -76,34 +78,67 @@ public abstract class Handler extends Service{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(Profile src, String msg){
+    private void SystemHandler(){
         /**
          * get, post using resource storage
          */
         dl.printMessage("Processing SystemHandler");
-        Request req = new Request("Device2", 0, src);
-        
-        //if msg = get
-        if(msg.equals("get")){
+        dl.printMessage(recv_packet.getPacketString());
+        dl.printMessage("pk_length : "+recv_packet.getPacket().length);
+        //Request req = new Request("Device2", 0, src);
+        if(recv_packet.getHeader_Direction().isRequest()){
+            SystemHandleRequest(recv_packet);
+        }else if(recv_packet.getHeader_Direction().isResponse()){
+            SystemHandleResponse(recv_packet);
+        }
+    }
+    
+    private void SystemHandleRequest(PacketProtocol rv_packet){
+        if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("set get");
-            resStorage.getProperty(req);
-        }
-        else if(msg.equals("observe")){
+            Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
+            String resmsg = String.valueOf(resStorage.getProperty(req));
+            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.GET
+                    , rv_packet.getSource(), resmsg, rv_packet.getMSGID());
+        }else if(rv_packet.getHeader_Instruction().isSet()){
+            
+        }else if(rv_packet.getHeader_Instruction().isPost()){
+            
+        }else if(rv_packet.getHeader_Instruction().isDelete()){
+            
+        }else if(rv_packet.getHeader_Instruction().isObserve()){
             dl.printMessage("set Observe");
-            dl.printMessage(resStorage.OberveLocalResource().toJSONString());
-            frame.sendDirectMessage(src, resStorage.OberveLocalResource().toJSONString());
+            String ret = resStorage.OberveLocalResource().toJSONString();
+            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.OBSERVE
+                    , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }
-        //if msg = set
-        
-        //if observing
-        
-//        Object obj = resStorage.getProperty(new Request("Device2", 0));
-//        dl.printMessage("result : "+(double)obj);
+    }
+    
+    private void SystemHandleResponse(PacketProtocol rv_packet){
+        if(rv_packet.getHeader_Instruction().isGet()){
+            dl.printMessage("Response get");
+            ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
+            if(reshandle != null)
+                reshandle.Response(new ResponseData(rv_packet.getSource(),rv_packet.getMsgData()));
+        }else if(rv_packet.getHeader_Instruction().isSet()){
+            
+        }else if(rv_packet.getHeader_Instruction().isPost()){
+            
+        }else if(rv_packet.getHeader_Instruction().isDelete()){
+            
+        }else if(rv_packet.getHeader_Instruction().isObserve()){
+            ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
+            if(reshandle != null){
+                dl.printMessage("Response Observe");
+                reshandle.Response(new ResponseData(rv_packet.getSource(),rv_packet.getMsgData()));
+            }
+//            dl.printMessage(rv_packet.getMsgData());
+        }
     }
     
     @Override
     public void execute(){
-        SystemHandler(recv_packet.getSource(), recv_packet.getMsgData());
-        userHandler(recv_packet.getSource(),recv_packet.getMsgData());
+        SystemHandler();
+        userHandler(recv_packet);
     }
 }

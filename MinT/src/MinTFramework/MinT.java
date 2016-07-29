@@ -28,7 +28,9 @@ import MinTFramework.Network.RoutingProtocol;
 import MinTFramework.Network.Handler;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
+import MinTFramework.Network.ResponseHandler;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
@@ -58,7 +60,7 @@ public abstract class MinT {
     public MinT(int serviceQueueLength, int numOfThread) {
         scheduler = new Scheduler(serviceQueueLength, numOfThread);
         devicemanager = new DeviceManager();
-        networkmanager = new NetworkManager(this);
+        networkmanager = new NetworkManager(this, resourceStorage);
         resourceStorage = new ResourceStorage(this);
         PM = new PropertyManager(this,resourceStorage);
         IM = new InstructionManager(this, resourceStorage);
@@ -267,6 +269,14 @@ public abstract class MinT {
     }
     
     /**
+     * get NetworkManager
+     * @return 
+     */
+    public NetworkManager getNetworkManager(){
+        return networkmanager;
+    }
+    
+    /**
      * add Network
      * @param ntype 
      */
@@ -286,19 +296,43 @@ public abstract class MinT {
     }
     
     /**
-     * Send Message
+     * GET Resource Data matched to filled Resource
      * @deprecated 
-     * @param dst
      * @param msg 
      */
-    public void sendMessage(String dst, NetworkType nt, String msg){
-        sendDirectMessage(new Profile("noname",dst,nt),msg);
+    public void GET(String ResourceName){
+        
     }
     
-    public void sendDirectMessage(Profile dst, String msg){
-        networkmanager.sendDirectMessage(dst,msg);
+    /**
+     * GET Resource data matched to Device Type
+     * @deprecated 
+     * @param dt 
+     */
+    public void GETbyDeviceType(DeviceType dt){
+        
     }
     
+    /**
+     * Request directly Resource Data to other Node
+     * @param dst destination Node Information
+     * @param resName Resource Name
+     * @param resHandle Response Handler
+     */
+    public void REQUEST_GET(Profile dst, String resName, ResponseHandler resHandle){
+        networkmanager.SEND_FOR_RESPONSE(PacketProtocol.HEADER_DIRECTION.REQUEST
+                ,PacketProtocol.HEADER_INSTRUCTION.GET, dst,resName, resHandle);
+    }
+    
+    /**
+     * Observe resources from other Node
+     * @param dst 
+     * @param resHandle Response Handler
+     */
+    public void REQUEST_OBSERVE(Profile dst, ResponseHandler resHandle){
+        networkmanager.SEND_FOR_RESPONSE(PacketProtocol.HEADER_DIRECTION.REQUEST,
+                PacketProtocol.HEADER_INSTRUCTION.OBSERVE, dst,"",resHandle);
+    }
     
     /**
      * set Application Protocol
@@ -306,6 +340,15 @@ public abstract class MinT {
      */
     public void setRoutingProtocol(RoutingProtocol ap){
         networkmanager.setRoutingProtocol(ap);
+    }
+    
+    /**
+     * get RoutingProtocol for test
+     * @deprecated 
+     * @return 
+     */
+    public RoutingProtocol getRoutingProtocol(){
+        return networkmanager.getRoutingProtocol();
     }
     
     /***************************
@@ -376,7 +419,7 @@ public abstract class MinT {
      */
     public void Start() {
         devicemanager.initAllDevice();
-        networkmanager.TurnOnNetwork();
+        networkmanager.onStart();
         scheduler.SchedulerRunning();
     }
     

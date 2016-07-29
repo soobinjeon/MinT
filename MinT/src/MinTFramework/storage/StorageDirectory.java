@@ -17,7 +17,7 @@
 package MinTFramework.storage;
 
 /**
- *
+ * Storage Directory
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
@@ -29,6 +29,12 @@ public class StorageDirectory {
     
     private final String spliter = "/";
     
+    /**
+     * init Directory
+     * @param source source address
+     * @param group group address
+     * @param resource resource Name
+     */
     public StorageDirectory(String source, String group, String resource){
         this.source = source;
         this.group = group;
@@ -48,6 +54,14 @@ public class StorageDirectory {
                 resource = sp[2];
             }
         }
+    }
+    
+    /**
+     * set Source address
+     * @param source 
+     */
+    public void setSource(String source){
+        this.source =source;
     }
     
     public String getSourceLocation(){

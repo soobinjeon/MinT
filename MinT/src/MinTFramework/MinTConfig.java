@@ -28,6 +28,7 @@ public class MinTConfig {
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
     
     //for Network
+    static public final int RESPONSE_ID_MAX = 4096;
     static public final int INTERNET_TCPUDP_PORT = 6513;
     static public final int INTERNET_COAP_PORT = 6514;
     static public String IP_ADDRESS = "";

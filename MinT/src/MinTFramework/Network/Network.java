@@ -81,7 +81,7 @@ public abstract class Network {
      */
     public void MatcherAndObservation(byte[] packet) {
         dl.printMessage(new String(packet));
-        PacketProtocol matchedPacket = new PacketProtocol(packet);
+        PacketProtocol matchedPacket = new PacketProtocol(this.getProfile(), packet);
         dl.printMessage(matchedPacket.getPacketString());
         if (isFinalDestiny(matchedPacket.getDestinationNode())) {
 //            frame.getNetworkHandler().callhadler(matchedPacket);

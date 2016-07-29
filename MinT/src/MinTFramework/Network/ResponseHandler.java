@@ -16,30 +16,11 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.MinT;
-import MinTFramework.storage.ResourceStorage;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingProtocol {
-    protected MinT frame;
-    protected NetworkManager networkManager;
-    protected ResourceStorage resStorage;
-    
-    public RoutingProtocol(){
-        
-    }
-    
-    public String getCurrentRoutingGroup(){
-        return "group";
-    }
-
-    public void setParents(NetworkManager nm, MinT frame, ResourceStorage resourceStorage) {
-        this.frame = frame;
-        networkManager = nm;
-        resStorage = resourceStorage;
-    }
+public interface ResponseHandler {
+    public void Response(ResponseData resdata);
 }

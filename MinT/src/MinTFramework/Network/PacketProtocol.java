@@ -17,37 +17,37 @@
 package MinTFramework.Network;
 
 import MinTFramework.Util.TypeCaster;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * Packet Protocol for MinT
  * MinT Protocol
- * {source}{previous departure}{next dstination}{final destination}{msg data}
- * |---------------------------route------------------------------||--data--|
- * |                         name|address                         ||  data  |
+ * {DIR|INS|ID}{source}{Previous Departure}{final destination}{msg data}
+ * |-header---||---------------------------route-------------||--data--|
+ *             |                         name|address        || 256KB  | should make maximum size
+ *  - MESSAGE HEADER
+ *     - DIR : REQUEST(0), RESPONSE(1) (1 bit)
+ *     - INS : GET(0), SET(1), POST(2), DELETE(3), OBSERVE(4) (3 bit)
+ *     - ID  : 1~1024 (4byte)
  * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PacketProtocol {
+    public static final int HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, Profile> routelist= new TreeMap<>();
-    private String data;
+    private String data="";
     private byte[] packetdata = null;
     private String packetdataString = null;
     private final int Numberoftotalpacket = 5;
     private String Scheme = "mint:";
+    private final String EMPTY_MSG = "-";
+    
+    private HEADER_DIRECTION h_direction;
+    private HEADER_INSTRUCTION h_instruction;
+    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -61,27 +61,36 @@ public class PacketProtocol {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketProtocol(Profile src, Profile prev, Profile next, Profile dest, String msg) {
+    public PacketProtocol(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+            Profile src, Profile prev, Profile next, Profile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
         routelist.put(ROUTE.NEXT,next);
         routelist.put(ROUTE.DESTINATION,dest);
+        h_direction = h_dir;
+        h_instruction = h_ins;
         data = msg;
-        makePacketData(routelist,data);
+        HEADER_MSGID = msgid;
+        makePacketData(HEADER_MSGID,h_direction, h_instruction,data);
+    }
+    
+    public PacketProtocol(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+            Profile src, Profile prev, Profile next, Profile dest, String msg) {
+        this(HEADER_MSGID_INITIALIZATION, h_dir, h_ins, src, prev, next, dest, msg);
     }
     
     /**
      * MinT Protocol -> Data
      * @param packet 
      */
-    public PacketProtocol(byte[] packet){
+    public PacketProtocol(Profile cpr, byte[] packet){
         packetdata = packet;
         try {
             packetdataString = TypeCaster.unzipStringFromBytes(packet);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        makeData(packetdataString);
+        makeData(cpr, packetdataString);
     }
     
     /**
@@ -128,16 +137,13 @@ public class PacketProtocol {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(TreeMap<ROUTE, Profile> rlist, String msgdata){
+    private void makePacketData(int MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
         String result = Scheme;
-        String mdata = getProtocolData(msgdata);
-        for(Profile pf : rlist.values()){
-            if(pf != null)
-                result += getProtocolData(pf.getProfile());
-            else
-                result += getProtocolData("");
-        }
-        
+        String mdata = getProtocolData(DataAnalizer(msgdata));
+        result += getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID));
+        result += getProtocolbyROUTE(ROUTE.SOURCE);
+        result += getProtocolbyROUTE(ROUTE.PREV);
+        result += getProtocolbyROUTE(ROUTE.DESTINATION);
         result += mdata;
         try {
             this.packetdata = TypeCaster.zipStringToBytes(result);
@@ -145,6 +151,23 @@ public class PacketProtocol {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * Make Header
+     * @param h_dir
+     * @param h_ins
+     * @return 
+     */
+    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id) {
+        return h_dir.getBit()+"|"+h_ins.getBit()+"|"+msg_id;
+    }
+    
+    private void makeStringtoHeader(String data){
+        String[] temp = data.split("\\|");
+        this.h_direction = HEADER_DIRECTION.getHeaderDirection(Integer.parseInt(temp[0]));
+        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(Integer.parseInt(temp[1]));
+        this.HEADER_MSGID = Integer.parseInt(temp[2]);
     }
     
     /**
@@ -172,6 +195,18 @@ public class PacketProtocol {
     }
     
     /**
+     * get Protocol by Route
+     * @param route
+     * @return 
+     */
+    private String getProtocolbyROUTE(ROUTE route){
+        Profile pf = this.routelist.get(route);
+        if(pf != null)
+            return getProtocolData(pf.getProfile());
+        else return getProtocolData("");
+    }
+    
+    /**
      * inner protocol for MinT
      * @param origin
      * @return 
@@ -179,24 +214,44 @@ public class PacketProtocol {
     private String getProtocolData(String origin){
         return "{"+origin+"}";
     }
+    
+    /**
+     * Empty Data Converter
+     * @param data
+     * @return 
+     */
+    private String DataAnalizer(String data){
+        if(data.equals(""))
+            return this.EMPTY_MSG;
+        else if(data.equals(EMPTY_MSG))
+            return "";
+        else
+            return data;
+    }
 
     /**
      * Make Data from byte Packet(MinT Protocol)
      * @param packet 
      */
-    private void makeData(String spacket) {
+    private void makeData(Profile cpr, String spacket) {
         spacket = spacket.trim();
         spacket = spacket.split(this.Scheme)[1];
         spacket = spacket.substring(1,spacket.length()-1);
         Pattern p = Pattern.compile("\\}\\{");
         String[] split = p.split(spacket);
         
+        System.out.println("Check Packet Data");
+        for(String s : split){
+            System.out.println("--"+s);
+        }
+        
         if(split.length == Numberoftotalpacket){
-            routelist.put(ROUTE.SOURCE, new Profile(split[0]));
-            routelist.put(ROUTE.PREV, new Profile(split[1]));
-            routelist.put(ROUTE.NEXT, new Profile(split[2]));
+            routelist.put(ROUTE.SOURCE, new Profile(split[1]));
+            routelist.put(ROUTE.PREV, new Profile(split[2]));
+            routelist.put(ROUTE.NEXT, cpr);
             routelist.put(ROUTE.DESTINATION, new Profile(split[3]));
             data = split[4];
+            makeStringtoHeader(split[0]);
         }
     }
     
@@ -218,15 +273,72 @@ public class PacketProtocol {
     
     public void setSource(Profile src){
         routelist.put(ROUTE.SOURCE, src);
-        makePacketData(routelist, data);
+        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
     }
     
     public void setPrevNode(Profile prev){
         routelist.put(ROUTE.PREV, prev);
-        makePacketData(routelist, data);
+        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
     }
     
     public String getMsgData(){
         return data;
+    }
+    
+    public HEADER_DIRECTION getHeader_Direction(){
+        return this.h_direction;
+    }
+    
+    public HEADER_INSTRUCTION getHeader_Instruction(){
+        return this.h_instruction;
+    }
+    
+    public int getMSGID(){
+        return HEADER_MSGID;
+    }
+    
+    public static enum HEADER_DIRECTION {
+        REQUEST(0), RESPONSE(1);
+        private int num;
+        HEADER_DIRECTION(int num){
+            this.num = num;
+        }
+        public int getBit(){
+            return num;
+        }
+        public static HEADER_DIRECTION getHeaderDirection(int i){
+            for(HEADER_DIRECTION h : HEADER_DIRECTION.values()){
+                if(h.getBit() == i)
+                    return h;
+            }
+            return null;
+        }
+
+        boolean isRequest() {return this == REQUEST;}
+        boolean isResponse() {return this == RESPONSE;}
+    }
+    public static enum HEADER_INSTRUCTION {
+        GET(0), SET(1), POST(2), DELETE(3), OBSERVE(4);
+        private int num;
+        HEADER_INSTRUCTION(int num){
+            this.num = num;
+        }
+        public int getBit(){
+            return num;
+        }
+        public static HEADER_INSTRUCTION getHeaderInstruction(int i){
+            for(HEADER_INSTRUCTION h : HEADER_INSTRUCTION.values()){
+                if(h.getBit() == i)
+                    return h;
+            }
+            return null;
+        }
+
+        public boolean isGet() {return this == GET;}
+        public boolean isSet() {return this == SET;}
+        public boolean isPost() {return this == POST;}
+        public boolean isDelete() {return this == DELETE;}
+        public boolean isObserve() {return this == OBSERVE;}
+        public boolean NeedResponse() {return this == GET || this ==OBSERVE;}
     }
 }
