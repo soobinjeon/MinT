@@ -133,10 +133,10 @@ public class ResourceStorage {
      * @see 
      * @param req 
      */
-    public Object getProperty(Request req){
+    public ResData getProperty(Request req){
         dl.printMessage("request RES : "+req.getResourceName());
         List<ThingProperty> rs = property.getbyResourceName(req.getResourceName());
-        ArrayList<Object> ol = new ArrayList<>();
+        ArrayList<ResData> ol = new ArrayList<>();
         for(ThingProperty tp : rs){
             dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
             ol.add(getProperty(req, tp));
@@ -157,14 +157,14 @@ public class ResourceStorage {
      * @param rs
      * @return 
      */
-    private Object getProperty(Request req, ThingProperty rs){
-        Object ret = null;
+    private ResData getProperty(Request req, ThingProperty rs){
+        ResData ret = null;
         if(rs != null){
             //resource is local and Aperiod Property
             if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC)
                 ret = PMhandle.get(req, rs);
             else //network or period property
-                ret = rs.getResourceData().getResource();
+                ret = rs.getResourceData();
         }
         else
             ret = null;
@@ -190,7 +190,7 @@ public class ResourceStorage {
     
     public static enum RESOURCE_TYPE {property, instruction;}
     /**
-     * get Observe Resource Data
+     * get Discover Resource Data
      * @return 
      */
     public JSONObject OberveLocalResource(Profile currentNode){
@@ -218,7 +218,7 @@ public class ResourceStorage {
      * @param currentNode 
      */
     private void addJSONArray(JSONArray ja, Resource res, Profile currentNode){
-        Resource nr = res.getCloneforObserve();
+        Resource nr = res.getCloneforDiscovery();
         if(res.getStorageCategory().isLocal()){
             nr.setLocation(new StorageDirectory(currentNode,
                     res.getStorageDirectory().getGroup(), res.getName()));
@@ -229,11 +229,11 @@ public class ResourceStorage {
     }
     
     /**
-     * String data to Observe Data
+     * String data to Discovery Data
      * @param data
      * @return 
      */
-    public JSONObject getOberveResource(String data){
+    public JSONObject getDiscoveryResource(String data){
         try{
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject)jsonParser.parse(data);

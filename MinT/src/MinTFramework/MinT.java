@@ -30,7 +30,9 @@ import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
+import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
+import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
@@ -325,13 +327,30 @@ public abstract class MinT {
     }
     
     /**
-     * Observe resources from other Node
+     * Discover resources from other Node
      * @param dst 
      * @param resHandle Response Handler
      */
-    public void REQUEST_OBSERVE(Profile dst, ResponseHandler resHandle){
+    public void DISCOVERY(Profile dst, ResponseHandler resHandle){
         networkmanager.SEND_FOR_RESPONSE(PacketProtocol.HEADER_DIRECTION.REQUEST,
-                PacketProtocol.HEADER_INSTRUCTION.OBSERVE, dst,"",resHandle);
+                PacketProtocol.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle);
+    }
+    
+    /**
+     * Get Local Resource by Resource Name
+     * @param resName
+     * @return 
+     */
+    public ResData GETLocalResource(String resName){
+        Request req = new Request(resName, 0, null);
+        return this.resourceStorage.getProperty(req);
+    }
+    
+    public void printPropertyLists(){
+        for(ThingProperty tp : getResStorage().getProperties()){
+            System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
+                    ", "+tp.getDeviceType().toString() +", "+tp.getPropertyRole().toString());
+        }
     }
     
     /**

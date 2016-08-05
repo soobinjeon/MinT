@@ -24,7 +24,7 @@ import MinTFramework.storage.datamap.Information;
  */
 public class Request extends Information {
     String targetRes;
-    Profile RequestNode;
+    Profile RequestNode = null;
     
     /**
      * 

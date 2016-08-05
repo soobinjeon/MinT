@@ -37,12 +37,12 @@ public class MinTRoutingProtocol extends RoutingProtocol{
         
     }
     
-    public void getOberveData(Profile dts){
-        frame.REQUEST_OBSERVE(dts, new ResponseHandler() {
+    public void getDISCOVERY(Profile dts){
+        frame.DISCOVERY(dts, new ResponseHandler() {
             @Override
             public void Response(ResponseData resdata) {
-                JSONObject observe = resStorage.getOberveResource(resdata.getResourceString());
-                JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+                JSONObject discovery = resStorage.getDiscoveryResource(resdata.getResourceString());
+                JSONArray jpr = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
                 for(int i=0;i<jpr.size();i++){
                     resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
                 }
@@ -52,7 +52,7 @@ public class MinTRoutingProtocol extends RoutingProtocol{
                 }
                 
                 /*add instruction*/
-//                JSONArray jis = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.instruction);
+//                JSONArray jis = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.instruction);
                 
                 
             }
