@@ -37,6 +37,7 @@ import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -344,6 +345,14 @@ public abstract class MinT {
     public ResData GETLocalResource(String resName){
         Request req = new Request(resName, 0, null);
         return this.resourceStorage.getProperty(req);
+    }
+    
+    public List<String> GETLocalPropertyList(){
+        return this.getResStorage().getPropertyList();
+    }
+    
+    public List<String> GETLocalInstructionList(){
+        return this.getResStorage().getInstructionList();
     }
     
     public void printPropertyLists(){
