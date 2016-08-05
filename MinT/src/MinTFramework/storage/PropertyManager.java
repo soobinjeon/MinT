@@ -51,7 +51,7 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @return 
      */
     @Override
-    public Object get(Request req, Resource res) {
+    public ResData get(Request req, Resource res) {
         return getResource(req, res);
     }
 
@@ -87,13 +87,13 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @param res
      * @return 
      */
-    private Object getResource(Request req, Resource res){
+    private ResData getResource(Request req, Resource res){
         
         ResourceThread rt = new ResourceThread(frame,res,req);
         frame.putService(rt);
         
         while(rt.isRunning()){}
-        return rt.getResource().getResourceData().getResource();
+        return rt.getResource().getResourceData();
     }
     
     

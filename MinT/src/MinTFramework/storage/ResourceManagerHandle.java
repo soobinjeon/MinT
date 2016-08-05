@@ -25,6 +25,6 @@ import MinTFramework.Network.Request;
  */
 public interface ResourceManagerHandle {
     public void set(Request req, Resource res);
-    public Object get(Request req, Resource res);
+    public ResData get(Request req, Resource res);
     public void put(Request req, Resource res);
 }

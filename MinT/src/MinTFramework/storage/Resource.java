@@ -37,13 +37,11 @@ public abstract class Resource{
         boolean isNetwork() {return this == Network;}
     }
     
-    //new property
     protected String id;
     protected StorageDirectory sourcelocation;
     protected Authority auth;
     protected StoreCategory scate;
     
-    //existing property
     protected String name;
     protected DeviceType dtype;
     protected MinT frame = null;
@@ -190,7 +188,7 @@ public abstract class Resource{
         return this.sourcelocation.getSource().equals(destination.getAddress());
     }
     
-    public Resource getCloneforObserve() {
+    public Resource getCloneforDiscovery() {
         return new Resource(this.name, DeviceType.valueOf(this.dtype.toString())
                 , Authority.valueOf(auth.toString()), StoreCategory.valueOf(scate.toString())) {
             @Override

@@ -100,7 +100,7 @@ public abstract class Handler extends Service{
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("set get");
             Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
-            String resmsg = String.valueOf(resStorage.getProperty(req));
+            String resmsg = String.valueOf(resStorage.getProperty(req).getResource());
             nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.GET
                     , rv_packet.getSource(), resmsg, rv_packet.getMSGID());
         }else if(rv_packet.getHeader_Instruction().isSet()){
@@ -109,10 +109,10 @@ public abstract class Handler extends Service{
             
         }else if(rv_packet.getHeader_Instruction().isDelete()){
             
-        }else if(rv_packet.getHeader_Instruction().isObserve()){
-            dl.printMessage("set Observe");
+        }else if(rv_packet.getHeader_Instruction().isDiscovery()){
+            dl.printMessage("set DISCOVERY");
             String ret = resStorage.OberveLocalResource(rv_packet.getDestinationNode()).toJSONString();
-            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.OBSERVE
+            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }
     }
@@ -129,30 +129,30 @@ public abstract class Handler extends Service{
             
         }else if(rv_packet.getHeader_Instruction().isDelete()){
             
-        }else if(rv_packet.getHeader_Instruction().isObserve()){
+        }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null){
-                dl.printMessage("Response Observe");
+                dl.printMessage("Response DISCOVERY");
                 ResponseData resdata = new ResponseData(rv_packet);
                 reshandle.Response(resdata);
-                UpdateObserveData(resdata);
+                UpdateDiscoverData(resdata);
             }
 //            dl.printMessage(rv_packet.getMsgData());
         }
     }
     
     /**
-     * update Observed Data in Storage
+     * update Discovered Data in Storage
      * @param resdata 
      */
-    private void UpdateObserveData(ResponseData resdata){
-        JSONObject observe = resStorage.getOberveResource(resdata.getResourceString());
-        JSONArray jpr = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+    private void UpdateDiscoverData(ResponseData resdata){
+        JSONObject discovery = resStorage.getDiscoveryResource(resdata.getResourceString());
+        JSONArray jpr = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
         for(int i=0;i<jpr.size();i++){
             resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
         }
         
-        JSONArray jis = (JSONArray)observe.get(ResourceStorage.RESOURCE_TYPE.instruction.toString());
+        JSONArray jis = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.instruction.toString());
         for(int i=0;i<jis.size();i++){
             resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.instruction, (JSONObject)jis.get(i), resdata);
         }

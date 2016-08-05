@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  *             |                         name|address        || 256KB  | should make maximum size
  *  - MESSAGE HEADER
  *     - DIR : REQUEST(0), RESPONSE(1) (1 bit)
- *     - INS : GET(0), SET(1), POST(2), DELETE(3), OBSERVE(4) (3 bit)
+ *     - INS : GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4) (3 bit)
  *     - ID  : 1~1024 (4byte)
  * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -318,7 +318,7 @@ public class PacketProtocol {
         boolean isResponse() {return this == RESPONSE;}
     }
     public static enum HEADER_INSTRUCTION {
-        GET(0), SET(1), POST(2), DELETE(3), OBSERVE(4);
+        GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4);
         private int num;
         HEADER_INSTRUCTION(int num){
             this.num = num;
@@ -338,7 +338,7 @@ public class PacketProtocol {
         public boolean isSet() {return this == SET;}
         public boolean isPost() {return this == POST;}
         public boolean isDelete() {return this == DELETE;}
-        public boolean isObserve() {return this == OBSERVE;}
-        public boolean NeedResponse() {return this == GET || this ==OBSERVE;}
+        public boolean isDiscovery() {return this == DISCOVERY;}
+        public boolean NeedResponse() {return this == GET || this == DISCOVERY;}
     }
 }

@@ -36,7 +36,7 @@ public class InstructionManager extends ResourceManager implements ResourceManag
     }
 
     @Override
-    public Object get(Request req, Resource res) {
+    public ResData get(Request req, Resource res) {
         return null;
     }
 

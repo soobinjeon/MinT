@@ -163,7 +163,7 @@ public class NetworkManager {
     /**
      * RESPONSE MSG
      * @param hd Direction (Request, Response)
-     * @param hi for Instruction (GET, SET, POST, PUT, DELETE, OBSERVE)
+     * @param hi for Instruction (GET, SET, POST, PUT, DELETE, DISCOVERY)
      * @param dst Destination profile
      * @param msg MSG
      * @param resKey 
@@ -188,10 +188,10 @@ public class NetworkManager {
     /**
      * send for response
      * @param hd Direction (Request, Response)
-     * @param hi Instruction (GET, OBSERVE)
+     * @param hi Instruction (GET, DISCOVERY)
      * @param dst Destination profile
      * @param msg MSG
-     * @param resHandle response handler (need to GET, OBSERVE)
+     * @param resHandle response handler (need to GET, DISCOVERY)
      */
     public void SEND_FOR_RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, Profile dst, String msg,
             ResponseHandler resHandle){
