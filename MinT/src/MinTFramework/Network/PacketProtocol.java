@@ -240,10 +240,10 @@ public class PacketProtocol {
         Pattern p = Pattern.compile("\\}\\{");
         String[] split = p.split(spacket);
         
-        System.out.println("Check Packet Data");
-        for(String s : split){
-            System.out.println("--"+s);
-        }
+//        System.out.println("Check Packet Data");
+//        for(String s : split){
+//            System.out.println("--"+s);
+//        }
         
         if(split.length == Numberoftotalpacket){
             routelist.put(ROUTE.SOURCE, new Profile(split[1]));

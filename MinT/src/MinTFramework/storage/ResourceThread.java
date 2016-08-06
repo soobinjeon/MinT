@@ -32,7 +32,7 @@ public class ResourceThread extends Service{
     private Resource res;
     private Request req;
     private ResourceThreadHandle rth = null;
-    private boolean isRunning = false;
+    private boolean isRunning = true;
     public ResourceThread(MinT _frame, Resource res, Request req) {
         this(_frame,res,req,null);
     }
@@ -42,7 +42,6 @@ public class ResourceThread extends Service{
         this.res = res;
         this.req = req;
         this.rth = rth;
-        isRunning = true;
     }
 
     @Override
@@ -81,10 +80,9 @@ public class ResourceThread extends Service{
     public Resource getResource(){
         return res;
     }
-
+    
     private void processGet() {
         Object result = res.get(req);
-//        System.out.println("execute Data : "+res.getResourceData().getResourceString());
         if(result != null){
             res.data.setResource(result);
         }

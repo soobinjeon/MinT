@@ -67,6 +67,13 @@ public abstract class MinT {
         PM = new PropertyManager(this,resourceStorage);
         IM = new InstructionManager(this, resourceStorage);
         networkmanager = new NetworkManager(this, resourceStorage);
+        
+        //init Network Handler
+        this.setNetwork(new Handler(this) {
+            @Override
+            public void userHandler(PacketProtocol rev_packet) {
+            }
+        });
     }
     
     /**

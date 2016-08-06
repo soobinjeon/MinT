@@ -47,7 +47,11 @@ public class ResponseData extends Information{
     public Profile getDestination(){
         return recv_packet.getDestinationNode();
     } 
-
+    
+    public PacketProtocol getPacketProtocol(){
+        return this.recv_packet;
+    }
+    
     @Override
     public Object getClone() {
         return new ResponseData(recv_packet, getResource());

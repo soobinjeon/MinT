@@ -161,14 +161,16 @@ public class ResourceStorage {
         ResData ret = null;
         if(rs != null){
             //resource is local and Aperiod Property
-            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC)
+            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC){
                 ret = PMhandle.get(req, rs);
-            else //network or period property
+            }
+            else{ //network or period property
                 ret = rs.getResourceData();
+            }
         }
         else
             ret = null;
-        
+        dl.printMessage("Last Pro : "+ret.getResourceString());
         return ret;
     }
     
@@ -193,7 +195,7 @@ public class ResourceStorage {
      * get Discover Resource Data
      * @return 
      */
-    public JSONObject OberveLocalResource(Profile currentNode){
+    public JSONObject DiscoverLocalResource(Profile currentNode){
         JSONObject obs = new JSONObject();
         JSONArray jpr = new JSONArray();
         JSONArray jis = new JSONArray();

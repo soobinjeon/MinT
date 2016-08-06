@@ -18,6 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
 import org.json.simple.JSONArray;
@@ -37,8 +38,8 @@ public abstract class Handler extends Service{
     public Handler(MinT _frame){
         super(_frame);
         this.frame = _frame;
-        resStorage = this.frame.getResStorage();
-        nmanager = this.frame.getNetworkManager();
+        resStorage = frame.getResStorage();
+        nmanager = frame.getNetworkManager();
     }
     /***
      * Call Packet Handler: Do not supprot upper v2.03
@@ -99,10 +100,20 @@ public abstract class Handler extends Service{
     private void SystemHandleRequest(PacketProtocol rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("set get");
+//            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+            
             Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
-            String resmsg = String.valueOf(resStorage.getProperty(req).getResource());
+            ResData res = resStorage.getProperty(req);
+            String ret = "";
+            
+            if(res != null)
+                ret = res.getResourceString();
+            else
+                ret = "";
             nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.GET
-                    , rv_packet.getSource(), resmsg, rv_packet.getMSGID());
+                    , rv_packet.getSource(), ret, rv_packet.getMSGID());
+//            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+//            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }else if(rv_packet.getHeader_Instruction().isSet()){
             
         }else if(rv_packet.getHeader_Instruction().isPost()){
@@ -111,7 +122,7 @@ public abstract class Handler extends Service{
             
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             dl.printMessage("set DISCOVERY");
-            String ret = resStorage.OberveLocalResource(rv_packet.getDestinationNode()).toJSONString();
+            String ret = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
             nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }

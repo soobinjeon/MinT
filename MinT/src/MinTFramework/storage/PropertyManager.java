@@ -20,6 +20,8 @@ import MinTFramework.MinT;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ThingProperty.PropertyRole;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -88,11 +90,19 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @return 
      */
     private ResData getResource(Request req, Resource res){
-        
         ResourceThread rt = new ResourceThread(frame,res,req);
         frame.putService(rt);
         
-        while(rt.isRunning()){}
+        boolean isStarted = false;
+        int cnt = 0;
+        while(!isStarted){
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException ex) {
+            }
+            if(!rt.isRunning())
+                isStarted = true;
+        }
         return rt.getResource().getResourceData();
     }
     

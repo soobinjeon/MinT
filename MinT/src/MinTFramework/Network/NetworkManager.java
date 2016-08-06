@@ -27,6 +27,7 @@ import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -43,10 +44,10 @@ public class NetworkManager {
     private Handler networkHandler = null;
     private RoutingProtocol routing;
     
-    private final HashMap<Integer,ResponseHandler> ResponseList = new HashMap<>();
+    private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
     
     private final DebugLog dl;
-    
+    private int tempcnt = 0;
     /**
      * Auto Set Network Manager as possible
      *
@@ -59,12 +60,6 @@ public class NetworkManager {
         this.frame = frame;
         routing = new MinTRoutingProtocol();
         resourceStorage = resStorage;
-        networkHandler = new Handler(frame) {
-            @Override
-            public void userHandler(PacketProtocol rev_packet) {
-            }
-        };
-
         setNodeName();
     }
     
@@ -356,17 +351,28 @@ public class NetworkManager {
      * @return 
      */
     public ResponseHandler getResponseDataMatchbyID(int num){
-        dl.printMessage("insert key : "+num);
+//        dl.printMessage("insert key : "+num);
         ResponseHandler resd = ResponseList.get(num);
         if(resd != null){
-            dl.printMessage("Remove Response List");
+//            dl.printMessage("Remove Response List");
             ResponseList.remove(num);
         }
-        
-        dl.printMessage("Response List Size : "+ResponseList.size());
-        for(int ks : ResponseList.keySet()){
-            dl.printMessage("Key set : "+ks);
-        }
+//        dl.printMessage("Response List Size : "+ResponseList.size());
+//        for(int ks : ResponseList.keySet()){
+//            dl.printMessage("Key set : "+ks);
+//        }
         return resd;
+    }
+
+    /**
+     * Temporary Method
+     */
+    
+    /**
+     * 
+     * @return 
+     */
+    public ConcurrentHashMap<Integer, ResponseHandler> getResponseList(){
+        return ResponseList;
     }
 }
