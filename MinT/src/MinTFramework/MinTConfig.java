@@ -23,7 +23,7 @@ package MinTFramework;
  */
 public class MinTConfig {
     static public final int DEFAULT_THREAD_NUM = 1000;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 10000;
+    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 1000;
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
     

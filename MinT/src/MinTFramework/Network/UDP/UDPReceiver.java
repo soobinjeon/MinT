@@ -24,7 +24,7 @@ import java.net.*;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class UDPReceiver implements Runnable {
+public class UDPReceiver extends Thread {
 
     /**
      * @param args the command line arguments
@@ -35,7 +35,7 @@ public class UDPReceiver implements Runnable {
     UDP udp;
     byte[] inbuf;
     byte[] mintPacket;
-
+    String name;
     /***
      * UDP Receiver Thread Constructor
      * @param socket
@@ -45,7 +45,12 @@ public class UDPReceiver implements Runnable {
     public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
         this.socket = socket;
         this.udp = udp;
-        
+    }
+    
+    public UDPReceiver(DatagramSocket socket, UDP udp, String name) throws SocketException {
+        this.socket = socket;
+        this.udp = udp;
+        this.name = name;
     }
 
     /***
@@ -63,10 +68,12 @@ public class UDPReceiver implements Runnable {
     @Override
     public void run() {
         try {
+//            System.out.println(name + " : waiting");
             inbuf = new byte[512];
             inPacket = new DatagramPacket(inbuf, inbuf.length);
             socket.receive(inPacket);
-            msgReceiveImpl.makeNewReceiver();
+//            System.out.println(name + " : recved!");
+            msgReceiveImpl.makeNewReceiver(name);
 
             udp.MatcherAndObservation(inPacket.getData());
             

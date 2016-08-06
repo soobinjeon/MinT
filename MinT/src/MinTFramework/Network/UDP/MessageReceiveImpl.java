@@ -9,5 +9,5 @@ public interface MessageReceiveImpl{
     /***
      * make new Receiver when received message
      */
-    public void makeNewReceiver();
+    public void makeNewReceiver(String id);
 }

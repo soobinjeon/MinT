@@ -46,6 +46,7 @@ public class NetworkManager {
     
     private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
     
+    private int tempHandlerCnt = 0;
     private final DebugLog dl;
     private int tempcnt = 0;
     /**
@@ -367,7 +368,14 @@ public class NetworkManager {
     /**
      * Temporary Method
      */
+    public synchronized void setHandlerCount(){
+        this.tempHandlerCnt++;
+//        System.out.println("hCnt : "+tempHandlerCnt);
+    }
     
+    public int getHandlerCount(){
+        return tempHandlerCnt;
+    }
     /**
      * 
      * @return 

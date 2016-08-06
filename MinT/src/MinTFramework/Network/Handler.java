@@ -29,14 +29,14 @@ import org.json.simple.JSONObject;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Handler extends Service{
+public abstract class Handler{
     protected MinT frame;
     protected PacketProtocol recv_packet;
     protected ResourceStorage resStorage;
     protected NetworkManager nmanager;
     DebugLog dl = new DebugLog("Handler");
     public Handler(MinT _frame){
-        super(_frame);
+//        super(_frame);
         this.frame = _frame;
         resStorage = frame.getResStorage();
         nmanager = frame.getNetworkManager();
@@ -181,8 +181,9 @@ public abstract class Handler extends Service{
         }
     }
     
-    @Override
-    public void execute(){
+//    @Override
+    public synchronized void execute(PacketProtocol packet){
+        callhadler(packet);
         SystemHandler();
         userHandler(recv_packet);
     }

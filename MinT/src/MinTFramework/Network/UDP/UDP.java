@@ -40,11 +40,10 @@ import java.util.logging.Logger;
 public class UDP extends Network {
 
     DatagramSocket socket;
-    UDPReceiver receiver;
     UDPSender sender;
     final int PORT;
     MessageReceiveImpl msgimpl;
-    Thread receiverThread;
+    
     String cmd;
     String dstIP;
     UDP self;
@@ -84,20 +83,16 @@ public class UDP extends Network {
     private void setReceiverCallback() {
         msgimpl = new MessageReceiveImpl() {
             @Override
-            public void makeNewReceiver() {
+            public void makeNewReceiver(String id) {
                 try {
-                    UDPReceiver receiver = new UDPReceiver(socket, self);
-                    Thread nThread;
-                    receiver.setReceive(msgimpl);
-
-                    nThread = new Thread(receiver);
-                    nThread.start();
+                    UDPReceiver ur = new UDPReceiver(socket, self, id);
+                    ur.setReceive(msgimpl);
+                    ur.start();
 
                 } catch (SocketException ex) {
                 }
             }
         };
-        receiver.setReceive(msgimpl);
     }
 
     /**
@@ -106,7 +101,6 @@ public class UDP extends Network {
     private void setUDPSocket() {
         try {
             socket = new DatagramSocket(PORT);
-            receiver = new UDPReceiver(socket, this);
             sender = new UDPSender(socket);
         } catch (SocketException ex) {
             Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
@@ -133,8 +127,15 @@ public class UDP extends Network {
      * Make and start Receiver thread
      */
     private void startReceiveThread() {
-        receiverThread = new Thread(receiver);
-        receiverThread.start();
+        for(int i=0;i<10;i++){
+            String name = "n_"+i;
+            try {
+                UDPReceiver ur = new UDPReceiver(socket, this, name);
+                ur.setReceive(msgimpl);
+                ur.start();
+            } catch (SocketException ex) {
+            }
+        }
     }
 
     /**
