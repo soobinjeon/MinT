@@ -18,6 +18,8 @@ package MinTFramework.Network.UDP;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -73,9 +75,9 @@ public class UDPReceiver extends Thread {
             inPacket = new DatagramPacket(inbuf, inbuf.length);
             socket.receive(inPacket);
 //            System.out.println(name + " : recved!");
-            msgReceiveImpl.makeNewReceiver(name);
-
+            msgReceiveImpl.makeNewReceiver(name);            
             udp.MatcherAndObservation(inPacket.getData());
+            
             
         } catch (IOException e) {
         }

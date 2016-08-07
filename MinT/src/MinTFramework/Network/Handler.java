@@ -41,24 +41,7 @@ public abstract class Handler{
         resStorage = frame.getResStorage();
         nmanager = frame.getNetworkManager();
     }
-    /***
-     * Call Packet Handler: Do not supprot upper v2.03
-     * @param src packet source
-     * @param msg pakcet message
-     * @param frame MinTFramework
-     */
-    @Deprecated
-    public void callPacketHandleService(String src, String msg, MinT frame){};
-    
-    /***
-     * Call Packet Handler:: Do not support upper v2.03
-     * You should use UserHandler(String src, String msg);
-     * @param src packet source
-     * @param msg pakcet message
-     */
-    @Deprecated
-    public void callPacketHandleService(String src, String msg){};
-    
+        
     /**
      * Handler for User service
      * @param src

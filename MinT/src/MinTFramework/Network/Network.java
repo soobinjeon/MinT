@@ -20,6 +20,8 @@ import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
 import MinTFramework.Util.DebugLog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -33,6 +35,7 @@ public abstract class Network {
     private RoutingProtocol routing;
     private DebugLog dl = new DebugLog("Network",false);
     private boolean isworking = true;
+    private Handler thandle;
     /***
      * set destination of packet
      * @param dst 
@@ -58,6 +61,11 @@ public abstract class Network {
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
         }
+        thandle = new Handler(frame) {
+            @Override
+            public void userHandler(PacketProtocol rev_packet) {
+            }
+        };
     }
 
     /***
@@ -74,21 +82,20 @@ public abstract class Network {
 
     /**
      * *
+     * should lock for mutex
      * Check Destination of packet if destination is here, call NetworkHandler
      * but, forwarding
      *
      * @param packet
      */
-    public void MatcherAndObservation(byte[] packet) {
+    public synchronized void MatcherAndObservation(byte[] packet) {
         dl.printMessage(new String(packet));
         PacketProtocol matchedPacket = new PacketProtocol(this.getProfile(), packet);
         dl.printMessage(matchedPacket.getPacketString());
         if (isFinalDestiny(matchedPacket.getDestinationNode())) {
-            
-//            frame.getNetworkHandler().callhadler(matchedPacket);
-//            frame.getNetworkHandler().callhadler(matchedPacket);
-            frame.getNetworkHandler().execute(matchedPacket);
-//            frame.putService(frame.getNetworkHandler());
+            SystemHandler sh = new SystemHandler(matchedPacket, frame);
+            sh.execute();
+//            sh.start();
             networkmanager.setHandlerCount();
         } else { //If stopover, through to stopover method in networkmanager
             networkmanager.stopOver(matchedPacket);
@@ -99,11 +106,10 @@ public abstract class Network {
      * *
      * send message to dst
      *
-     * @param dst destination of message
-     * @param msg message to send
+     * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public void send(PacketProtocol packet) throws NetworkException{
+    public synchronized void send(PacketProtocol packet) throws NetworkException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{

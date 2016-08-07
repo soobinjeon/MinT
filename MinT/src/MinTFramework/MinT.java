@@ -67,13 +67,6 @@ public abstract class MinT {
         PM = new PropertyManager(this,resourceStorage);
         IM = new InstructionManager(this, resourceStorage);
         networkmanager = new NetworkManager(this, resourceStorage);
-        
-        //init Network Handler
-        this.setNetwork(new Handler(this) {
-            @Override
-            public void userHandler(PacketProtocol rev_packet) {
-            }
-        });
     }
     
     /**
@@ -237,37 +230,22 @@ public abstract class MinT {
      ************************/
    
     /**
+     * @deprecated 
+     * Use setNetworkName
      * set network user configuration
      * @param name node Name
      * @param nhandler User Handler
      */
-    public void setNetwork(String name, Handler nhandler){
-        networkmanager.setNetworkHandler(nhandler);
+    public void setNetwork(String name){
         networkmanager.setNodeName(name);
     }
     
     /**
-     * set network user configuration (only Name)
-     * @param name node Name 
+     * set network Name
+     * @param name node Name
      */
-    public void setNetwork(String name){
-        setNetwork(name, null);
-    }
-    
-    /**
-     * set network user configuration (only Name)
-     * @param nhandler user Handler
-     */
-    public void setNetwork(Handler nhandler){
-        setNetwork(null,nhandler);
-    }
-    
-    /**
-     * set Network Handler for APP
-     * @param nhandler 
-     */
-    public Handler getNetworkHandler(){
-        return networkmanager.getNetworkHandler();
+    public void setNetworkName(String name){
+        networkmanager.setNodeName(name);
     }
     
     /**

@@ -127,7 +127,7 @@ public class UDP extends Network {
      * Make and start Receiver thread
      */
     private void startReceiveThread() {
-        for(int i=0;i<10;i++){
+        for(int i=0;i<MinTConfig.UDP_NETWORK_THREAD;i++){
             String name = "n_"+i;
             try {
                 UDPReceiver ur = new UDPReceiver(socket, this, name);

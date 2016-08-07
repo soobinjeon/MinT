@@ -18,6 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Util.TypeCaster;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -295,6 +296,12 @@ public class PacketProtocol {
     
     public int getMSGID(){
         return HEADER_MSGID;
+    }
+    
+    public PacketProtocol getclone(){
+        byte[] nbyte = new byte[packetdata.length];
+        System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
+        return new PacketProtocol(routelist.get(ROUTE.NEXT), nbyte);
     }
     
     public static enum HEADER_DIRECTION {

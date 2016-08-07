@@ -41,7 +41,6 @@ public class NetworkManager {
     private final HashMap<NetworkType,Network> networks;
     private String NodeName = null;
     
-    private Handler networkHandler = null;
     private RoutingProtocol routing;
     
     private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
@@ -251,7 +250,7 @@ public class NetworkManager {
     //        this.networkHandler.
 
             try {
-                dl.printMessage("Send Network" + sendNetwork.getNetworkType());
+                dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
                 dl.printMessage("Packet :" + packet.getPacketString());
                 sendNetwork.send(packet);
             } catch (NetworkException ex) {
@@ -289,26 +288,6 @@ public class NetworkManager {
         }
 
         return newid;
-    }
-
-    /**
-     * set Network Handler in network manager
-     *
-     * @param nhandler
-     */
-    public void setNetworkHandler(Handler nhandler) {
-        if (nhandler != null) {
-            this.networkHandler = nhandler;
-        }
-    }
-
-    /**
-     * get Network Handler
-     *
-     * @return
-     */
-    public Handler getNetworkHandler() {
-        return this.networkHandler;
     }
 
     /**
