@@ -22,38 +22,61 @@ package MinTFramework;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Service {
-
     private int id;
     private int prior;
+    private boolean isInterrupted = false;
     protected final MinT frame;
+    
     /***
      * Service Constructor
      * Deafult id=0, prior = 0;
      * @param _frame 
      */
     public Service(MinT _frame) {
-        id = 0;
+        id = ScheduleWorkerThread.NOT_WORKING_THREAD_SERVICE_ID;
         prior = 0;
         frame = _frame;
+        isInterrupted = false;
     }
+    
+    public Service(){
+        this(null);
+    }
+    
     /**
+     * @deprecated
+     * Use Main Thread Method
      * set Service Prior
- NOT USED UNTIL NOW
+        NOT USED UNTIL NOW
      * @param pri 
      */
     public void setPrior(int pri){
         this.prior = pri;
     }
+    
     public void setID(int id){
         this.id = id;
     }
     
+    /**
+     * @deprecated 
+     * Use Main Thread Method
+     * @return 
+     */
     public int getPrior() {
         return this.prior;
     }
 
     public int getID() {
         return this.id;
+    }
+    
+    public void serviceInterrupt(){
+            isInterrupted = true;
+    }
+    
+    protected boolean isServiceInterrupted(){
+        return isInterrupted;
     }
     /**
      * Scheduler execute this method

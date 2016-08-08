@@ -29,25 +29,44 @@ public class ScheduleWorkerThread extends Thread {
     private Service service;
     private int serviceId;
     private DebugLog dl;
+    public static final int NOT_WORKING_THREAD_SERVICE_ID = -1;
+    private boolean isInterrupted = false;
     
+    /**
+     * init Schedule Worker Thread
+     * @param name
+     * @param scheduler 
+     */
     public ScheduleWorkerThread(String name, Scheduler scheduler) {
         super(name);
         this.service = null;
         this.scheduler = scheduler;
-        this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
+        this.serviceId = NOT_WORKING_THREAD_SERVICE_ID;
+        isInterrupted = false;
         dl = new DebugLog(name);
     }
 
     public synchronized int getServiceId() {
         return serviceId;
     }
+    
+//    /**
+//     * Stop service in this thread
+//     */
+//
+//    public synchronized void stopService() {
+//        this.service = null;
+//        this.serviceId = NOT_WORKING_THREAD_SERVICE_ID;
+//    }
+    
     /**
-     * Stop service in this thread
+     * Interrupt Thread
      */
-
-    public synchronized void stopService() {
-        this.service = null;
-        this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
+    public void Threadinterrupt(){
+        isInterrupted = true;
+        if(service != null){
+            service.serviceInterrupt();
+        }
     }
     
     /**
@@ -55,18 +74,31 @@ public class ScheduleWorkerThread extends Thread {
      * @return 
      */
     public synchronized boolean isWorking(){
-        return serviceId != MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
+        return serviceId != NOT_WORKING_THREAD_SERVICE_ID;
     }
+    
     
     @Override
     public void run() {
-        while (true) {
-            this.serviceId = MinTConfig.NOT_WORKING_THREAD_SERVICE_ID;
-            this.service = scheduler.takeService();
-            this.serviceId = service.getID();
-            dl.printMessage("Service("+service.getClass().getName()+") Start ID("+serviceId+"), ["+scheduler.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
-            service.execute();
-            dl.printMessage("Service("+service.getClass().getName()+") End ID("+serviceId+"), ["+(scheduler.getNumberofWorkingThreads()-1)+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
+        try{
+            while (!isInterrupted) {
+                this.serviceId = NOT_WORKING_THREAD_SERVICE_ID;
+                this.service = scheduler.takeService(this);
+                if(service != null){
+                    this.serviceId = service.getID();
+        //                dl.printMessage("Service("+service.getClass().getName()+") Start ID("+serviceId+"), ["+scheduler.getNumberofWorkingThreads()+"/]");
+                    service.execute();
+        //            dl.printMessage("Service("+service.getClass().getName()+") End ID("+serviceId+"), ["+(scheduler.getNumberofWorkingThreads()-1)+"/"+DEFAULT_THREAD_NUM+"]");
+                }
+            }
+            if(isInterrupted){
+                if(service != null){
+                    service.serviceInterrupt();
+                }
+//                System.out.println(this.getName()+" status : "+Thread.interrupted());
+            }
+        }catch(Exception e){
+            
         }
     }
 }

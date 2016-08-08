@@ -29,34 +29,41 @@ public class Scheduler {
     private Service[] serviceQueue;
     private int tail;
     private int head;
-    private int count;
+    private int queuecount;
+    private boolean isStopAllService = false;
     private ScheduleWorkerThread[] threadPool;
     private DebugLog log = new DebugLog("Scheduler");
-
+    
+    /**
+     * Scheduler for MinT
+     * @param serviceQueueLength
+     * @param numOfThread 
+     */
     public Scheduler(int serviceQueueLength, int numOfThread) {
         this.serviceQueue = new Service[serviceQueueLength];
         this.head = 0;
         this.tail = 0;
-        this.count = 0;
-
+        this.queuecount = 0;
+        
         threadPool = new ScheduleWorkerThread[numOfThread];
         for (int i = 0; i < threadPool.length; i++) {
             threadPool[i] = new ScheduleWorkerThread("ScheduleWorker-" + i, this);
         }
     }
-
+    
     /**
      * *
      * Run all thread in threadpool.
      */
     public void SchedulerRunning() {
+        isStopAllService = false;
         for (ScheduleWorkerThread threadPool1 : threadPool) {
             threadPool1.start();
         }
     }
 
     /**
-     * *
+     * @deprecated 
      * Stop service.
      *
      * @param service Service to stop.
@@ -68,7 +75,19 @@ public class Scheduler {
             }
         }
     }
-
+    
+    public void stopAllService(){
+        isStopAllService = true;
+        for (ScheduleWorkerThread threadPool1 : threadPool) {
+            threadPool1.Threadinterrupt();
+        }
+        this.putService(new Service() {
+            @Override
+            public void execute() {
+            }
+        });
+    }
+    
     /**
      * **
     Print all Service ID in thread pool
@@ -77,6 +96,14 @@ public class Scheduler {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
             log.printMessage(threadPool1.getName() + " " + threadPool1.getServiceId());
         }
+    }
+    
+    public int getQueueWaitingLength(){
+        return queuecount;
+    }
+    
+    public int getQueueTotalLength(){
+        return serviceQueue.length;
     }
 
     /**
@@ -96,11 +123,12 @@ public class Scheduler {
 
 
     /***
+     * @deprecated 
      * Generate unique service ID
      * @return unique service ID
      */
     private synchronized int makeID() {
-        int length = threadPool.length+serviceQueue.length;
+        int length = serviceQueue.length+1;
         boolean rid[] = new boolean[length];
         int newid = 0;
         boolean idflag = true;
@@ -109,15 +137,6 @@ public class Scheduler {
             rid[i] = false;
         }
         
-        /**
-         * *
-         * check ThreadPool
-         */
-        for (int i = 0; i < threadPool.length; i++) {
-            if (threadPool[i].getServiceId() != -1) {
-                rid[threadPool[i].getServiceId()] = true;
-            }
-        }
         /**
          * *
          * check serviceQueue
@@ -150,7 +169,7 @@ public class Scheduler {
      */
     public synchronized void putService(Service service) {
 
-        while (count >= serviceQueue.length) {
+        while (queuecount >= serviceQueue.length) {
             try {
                 wait();
                 break;
@@ -158,14 +177,16 @@ public class Scheduler {
             }
         }
 
-        service.setID(makeID());
+        //make ID
+        service.setID(tail);
 
         serviceQueue[tail] = service;
 
         tail = (tail + 1) % serviceQueue.length;
-        count++;
+        queuecount++;
         notifyAll();
-
+//        log.printMessage("putService["+service.getID()
+//                +"] : ["+getQueueLength()+"/"+serviceQueue.length+"]");
     }
 
     /***
@@ -173,19 +194,27 @@ public class Scheduler {
      * !!!Do not use at Application!!!
      * 
      * take service in service queue
+     * @param cthread
      * @return service 
      */
-    public synchronized Service takeService() {
-        while (count <= 0) {
+    protected synchronized Service takeService(ScheduleWorkerThread cthread) {
+        while (!isStopAllService && queuecount <= 0) {
             try {
                 wait();
             } catch (InterruptedException e) {
             }
         }
+        
+        if(isStopAllService)
+            cthread.Threadinterrupt();
+        
         Service service = serviceQueue[head];
+        serviceQueue[head] = null;
         head = (head + 1) % serviceQueue.length;
-        count--;
+        queuecount--;
         notifyAll();
+//        log.printMessage("takeService["+service.getID()
+//                +"] : ["+getQueueLength()+"/"+serviceQueue.length+"]");
         return service;
     }
 }
