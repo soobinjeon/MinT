@@ -43,6 +43,10 @@ public class NetworkManager {
     
     private RoutingProtocol routing;
     
+    //for Network Recv/Handle
+    protected Scheduler NetworkScheduler;
+    
+    //Message Response List
     private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
     
     private int tempHandlerCnt = 0;
@@ -58,9 +62,14 @@ public class NetworkManager {
         this.networkList = new ArrayList<>();
         this.networks = new HashMap<>();
         this.frame = frame;
-        routing = new MinTRoutingProtocol();
         resourceStorage = resStorage;
         setNodeName();
+        
+        routing = new MinTRoutingProtocol();
+        
+        //run Threadpool for network
+        NetworkScheduler = new Scheduler("Network Handle",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
+        NetworkScheduler.SchedulerRunning();
     }
     
     private void initRoutingSetup(){
@@ -199,17 +208,6 @@ public class NetworkManager {
             dl.printMessage("Send MSG ID : "+npacket.getMSGID());
             sendMsg(npacket);
         }
-    }
-    
-    
-
-    /**
-     * Stop Over Processor
-     *
-     * @param packet
-     */
-    public void stopOver(PacketProtocol packet) {
-
     }
 
     /**
@@ -361,5 +359,17 @@ public class NetworkManager {
      */
     public ConcurrentHashMap<Integer, ResponseHandler> getResponseList(){
         return ResponseList;
+    }
+    
+    /**
+     * get NetworkScheduler for operate network receiver
+     * @return 
+     */
+    protected Scheduler getNetworkScheduler(){
+        return NetworkScheduler;
+    }
+    
+    public int getQueueWaitingLength(){
+        return NetworkScheduler.getQueueWaitingLength();
     }
 }

@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.UDP;
 
+import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.*;
 import java.util.logging.Level;
@@ -33,11 +34,10 @@ public class UDPReceiver extends Thread {
      */
     DatagramSocket socket;
     DatagramPacket inPacket;
-    MessageReceiveImpl msgReceiveImpl;
     UDP udp;
     byte[] inbuf;
     byte[] mintPacket;
-    String name;
+    DebugLog dl;
     /***
      * UDP Receiver Thread Constructor
      * @param socket
@@ -45,22 +45,9 @@ public class UDPReceiver extends Thread {
      * @throws SocketException 
      */
     public UDPReceiver(DatagramSocket socket, UDP udp) throws SocketException {
+        this.dl = new DebugLog("UDPRecevier");
         this.socket = socket;
         this.udp = udp;
-    }
-    
-    public UDPReceiver(DatagramSocket socket, UDP udp, String name) throws SocketException {
-        this.socket = socket;
-        this.udp = udp;
-        this.name = name;
-    }
-
-    /***
-     * make new thread msg impl
-     * @param msimpl 
-     */
-    public void setReceive(MessageReceiveImpl msimpl) {
-        this.msgReceiveImpl = msimpl;
     }
 
     /***
@@ -70,15 +57,13 @@ public class UDPReceiver extends Thread {
     @Override
     public void run() {
         try {
-//            System.out.println(name + " : waiting");
-            inbuf = new byte[512];
-            inPacket = new DatagramPacket(inbuf, inbuf.length);
-            socket.receive(inPacket);
-//            System.out.println(name + " : recved!");
-            msgReceiveImpl.makeNewReceiver(name);            
-            udp.MatcherAndObservation(inPacket.getData());
-            
-            
+            while(true){
+                dl.printMessage("UDP Receiver Receving...");
+                inbuf = new byte[512];
+                inPacket = new DatagramPacket(inbuf, inbuf.length);
+                socket.receive(inPacket);
+                udp.ReceiveHandler(inPacket.getData());
+            }
         } catch (IOException e) {
         }
 

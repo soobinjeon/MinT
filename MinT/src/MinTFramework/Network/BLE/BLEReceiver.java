@@ -72,8 +72,7 @@ public class BLEReceiver implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-                ble.MatcherAndObservation(inbuf);
+                ble.ReceiveHandler(inbuf);
             }
         }
     }

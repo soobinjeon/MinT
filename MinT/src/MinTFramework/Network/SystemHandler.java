@@ -29,7 +29,7 @@ import org.json.simple.JSONObject;
  *
  * @author soobisooba
  */
-public class SystemHandler extends Thread{
+public class SystemHandler{
     protected MinT frame;
     protected PacketProtocol recv_packet;
     protected ResourceStorage resStorage;
@@ -39,18 +39,13 @@ public class SystemHandler extends Thread{
     public SystemHandler(PacketProtocol recv_pk, MinT _frame){
 //        super(_frame);
         this.frame = _frame;
-        resStorage = frame.getResStorage();
+        resStorage = this.frame.getResStorage();
         nmanager = frame.getNetworkManager();
         recv_packet = recv_pk.getclone();
     }
-//    @Override
-    public void execute() {
-        SystemHandler();
-    }
     
-    @Override
-    public void run(){
-        execute();
+    public void startHandle(){
+        SystemHandler();
     }
     
     /**
@@ -159,4 +154,5 @@ public class SystemHandler extends Thread{
                     +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
         }
     }
+
 }

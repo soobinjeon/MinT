@@ -38,12 +38,9 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
-
     DatagramSocket socket;
     UDPSender sender;
     final int PORT;
-    MessageReceiveImpl msgimpl;
-    
     String cmd;
     String dstIP;
     UDP self;
@@ -65,34 +62,26 @@ public class UDP extends Network {
         
         PORT = port;
         this.setUDPSocket();
-        this.setReceiverCallback();
         this.portOpen();
         this.startReceiveThread();
         System.out.println("Current IP Addr : "+this.profile.getAddress()+":"+port);
         self = this;
     }
-
-    /**
-     * set Receiver Callback Msg !!Important!! ** must call after 'setSocket'
-     * method
-     *
-     **
-     * @param frame
-     * @param handler
+    
+    /***
+     * Make and start Receiver thread
      */
-    private void setReceiverCallback() {
-        msgimpl = new MessageReceiveImpl() {
-            @Override
-            public void makeNewReceiver(String id) {
-                try {
-                    UDPReceiver ur = new UDPReceiver(socket, self, id);
-                    ur.setReceive(msgimpl);
-                    ur.start();
-
-                } catch (SocketException ex) {
-                }
-            }
-        };
+    private void startReceiveThread() {
+        try {
+//            UDPReceiver[] ur = new UDPReceiver[10];
+//            for(int i=0;i<ur.length;i++){
+//                ur[i] = new UDPReceiver(socket, this);
+//                ur[i].start();
+//            }
+            UDPReceiver ur = new UDPReceiver(socket, this);
+            ur.start();
+        } catch (SocketException ex) {
+        }
     }
 
     /**
@@ -120,21 +109,6 @@ public class UDP extends Network {
             log.printMessage(OS);
             OSUtil.linuxShellCommand("iptables -I INPUT 1 -p udp --dport " + PORT + " -j ACCEPT");
             OSUtil.linuxShellCommand("iptables -I OUTPUT 1 -p udp --dport " + PORT + " -j ACCEPT");
-        }
-    }
-
-    /***
-     * Make and start Receiver thread
-     */
-    private void startReceiveThread() {
-        for(int i=0;i<MinTConfig.UDP_NETWORK_THREAD;i++){
-            String name = "n_"+i;
-            try {
-                UDPReceiver ur = new UDPReceiver(socket, this, name);
-                ur.setReceive(msgimpl);
-                ur.start();
-            } catch (SocketException ex) {
-            }
         }
     }
 

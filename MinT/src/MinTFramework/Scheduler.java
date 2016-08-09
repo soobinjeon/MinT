@@ -24,12 +24,14 @@ import MinTFramework.Util.DebugLog;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Scheduler {
-
     //for Service Queue
+    private String name;
     private Service[] serviceQueue;
     private int tail;
     private int head;
     private int queuecount;
+    private int totalQueueSize = 0;
+    private int totalThreadPoolSize = 0;
     private boolean isStopAllService = false;
     private ScheduleWorkerThread[] threadPool;
     private DebugLog log = new DebugLog("Scheduler");
@@ -39,7 +41,10 @@ public class Scheduler {
      * @param serviceQueueLength
      * @param numOfThread 
      */
-    public Scheduler(int serviceQueueLength, int numOfThread) {
+    public Scheduler(String name, int serviceQueueLength, int numOfThread) {
+        this.name = name;
+        this.totalQueueSize = serviceQueueLength;
+        this.totalThreadPoolSize = numOfThread;
         this.serviceQueue = new Service[serviceQueueLength];
         this.head = 0;
         this.tail = 0;
@@ -60,6 +65,7 @@ public class Scheduler {
         for (ScheduleWorkerThread threadPool1 : threadPool) {
             threadPool1.start();
         }
+        System.out.println("Scheduler-"+name+" [QueueSIZE-"+getQueueTotalLength()+"|ThreadSIZE-"+totalThreadPoolSize+"] was started.");
     }
 
     /**
@@ -103,7 +109,7 @@ public class Scheduler {
     }
     
     public int getQueueTotalLength(){
-        return serviceQueue.length;
+        return this.totalQueueSize;
     }
 
     /**

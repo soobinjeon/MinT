@@ -61,7 +61,7 @@ public abstract class MinT {
      * @param numOfThread number of workerthread in framework
      */
     public MinT(int serviceQueueLength, int numOfThread) {
-        scheduler = new Scheduler(serviceQueueLength, numOfThread);
+        scheduler = new Scheduler("Serivce",serviceQueueLength, numOfThread);
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage(this);
         PM = new PropertyManager(this,resourceStorage);

@@ -19,6 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
+import MinTFramework.Scheduler;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,14 +29,14 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public abstract class Network {
-
     protected MinT frame;
     protected NetworkManager networkmanager;
+    protected Scheduler networkScheduler;
     protected Profile profile;
     private RoutingProtocol routing;
-    private DebugLog dl = new DebugLog("Network",false);
     private boolean isworking = true;
-    private Handler thandle;
+    
+    private DebugLog dl = new DebugLog("Network",false);
     /***
      * set destination of packet
      * @param dst 
@@ -56,16 +57,12 @@ public abstract class Network {
     public Network(MinT frame, NetworkManager nm, Profile npro, RoutingProtocol _routing) {
         this.frame = frame;
         this.networkmanager = nm;
+        networkScheduler = networkmanager.getNetworkScheduler();
         routing = _routing;
         profile = npro;
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
         }
-        thandle = new Handler(frame) {
-            @Override
-            public void userHandler(PacketProtocol rev_packet) {
-            }
-        };
     }
 
     /***
@@ -79,27 +76,14 @@ public abstract class Network {
     public void setApplicationProtocol(RoutingProtocol routing) {
         this.routing = routing;
     }
-
+    
     /**
-     * *
-     * should lock for mutex
-     * Check Destination of packet if destination is here, call NetworkHandler
-     * but, forwarding
-     *
-     * @param packet
+     * call Receive Handler after Receiving data 
+     * @param packet 
      */
-    public synchronized void MatcherAndObservation(byte[] packet) {
-        dl.printMessage(new String(packet));
-        PacketProtocol matchedPacket = new PacketProtocol(this.getProfile(), packet);
-        dl.printMessage(matchedPacket.getPacketString());
-        if (isFinalDestiny(matchedPacket.getDestinationNode())) {
-            SystemHandler sh = new SystemHandler(matchedPacket, frame);
-            sh.execute();
-//            sh.start();
-            networkmanager.setHandlerCount();
-        } else { //If stopover, through to stopover method in networkmanager
-            networkmanager.stopOver(matchedPacket);
-        }
+    public void ReceiveHandler(byte[] packet){
+//        dl.printMessage("Call NetworkReceiver");
+        this.networkScheduler.putService(new NetworkReceiver(packet, this));
     }
 
     /**
@@ -117,16 +101,6 @@ public abstract class Network {
             this.sendProtocol(packet);
         }
     }
-
-    /**
-     * Check whether destination is here
-     *
-     * @param dst
-     * @return
-     */
-    private boolean isFinalDestiny(Profile dst) {
-        return this.profile.equals(dst);
-    }
     
     protected void isWorking(boolean is){
         this.isworking = is;
@@ -142,5 +116,9 @@ public abstract class Network {
     
     public NetworkType getNetworkType(){
         return profile.getNetworkType();
+    }
+    
+    public NetworkManager getNetworkManager(){
+        return networkmanager;
     }
 }
