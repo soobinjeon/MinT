@@ -16,6 +16,8 @@
  */
 package MinTFramework;
 
+import MinTFramework.Schedule.Scheduler;
+import MinTFramework.Schedule.Service;
 import MinTFramework.storage.PropertyManager;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.InstructionManager;

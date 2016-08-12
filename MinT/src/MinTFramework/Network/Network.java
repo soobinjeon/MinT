@@ -19,7 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
-import MinTFramework.Scheduler;
+import MinTFramework.Schedule.Scheduler;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;

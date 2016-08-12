@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Schedule.Scheduler;
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
 import MinTFramework.Network.BLE.BLE;

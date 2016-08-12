@@ -17,7 +17,6 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.Service;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
