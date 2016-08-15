@@ -126,7 +126,14 @@ public class Scheduler {
         }
         return num;
     }
-
+    
+    /**
+     * get Number of Threads
+     * @return 
+     */
+    public int getNumberofThreads(){
+        return threadPool.length;
+    }
 
     /***
      * @deprecated 

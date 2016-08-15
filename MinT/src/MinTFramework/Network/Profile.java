@@ -25,6 +25,7 @@ public class Profile {
     private String id;
     private String name="";
     private String address="";
+    private int Port = 0;
     private NetworkType ntype;
     private String Split = "|";
     
@@ -39,6 +40,7 @@ public class Profile {
         this.address = address;
         this.ntype = ntype;
         makeID();
+        setPort();
     }
     
     public Profile(String bytearray){
@@ -47,12 +49,14 @@ public class Profile {
             name = temp[0];
             address = temp[1];
             ntype = null;
-            id = name+address;
+            makeID();
         }
         
         if(temp.length > 2){
             ntype = NetworkType.getNetworkType(Integer.parseInt(temp[2]));
         }
+        
+        setPort();
     }
     
     public String getName(){
@@ -65,6 +69,14 @@ public class Profile {
     
     public String getId(){
         return id;
+    }
+    
+    /**
+     * get Port, if UDP, TCP/IP, CoAP
+     * @return 
+     */
+    public int getPort(){
+        return Port;
     }
     
     public NetworkType getNetworkType(){
@@ -101,6 +113,7 @@ public class Profile {
     @Override
     public boolean equals(Object obj){
         Profile ep = (Profile)obj;
+//        System.out.println("cid : "+this.getId()+", eid : "+ep.getId());
         if(this.id.equals(ep.getId()))
             return true;
         else
@@ -109,8 +122,21 @@ public class Profile {
 
     private void makeID() {
         if(address==null || address.equals(""))
-            id = name + "";
+            id = "";
+//            id = name + "";
         else
-            id = name+address;
+            id = address;
+//            id = name+address;
+    }
+    
+    private void setPort(){
+        if(ntype == NetworkType.TCPIP 
+                || ntype == NetworkType.UDP 
+                || ntype == NetworkType.COAP){
+            String[] p = this.address.split(":");
+            if(p.length > 1 && p[1] != null){
+                this.Port = Integer.parseInt(p[1]);
+            }
+        }
     }
 }

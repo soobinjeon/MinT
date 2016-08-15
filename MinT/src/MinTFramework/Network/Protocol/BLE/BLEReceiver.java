@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.BLE;
+package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Util.TypeCaster;
@@ -72,7 +72,7 @@ public class BLEReceiver implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(BLEReceiver.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                ble.ReceiveHandler(inbuf);
+                ble.putReceiveHandler(inbuf);
             }
         }
     }

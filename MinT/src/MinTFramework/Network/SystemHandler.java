@@ -30,21 +30,18 @@ import org.json.simple.JSONObject;
  */
 public class SystemHandler{
     protected MinT frame;
-    protected PacketProtocol recv_packet;
     protected ResourceStorage resStorage;
     protected NetworkManager nmanager;
     DebugLog dl = new DebugLog("SystemHandler");
     
-    public SystemHandler(PacketProtocol recv_pk, MinT _frame){
-//        super(_frame);
+    public SystemHandler(MinT _frame){
         this.frame = _frame;
         resStorage = this.frame.getResStorage();
         nmanager = frame.getNetworkManager();
-        recv_packet = recv_pk.getclone();
     }
     
-    public void startHandle(){
-        SystemHandler();
+    public void startHandle(PacketProtocol recv_pk){
+        SystemHandler(recv_pk);
     }
     
     /**
@@ -55,7 +52,7 @@ public class SystemHandler{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(){
+    private void SystemHandler(PacketProtocol recv_packet){
         /**
          * get, post using resource storage
          */

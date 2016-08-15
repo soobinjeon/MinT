@@ -19,7 +19,10 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Schedule.Scheduler;
+import MinTFramework.Schedule.Service;
+import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,12 +34,17 @@ import java.util.logging.Logger;
 public abstract class Network {
     protected MinT frame;
     protected NetworkManager networkmanager;
-    protected Scheduler networkScheduler;
     protected Profile profile;
+    protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
+    
+    //Network Pools
+    private Scheduler networkAdaptorPool;
+    private Scheduler networkListenerPool;
+    
     private boolean isworking = true;
     
-    private DebugLog dl = new DebugLog("Network",false);
+    private DebugLog ndl = new DebugLog("Network");
     /***
      * set destination of packet
      * @param dst 
@@ -49,6 +57,12 @@ public abstract class Network {
     abstract protected void sendProtocol(PacketProtocol packet);
 
     /**
+     * return to new RecvListener()
+     * @return new Service();
+     */
+    abstract protected Service getRecvListener(int nofListener);
+    
+    /**
      * *
      * Constructor
      *
@@ -57,14 +71,27 @@ public abstract class Network {
     public Network(MinT frame, NetworkManager nm, Profile npro, RoutingProtocol _routing) {
         this.frame = frame;
         this.networkmanager = nm;
-        networkScheduler = networkmanager.getNetworkScheduler();
+        
+        networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
+        networkListenerPool = networkmanager.getNetworkListnerPool();
+        byteBufferPool = networkmanager.getByteBufferPool();
+        
         routing = _routing;
         profile = npro;
-        if(!MinTConfig.IP_ADDRESS.equals("")){
-            profile.setAddress(MinTConfig.IP_ADDRESS);
-        }
+        
+        ndl.printMessage("Set Network listener");
     }
-
+    
+    /**
+     * use in NetworkManager
+     * Turn On Network
+     */
+    public void TurnOnNetwork(){
+        ndl.printMessage(this.getClass().getName()+" - started");
+        
+        //Set Network Listner
+        setNetworkListner();
+    }
     /***
      * 
      * Setting RoutingProtocol 
@@ -78,12 +105,22 @@ public abstract class Network {
     }
     
     /**
+     * set Network Listener according to number of Listener Pool
+     */
+    private void setNetworkListner() {
+        ndl.printMessage("Set Network Lisntener");
+        for(int i=0;i<networkListenerPool.getNumberofThreads();i++){
+            networkListenerPool.putService(getRecvListener(i));
+            ndl.printMessage("added - "+i);
+        }
+    }
+    
+    /**
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void ReceiveHandler(byte[] packet){
-//        dl.printMessage("Call NetworkReceiver");
-        this.networkScheduler.putService(new NetworkReceiver(packet, this));
+    public void putReceiveHandler(byte[] packet){
+        this.networkAdaptorPool.putService(new NetworkRecvAdaptor(packet, this));
     }
 
     /**

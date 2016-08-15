@@ -19,16 +19,23 @@ package MinTFramework.Network;
 import MinTFramework.Schedule.Scheduler;
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
-import MinTFramework.Network.BLE.BLE;
+import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.PacketProtocol.HEADER_DIRECTION;
 import MinTFramework.Network.PacketProtocol.HEADER_INSTRUCTION;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
-import MinTFramework.Network.UDP.UDP;
+import MinTFramework.Network.Protocol.UDP.UDP;
+import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,15 +51,21 @@ public class NetworkManager {
     
     private RoutingProtocol routing;
     
-    //for Network Recv/Handle
-    protected Scheduler NetworkScheduler;
+    //Network Recv Adaptor Pool for Handling the Recv Data
+    private Scheduler NetworkRecvAdaptPool;
+    
+    //Network Recv Listner Pool for Network Receiver
+    private Scheduler NetworkRecvListnerPool;
+    
+    //for Network Recv ByteBuffer
+    private ByteBufferPool bytepool = null;
     
     //Message Response List
     private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
     
     private int tempHandlerCnt = 0;
     private final DebugLog dl;
-    private int tempcnt = 0;
+    
     /**
      * Auto Set Network Manager as possible
      *
@@ -66,11 +79,9 @@ public class NetworkManager {
         resourceStorage = resStorage;
         setNodeName();
         
-        routing = new MinTRoutingProtocol();
+        makeBytebuffer();
         
-        //run Threadpool for network
-        NetworkScheduler = new Scheduler("Network Handle",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
-        NetworkScheduler.SchedulerRunning();
+        routing = new MinTRoutingProtocol();
     }
     
     private void initRoutingSetup(){
@@ -101,6 +112,19 @@ public class NetworkManager {
      * Turn on All Networks!
      */
     private void TurnOnNetwork() {
+        //run Threadpool for network
+        NetworkRecvAdaptPool = new Scheduler("Network Adaptor Pool",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
+        NetworkRecvAdaptPool.SchedulerRunning();
+        
+        //initializing Network Recv Adapt Pool according to number of networks
+        int ThreadsbyNumofNetwork = MinTConfig.ThreadsbyNumberofNetworks;
+        dl.printMessage("network List : "+networkList.size()+", "+ThreadsbyNumofNetwork);
+        NetworkRecvListnerPool = new Scheduler("Network Recv ListnerPool"
+                , MinTConfig.NETWORK_WAITING_QUEUE
+                , networkList.size() * ThreadsbyNumofNetwork);
+        NetworkRecvListnerPool.SchedulerRunning();
+        
+        //Setting on Networks
         for (NetworkType ty : networkList) {
             setOnNetwork(ty);
         }
@@ -125,6 +149,13 @@ public class NetworkManager {
             dl.printMessage("Turned on BLE");
         } else if (ntype == NetworkType.COAP) { // for CoAP, need to add
             dl.printMessage("Turned on COAP");
+        }
+        
+        //Turn On All Network
+        Iterator it = networks.values().iterator();
+        while(it.hasNext()){
+            Network nn = (Network)it.next();
+            nn.TurnOnNetwork();
         }
     }
 
@@ -330,16 +361,10 @@ public class NetworkManager {
      * @return 
      */
     public ResponseHandler getResponseDataMatchbyID(int num){
-//        dl.printMessage("insert key : "+num);
         ResponseHandler resd = ResponseList.get(num);
         if(resd != null){
-//            dl.printMessage("Remove Response List");
             ResponseList.remove(num);
         }
-//        dl.printMessage("Response List Size : "+ResponseList.size());
-//        for(int ks : ResponseList.keySet()){
-//            dl.printMessage("Key set : "+ks);
-//        }
         return resd;
     }
 
@@ -348,14 +373,13 @@ public class NetworkManager {
      */
     public synchronized void setHandlerCount(){
         this.tempHandlerCnt++;
-//        System.out.println("hCnt : "+tempHandlerCnt);
     }
     
     public int getHandlerCount(){
         return tempHandlerCnt;
     }
     /**
-     * 
+     * get Response Msg List
      * @return 
      */
     public ConcurrentHashMap<Integer, ResponseHandler> getResponseList(){
@@ -366,11 +390,61 @@ public class NetworkManager {
      * get NetworkScheduler for operate network receiver
      * @return 
      */
-    protected Scheduler getNetworkScheduler(){
-        return NetworkScheduler;
+    protected Scheduler getNetworkAdaptorPool(){
+        return NetworkRecvAdaptPool;
     }
     
-    public int getQueueWaitingLength(){
-        return NetworkScheduler.getQueueWaitingLength();
+    /**
+     * get Network Listener Pool
+     * @return 
+     */
+    protected Scheduler getNetworkListnerPool(){
+        return NetworkRecvListnerPool;
+    }
+    
+    /**
+     * get Network Queue waiting Length
+     * @return 
+     */
+    public int getNetworkAdaptorQueueWaitingLength(){
+        return NetworkRecvAdaptPool.getQueueWaitingLength();
+    }
+    
+    
+    
+    /**
+     * get ByteBufferPool
+     * @return 
+     */
+    public ByteBufferPool getByteBufferPool(){
+        return bytepool;
+    }
+    
+    /**
+     * Make ByteBuffer for Recv Byte Data
+     */
+    private void makeBytebuffer() {
+        try {
+            String fileName = "bufferpool.dat";
+            File bfile = new File(fileName);;
+
+            if (!existFile(fileName)) {
+                bfile.createNewFile();
+            }
+
+
+            bytepool = new ByteBufferPool(1024, 1024 * 1024 * 3, bfile);
+        } catch (IOException ex) {
+        }
+    }
+    
+    private Boolean existFile(String isLivefile) {
+        File f1 = new File(isLivefile);
+
+        if (f1.exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

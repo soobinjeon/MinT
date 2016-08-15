@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.BLE;
+package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.MinT;
-import MinTFramework.Network.RoutingProtocol;
+import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
+import MinTFramework.Schedule.Service;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -128,5 +129,19 @@ public class BLE extends Network {
     protected void sendProtocol(PacketProtocol packet) {
         //System.out.println(packet);
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
+    }
+
+    /**
+     * @see should implement method
+     * @return 
+     */
+    @Override
+    protected Service getRecvListener(int nofListener) {
+        return new Service(frame) {
+            @Override
+            public void execute() {
+                
+            }
+        };
     }
 }
