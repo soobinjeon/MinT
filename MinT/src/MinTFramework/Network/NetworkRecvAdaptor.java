@@ -17,7 +17,7 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.Schedule.Service;
+import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 
 /**

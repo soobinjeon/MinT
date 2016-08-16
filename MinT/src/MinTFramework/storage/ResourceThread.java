@@ -18,7 +18,7 @@ package MinTFramework.storage;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.Request;
-import MinTFramework.Schedule.Service;
+import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.logging.Level;
 import java.util.logging.Logger;

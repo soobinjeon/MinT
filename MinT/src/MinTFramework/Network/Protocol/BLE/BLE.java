@@ -24,7 +24,7 @@ import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
-import MinTFramework.Schedule.Service;
+import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;

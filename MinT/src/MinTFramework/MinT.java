@@ -16,8 +16,8 @@
  */
 package MinTFramework;
 
-import MinTFramework.Schedule.Scheduler;
-import MinTFramework.Schedule.Service;
+import MinTFramework.SystemScheduler.Scheduler;
+import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.PropertyManager;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.InstructionManager;
@@ -196,13 +196,7 @@ public abstract class MinT {
     public void clearDeviceList() {
         devicemanager.clearDeviceList();
     }
-    /**
-     * Remove service in Scheduler
-     * @param service Service object to remove from scheduler
-     */
-    public void stopService(Service service) {
-        scheduler.stopService(service);
-    }
+
     /**
      * Add service in Scheduler
      * @param service Service object to add to scheduler
@@ -211,19 +205,20 @@ public abstract class MinT {
         scheduler.putService(service);
     }
 
-    /**
-     * Print service name and id in thread in scheduler
-     */
-    public void showWorkingThreads() {
-        scheduler.showWorkingThreads();
-    }
+//    /**
+//     * Print service name and id in thread in scheduler
+//     */
+//    public void showWorkingThreads() {
+//        scheduler.showWorkingThreads();
+//    }
     
     /**
+     * @deprecated 
      * get Number of Working Threads
      * @return 
      */
     public int getNumberofWorkingThreads(){
-        return scheduler.getNumberofWorkingThreads();
+        return 0;
     }
     
     /*************************
@@ -434,7 +429,7 @@ public abstract class MinT {
     public void Start() {
         devicemanager.initAllDevice();
         networkmanager.onStart();
-        scheduler.SchedulerRunning();
+        scheduler.StartPool();
     }
     
     protected void isDebug(boolean isdebug){

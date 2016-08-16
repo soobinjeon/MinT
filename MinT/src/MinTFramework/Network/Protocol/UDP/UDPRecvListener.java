@@ -5,7 +5,7 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.Schedule.Service;
+import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.TypeCaster;
 import java.io.File;

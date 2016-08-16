@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Schedule;
+package MinTFramework.SystemScheduler;
 
 import MinTFramework.MinT;
+import MinTFramework.ThreadsPool.PoolWorkerThread;
 
 /**
  *
@@ -28,7 +29,7 @@ public abstract class Service {
     private int prior;
     private boolean isInterrupted = false;
     protected final MinT frame;
-    
+    private PoolWorkerThread parentThread;
     /***
      * Service Constructor
      * Deafult id=0, prior = 0;
@@ -85,4 +86,8 @@ public abstract class Service {
      * App develper must 
      */
     abstract public void execute();
+
+    void setParentThread(ScheduleWorkerThread aThis) {
+        parentThread = aThis;
+    }
 }

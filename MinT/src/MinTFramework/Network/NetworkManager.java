@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Schedule.Scheduler;
+import MinTFramework.SystemScheduler.Scheduler;
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
 import MinTFramework.Network.Protocol.BLE.BLE;
@@ -34,8 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -114,7 +112,7 @@ public class NetworkManager {
     private void TurnOnNetwork() {
         //run Threadpool for network
         NetworkRecvAdaptPool = new Scheduler("Network Adaptor Pool",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
-        NetworkRecvAdaptPool.SchedulerRunning();
+        NetworkRecvAdaptPool.StartPool();
         
         //initializing Network Recv Adapt Pool according to number of networks
         int ThreadsbyNumofNetwork = MinTConfig.ThreadsbyNumberofNetworks;
@@ -122,7 +120,7 @@ public class NetworkManager {
         NetworkRecvListnerPool = new Scheduler("Network Recv ListnerPool"
                 , MinTConfig.NETWORK_WAITING_QUEUE
                 , networkList.size() * ThreadsbyNumofNetwork);
-        NetworkRecvListnerPool.SchedulerRunning();
+        NetworkRecvListnerPool.StartPool();
         
         //Setting on Networks
         for (NetworkType ty : networkList) {
