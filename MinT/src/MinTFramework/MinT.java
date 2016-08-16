@@ -27,7 +27,6 @@ import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.RoutingProtocol;
-import MinTFramework.Network.Handler;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketProtocol;
