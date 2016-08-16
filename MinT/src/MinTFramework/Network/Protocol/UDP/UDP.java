@@ -14,21 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.UDP;
+package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
-import MinTFramework.Network.RoutingProtocol;
+import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketProtocol;
 import MinTFramework.Network.Profile;
+import MinTFramework.Schedule.Service;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.net.StandardSocketOptions;
+import java.nio.channels.DatagramChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,13 +42,14 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
-    DatagramSocket socket;
     UDPSender sender;
     final int PORT;
     String cmd;
     String dstIP;
-    UDP self;
     int dstPort;
+    
+    InetSocketAddress isa;
+    DatagramChannel channel;
 
     private final DebugLog log = new DebugLog("UDP.java");
 
@@ -60,42 +65,52 @@ public class UDP extends Network {
     public UDP(int port, RoutingProtocol _ap, MinT frame, NetworkManager nm) {
         super(frame,nm, new Profile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port,NetworkType.UDP),_ap);
         
+        if(!MinTConfig.IP_ADDRESS.equals("")){
+            profile.setAddress(MinTConfig.IP_ADDRESS);
+        }
+        
         PORT = port;
-        this.setUDPSocket();
         this.portOpen();
-        this.startReceiveThread();
-        System.out.println("Current IP Addr : "+this.profile.getAddress()+":"+port);
-        self = this;
+        try {
+            this.setUDPSocket();
+        } catch (IOException ex) {
+        }
+        
+        System.out.println("Current IP Addr? : "+this.profile.getAddress()+":"+port);
     }
     
-    /***
-     * Make and start Receiver thread
-     */
-    private void startReceiveThread() {
-        try {
-//            UDPReceiver[] ur = new UDPReceiver[10];
-//            for(int i=0;i<ur.length;i++){
-//                ur[i] = new UDPReceiver(socket, this);
-//                ur[i].start();
-//            }
-            UDPReceiver ur = new UDPReceiver(socket, this);
-            ur.start();
-        } catch (SocketException ex) {
-        }
-    }
-
     /**
      * set DatagramSocket make Sender and Receiver
      */
-    private void setUDPSocket() {
+    private void setUDPSocket() throws IOException {
+        InetSocketAddress isa = new InetSocketAddress(PORT);
+        channel = DatagramChannel.open();
+        channel.socket().bind(isa);
+        channel.configureBlocking(false);
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, 1024*1024*10);
+        
+        sender = new UDPSender(channel);
+//        try {
+//            
+//            sender = new UDPSender(new DatagramSocket(PORT));
+//        } catch (SocketException ex) {
+//        }
+    }
+    
+    /**
+     * set Recv Listener
+     * @param nofListener
+     * @return 
+     */
+    @Override
+    protected Service getRecvListener(int nofListener) {
         try {
-            socket = new DatagramSocket(PORT);
-            sender = new UDPSender(socket);
-        } catch (SocketException ex) {
-            Logger.getLogger(UDP.class.getName()).log(Level.SEVERE, null, ex);
+            return new UDPRecvListener(channel, this);
+        } catch (IOException ex) {
+            return null;
         }
     }
-
+    
     /**
      * For Linux make port open
      *

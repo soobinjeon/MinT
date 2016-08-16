@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.UDP;
+package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.DatagramPacket;

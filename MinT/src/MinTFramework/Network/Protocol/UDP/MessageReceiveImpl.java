@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MinTFramework.Network.UDP;
+package MinTFramework.Network.Protocol.UDP;
 
 public interface MessageReceiveImpl{
     /***

@@ -26,9 +26,9 @@ public class MinTConfig {
     static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 100000;
     
     static public final int NETWORK_WAITING_QUEUE = 100000;
-    static public final int NETWORK_THREADPOOL_NUM = 1;
+    static public final int NETWORK_THREADPOOL_NUM = 10;
+    static public final int ThreadsbyNumberofNetworks = 1;
     
-    static public final int UDP_NETWORK_THREAD = 10;
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
     

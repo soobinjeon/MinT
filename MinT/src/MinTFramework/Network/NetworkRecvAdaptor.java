@@ -24,7 +24,7 @@ import MinTFramework.Util.DebugLog;
  *
  * @author soobin
  */
-public class NetworkReceiver extends Service{
+public class NetworkRecvAdaptor extends Service{
     Network parentNetwork;
     NetworkManager parentNetworkManager;
     SystemHandler systemHandle;
@@ -33,12 +33,13 @@ public class NetworkReceiver extends Service{
     SystemHandler syshandle;
     DebugLog dl = new DebugLog("NetworkReceiver");
     
-    public NetworkReceiver(byte[] recvPacket, Network pn){
+    public NetworkRecvAdaptor(byte[] recvPacket, Network pn){
         super(pn.frame);
         this.recvPacket = recvPacket;
         parentNetwork = pn;
         parentNetworkManager = parentNetwork.getNetworkManager();
         currentProfile = parentNetwork.getProfile();
+        syshandle = new SystemHandler(frame);
     }
     
     @Override
@@ -60,11 +61,8 @@ public class NetworkReceiver extends Service{
         PacketProtocol matchedPacket = new PacketProtocol(currentProfile, packet);
         dl.printMessage(matchedPacket.getPacketString());
         if (isFinalDestiny(matchedPacket.getDestinationNode())) {
-
-//            SystemHandler sh = new SystemHandler(matchedPacket, frame);
-//            sh.execute();
-            syshandle = new SystemHandler(matchedPacket, frame);
-            syshandle.startHandle();
+            dl.printMessage("is Final?");
+            syshandle.startHandle(matchedPacket);
             this.parentNetworkManager.setHandlerCount();
 
         } else { //If stopover, through to stopover method in networkmanager
