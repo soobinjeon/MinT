@@ -18,7 +18,6 @@ package MinTFramework.Network;
 
 import MinTFramework.Util.TypeCaster;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -37,7 +36,7 @@ import java.util.regex.Pattern;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PacketDatagram {
-    public static final int HEADER_MSGID_INITIALIZATION = 0;
+    public static final long HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
     private String data="";
     private byte[] packetdata = null;
@@ -48,7 +47,7 @@ public class PacketDatagram {
     
     private HEADER_DIRECTION h_direction;
     private HEADER_INSTRUCTION h_instruction;
-    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
+    private long HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -62,7 +61,7 @@ public class PacketDatagram {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketDatagram(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+    public PacketDatagram(long msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
@@ -84,14 +83,14 @@ public class PacketDatagram {
      * MinT Protocol -> Data
      * @param packet 
      */
-    public PacketDatagram(NetworkProfile cpr, byte[] packet){
+    public PacketDatagram(byte[] packet){
         packetdata = packet;
         try {
             packetdataString = TypeCaster.unzipStringFromBytes(packet);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        makeData(cpr, packetdataString);
+        makeData(packetdataString);
     }
     
     /**
@@ -138,7 +137,7 @@ public class PacketDatagram {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(int MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
+    private void makePacketData(long MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
         String result = Scheme;
         String mdata = getProtocolData(DataAnalizer(msgdata));
         result += getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID));
@@ -160,7 +159,7 @@ public class PacketDatagram {
      * @param h_ins
      * @return 
      */
-    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id) {
+    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, long msg_id) {
         return h_dir.getBit()+"|"+h_ins.getBit()+"|"+msg_id;
     }
     
@@ -234,7 +233,7 @@ public class PacketDatagram {
      * Make Data from byte Packet(MinT Protocol)
      * @param packet 
      */
-    private void makeData(NetworkProfile cpr, String spacket) {
+    private void makeData(String spacket) {
         spacket = spacket.trim();
         spacket = spacket.split(this.Scheme)[1];
         spacket = spacket.substring(1,spacket.length()-1);
@@ -249,7 +248,7 @@ public class PacketDatagram {
         if(split.length == Numberoftotalpacket){
             routelist.put(ROUTE.SOURCE, new NetworkProfile(split[1]));
             routelist.put(ROUTE.PREV, new NetworkProfile(split[2]));
-            routelist.put(ROUTE.NEXT, cpr);
+            routelist.put(ROUTE.NEXT, null);
             routelist.put(ROUTE.DESTINATION, new NetworkProfile(split[3]));
             data = split[4];
             makeStringtoHeader(split[0]);
@@ -294,15 +293,15 @@ public class PacketDatagram {
         return this.h_instruction;
     }
     
-    public int getMSGID(){
+    public long getMSGID(){
         return HEADER_MSGID;
     }
     
-    public PacketDatagram getclone(){
-        byte[] nbyte = new byte[packetdata.length];
-        System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
-        return new PacketDatagram(routelist.get(ROUTE.NEXT), nbyte);
-    }
+//    public PacketDatagram getclone(){
+//        byte[] nbyte = new byte[packetdata.length];
+//        System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
+//        return new PacketDatagram(routelist.get(ROUTE.NEXT), nbyte);
+//    }
     
     public static enum HEADER_DIRECTION {
         REQUEST(0), RESPONSE(1);

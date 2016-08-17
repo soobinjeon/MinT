@@ -49,11 +49,6 @@ public abstract class ResourcePool {
         this.head = 0;
         this.tail = 0;
         this.queuecount = 0;
-        
-        threadPool = new PoolWorkerThread[numOfThread];
-        for (int i = 0; i < threadPool.length; i++) {
-            threadPool[i] = makeWorkerThread(i, this);
-        }
     }
     
     protected abstract PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool);
@@ -64,6 +59,12 @@ public abstract class ResourcePool {
      */
     public void StartPool() {
         isStopAllService = false;
+        
+        threadPool = new PoolWorkerThread[totalThreadPoolSize];
+        for (int i = 0; i < threadPool.length; i++) {
+            threadPool[i] = makeWorkerThread(i, this);
+        }
+        
         for (PoolWorkerThread threadPool1 : threadPool) {
             threadPool1.start();
         }

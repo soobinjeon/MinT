@@ -34,8 +34,8 @@ public class SystemHandler{
     protected NetworkManager nmanager;
     DebugLog dl = new DebugLog("SystemHandler");
     
-    public SystemHandler(MinT _frame){
-        this.frame = _frame;
+    public SystemHandler(){
+        this.frame = MinT.getInstance();
         resStorage = this.frame.getResStorage();
         nmanager = frame.getNetworkManager();
     }
@@ -80,8 +80,8 @@ public class SystemHandler{
                 ret = res.getResourceString();
             else
                 ret = "";
-            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
-                    , rv_packet.getSource(), ret, rv_packet.getMSGID());
+            nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
+                    , rv_packet.getSource(), ret, rv_packet.getMSGID()));
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }else if(rv_packet.getHeader_Instruction().isSet()){
@@ -93,8 +93,8 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             dl.printMessage("set DISCOVERY");
             String ret = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
-            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.DISCOVERY
-                    , rv_packet.getSource(), ret, rv_packet.getMSGID());
+            nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.DISCOVERY
+                    , rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }
     }
     

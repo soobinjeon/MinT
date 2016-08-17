@@ -21,17 +21,19 @@ import MinTFramework.ThreadsPool.ResourcePool;
 
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class NetworkRecvAdaptPool extends ResourcePool{
-
-    public NetworkRecvAdaptPool(String name, int ObjectQueueLength, int numOfThread) {
-        super(name, ObjectQueueLength, numOfThread);
+public class SendAdaptor extends PoolWorkerThread<SendMSG>{
+    private Transportation sender;
+    public SendAdaptor(String name, int ID, ResourcePool pool) {
+        super(name, ID, pool);
+        sender = new Transportation(NetworkManager.LAYER_DIRECTION.SEND);
     }
 
     @Override
-    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected void HandleResoure(SendMSG resource) {
+        sender.EndPointSend(resource);
     }
     
 }

@@ -33,6 +33,7 @@ import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
@@ -48,7 +49,8 @@ import java.util.List;
 public abstract class MinT {
 
     private DeviceManager devicemanager;
-    private NetworkManager networkmanager;
+    private NetworkManager NTWmanager;
+    private static MinT MinTFrame;
     private Scheduler scheduler;
     private ResourceStorage resourceStorage;
     private PropertyManager PM;
@@ -67,7 +69,8 @@ public abstract class MinT {
         resourceStorage = new ResourceStorage(this);
         PM = new PropertyManager(this,resourceStorage);
         IM = new InstructionManager(this, resourceStorage);
-        networkmanager = new NetworkManager(this, resourceStorage);
+        NTWmanager = new NetworkManager(this, resourceStorage);
+        MinTFrame = this;
     }
     
     /**
@@ -76,6 +79,10 @@ public abstract class MinT {
      */
     public MinT() {
         this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+    }
+    
+    public static MinT getInstance(){
+        return MinTFrame;
     }
 
     /**
@@ -233,7 +240,7 @@ public abstract class MinT {
      * @param nhandler User Handler
      */
     public void setNetwork(String name){
-        networkmanager.setNodeName(name);
+        NTWmanager.setNodeName(name);
     }
     
     /**
@@ -241,7 +248,7 @@ public abstract class MinT {
      * @param name node Name
      */
     public void setNetworkName(String name){
-        networkmanager.setNodeName(name);
+        NTWmanager.setNodeName(name);
     }
     
     /**
@@ -249,7 +256,7 @@ public abstract class MinT {
      * @return 
      */
     public String getNodeName(){
-        return networkmanager.getNodeName();
+        return NTWmanager.getNodeName();
     }
     
     /**
@@ -257,7 +264,7 @@ public abstract class MinT {
      * @return 
      */
     public NetworkManager getNetworkManager(){
-        return networkmanager;
+        return NTWmanager;
     }
     
     /**
@@ -265,7 +272,7 @@ public abstract class MinT {
      * @param ntype 
      */
     public void addNetwork(NetworkType ntype){
-        networkmanager.AddNetwork(ntype);
+        NTWmanager.AddNetwork(ntype);
     }
     
     /**
@@ -304,8 +311,8 @@ public abstract class MinT {
      * @param resHandle Response Handler
      */
     public void REQUEST_GET(NetworkProfile dst, String resName, ResponseHandler resHandle){
-        networkmanager.SEND_FOR_RESPONSE(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,resName, resHandle);
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
+                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,resName, resHandle));
     }
     
     /**
@@ -314,8 +321,8 @@ public abstract class MinT {
      * @param resHandle Response Handler
      */
     public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
-        networkmanager.SEND_FOR_RESPONSE(PacketDatagram.HEADER_DIRECTION.REQUEST,
-                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle);
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST,
+                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle));
     }
     
     /**
@@ -348,7 +355,7 @@ public abstract class MinT {
      * @param ap 
      */
     public void setRoutingProtocol(RoutingProtocol ap){
-        networkmanager.setRoutingProtocol(ap);
+        NTWmanager.setRoutingProtocol(ap);
     }
     
     /**
@@ -357,7 +364,7 @@ public abstract class MinT {
      * @return 
      */
     public RoutingProtocol getRoutingProtocol(){
-        return networkmanager.getRoutingProtocol();
+        return NTWmanager.getRoutingProtocol();
     }
     
     /***************************
@@ -389,7 +396,7 @@ public abstract class MinT {
      * @return 
      */
     public String getResourceGroup(){
-        return this.networkmanager.getCurrentRoutingGroup();
+        return this.NTWmanager.getCurrentRoutingGroup();
     }
 //    /**
 //     * put cache data to Shared Memory
@@ -428,7 +435,7 @@ public abstract class MinT {
      */
     public void Start() {
         devicemanager.initAllDevice();
-        networkmanager.onStart();
+        NTWmanager.onStart();
         scheduler.StartPool();
     }
     

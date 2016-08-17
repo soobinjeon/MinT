@@ -14,30 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Network;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 10;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 10000;
+public class PacketIDManager {
+    private final long DEFAULT_ID = 1;
+    private long id = DEFAULT_ID;
+    private boolean cycled = false;
+    private ConcurrentHashMap<Long,SendMSG> idlist;
+    public PacketIDManager(ConcurrentHashMap<Long,SendMSG> IDList){
+        idlist = IDList;
+    }
     
-    //Network Adaptor
-    static public final int NETWORK_WAITING_QUEUE = 1000000;
-    static public final int NETWORK_THREADPOOL_NUM = 50;
-    
-    //UDP
-    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
-    
-    static public boolean DebugMode = false;
-    static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
-    
-    //for Network
-    static public final int RESPONSE_ID_MAX = 120000;
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
-    static public String IP_ADDRESS = "";
+    public synchronized long makePacketID(){
+        if(id == Long.MAX_VALUE){
+            id = DEFAULT_ID;
+            cycled = true;
+        }
+        
+        if(!cycled)
+            return id++;
+        else{
+            while(true){
+                if(idlist.get(id) == null)
+                    break;
+                id++;
+            }
+            return id++;
+        }
+    }
 }

@@ -16,12 +16,8 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.SystemScheduler.Scheduler;
 import MinTFramework.*;
-import MinTFramework.Exception.NetworkException;
 import MinTFramework.Network.Protocol.BLE.BLE;
-import MinTFramework.Network.PacketDatagram.HEADER_DIRECTION;
-import MinTFramework.Network.PacketDatagram.HEADER_INSTRUCTION;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Routing.RoutingProtocol;
@@ -31,7 +27,6 @@ import MinTFramework.storage.ResourceStorage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,19 +39,23 @@ public class NetworkManager {
     private MinT frame = null;
     private ResourceStorage resourceStorage = null;
     private final ArrayList<NetworkType> networkList;
-    private final HashMap<NetworkType,Network> networks;
+    private final ConcurrentHashMap<NetworkType,Network> networks;
     private String NodeName = null;
     
     private RoutingProtocol routing;
     
     //Network Recv Adaptor Pool for Handling the Recv Data
-    private Scheduler NetworkRecvAdaptPool;
+    private ReceiveAdaptPool NetworkRecvAdaptPool;
+    
+    //Network Send Adaptor Pool for Send Data
+    private SendAdaptPool NetworkSendPool;
     
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
     
     //Message Response List
-    private final ConcurrentHashMap<Integer,ResponseHandler> ResponseList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long,SendMSG> ResponseList = new ConcurrentHashMap<>();
+    private PacketIDManager idmaker;
     
     private int tempHandlerCnt = 0;
     private final DebugLog dl;
@@ -69,7 +68,7 @@ public class NetworkManager {
     public NetworkManager(MinT frame, ResourceStorage resStorage) {
         this.dl = new DebugLog("NetworkManager",true);
         this.networkList = new ArrayList<>();
-        this.networks = new HashMap<>();
+        this.networks = new ConcurrentHashMap<>();
         this.frame = frame;
         resourceStorage = resStorage;
         setNodeName();
@@ -77,6 +76,14 @@ public class NetworkManager {
         makeBytebuffer();
         
         routing = new MinTRoutingProtocol();
+        
+        idmaker = new PacketIDManager(ResponseList);
+        
+        NetworkRecvAdaptPool = new ReceiveAdaptPool("Receive Adaptor Pool", 
+                MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
+        
+        NetworkSendPool = new SendAdaptPool("Send Adaptor Pool", 
+                MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
     }
     
     private void initRoutingSetup(){
@@ -107,14 +114,14 @@ public class NetworkManager {
      * Turn on All Networks!
      */
     private void TurnOnNetwork() {
-        //run Threadpool for network
-        NetworkRecvAdaptPool = new Scheduler("Network Adaptor Pool",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
-        NetworkRecvAdaptPool.StartPool();
-        
         //Setting on Networks
         for (NetworkType ty : networkList) {
             setOnNetwork(ty);
         }
+        
+        //run Threadpool for network
+        NetworkRecvAdaptPool.StartPool();
+        NetworkSendPool.StartPool();
     }
 
     /**
@@ -167,146 +174,20 @@ public class NetworkManager {
         return routing;
     }
 
+
+    
+    public void SEND(SendMSG smsg){
+        NetworkSendPool.putResource(smsg);
+    }
+    
     /**
-     * get Final Destination using Routing Protocol
-     * @param dst
+     * get PacketID 
      * @return 
      */
-    private NetworkProfile getFinalDestination(NetworkProfile dst) {
-        NetworkProfile fdst = null;
-        if (dst.isNameProfile()) {
-            //라우팅 스토어에서 검색
-            fdst = dst;
-        } else {
-            fdst = dst;
-        }
-        return fdst;
+    public PacketIDManager getIDMaker(){
+        return idmaker;
     }
     
-    /**
-     * RESPONSE MSG
-     * @param hd Direction (Request, Response)
-     * @param hi for Instruction (GET, SET, POST, PUT, DELETE, DISCOVERY)
-     * @param dst Destination profile
-     * @param msg MSG
-     * @param resKey 
-     */
-    public void RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg, int resKey){
-        NetworkProfile fdst = getFinalDestination(dst);
-        PacketDatagram npacket = new PacketDatagram(resKey, hd, hi, null, null, getNextNode(fdst), fdst, msg);
-        sendMsg(npacket);
-    }
-    
-    /**
-     * SEND
-     * @param hd Direction (Request, Response)
-     * @param hi for Instruction (SET, POST, PUT, DELETE)
-     * @param dst Destination profile
-     * @param msg MSG
-     */
-    public void SEND(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg){
-        RESPONSE(hd,hi,dst,msg,PacketDatagram.HEADER_MSGID_INITIALIZATION);
-    }
-    
-    /**
-     * send for response
-     * @param hd Direction (Request, Response)
-     * @param hi Instruction (GET, DISCOVERY)
-     * @param dst Destination profile
-     * @param msg MSG
-     * @param resHandle response handler (need to GET, DISCOVERY)
-     */
-    public void SEND_FOR_RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg,
-            ResponseHandler resHandle){
-        NetworkProfile fdst = getFinalDestination(dst);
-        PacketDatagram npacket = null;
-        //if this packet need to response from target Node
-        if(hd.isRequest() && hi.NeedResponse()){
-            npacket = new PacketDatagram(makePacketID(),hd, hi, null, null, getNextNode(fdst), fdst, msg);
-            ResponseList.put(npacket.getMSGID(), resHandle);
-            dl.printMessage("Send MSG ID : "+npacket.getMSGID());
-            sendMsg(npacket);
-        }
-    }
-
-    /**
-     * Routing Protocol
-     *
-     * @param fdst
-     * @return
-     */
-    private NetworkProfile getNextNode(NetworkProfile fdst) {
-        //Serch Routing Protocol
-        return fdst;
-    }
-
-    /**
-     * *
-     * 얘는 프로토콜에서 목적지의 프로토콜에 따라 보내는 네트워크를 선택
-     *
-     * @param dst
-     * @param msg
-     */
-    private void sendMsg(PacketDatagram packet) {
-        NetworkType nnodetype = packet.getNextNode().getNetworkType();
-        Network sendNetwork = networks.get(nnodetype);
-        
-        //Send Message
-        if (sendNetwork != null) {
-                //set Source Node
-            if (packet.getSource() == null) {
-                packet.setSource(sendNetwork.getProfile());
-            }
-
-            //set Previous Node
-            if (packet.getPreviosNode() == null) {
-                packet.setPrevNode(sendNetwork.getProfile());
-            }
-
-            //set Response Handler
-    //        this.networkHandler.
-
-            try {
-                dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
-                dl.printMessage("Packet :" + packet.getPacketString());
-                sendNetwork.send(packet);
-            } catch (NetworkException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            dl.printMessage("Error : There are no Networks");
-            System.out.println("Error : There are no Networks");
-        }
-    }
-    
-    private int makePacketID() {
-        int length = MinTConfig.RESPONSE_ID_MAX;
-        boolean rid[] = new boolean[length];
-        int newid = 1;
-        
-        for(int i=1;i<length;i++){
-            rid[i] = false;
-        }
-        
-        //check serviceQueue
-        for(int k : ResponseList.keySet()){
-            rid[k] = true;
-        }
-        //Make New ID
-        
-        newid = 1;
-        while(true){
-            if(rid[newid] == false){
-                break;
-            }
-            else{
-                newid++;
-            }
-        }
-
-        return newid;
-    }
-
     /**
      * set Node Name
      *
@@ -347,8 +228,9 @@ public class NetworkManager {
      * @param num
      * @return 
      */
-    public ResponseHandler getResponseDataMatchbyID(int num){
-        ResponseHandler resd = ResponseList.get(num);
+    public synchronized ResponseHandler getResponseDataMatchbyID(long num){
+        SendMSG smsg = ResponseList.get(num);
+        ResponseHandler resd = smsg.getResponseHandler();
         if(resd != null){
             ResponseList.remove(num);
         }
@@ -369,7 +251,7 @@ public class NetworkManager {
      * get Response Msg List
      * @return 
      */
-    public ConcurrentHashMap<Integer, ResponseHandler> getResponseList(){
+    public synchronized ConcurrentHashMap<Long, SendMSG> getResponseList(){
         return ResponseList;
     }
     
@@ -377,8 +259,15 @@ public class NetworkManager {
      * get NetworkScheduler for operate network receiver
      * @return 
      */
-    protected Scheduler getNetworkAdaptorPool(){
+    protected ReceiveAdaptPool getNetworkAdaptorPool(){
+        if(NetworkRecvAdaptPool == null){
+            dl.printMessage("NRA NULL");
+        }
         return NetworkRecvAdaptPool;
+    }
+    
+    protected ConcurrentHashMap<NetworkType,Network> getNetworks(){
+        return this.networks;
     }
     
     /**
@@ -425,5 +314,9 @@ public class NetworkManager {
         } else {
             return false;
         }
+    }
+    
+    public static enum LAYER_DIRECTION {
+        RECEIVE, SEND;
     }
 }

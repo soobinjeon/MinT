@@ -16,21 +16,29 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
-
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class NetworkRecvAdaptor extends PoolWorkerThread<byte[]>{
-
-    public NetworkRecvAdaptor(String name, int ID, ResourcePool pool) {
-        super(name, ID, pool);
-    }
-
-    @Override
-    protected void HandleResoure(byte[] resource) {
-        
-    }
+public interface NetworkLayers {
+    /**
+     * Just Implement to EndPoint Layer
+     * @param packet 
+     */
+    public void EndPointReceive(byte[] packet);
+    
+    /**
+     * Layer Implements
+     * @param packet 
+     */
+    public void Receive(PacketDatagram packet);
+    
+    /**
+     * Layer Implements
+     * @param packet 
+     */
+    public void Send(PacketDatagram packet);
+    
+    public void EndPointSend(SendMSG sendmsg);
 }

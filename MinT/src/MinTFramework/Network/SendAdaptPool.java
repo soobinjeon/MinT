@@ -14,30 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.Network;
+
+import MinTFramework.ThreadsPool.PoolWorkerThread;
+import MinTFramework.ThreadsPool.ResourcePool;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 10;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 10000;
+public class SendAdaptPool extends ResourcePool{
+
+    public SendAdaptPool(String name, int ObjectQueueLength, int numOfThread) {
+        super(name, ObjectQueueLength, numOfThread);
+    }
+
+    @Override
+    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
+        return new SendAdaptor("Send Adaptor", numofThread, parentPool);
+    }
     
-    //Network Adaptor
-    static public final int NETWORK_WAITING_QUEUE = 1000000;
-    static public final int NETWORK_THREADPOOL_NUM = 50;
-    
-    //UDP
-    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
-    
-    static public boolean DebugMode = false;
-    static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
-    
-    //for Network
-    static public final int RESPONSE_ID_MAX = 120000;
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
-    static public String IP_ADDRESS = "";
 }

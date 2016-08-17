@@ -18,14 +18,9 @@ package MinTFramework.Network;
 
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
-import MinTFramework.MinTConfig;
 import MinTFramework.Network.Routing.RoutingProtocol;
-import MinTFramework.SystemScheduler.Scheduler;
-import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -39,7 +34,7 @@ public abstract class Network {
     private RoutingProtocol routing;
     
     //Network Pools
-    private Scheduler networkAdaptorPool;
+    private ReceiveAdaptPool networkAdaptorPool;
     
     private boolean isworking = true;
     
@@ -65,7 +60,6 @@ public abstract class Network {
     public Network(MinT frame, NetworkManager nm, NetworkProfile npro, RoutingProtocol _routing) {
         this.frame = frame;
         this.networkmanager = nm;
-        
         networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
         byteBufferPool = networkmanager.getByteBufferPool();
         
@@ -99,7 +93,10 @@ public abstract class Network {
      * @param packet 
      */
     public synchronized void putReceiveHandler(byte[] packet){
-        this.networkAdaptorPool.putService(new NetworkRecvAdaptor_OLD(packet, this));
+        if(networkAdaptorPool == null){
+            ndl.printMessage("Adaptor Null");
+        }
+        this.networkAdaptorPool.putResource(packet);
     }
 
     /**
