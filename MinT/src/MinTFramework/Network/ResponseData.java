@@ -24,12 +24,12 @@ import MinTFramework.storage.datamap.Information;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class ResponseData extends Information{
-    private PacketProtocol recv_packet;
-    private Profile source;
-    public ResponseData(PacketProtocol recv_packet) {
+    private PacketDatagram recv_packet;
+    private NetworkProfile source;
+    public ResponseData(PacketDatagram recv_packet) {
         this(recv_packet, recv_packet.getMsgData());
     }
-    public ResponseData(PacketProtocol recv_packet, Object data) {
+    public ResponseData(PacketDatagram recv_packet, Object data) {
         super(data);
         source = recv_packet.getSource();
         this.recv_packet = recv_packet;
@@ -40,15 +40,15 @@ public class ResponseData extends Information{
         super.setResource(setres);
     }
     
-    public Profile getSourceInfo(){
+    public NetworkProfile getSourceInfo(){
         return source;
     }
     
-    public Profile getDestination(){
+    public NetworkProfile getDestination(){
         return recv_packet.getDestinationNode();
     } 
     
-    public PacketProtocol getPacketProtocol(){
+    public PacketDatagram getPacketProtocol(){
         return this.recv_packet;
     }
     

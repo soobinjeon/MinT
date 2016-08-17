@@ -22,8 +22,8 @@ import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketProtocol;
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
@@ -35,6 +35,7 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class BLE extends Network {
+    
 
     BLEReceiver receiver;
     BLESender sender;
@@ -53,7 +54,7 @@ public class BLE extends Network {
      * @param nm 
      */
     public BLE(RoutingProtocol _ap, MinT frame, NetworkManager nm){
-        super(frame,nm,new Profile(frame.getNodeName(),null,NetworkType.BLE),_ap);
+        super(frame,nm,new NetworkProfile(frame.getNodeName(),null,NetworkType.BLE),_ap);
         if(!setBLEDevice()){
             String str = "BLE devices are not detected in the MinT: Please check it out";
             System.err.println(str);
@@ -97,7 +98,7 @@ public class BLE extends Network {
      */
 
     @Override
-    public void setDestination(Profile _dst) {
+    public void setDestination(NetworkProfile _dst) {
         this.dst = _dst.getAddress();
         deviceBLE.setRole(1);
         //지연 필수******************짧을 시 통신불가, 1초보다 짧을 시 되었다 안되었다함
@@ -126,22 +127,15 @@ public class BLE extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(PacketProtocol packet) {
+    protected void sendProtocol(PacketDatagram packet) {
         //System.out.println(packet);
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 
     /**
-     * @see should implement method
-     * @return 
+     * @see 
      */
     @Override
-    protected Service getRecvListener(int nofListener) {
-        return new Service(frame) {
-            @Override
-            public void execute() {
-                
-            }
-        };
+    protected void interrupt() {
     }
 }

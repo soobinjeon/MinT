@@ -17,7 +17,7 @@
 package MinTFramework.storage;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseData;
 import MinTFramework.Util.DebugLog;
@@ -195,7 +195,7 @@ public class ResourceStorage {
      * get Discover Resource Data
      * @return 
      */
-    public JSONObject DiscoverLocalResource(Profile currentNode){
+    public JSONObject DiscoverLocalResource(NetworkProfile currentNode){
         JSONObject obs = new JSONObject();
         JSONArray jpr = new JSONArray();
         JSONArray jis = new JSONArray();
@@ -219,7 +219,7 @@ public class ResourceStorage {
      * @param res
      * @param currentNode 
      */
-    private void addJSONArray(JSONArray ja, Resource res, Profile currentNode){
+    private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode){
         Resource nr = res.getCloneforDiscovery();
         if(res.getStorageCategory().isLocal()){
             nr.setLocation(new StorageDirectory(currentNode,

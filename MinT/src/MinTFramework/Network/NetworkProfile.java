@@ -21,7 +21,7 @@ package MinTFramework.Network;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Profile {
+public class NetworkProfile {
     private String id;
     private String name="";
     private String address="";
@@ -35,7 +35,7 @@ public class Profile {
      * @param address Address of Node (ex : Internet based:ip address, BLE:bluetooth address and so on)
      * @param ntype type of Network
      */
-    public Profile(String name, String address, NetworkType ntype){
+    public NetworkProfile(String name, String address, NetworkType ntype){
         this.name = name;
         this.address = address;
         this.ntype = ntype;
@@ -43,7 +43,7 @@ public class Profile {
         setPort();
     }
     
-    public Profile(String bytearray){
+    public NetworkProfile(String bytearray){
         String[] temp = bytearray.split("\\"+Split);
         if(temp.length > 1){
             name = temp[0];
@@ -112,7 +112,7 @@ public class Profile {
      */
     @Override
     public boolean equals(Object obj){
-        Profile ep = (Profile)obj;
+        NetworkProfile ep = (NetworkProfile)obj;
 //        System.out.println("cid : "+this.getId()+", eid : "+ep.getId());
         if(this.id.equals(ep.getId()))
             return true;

@@ -16,7 +16,7 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.NetworkProfile;
 
 /**
  * Storage Directory
@@ -25,7 +25,7 @@ import MinTFramework.Network.Profile;
  */
 public class StorageDirectory {
     protected static final String LOCAL_SOURCE = "local";
-    private Profile networkProfile;
+    private NetworkProfile networkProfile;
     private String source = "";
     private String group = "";
     private String resource = "";
@@ -38,7 +38,7 @@ public class StorageDirectory {
      * @param group group address
      * @param resource resource Name
      */
-    public StorageDirectory(Profile src, String group, String resource){
+    public StorageDirectory(NetworkProfile src, String group, String resource){
         if(src != null){
             this.networkProfile = src;
             this.source = src.getAddress();
@@ -93,7 +93,7 @@ public class StorageDirectory {
         return this.source.equals(StorageDirectory.LOCAL_SOURCE);
     }
     
-    public Profile getSrouceProfile(){
+    public NetworkProfile getSrouceProfile(){
         return this.networkProfile;
     }
 }

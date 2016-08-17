@@ -29,8 +29,8 @@ import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketProtocol;
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.storage.ResData;
@@ -303,9 +303,9 @@ public abstract class MinT {
      * @param resName Resource Name
      * @param resHandle Response Handler
      */
-    public void REQUEST_GET(Profile dst, String resName, ResponseHandler resHandle){
-        networkmanager.SEND_FOR_RESPONSE(PacketProtocol.HEADER_DIRECTION.REQUEST
-                ,PacketProtocol.HEADER_INSTRUCTION.GET, dst,resName, resHandle);
+    public void REQUEST_GET(NetworkProfile dst, String resName, ResponseHandler resHandle){
+        networkmanager.SEND_FOR_RESPONSE(PacketDatagram.HEADER_DIRECTION.REQUEST
+                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,resName, resHandle);
     }
     
     /**
@@ -313,9 +313,9 @@ public abstract class MinT {
      * @param dst 
      * @param resHandle Response Handler
      */
-    public void DISCOVERY(Profile dst, ResponseHandler resHandle){
-        networkmanager.SEND_FOR_RESPONSE(PacketProtocol.HEADER_DIRECTION.REQUEST,
-                PacketProtocol.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle);
+    public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
+        networkmanager.SEND_FOR_RESPONSE(PacketDatagram.HEADER_DIRECTION.REQUEST,
+                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle);
     }
     
     /**

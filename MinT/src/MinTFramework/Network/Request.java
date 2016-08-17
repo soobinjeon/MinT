@@ -24,14 +24,14 @@ import MinTFramework.storage.datamap.Information;
  */
 public class Request extends Information {
     String targetRes;
-    Profile RequestNode = null;
+    NetworkProfile RequestNode = null;
     
     /**
      * 
      * @param res Resource Name or ID
      * @param _getResource 
      */
-    public Request(String res, Object _getResource, Profile tn) {
+    public Request(String res, Object _getResource, NetworkProfile tn) {
         super(_getResource);
         targetRes = res;
         RequestNode = tn;
@@ -54,7 +54,7 @@ public class Request extends Information {
      * get Target Node
      * @return 
      */
-    public Profile getRequestNode(){
+    public NetworkProfile getRequestNode(){
         return RequestNode;
     }
 }

@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.Routing.MinTSharing;
 
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.ResponseData;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.RoutingProtocol;
@@ -37,7 +37,7 @@ public class MinTRoutingProtocol extends RoutingProtocol{
         
     }
     
-    public void getDISCOVERY(Profile dts){
+    public void getDISCOVERY(NetworkProfile dts){
         frame.DISCOVERY(dts, new ResponseHandler() {
             @Override
             public void Response(ResponseData resdata) {

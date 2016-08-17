@@ -20,8 +20,8 @@ import MinTFramework.SystemScheduler.Scheduler;
 import MinTFramework.*;
 import MinTFramework.Exception.NetworkException;
 import MinTFramework.Network.Protocol.BLE.BLE;
-import MinTFramework.Network.PacketProtocol.HEADER_DIRECTION;
-import MinTFramework.Network.PacketProtocol.HEADER_INSTRUCTION;
+import MinTFramework.Network.PacketDatagram.HEADER_DIRECTION;
+import MinTFramework.Network.PacketDatagram.HEADER_INSTRUCTION;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Routing.RoutingProtocol;
@@ -51,9 +51,6 @@ public class NetworkManager {
     
     //Network Recv Adaptor Pool for Handling the Recv Data
     private Scheduler NetworkRecvAdaptPool;
-    
-    //Network Recv Listner Pool for Network Receiver
-    private Scheduler NetworkRecvListnerPool;
     
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
@@ -113,14 +110,6 @@ public class NetworkManager {
         //run Threadpool for network
         NetworkRecvAdaptPool = new Scheduler("Network Adaptor Pool",MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
         NetworkRecvAdaptPool.StartPool();
-        
-        //initializing Network Recv Adapt Pool according to number of networks
-        int ThreadsbyNumofNetwork = MinTConfig.ThreadsbyNumberofNetworks;
-        dl.printMessage("network List : "+networkList.size()+", "+ThreadsbyNumofNetwork);
-        NetworkRecvListnerPool = new Scheduler("Network Recv ListnerPool"
-                , MinTConfig.NETWORK_WAITING_QUEUE
-                , networkList.size() * ThreadsbyNumofNetwork);
-        NetworkRecvListnerPool.StartPool();
         
         //Setting on Networks
         for (NetworkType ty : networkList) {
@@ -183,8 +172,8 @@ public class NetworkManager {
      * @param dst
      * @return 
      */
-    private Profile getFinalDestination(Profile dst) {
-        Profile fdst = null;
+    private NetworkProfile getFinalDestination(NetworkProfile dst) {
+        NetworkProfile fdst = null;
         if (dst.isNameProfile()) {
             //라우팅 스토어에서 검색
             fdst = dst;
@@ -202,9 +191,9 @@ public class NetworkManager {
      * @param msg MSG
      * @param resKey 
      */
-    public void RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, Profile dst, String msg, int resKey){
-        Profile fdst = getFinalDestination(dst);
-        PacketProtocol npacket = new PacketProtocol(resKey, hd, hi, null, null, getNextNode(fdst), fdst, msg);
+    public void RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg, int resKey){
+        NetworkProfile fdst = getFinalDestination(dst);
+        PacketDatagram npacket = new PacketDatagram(resKey, hd, hi, null, null, getNextNode(fdst), fdst, msg);
         sendMsg(npacket);
     }
     
@@ -215,8 +204,8 @@ public class NetworkManager {
      * @param dst Destination profile
      * @param msg MSG
      */
-    public void SEND(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, Profile dst, String msg){
-        RESPONSE(hd,hi,dst,msg,PacketProtocol.HEADER_MSGID_INITIALIZATION);
+    public void SEND(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg){
+        RESPONSE(hd,hi,dst,msg,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
     /**
@@ -227,13 +216,13 @@ public class NetworkManager {
      * @param msg MSG
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
-    public void SEND_FOR_RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, Profile dst, String msg,
+    public void SEND_FOR_RESPONSE(HEADER_DIRECTION hd, HEADER_INSTRUCTION hi, NetworkProfile dst, String msg,
             ResponseHandler resHandle){
-        Profile fdst = getFinalDestination(dst);
-        PacketProtocol npacket = null;
+        NetworkProfile fdst = getFinalDestination(dst);
+        PacketDatagram npacket = null;
         //if this packet need to response from target Node
         if(hd.isRequest() && hi.NeedResponse()){
-            npacket = new PacketProtocol(makePacketID(),hd, hi, null, null, getNextNode(fdst), fdst, msg);
+            npacket = new PacketDatagram(makePacketID(),hd, hi, null, null, getNextNode(fdst), fdst, msg);
             ResponseList.put(npacket.getMSGID(), resHandle);
             dl.printMessage("Send MSG ID : "+npacket.getMSGID());
             sendMsg(npacket);
@@ -246,7 +235,7 @@ public class NetworkManager {
      * @param fdst
      * @return
      */
-    private Profile getNextNode(Profile fdst) {
+    private NetworkProfile getNextNode(NetworkProfile fdst) {
         //Serch Routing Protocol
         return fdst;
     }
@@ -258,7 +247,7 @@ public class NetworkManager {
      * @param dst
      * @param msg
      */
-    private void sendMsg(PacketProtocol packet) {
+    private void sendMsg(PacketDatagram packet) {
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
         Network sendNetwork = networks.get(nnodetype);
         
@@ -390,14 +379,6 @@ public class NetworkManager {
      */
     protected Scheduler getNetworkAdaptorPool(){
         return NetworkRecvAdaptPool;
-    }
-    
-    /**
-     * get Network Listener Pool
-     * @return 
-     */
-    protected Scheduler getNetworkListnerPool(){
-        return NetworkRecvListnerPool;
     }
     
     /**

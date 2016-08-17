@@ -31,7 +31,7 @@ import org.json.simple.JSONObject;
  */
 public abstract class Handler{
     protected MinT frame;
-    protected PacketProtocol recv_packet;
+    protected PacketDatagram recv_packet;
     protected ResourceStorage resStorage;
     protected NetworkManager nmanager;
     DebugLog dl = new DebugLog("Handler");
@@ -47,13 +47,13 @@ public abstract class Handler{
      * @param src
      * @param msg 
      */
-    abstract public void userHandler(PacketProtocol rev_packet);
+    abstract public void userHandler(PacketDatagram rev_packet);
     
     /**
      * call Handler
      * @param packet
      */
-    protected void callhadler(PacketProtocol packet){
+    protected void callhadler(PacketDatagram packet){
         recv_packet = packet;
     }
     
@@ -80,7 +80,7 @@ public abstract class Handler{
         }
     }
     
-    private void SystemHandleRequest(PacketProtocol rv_packet){
+    private void SystemHandleRequest(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
@@ -93,7 +93,7 @@ public abstract class Handler{
                 ret = res.getResourceString();
             else
                 ret = "";
-            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.GET
+            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
@@ -106,12 +106,12 @@ public abstract class Handler{
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             dl.printMessage("set DISCOVERY");
             String ret = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
-            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.DISCOVERY
+            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }
     }
     
-    private void SystemHandleResponse(PacketProtocol rv_packet){
+    private void SystemHandleResponse(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("Response get");
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
@@ -165,7 +165,7 @@ public abstract class Handler{
     }
     
 //    @Override
-    public synchronized void execute(PacketProtocol packet){
+    public synchronized void execute(PacketDatagram packet){
         callhadler(packet);
         SystemHandler();
         userHandler(recv_packet);

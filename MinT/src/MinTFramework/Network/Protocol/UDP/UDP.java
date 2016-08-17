@@ -22,8 +22,8 @@ import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketProtocol;
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
@@ -51,6 +51,8 @@ public class UDP extends Network {
     InetSocketAddress isa;
     DatagramChannel channel;
 
+    private final int NUMofRecv_Listener_Threads = MinTConfig.UDP_NUM_OF_LISTENER_THREADS;
+    private UDPRecvListener[] UDPListener;
     private final DebugLog log = new DebugLog("UDP.java");
 
     /**
@@ -63,20 +65,17 @@ public class UDP extends Network {
      */
     @SuppressWarnings("LeakingThisInConstructor")
     public UDP(int port, RoutingProtocol _ap, MinT frame, NetworkManager nm) {
-        super(frame,nm, new Profile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port,NetworkType.UDP),_ap);
-        
+        super(frame,nm, new NetworkProfile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port,NetworkType.UDP),_ap);
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
         }
-        
         PORT = port;
         this.portOpen();
         try {
             this.setUDPSocket();
         } catch (IOException ex) {
         }
-        
-        System.out.println("Current IP Addr? : "+this.profile.getAddress()+":"+port);
+        MakeUDPReceiveListeners();
     }
     
     /**
@@ -95,20 +94,6 @@ public class UDP extends Network {
 //            sender = new UDPSender(new DatagramSocket(PORT));
 //        } catch (SocketException ex) {
 //        }
-    }
-    
-    /**
-     * set Recv Listener
-     * @param nofListener
-     * @return 
-     */
-    @Override
-    protected Service getRecvListener(int nofListener) {
-        try {
-            return new UDPRecvListener(channel, this);
-        } catch (IOException ex) {
-            return null;
-        }
     }
     
     /**
@@ -134,7 +119,7 @@ public class UDP extends Network {
      */
 
     @Override
-    public void setDestination(Profile dst) {
+    public void setDestination(NetworkProfile dst) {
         String[] adst = dst.getAddress().split(":");
         this.dstIP = adst[0];
         this.dstPort = Integer.parseInt(adst[1]);
@@ -144,11 +129,35 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(PacketProtocol packet) {
+    protected void sendProtocol(PacketDatagram packet) {
         try {
             sender.SendMsg(packet.getPacket(), dstIP, dstPort);
         } catch (SocketException ex) {
         } catch (IOException ex) {
         }
+    }
+
+    /**
+     * Make UDP Receive Listeners
+     */
+    private void MakeUDPReceiveListeners() {
+        UDPListener = new UDPRecvListener[NUMofRecv_Listener_Threads];
+        for(int i=0;i<UDPListener.length;i++){
+            try {
+                UDPListener[i] = new UDPRecvListener(channel, this);
+                UDPListener[i].start();
+            } catch (IOException ex) {
+            }
+        }
+        System.out.println("UDP - Receive Listeners are started");
+    }
+
+    @Override
+    protected void interrupt() {
+        //Stop All Listener
+        for(int i=0;i<UDPListener.length;i++)
+            UDPListener[i].interrupt();
+        
+        //Stop All Sender
     }
 }

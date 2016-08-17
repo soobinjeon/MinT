@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  *
  * @author soobin
  */
-public class UDPRecvListener extends Service{
+public class UDPRecvListener extends Thread{
     Selector selector;
     DatagramChannel channel;
     UDP udp = null;
@@ -49,7 +49,7 @@ public class UDPRecvListener extends Service{
     }
 
     @Override
-    public void execute() {
+    public void run() {
         try{
             while(!Thread.currentThread().isInterrupted()){
 //                dl.printMessage(this.getID()+"-wait selector..");

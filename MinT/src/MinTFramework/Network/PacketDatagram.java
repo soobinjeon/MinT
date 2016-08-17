@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class PacketProtocol {
+public class PacketDatagram {
     public static final int HEADER_MSGID_INITIALIZATION = 0;
-    private TreeMap<ROUTE, Profile> routelist= new TreeMap<>();
+    private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
     private String data="";
     private byte[] packetdata = null;
     private String packetdataString = null;
@@ -62,8 +62,8 @@ public class PacketProtocol {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketProtocol(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
-            Profile src, Profile prev, Profile next, Profile dest, String msg) {
+    public PacketDatagram(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
         routelist.put(ROUTE.NEXT,next);
@@ -75,8 +75,8 @@ public class PacketProtocol {
         makePacketData(HEADER_MSGID,h_direction, h_instruction,data);
     }
     
-    public PacketProtocol(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
-            Profile src, Profile prev, Profile next, Profile dest, String msg) {
+    public PacketDatagram(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         this(HEADER_MSGID_INITIALIZATION, h_dir, h_ins, src, prev, next, dest, msg);
     }
     
@@ -84,7 +84,7 @@ public class PacketProtocol {
      * MinT Protocol -> Data
      * @param packet 
      */
-    public PacketProtocol(Profile cpr, byte[] packet){
+    public PacketDatagram(NetworkProfile cpr, byte[] packet){
         packetdata = packet;
         try {
             packetdataString = TypeCaster.unzipStringFromBytes(packet);
@@ -101,14 +101,14 @@ public class PacketProtocol {
      * @param msgdata
      * @return 
      */
-    private void makeByteData(TreeMap<ROUTE, Profile> rlist, String msgdata){
+    private void makeByteData(TreeMap<ROUTE, NetworkProfile> rlist, String msgdata){
         byte[][] route = new byte[rlist.size()][];
         byte[] msg = getStringtoByte(msgdata);
         byte[] result;
         int routesize = 0;
         int msgsize = msg.length;
         int i=0;
-        for(Profile pf : rlist.values()){
+        for(NetworkProfile pf : rlist.values()){
             if(pf != null)
                 route[i] = getStringtoByte(pf.getProfile());
             else
@@ -201,7 +201,7 @@ public class PacketProtocol {
      * @return 
      */
     private String getProtocolbyROUTE(ROUTE route){
-        Profile pf = this.routelist.get(route);
+        NetworkProfile pf = this.routelist.get(route);
         if(pf != null)
             return getProtocolData(pf.getProfile());
         else return getProtocolData("");
@@ -234,7 +234,7 @@ public class PacketProtocol {
      * Make Data from byte Packet(MinT Protocol)
      * @param packet 
      */
-    private void makeData(Profile cpr, String spacket) {
+    private void makeData(NetworkProfile cpr, String spacket) {
         spacket = spacket.trim();
         spacket = spacket.split(this.Scheme)[1];
         spacket = spacket.substring(1,spacket.length()-1);
@@ -247,37 +247,37 @@ public class PacketProtocol {
 //        }
         
         if(split.length == Numberoftotalpacket){
-            routelist.put(ROUTE.SOURCE, new Profile(split[1]));
-            routelist.put(ROUTE.PREV, new Profile(split[2]));
+            routelist.put(ROUTE.SOURCE, new NetworkProfile(split[1]));
+            routelist.put(ROUTE.PREV, new NetworkProfile(split[2]));
             routelist.put(ROUTE.NEXT, cpr);
-            routelist.put(ROUTE.DESTINATION, new Profile(split[3]));
+            routelist.put(ROUTE.DESTINATION, new NetworkProfile(split[3]));
             data = split[4];
             makeStringtoHeader(split[0]);
         }
     }
     
-    public Profile getSource(){
+    public NetworkProfile getSource(){
         return routelist.get(ROUTE.SOURCE);
     }
     
-    public Profile getPreviosNode(){
+    public NetworkProfile getPreviosNode(){
         return routelist.get(ROUTE.PREV);
     }
     
-    public Profile getNextNode(){
+    public NetworkProfile getNextNode(){
         return routelist.get(ROUTE.NEXT);
     }
     
-    public Profile getDestinationNode(){
+    public NetworkProfile getDestinationNode(){
         return routelist.get(ROUTE.DESTINATION);
     }
     
-    public void setSource(Profile src){
+    public void setSource(NetworkProfile src){
         routelist.put(ROUTE.SOURCE, src);
         makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
     }
     
-    public void setPrevNode(Profile prev){
+    public void setPrevNode(NetworkProfile prev){
         routelist.put(ROUTE.PREV, prev);
         makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
     }
@@ -298,10 +298,10 @@ public class PacketProtocol {
         return HEADER_MSGID;
     }
     
-    public PacketProtocol getclone(){
+    public PacketDatagram getclone(){
         byte[] nbyte = new byte[packetdata.length];
         System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
-        return new PacketProtocol(routelist.get(ROUTE.NEXT), nbyte);
+        return new PacketDatagram(routelist.get(ROUTE.NEXT), nbyte);
     }
     
     public static enum HEADER_DIRECTION {

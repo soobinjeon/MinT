@@ -40,7 +40,7 @@ public class SystemHandler{
         nmanager = frame.getNetworkManager();
     }
     
-    public void startHandle(PacketProtocol recv_pk){
+    public void startHandle(PacketDatagram recv_pk){
         SystemHandler(recv_pk);
     }
     
@@ -52,7 +52,7 @@ public class SystemHandler{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(PacketProtocol recv_packet){
+    private void SystemHandler(PacketDatagram recv_packet){
         /**
          * get, post using resource storage
          */
@@ -67,7 +67,7 @@ public class SystemHandler{
         }
     }
     
-    private void SystemHandleRequest(PacketProtocol rv_packet){
+    private void SystemHandleRequest(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
@@ -80,7 +80,7 @@ public class SystemHandler{
                 ret = res.getResourceString();
             else
                 ret = "";
-            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.GET
+            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
@@ -93,12 +93,12 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             dl.printMessage("set DISCOVERY");
             String ret = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
-            nmanager.RESPONSE(PacketProtocol.HEADER_DIRECTION.RESPONSE, PacketProtocol.HEADER_INSTRUCTION.DISCOVERY
+            nmanager.RESPONSE(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID());
         }
     }
     
-    private void SystemHandleResponse(PacketProtocol rv_packet){
+    private void SystemHandleResponse(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
             dl.printMessage("Response get");
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());

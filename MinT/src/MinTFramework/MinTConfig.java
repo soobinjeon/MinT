@@ -27,7 +27,9 @@ public class MinTConfig {
     
     static public final int NETWORK_WAITING_QUEUE = 100000;
     static public final int NETWORK_THREADPOOL_NUM = 10;
-    static public final int ThreadsbyNumberofNetworks = 1;
+    
+    //UDP
+    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;

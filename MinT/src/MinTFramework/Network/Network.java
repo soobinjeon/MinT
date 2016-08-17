@@ -34,13 +34,12 @@ import java.util.logging.Logger;
 public abstract class Network {
     protected MinT frame;
     protected NetworkManager networkmanager;
-    protected Profile profile;
+    protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
     
     //Network Pools
     private Scheduler networkAdaptorPool;
-    private Scheduler networkListenerPool;
     
     private boolean isworking = true;
     
@@ -49,31 +48,25 @@ public abstract class Network {
      * set destination of packet
      * @param dst 
      */
-    abstract protected void setDestination(Profile dst);
+    abstract protected void setDestination(NetworkProfile dst);
     /***
      * send packet
      * @param packet 
      */
-    abstract protected void sendProtocol(PacketProtocol packet);
+    abstract protected void sendProtocol(PacketDatagram packet);
 
-    /**
-     * return to new RecvListener()
-     * @return new Service();
-     */
-    abstract protected Service getRecvListener(int nofListener);
-    
+    abstract protected void interrupt();
     /**
      * *
      * Constructor
      *
      * @param frame MinT Framework Object
      */
-    public Network(MinT frame, NetworkManager nm, Profile npro, RoutingProtocol _routing) {
+    public Network(MinT frame, NetworkManager nm, NetworkProfile npro, RoutingProtocol _routing) {
         this.frame = frame;
         this.networkmanager = nm;
         
         networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
-        networkListenerPool = networkmanager.getNetworkListnerPool();
         byteBufferPool = networkmanager.getByteBufferPool();
         
         routing = _routing;
@@ -88,9 +81,6 @@ public abstract class Network {
      */
     public void TurnOnNetwork(){
         ndl.printMessage(this.getClass().getName()+" - started");
-        
-        //Set Network Listner
-        setNetworkListner();
     }
     /***
      * 
@@ -105,22 +95,11 @@ public abstract class Network {
     }
     
     /**
-     * set Network Listener according to number of Listener Pool
-     */
-    private void setNetworkListner() {
-        ndl.printMessage("Set Network Lisntener");
-        for(int i=0;i<networkListenerPool.getNumberofThreads();i++){
-            networkListenerPool.putService(getRecvListener(i));
-            ndl.printMessage("added - "+i);
-        }
-    }
-    
-    /**
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void putReceiveHandler(byte[] packet){
-        this.networkAdaptorPool.putService(new NetworkRecvAdaptor(packet, this));
+    public synchronized void putReceiveHandler(byte[] packet){
+        this.networkAdaptorPool.putService(new NetworkRecvAdaptor_OLD(packet, this));
     }
 
     /**
@@ -130,7 +109,7 @@ public abstract class Network {
      * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public synchronized void send(PacketProtocol packet) throws NetworkException{
+    public synchronized void send(PacketDatagram packet) throws NetworkException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
@@ -147,7 +126,7 @@ public abstract class Network {
         return isworking;
     }
     
-    public Profile getProfile(){
+    public NetworkProfile getProfile(){
         return profile;
     }
     

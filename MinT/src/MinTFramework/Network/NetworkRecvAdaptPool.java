@@ -23,14 +23,15 @@ import MinTFramework.ThreadsPool.ResourcePool;
  *
  * @author soobin
  */
-public class NetworkRecvAdaptor extends PoolWorkerThread<byte[]>{
+public class NetworkRecvAdaptPool extends ResourcePool{
 
-    public NetworkRecvAdaptor(String name, int ID, ResourcePool pool) {
-        super(name, ID, pool);
+    public NetworkRecvAdaptPool(String name, int ObjectQueueLength, int numOfThread) {
+        super(name, ObjectQueueLength, numOfThread);
     }
 
     @Override
-    protected void HandleResoure(byte[] resource) {
-        
+    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
 }

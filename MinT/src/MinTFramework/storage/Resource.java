@@ -18,7 +18,7 @@ package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
-import MinTFramework.Network.Profile;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import org.json.simple.JSONObject;
@@ -179,11 +179,11 @@ public abstract class Resource{
      * get Resource Profile
      * @return 
      */
-    public Profile getSourceProfile(){
+    public NetworkProfile getSourceProfile(){
         return this.sourcelocation.getSrouceProfile();
     }
     
-    boolean isSameLocation(Profile destination) {
+    boolean isSameLocation(NetworkProfile destination) {
         dl.printMessage("src :"+sourcelocation.getSource()+", des : "+destination.getAddress());
         return this.sourcelocation.getSource().equals(destination.getAddress());
     }
@@ -223,7 +223,7 @@ public abstract class Resource{
             this.auth = Authority.valueOf((String)jtor.get(JSONKEY.AUTH.toString()));
             this.dtype = DeviceType.valueOf((String)jtor.get(JSONKEY.DEVICETYPE.toString()));
             
-            sourcelocation = new StorageDirectory(new Profile((String)jtor.get(JSONKEY.SOURCELOC.toString())), 
+            sourcelocation = new StorageDirectory(new NetworkProfile((String)jtor.get(JSONKEY.SOURCELOC.toString())), 
                     (String)jtor.get(JSONKEY.GROUP.toString()), name);
         }catch(Exception e){
             
