@@ -25,6 +25,7 @@ public class NetworkProfile {
     private String id;
     private String name="";
     private String address="";
+    private String ipaddr="";
     private int Port = 0;
     private NetworkType ntype;
     private String Split = "|";
@@ -40,7 +41,7 @@ public class NetworkProfile {
         this.address = address;
         this.ntype = ntype;
         makeID();
-        setPort();
+        setIPMode();
     }
     
     public NetworkProfile(String bytearray){
@@ -56,7 +57,7 @@ public class NetworkProfile {
             ntype = NetworkType.getNetworkType(Integer.parseInt(temp[2]));
         }
         
-        setPort();
+        setIPMode();
     }
     
     public String getName(){
@@ -78,14 +79,18 @@ public class NetworkProfile {
     public int getPort(){
         return Port;
     }
+    public String getIPAddr(){
+        return this.ipaddr;
+    }
     
     public NetworkType getNetworkType(){
         return ntype;
     }
     
     public void setAddress(String add){
-        address = add;
+        address = add+":"+Port;
         makeID();
+        setIPMode();
     }
     
     public void setName(String name){
@@ -129,12 +134,13 @@ public class NetworkProfile {
 //            id = name+address;
     }
     
-    private void setPort(){
+    private void setIPMode(){
         if(ntype == NetworkType.TCPIP 
                 || ntype == NetworkType.UDP 
                 || ntype == NetworkType.COAP){
             String[] p = this.address.split(":");
             if(p.length > 1 && p[1] != null){
+                this.ipaddr = p[0];
                 this.Port = Integer.parseInt(p[1]);
             }
         }

@@ -16,25 +16,18 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
-import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
-import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -45,8 +38,6 @@ public class UDP extends Network {
     UDPSender sender;
     final int PORT;
     String cmd;
-    String dstIP;
-    int dstPort;
     
     InetSocketAddress isa;
     DatagramChannel channel;
@@ -66,8 +57,10 @@ public class UDP extends Network {
     @SuppressWarnings("LeakingThisInConstructor")
     public UDP(String nodeName, int port) {
         super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+port,NetworkType.UDP));
+        log.printMessage(profile.getProfile());
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
+            log.printMessage(profile.getProfile());
         }
         PORT = port;
         this.portOpen();
@@ -112,18 +105,6 @@ public class UDP extends Network {
         }
     }
 
-    /**
-     * Setting Destination
-     *
-     * @param dst destination for msg {ip}:{port}/ example "192.168.7.2:55"
-     */
-
-    @Override
-    public void setDestination(NetworkProfile dst) {
-        String[] adst = dst.getAddress().split(":");
-        this.dstIP = adst[0];
-        this.dstPort = Integer.parseInt(adst[1]);
-    }
     /***
      * Sending Message
      * @param packet 
@@ -131,7 +112,8 @@ public class UDP extends Network {
     @Override
     protected void sendProtocol(PacketDatagram packet) {
         try {
-            sender.SendMsg(packet.getPacket(), dstIP, dstPort);
+            NetworkProfile dst = packet.getNextNode();
+            sender.SendMsg(packet.getPacket(), dst.getIPAddr(), dst.getPort());
         } catch (SocketException ex) {
         } catch (IOException ex) {
         }

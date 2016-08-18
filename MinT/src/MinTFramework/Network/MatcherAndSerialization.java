@@ -69,6 +69,7 @@ public class MatcherAndSerialization implements NetworkLayers{
             try {
                 dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
                 dl.printMessage("Packet :" + packet.getPacketString());
+                dl.printMessage("Packet Length : "+packet.getPacket().length);
                 sendNetwork.send(packet);
 //                networkManager.setSendHandlerCnt();
             } catch (Exception ex) {

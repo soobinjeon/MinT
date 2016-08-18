@@ -17,14 +17,10 @@
 package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.MinT;
-import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.Network;
-import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.SystemScheduler.Service;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +38,6 @@ public class BLE extends Network {
     MessageReceiveImpl msgimpl;
     Thread receiverThread;
     String cmd;
-    String dst;
     DeviceBLE deviceBLE = null;
     DebugLog dl = new DebugLog("BLE Network");
     
@@ -96,10 +91,8 @@ public class BLE extends Network {
      * @param _dst
      * @param dst destination for msg {MAC} / example ":78A5043F7EC6"
      */
-
-    @Override
-    public void setDestination(NetworkProfile _dst) {
-        this.dst = _dst.getAddress();
+    public String setDestination(NetworkProfile _dst) {
+        String dst = _dst.getAddress();
         deviceBLE.setRole(1);
         //지연 필수******************짧을 시 통신불가, 1초보다 짧을 시 되었다 안되었다함
         try {
@@ -120,8 +113,9 @@ public class BLE extends Network {
             //deviceBLE.writeUART("AT");
             //return false;
         }
-        
+        return dst;
     }
+    
     /***
      * Sending Message
      * @param packet 
@@ -129,6 +123,7 @@ public class BLE extends Network {
     @Override
     protected void sendProtocol(PacketDatagram packet) {
         //System.out.println(packet);
+        String dst = setDestination(packet.getNextNode());
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 

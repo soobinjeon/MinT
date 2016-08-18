@@ -87,7 +87,7 @@ public class Transportation implements NetworkLayers{
         else if(sendmsg.isRequestGET()){
             if(sendmsg.getSendHit() == 0){
                 sendmsg.setResKey(networkManager.getIDMaker().makePacketID());
-                networkManager.getResponseList().put(sendmsg.getResponseKey(), sendmsg);
+                networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
             }
             
             npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()

@@ -39,11 +39,7 @@ public abstract class Network {
     private boolean isworking = true;
     
     private DebugLog ndl = new DebugLog("Network");
-    /***
-     * set destination of packet
-     * @param dst 
-     */
-    abstract protected void setDestination(NetworkProfile dst);
+
     /***
      * send packet
      * @param packet 
@@ -106,11 +102,10 @@ public abstract class Network {
      * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public synchronized void send(PacketDatagram packet) throws NetworkException{
+    public void send(PacketDatagram packet) throws NetworkException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
-            this.setDestination(packet.getNextNode());
             this.sendProtocol(packet);
         }
     }

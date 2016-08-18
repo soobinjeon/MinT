@@ -74,7 +74,7 @@ public class NetworkManager {
         this.frame = MinT.getInstance();
         resourceStorage = frame.getResStorage();
         setNodeName();
-        
+        dl.printMessage("set ByteBuffer");
         makeBytebuffer();
         
         routing = new MinTRoutingProtocol();
@@ -324,9 +324,9 @@ public class NetworkManager {
             if (!existFile(fileName)) {
                 bfile.createNewFile();
             }
+            bfile.deleteOnExit();
 
-
-            bytepool = new ByteBufferPool(1024, 1024 * 1024 * 3, bfile);
+            bytepool = new ByteBufferPool(20*1024, 40 * 2048, bfile);
         } catch (IOException ex) {
         }
     }
@@ -339,5 +339,14 @@ public class NetworkManager {
         } else {
             return false;
         }
+    }
+
+    public void putResponse(long responseKey, SendMSG sendmsg) {
+        ResponseList.put(responseKey, sendmsg);
+//        System.out.println("size : "+ResponseList.size());
+    }
+    
+    public int getResponseSize(){
+        return ResponseList.size();
     }
 }

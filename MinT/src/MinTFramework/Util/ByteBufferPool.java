@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class ByteBufferPool {
 
     private static final int MEMORY_BLOCKSIZE = 1024;
-    private static final int FILE_BLOCKSIZE = 10240;
+    private static final int FILE_BLOCKSIZE = 2048;
 
     private final ArrayList memoryQueue = new ArrayList();
     private final ArrayList fileQueue = new ArrayList();

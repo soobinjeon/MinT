@@ -5,20 +5,16 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.SystemScheduler.Service;
+import MinTFramework.Network.NetworkManager;
+import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
-import MinTFramework.Util.TypeCaster;
-import java.io.File;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.StandardSocketOptions;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -28,21 +24,12 @@ public class UDPRecvListener extends Thread{
     Selector selector;
     DatagramChannel channel;
     UDP udp = null;
+    NetworkManager networkmanager = null;
     DebugLog dl = new DebugLog("UDPRecvAdaptor");
-    
-    public UDPRecvListener(InetSocketAddress isa, UDP udp) throws IOException{
-        dl.printMessage("Set UDP Recv! - " + isa.toString() + ", port : "+isa.getPort());
-        this.udp = udp;
-        selector = Selector.open();
-        channel = DatagramChannel.open();
-        channel.socket().bind(isa);
-        channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, 1024*1024*10);
-        channel.register(selector, SelectionKey.OP_READ);
-    }
     
     public UDPRecvListener(DatagramChannel channel, UDP udp) throws IOException{
         this.udp = udp;
+        networkmanager = udp.getNetworkManager();
         selector = Selector.open();
         this.channel = channel;
         channel.register(selector, SelectionKey.OP_READ);
@@ -66,29 +53,42 @@ public class UDPRecvListener extends Thread{
 //        dl.printMessage("in the RequestPending..");
         Iterator selectedKeys = selector.selectedKeys().iterator();
         while(selectedKeys.hasNext()){
-            try {
                 SelectionKey key = (SelectionKey) selectedKeys.next();
                 selectedKeys.remove();
                 if(!key.isValid())
                     continue;
                 if(key.isReadable())
                     read(key);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
     }
     
-    private void read(SelectionKey key) throws IOException{
+    private void read(SelectionKey key){
 //        dl.printMessage("in the read");
-        ByteBuffer req = ByteBuffer.allocate(512);
-//        ByteBuffer req = bytepool.getMemoryBuffer();
-        DatagramChannel chan = (DatagramChannel)key.channel();
-        chan.receive(req);
-        req.flip();
-//        udp.getNetworkManager().setHandlerCount();
-        udp.putReceiveHandler(req.array());
-//        String str = TypeCaster.unzipStringFromBytes(req.array());
-//        System.out.println(this.getID()+" = "+str);
+        ByteBufferPool bbp = networkmanager.getByteBufferPool();
+        ByteBuffer req = null;
+        byte[] fwdbyte = null;
+        SocketAddress rd = null;
+        try{
+            req = bbp.getMemoryBuffer();
+            DatagramChannel chan = (DatagramChannel)key.channel();
+            //read
+            rd = chan.receive(req);
+            dl.printMessage("readed limit : "+req.limit()+" byte Readed");
+            //sort pointer
+            req.flip();
+            
+            //make received byte
+            fwdbyte = new byte[req.limit()];
+            req.get(fwdbyte, 0, req.limit());
+            dl.printMessage("req bytebuffer : "+req.limit()+" byte Readed");
+            dl.printMessage("fwd byte : "+fwdbyte.length+" byte Readed");
+            
+            //send byte to handler
+            udp.putReceiveHandler(fwdbyte);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally{
+            bbp.putBuffer(req);
+        }
     }
 }

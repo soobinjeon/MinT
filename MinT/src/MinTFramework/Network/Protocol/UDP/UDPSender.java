@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.Protocol.UDP;
+import MinTFramework.MinT;
+import MinTFramework.Network.NetworkManager;
+import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.*;
@@ -22,10 +25,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UDPSender {
+    MinT frame = MinT.getInstance();
+    NetworkManager nmanager;
     Selector selector;
     DatagramChannel channel;
     DebugLog dl = new DebugLog("UDPSender");
@@ -34,17 +37,23 @@ public class UDPSender {
         selector = Selector.open();
         this.channel = channel;
         channel.register(selector, SelectionKey.OP_WRITE);
+        nmanager = frame.getNetworkManager();
     }
 
     public void SendMsg(byte[] _msg, String dstIP, int _dstPort) throws UnknownHostException, IOException{
-        ByteBuffer out = ByteBuffer.allocate(512);
-        out.clear();
-        out.put(_msg);
-        out.flip();
-        InetAddress address = InetAddress.getByName(dstIP);
-        SocketAddress add = new InetSocketAddress(address, _dstPort);
-        channel.send(out, add);
-//        dl.printMessage("msg : "+msg);
-//        dl.printMessage("address : "+dstIP+", dstPort:"+_dstPort); 
+        ByteBufferPool bbp = nmanager.getByteBufferPool();
+        ByteBuffer out = null;
+        try{        
+            out = bbp.getMemoryBuffer();
+            out.put(_msg);
+            out.flip();
+            InetAddress address = InetAddress.getByName(dstIP);
+            SocketAddress add = new InetSocketAddress(address, _dstPort);
+            channel.send(out, add);
+    //        dl.printMessage("msg : "+msg);
+    //        dl.printMessage("address : "+dstIP+", dstPort:"+_dstPort); 
+        }finally{
+            bbp.putBuffer(out);
+        }
     }
 }
