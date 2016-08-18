@@ -28,7 +28,7 @@ public class SendAdaptor extends PoolWorkerThread<SendMSG>{
     private Transportation sender;
     public SendAdaptor(String name, int ID, ResourcePool pool) {
         super(name, ID, pool);
-        sender = new Transportation(NetworkManager.LAYER_DIRECTION.SEND);
+        sender = new Transportation(NetworkLayers.LAYER_DIRECTION.SEND);
     }
 
     @Override

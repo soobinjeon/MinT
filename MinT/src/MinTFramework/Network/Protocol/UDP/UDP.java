@@ -64,8 +64,8 @@ public class UDP extends Network {
      * @param nm Network Manager
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    public UDP(int port, RoutingProtocol _ap, MinT frame, NetworkManager nm) {
-        super(frame,nm, new NetworkProfile(frame.getNodeName(),OSUtil.getIPAddress()+":"+port,NetworkType.UDP),_ap);
+    public UDP(String nodeName, int port) {
+        super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+port,NetworkType.UDP));
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
         }

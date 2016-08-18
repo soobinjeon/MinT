@@ -32,9 +32,9 @@ public class ResourceManager {
      * @param _frame
      * @param rs 
      */
-    public ResourceManager(MinT _frame, ResourceStorage rs){
-        RS = rs;
-        frame = _frame;
+    public ResourceManager(){
+        frame = MinT.getInstance();
+        RS = frame.getResStorage();
     }
 
     protected void initHandler(ResourceManagerHandle handle) {

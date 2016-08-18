@@ -36,8 +36,8 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @param _frame MinT frame
      * @param rs Resource Storage
      */
-    public PropertyManager(MinT _frame, ResourceStorage rs){
-        super(_frame,rs);
+    public PropertyManager(){
+        super();
         initHandler(this);
     }
     

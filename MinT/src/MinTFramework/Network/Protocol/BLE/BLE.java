@@ -53,8 +53,8 @@ public class BLE extends Network {
      * @param frame 
      * @param nm 
      */
-    public BLE(RoutingProtocol _ap, MinT frame, NetworkManager nm){
-        super(frame,nm,new NetworkProfile(frame.getNodeName(),null,NetworkType.BLE),_ap);
+    public BLE(String NodeName){
+        super(new NetworkProfile(NodeName,null,NetworkType.BLE));
         if(!setBLEDevice()){
             String str = "BLE devices are not detected in the MinT: Please check it out";
             System.err.println(str);

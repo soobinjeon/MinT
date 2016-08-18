@@ -22,6 +22,9 @@ package MinTFramework.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public interface NetworkLayers {
+    public static enum LAYER_DIRECTION {
+        RECEIVE, SEND;
+    }
     /**
      * Just Implement to EndPoint Layer
      * @param packet 

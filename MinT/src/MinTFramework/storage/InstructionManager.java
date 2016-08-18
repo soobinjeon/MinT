@@ -25,8 +25,8 @@ import MinTFramework.Network.Request;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class InstructionManager extends ResourceManager implements ResourceManagerHandle{
-    public InstructionManager(MinT _frame, ResourceStorage rs){
-        super(_frame,rs);
+    public InstructionManager(){
+        super();
         initHandler(this);
     }
     

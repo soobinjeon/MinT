@@ -28,7 +28,7 @@ public class ReceiveAdaptor extends PoolWorkerThread<byte[]>{
     
     public ReceiveAdaptor(String name, int ID, ResourcePool pool) {
         super(name, ID, pool);
-        matcher = new MatcherAndSerialization(NetworkManager.LAYER_DIRECTION.RECEIVE);
+        matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
     }
 
     @Override

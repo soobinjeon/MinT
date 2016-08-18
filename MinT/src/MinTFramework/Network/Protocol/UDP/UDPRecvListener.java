@@ -86,6 +86,7 @@ public class UDPRecvListener extends Thread{
         DatagramChannel chan = (DatagramChannel)key.channel();
         chan.receive(req);
         req.flip();
+//        udp.getNetworkManager().setHandlerCount();
         udp.putReceiveHandler(req.array());
 //        String str = TypeCaster.unzipStringFromBytes(req.array());
 //        System.out.println(this.getID()+" = "+str);

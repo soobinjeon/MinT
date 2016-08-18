@@ -57,7 +57,9 @@ public class NetworkManager {
     private final ConcurrentHashMap<Long,SendMSG> ResponseList = new ConcurrentHashMap<>();
     private PacketIDManager idmaker;
     
+    //Temporary properties for check
     private int tempHandlerCnt = 0;
+    private int sendHandlerCnt = 0;
     private final DebugLog dl;
     
     /**
@@ -65,12 +67,12 @@ public class NetworkManager {
      *
      * @param frame
      */
-    public NetworkManager(MinT frame, ResourceStorage resStorage) {
+    public NetworkManager() {
         this.dl = new DebugLog("NetworkManager",true);
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
-        this.frame = frame;
-        resourceStorage = resStorage;
+        this.frame = MinT.getInstance();
+        resourceStorage = frame.getResStorage();
         setNodeName();
         
         makeBytebuffer();
@@ -86,6 +88,9 @@ public class NetworkManager {
                 MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
     }
     
+    /**
+     * Init Routing Algorithm
+     */
     private void initRoutingSetup(){
         dl.printMessage("routing init");
         if(resourceStorage == null)
@@ -134,12 +139,12 @@ public class NetworkManager {
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
             dl.printMessage("Starting UDP... "+ntype.getPort());
-            networks.put(ntype, new UDP(ntype.getPort(),routing,this.frame,this));
+            networks.put(ntype, new UDP(frame.getNodeName(),ntype.getPort()));
             dl.printMessage("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
             dl.printMessage("Starting BLE...");
-            networks.put(ntype, new BLE(routing, frame, this));
+            networks.put(ntype, new BLE(frame.getNodeName()));
             dl.printMessage("Turned on BLE");
         } else if (ntype == NetworkType.COAP) { // for CoAP, need to add
             dl.printMessage("Turned on COAP");
@@ -166,16 +171,17 @@ public class NetworkManager {
     }
     
     /**
-     * for Test/
-     * @deprecated 
+     * get Routing Protocol
      * @return 
      */
     public RoutingProtocol getRoutingProtocol(){
         return routing;
     }
-
-
     
+    /**
+     * Network Send Method
+     * @param smsg 
+     */
     public void SEND(SendMSG smsg){
         NetworkSendPool.putResource(smsg);
     }
@@ -247,6 +253,13 @@ public class NetworkManager {
     public int getHandlerCount(){
         return tempHandlerCnt;
     }
+    public synchronized void setSendHandlerCnt(){
+        this.sendHandlerCnt++;
+    }
+    public int getSendHandlercnt(){
+        return sendHandlerCnt;
+    }
+    
     /**
      * get Response Msg List
      * @return 
@@ -266,6 +279,10 @@ public class NetworkManager {
         return NetworkRecvAdaptPool;
     }
     
+    /**
+     * get Adapted Networks
+     * @return 
+     */
     protected ConcurrentHashMap<NetworkType,Network> getNetworks(){
         return this.networks;
     }
@@ -276,6 +293,14 @@ public class NetworkManager {
      */
     public int getNetworkAdaptorQueueWaitingLength(){
         return NetworkRecvAdaptPool.getQueueWaitingLength();
+    }
+    
+    /**
+     * get Sender Waiting Queue
+     * @return 
+     */
+    public int getNetworkSenderQueueWaitingLength(){
+        return NetworkSendPool.getQueueWaitingLength();
     }
     
     
@@ -314,9 +339,5 @@ public class NetworkManager {
         } else {
             return false;
         }
-    }
-    
-    public static enum LAYER_DIRECTION {
-        RECEIVE, SEND;
     }
 }

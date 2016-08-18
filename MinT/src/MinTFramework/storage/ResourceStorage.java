@@ -53,10 +53,10 @@ public class ResourceStorage {
     
     private MinT frame = null;
     private DebugLog dl = new DebugLog("ResourceStorage");
-    public ResourceStorage(MinT frame){
+    public ResourceStorage(){
         this.instruction = new Repository<>();
         this.property = new Repository<>();
-        this.frame = frame;
+        this.frame = MinT.getInstance();
     }
     
     public void setPropertyHandler(ResourceManagerHandle pmhandle) {

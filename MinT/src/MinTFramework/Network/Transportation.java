@@ -31,14 +31,14 @@ public class Transportation implements NetworkLayers{
     private MatcherAndSerialization serialization = null;
     DebugLog dl = new DebugLog("Transportation");
     
-    public Transportation(NetworkManager.LAYER_DIRECTION layerDirection){
+    public Transportation(NetworkLayers.LAYER_DIRECTION layerDirection){
         frame = MinT.getInstance();
         this.networkManager = frame.getNetworkManager();        
         
-        if(layerDirection == NetworkManager.LAYER_DIRECTION.RECEIVE)
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE)
             syshandle = new SystemHandler();
         
-        if(layerDirection == NetworkManager.LAYER_DIRECTION.SEND)
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND)
             serialization = new MatcherAndSerialization(layerDirection);
     }
 
@@ -46,7 +46,7 @@ public class Transportation implements NetworkLayers{
     public void Receive(PacketDatagram packet) {
         if(isFinalDestination(packet.getDestinationNode())){
             syshandle.startHandle(packet);
-            networkManager.setHandlerCount();
+//            networkManager.setHandlerCount();
         }
         else{
             stopOver(packet);

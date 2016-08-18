@@ -57,13 +57,13 @@ public abstract class Network {
      *
      * @param frame MinT Framework Object
      */
-    public Network(MinT frame, NetworkManager nm, NetworkProfile npro, RoutingProtocol _routing) {
-        this.frame = frame;
-        this.networkmanager = nm;
+    public Network(NetworkProfile npro) {
+        this.frame = MinT.getInstance();
+        this.networkmanager = frame.getNetworkManager();
         networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
         byteBufferPool = networkmanager.getByteBufferPool();
         
-        routing = _routing;
+        routing = networkmanager.getRoutingProtocol();
         profile = npro;
         
         ndl.printMessage("Set Network listener");
@@ -92,7 +92,7 @@ public abstract class Network {
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public synchronized void putReceiveHandler(byte[] packet){
+    public void putReceiveHandler(byte[] packet){
         if(networkAdaptorPool == null){
             ndl.printMessage("Adaptor Null");
         }

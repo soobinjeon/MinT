@@ -64,13 +64,13 @@ public abstract class MinT {
      * @param numOfThread number of workerthread in framework
      */
     public MinT(int serviceQueueLength, int numOfThread) {
+        MinTFrame = this;
         scheduler = new Scheduler("Serivce",serviceQueueLength, numOfThread);
         devicemanager = new DeviceManager();
-        resourceStorage = new ResourceStorage(this);
-        PM = new PropertyManager(this,resourceStorage);
-        IM = new InstructionManager(this, resourceStorage);
-        NTWmanager = new NetworkManager(this, resourceStorage);
-        MinTFrame = this;
+        resourceStorage = new ResourceStorage();
+        PM = new PropertyManager();
+        IM = new InstructionManager();
+        NTWmanager = new NetworkManager();
     }
     
     /**

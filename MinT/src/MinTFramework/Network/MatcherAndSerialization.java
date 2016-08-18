@@ -30,11 +30,11 @@ public class MatcherAndSerialization implements NetworkLayers{
     private NetworkManager networkManager;
     private DebugLog dl = new DebugLog("MatcherAndSerialization");
     
-    public MatcherAndSerialization(NetworkManager.LAYER_DIRECTION layerDirection){
+    public MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION layerDirection){
         frame = MinT.getInstance();
         networkManager = frame.getNetworkManager();
         
-        if(layerDirection == NetworkManager.LAYER_DIRECTION.RECEIVE)
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE)
             transportation = new Transportation(layerDirection);
     }
 
@@ -70,6 +70,7 @@ public class MatcherAndSerialization implements NetworkLayers{
                 dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
                 dl.printMessage("Packet :" + packet.getPacketString());
                 sendNetwork.send(packet);
+//                networkManager.setSendHandlerCnt();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
