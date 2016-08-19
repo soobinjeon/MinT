@@ -81,7 +81,7 @@ public class UDP extends Network {
         channel.configureBlocking(false);
         channel.setOption(StandardSocketOptions.SO_RCVBUF, 1024*1024*10);
         
-        sender = new UDPSender(channel);
+        sender = new UDPSender(channel, this);
 //        try {
 //            
 //            sender = new UDPSender(new DatagramSocket(PORT));

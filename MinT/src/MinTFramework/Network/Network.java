@@ -19,6 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 /**
@@ -32,7 +33,7 @@ public abstract class Network {
     protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
-    
+    public PacketPerform pperform;
     //Network Pools
     private ReceiveAdaptPool networkAdaptorPool;
     
@@ -63,6 +64,7 @@ public abstract class Network {
         profile = npro;
         
         ndl.printMessage("Set Network listener");
+        pperform = new PacketPerform();
     }
     
     /**

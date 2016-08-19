@@ -29,18 +29,23 @@ import java.nio.channels.Selector;
 public class UDPSender {
     MinT frame = MinT.getInstance();
     NetworkManager nmanager;
+    UDP udp;
     Selector selector;
     DatagramChannel channel;
     DebugLog dl = new DebugLog("UDPSender");
     
-    public UDPSender(DatagramChannel channel) throws IOException{
+    public UDPSender(DatagramChannel channel, UDP udp) throws IOException{
         selector = Selector.open();
         this.channel = channel;
         channel.register(selector, SelectionKey.OP_WRITE);
         nmanager = frame.getNetworkManager();
+        this.udp = udp;
     }
 
     public void SendMsg(byte[] _msg, String dstIP, int _dstPort) throws UnknownHostException, IOException{
+        long stime = System.currentTimeMillis();
+        long etime = 0;
+        int bsize = 0;
         ByteBufferPool bbp = nmanager.getByteBufferPool();
         ByteBuffer out = null;
         try{        
@@ -49,11 +54,13 @@ public class UDPSender {
             out.flip();
             InetAddress address = InetAddress.getByName(dstIP);
             SocketAddress add = new InetSocketAddress(address, _dstPort);
-            channel.send(out, add);
+            bsize = channel.send(out, add);
     //        dl.printMessage("msg : "+msg);
     //        dl.printMessage("address : "+dstIP+", dstPort:"+_dstPort); 
         }finally{
             bbp.putBuffer(out);
+            etime = System.currentTimeMillis();
+            udp.pperform.setPacketInfo(bsize, etime-stime);
         }
     }
 }

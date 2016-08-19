@@ -85,7 +85,7 @@ public class NetworkManager {
                 MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
         
         NetworkSendPool = new SendAdaptPool("Send Adaptor Pool", 
-                MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
+                MinTConfig.NETWORK_WAITING_QUEUE, 1);
     }
     
     /**
@@ -285,6 +285,10 @@ public class NetworkManager {
      */
     protected ConcurrentHashMap<NetworkType,Network> getNetworks(){
         return this.networks;
+    }
+    
+    public Network getNetwork(NetworkType ntype){
+        return networks.get(ntype);
     }
     
     /**
