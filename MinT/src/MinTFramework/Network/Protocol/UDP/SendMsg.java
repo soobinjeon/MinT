@@ -46,7 +46,7 @@ public class SendMsg implements Runnable {
     public void run() {
         try {
             socket.send(outPacket);
-            dl.printMessage("Send Success");
+//            dl.printMessage("Send Success");
         } catch (IOException ex) {
         }
     }

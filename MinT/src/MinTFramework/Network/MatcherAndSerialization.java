@@ -17,6 +17,8 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
+import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -29,6 +31,7 @@ public class MatcherAndSerialization implements NetworkLayers{
     private MinT frame;
     private NetworkManager networkManager;
     private DebugLog dl = new DebugLog("MatcherAndSerialization");
+    private Performance bench_send = null;
     
     public MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION layerDirection){
         frame = MinT.getInstance();
@@ -36,6 +39,13 @@ public class MatcherAndSerialization implements NetworkLayers{
         
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE)
             transportation = new Transportation(layerDirection);
+        
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND){
+            if(frame.isBenchMode()){
+                bench_send = new PacketPerform("M/S-sender");
+                frame.addPerformance(MinT.PERFORM_METHOD.MaS_Sender, bench_send);
+            }
+        }
     }
 
     @Override
@@ -49,9 +59,11 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public void Send(PacketDatagram packet) {
+        if(bench_send != null)
+            bench_send.startPerform();
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
         Network sendNetwork = networkManager.getNetworks().get(nnodetype);
-
+        
         //Send Message
         if (sendNetwork != null) {
             //set Source Node
@@ -67,17 +79,21 @@ public class MatcherAndSerialization implements NetworkLayers{
             //set Response Handler
             //        this.networkHandler.
             try {
-                dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
-                dl.printMessage("Packet :" + packet.getPacketString());
-                dl.printMessage("Packet Length : "+packet.getPacket().length);
+//                dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
+//                dl.printMessage("Packet :" + packet.getPacketString());
+//                dl.printMessage("Packet Length : "+packet.getPacket().length);
+                
+                if(bench_send != null)
+                    bench_send.endPerform();
+                
                 sendNetwork.send(packet);
 //                networkManager.setSendHandlerCnt();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
-            dl.printMessage("Error : There are no Networks");
-            System.out.println("Error : There are no Networks");
+//            dl.printMessage("Error : There are no Networks");
+//            System.out.println("Error : There are no Networks");
         }
     }
 

@@ -17,6 +17,8 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
+import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -29,7 +31,9 @@ public class Transportation implements NetworkLayers{
     private NetworkManager networkManager;
     private SystemHandler syshandle = null;
     private MatcherAndSerialization serialization = null;
+    
     DebugLog dl = new DebugLog("Transportation");
+    private Performance bench_send = null;
     
     public Transportation(NetworkLayers.LAYER_DIRECTION layerDirection){
         frame = MinT.getInstance();
@@ -38,8 +42,13 @@ public class Transportation implements NetworkLayers{
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE)
             syshandle = new SystemHandler();
         
-        if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND)
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND){
             serialization = new MatcherAndSerialization(layerDirection);
+            if(frame.isBenchMode()){
+                bench_send = new PacketPerform("Trans-sender");
+                frame.addPerformance(MinT.PERFORM_METHOD.Trans_Sender, bench_send);
+            }
+        }
     }
 
     @Override
@@ -72,6 +81,9 @@ public class Transportation implements NetworkLayers{
     @Override
     public void EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
+        if(bench_send != null)
+            bench_send.startPerform();
+        
         NetworkProfile fdst = getFinalDestination(sendmsg.getDestination());
         
         PacketDatagram npacket = null;
@@ -96,7 +108,8 @@ public class Transportation implements NetworkLayers{
         }
         //msg sending count
         sendmsg.Sended();
-        
+        if(bench_send != null)
+            bench_send.endPerform();
         //send packet
         Send(npacket);
     }

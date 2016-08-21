@@ -184,7 +184,7 @@ public abstract class Resource{
     }
     
     boolean isSameLocation(NetworkProfile destination) {
-        dl.printMessage("src :"+sourcelocation.getSource()+", des : "+destination.getAddress());
+//        dl.printMessage("src :"+sourcelocation.getSource()+", des : "+destination.getAddress());
         return this.sourcelocation.getSource().equals(destination.getAddress());
     }
     

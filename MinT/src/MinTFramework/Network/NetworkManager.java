@@ -74,7 +74,7 @@ public class NetworkManager {
         this.frame = MinT.getInstance();
         resourceStorage = frame.getResStorage();
         setNodeName();
-        dl.printMessage("set ByteBuffer");
+//        dl.printMessage("set ByteBuffer");
         makeBytebuffer();
         
         routing = new MinTRoutingProtocol();
@@ -92,9 +92,9 @@ public class NetworkManager {
      * Init Routing Algorithm
      */
     private void initRoutingSetup(){
-        dl.printMessage("routing init");
+        System.out.println("routing init");
         if(resourceStorage == null)
-            dl.printMessage("resource null");
+            System.out.println("resource null");
         routing.setParents(this, frame, resourceStorage);
     }
 

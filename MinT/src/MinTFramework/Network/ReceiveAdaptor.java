@@ -16,8 +16,10 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinT;
 import MinTFramework.ThreadsPool.PoolWorkerThread;
 import MinTFramework.ThreadsPool.ResourcePool;
+import MinTFramework.Util.Benchmarks.Performance;
 
 /**
  *
@@ -26,13 +28,25 @@ import MinTFramework.ThreadsPool.ResourcePool;
 public class ReceiveAdaptor extends PoolWorkerThread<byte[]>{
     private MatcherAndSerialization matcher;
     
+    private Performance bench = null;
+    private MinT parent;
+    
     public ReceiveAdaptor(String name, int ID, ResourcePool pool) {
         super(name, ID, pool);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
+        parent = MinT.getInstance();
+        if(parent.isBenchMode()){
+            bench = new Performance(this.getName());
+            parent.addPerformance(MinT.PERFORM_METHOD.RECV_LAYER, bench);
+        }
     }
 
     @Override
     protected void HandleResoure(byte[] resource) {
+        if(bench != null)
+            bench.startPerform();
         matcher.EndPointReceive(resource);
+        if(bench != null)
+            bench.endPerform();
     }
 }

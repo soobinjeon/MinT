@@ -62,6 +62,7 @@ public abstract class PoolWorkerThread<T> extends Thread {
                 }
             }
         }catch(Exception e){
+            e.printStackTrace();
             System.out.println(this.getName()+" Inturrupted!, status : "+Thread.interrupted());
         }finally{
             System.out.println(this.getName()+" Inturrupted!, status : "+Thread.interrupted());

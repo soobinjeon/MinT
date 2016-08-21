@@ -21,7 +21,6 @@ import MinTFramework.Network.ResponseData;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
-import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -47,9 +46,9 @@ public class MinTRoutingProtocol extends RoutingProtocol{
                     resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
                 }
                 
-                for(Resource pl :resStorage.getProperties()){
-                    dl.printMessage("PL : "+pl.getName()+", "+pl.getStorageDirectory().getSourceLocation());
-                }
+//                for(Resource pl :resStorage.getProperties()){
+//                    dl.printMessage("PL : "+pl.getName()+", "+pl.getStorageDirectory().getSourceLocation());
+//                }
                 
                 /*add instruction*/
 //                JSONArray jis = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.instruction);

@@ -129,4 +129,14 @@ public class TypeCaster {
             result = buff.getDouble();
         return result; // position위치(0)에서 부터 4바이트를 int로 변경하여 반환
     }
+    
+//    public static String bytesToString(byte[] input) {
+//        StringBuilder s = new StringBuilder(input.length);
+//
+//        for (int i = 0; i < input.length; i++) {
+//            s.append((char) input[i]);
+//        }
+//
+//        return s.toString();
+//    }
 }

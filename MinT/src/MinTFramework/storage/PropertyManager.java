@@ -16,12 +16,9 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.MinT;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ThingProperty.PropertyRole;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -70,7 +67,7 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @param pr 
      */
     public void addProperty(ThingProperty pr){
-        dl.printMessage(pr.getName());
+//        dl.printMessage(pr.getName());
         
         /**
          * fix me

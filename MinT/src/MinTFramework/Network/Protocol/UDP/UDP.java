@@ -24,7 +24,9 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
@@ -79,7 +81,7 @@ public class UDP extends Network {
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, 1024*1024*10);
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
         
         sender = new UDPSender(channel, this);
 //        try {
@@ -113,7 +115,9 @@ public class UDP extends Network {
     protected void sendProtocol(PacketDatagram packet) {
         try {
             NetworkProfile dst = packet.getNextNode();
-            sender.SendMsg(packet.getPacket(), dst.getIPAddr(), dst.getPort());
+            InetAddress address = InetAddress.getByName(dst.getIPAddr());
+            SocketAddress add = new InetSocketAddress(address, dst.getPort());
+            sender.SendMsg(packet.getPacket(), add);
         } catch (SocketException ex) {
         } catch (IOException ex) {
         }

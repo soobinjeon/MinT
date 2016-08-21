@@ -5,7 +5,9 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
+import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
@@ -26,13 +28,19 @@ public class UDPRecvListener extends Thread{
     UDP udp = null;
     NetworkManager networkmanager = null;
     DebugLog dl = new DebugLog("UDPRecvAdaptor");
-    
+    private PacketPerform bench = null;
+    private MinT parent;
     public UDPRecvListener(DatagramChannel channel, UDP udp) throws IOException{
         this.udp = udp;
         networkmanager = udp.getNetworkManager();
         selector = Selector.open();
         this.channel = channel;
         channel.register(selector, SelectionKey.OP_READ);
+        parent = MinT.getInstance();
+        if(parent.isBenchMode()){
+            bench = new PacketPerform("UDP Recv");
+            parent.addPerformance(MinT.PERFORM_METHOD.UDP_RECV, bench);
+        }
     }
 
     @Override
@@ -63,7 +71,8 @@ public class UDPRecvListener extends Thread{
     }
     
     private void read(SelectionKey key){
-//        dl.printMessage("in the read");
+        if(bench != null)
+            bench.startPerform();
         ByteBufferPool bbp = networkmanager.getByteBufferPool();
         ByteBuffer req = null;
         byte[] fwdbyte = null;
@@ -73,15 +82,12 @@ public class UDPRecvListener extends Thread{
             DatagramChannel chan = (DatagramChannel)key.channel();
             //read
             rd = chan.receive(req);
-            dl.printMessage("readed limit : "+req.limit()+" byte Readed");
             //sort pointer
             req.flip();
             
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
-            dl.printMessage("req bytebuffer : "+req.limit()+" byte Readed");
-            dl.printMessage("fwd byte : "+fwdbyte.length+" byte Readed");
             
             //send byte to handler
             udp.putReceiveHandler(fwdbyte);
@@ -89,6 +95,8 @@ public class UDPRecvListener extends Thread{
             e.printStackTrace();
         }finally{
             bbp.putBuffer(req);
+            if(bench != null)
+                bench.endPerform(req.limit());
         }
     }
 }

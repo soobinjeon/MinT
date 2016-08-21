@@ -16,8 +16,6 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Util.TypeCaster;
-import java.io.IOException;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
@@ -44,10 +42,12 @@ public class PacketDatagram {
     private final int Numberoftotalpacket = 5;
     private String Scheme = "mint:";
     private final String EMPTY_MSG = "-";
-    
+    private StringBuilder MakeData = new StringBuilder();
+    private StringBuilder Prodata = new StringBuilder();
     private HEADER_DIRECTION h_direction;
     private HEADER_INSTRUCTION h_instruction;
     private long HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
+
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -71,7 +71,7 @@ public class PacketDatagram {
         h_instruction = h_ins;
         data = msg;
         HEADER_MSGID = msgid;
-        makePacketData(HEADER_MSGID,h_direction, h_instruction,data);
+//        makePacketData(HEADER_MSGID,h_direction, h_instruction,data);
     }
     
     public PacketDatagram(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
@@ -86,8 +86,9 @@ public class PacketDatagram {
     public PacketDatagram(byte[] packet){
         packetdata = packet;
         try {
-            packetdataString = TypeCaster.unzipStringFromBytes(packet);
-        } catch (IOException ex) {
+//            packetdataString = TypeCaster.unzipStringFromBytes(packet);
+            packetdataString = new String(packet);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         makeData(packetdataString);
@@ -132,23 +133,34 @@ public class PacketDatagram {
         System.out.println("Before length : "+packetdata.length);
     }
     
+    public void makeBytes() {
+        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
+    }
+    
     /**
      * Make Byte Packet Data
      * @param rlist
      * @param msgdata 
      */
     private void makePacketData(long MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
-        String result = Scheme;
-        String mdata = getProtocolData(DataAnalizer(msgdata));
-        result += getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID));
-        result += getProtocolbyROUTE(ROUTE.SOURCE);
-        result += getProtocolbyROUTE(ROUTE.PREV);
-        result += getProtocolbyROUTE(ROUTE.DESTINATION);
-        result += mdata;
+        MakeData.setLength(0);
+        MakeData.append(Scheme);
+        //String mdata = getProtocolData(DataAnalizer(msgdata));
+        MakeData.append(getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID)));
+        MakeData.append(getProtocolbyROUTE(ROUTE.SOURCE));
+        MakeData.append(getProtocolbyROUTE(ROUTE.PREV));
+        MakeData.append(getProtocolbyROUTE(ROUTE.DESTINATION));
+        MakeData.append(getProtocolData(DataAnalizer(msgdata)));
+//        result += getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID));
+//        result += getProtocolbyROUTE(ROUTE.SOURCE);
+//        result += getProtocolbyROUTE(ROUTE.PREV);
+//        result += getProtocolbyROUTE(ROUTE.DESTINATION);
+//        result += mdata;
         try {
-            this.packetdata = TypeCaster.zipStringToBytes(result);
-            packetdataString = result;
-        } catch (IOException ex) {
+//            this.packetdata = TypeCaster.zipStringToBytes(MakeData.toString());
+            packetdataString = MakeData.toString();
+            packetdata = packetdataString.getBytes();
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -213,6 +225,8 @@ public class PacketDatagram {
      */
     private String getProtocolData(String origin){
         return "{"+origin+"}";
+//        Prodata.setLength(0);
+//        return Prodata.append("{").append(origin).append("}").toString();
     }
     
     /**
@@ -273,12 +287,12 @@ public class PacketDatagram {
     
     public void setSource(NetworkProfile src){
         routelist.put(ROUTE.SOURCE, src);
-        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
+//        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
     }
     
     public void setPrevNode(NetworkProfile prev){
         routelist.put(ROUTE.PREV, prev);
-        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
+//        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
     }
     
     public String getMsgData(){

@@ -20,52 +20,51 @@ package MinTFramework.Util.Benchmarks;
  *
  * @author soobin
  */
-public class PacketPerform {
+public class PacketPerform extends Performance{
     private int totalbytes = 0;
     private int packets = 0;
-    private long stime = 0;
-    private long etime = 0;
-    private long totaltime = 0;
-    private double time = 0;
-    public PacketPerform(){
-        
+    
+    public PacketPerform(String Name){
+        this(Name, true);
+    }
+    public PacketPerform(String Name, boolean isdebug){
+        super(Name, isdebug, BENCHMARK_TYPE.PACKET);
     }
     
-    public void startPerform(){
+    @Override
+    public void reset(){
+        super.reset();
         totalbytes = 0;
         packets = 0;
-        stime = System.currentTimeMillis();
     }
     
-    public void endPerform(){
-        etime = System.currentTimeMillis();
-        time = (double)((etime-stime)/1000.0);
+    public void endPerform(int bytesize){
+        endPerform();
+        setPacketInfo(bytesize);
     }
     
-    public synchronized void setPacketInfo(int bytesize){
+    private void setPacketInfo(int bytesize){
         totalbytes += bytesize;
         packets ++;
     }
     
-    public synchronized void setPacketInfo(int bytesize, long time){
-        setPacketInfo(bytesize);
-        this.totaltime += time;
-        this.time = (double)(totaltime / 1000.0);
-    }
-    
-    public double getTotalTime(){
-        return totaltime / 1000.0;
-    }
-    
     public double getPacketperSec(){
-        return packets / time;
+        return getTotalTime() == 0 ? 0 : packets / getTotalTime();
     }
     
     public double getByteperSec(){
-        return totalbytes / time;
+        return getTotalTime() == 0 ? 0 : totalbytes / getTotalTime();
     }
     
     public double getBytesPerPacket(){
         return totalbytes / packets;
+    }
+    
+    public double getTotalBytes(){
+        return totalbytes;
+    }
+    
+    public double getTotalPackets(){
+        return packets;
     }
 }

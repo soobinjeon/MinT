@@ -19,7 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.Routing.RoutingProtocol;
-import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 /**
@@ -33,14 +33,13 @@ public abstract class Network {
     protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
-    public PacketPerform pperform;
     //Network Pools
     private ReceiveAdaptPool networkAdaptorPool;
     
     private boolean isworking = true;
     
     private DebugLog ndl = new DebugLog("Network");
-
+    Performance pf = null;
     /***
      * send packet
      * @param packet 
@@ -63,8 +62,11 @@ public abstract class Network {
         routing = networkmanager.getRoutingProtocol();
         profile = npro;
         
-        ndl.printMessage("Set Network listener");
-        pperform = new PacketPerform();
+//        ndl.printMessage("Set Network listener");
+        if(frame.isBenchMode()){
+            pf = new Performance("Network Sender");
+            frame.addPerformance(MinT.PERFORM_METHOD.NETWORK_SEND, pf);
+        }
     }
     
     /**
@@ -72,7 +74,7 @@ public abstract class Network {
      * Turn On Network
      */
     public void TurnOnNetwork(){
-        ndl.printMessage(this.getClass().getName()+" - started");
+//        ndl.printMessage(this.getClass().getName()+" - started");
     }
     /***
      * 
@@ -92,7 +94,7 @@ public abstract class Network {
      */
     public void putReceiveHandler(byte[] packet){
         if(networkAdaptorPool == null){
-            ndl.printMessage("Adaptor Null");
+//            ndl.printMessage("Adaptor Null");
         }
         this.networkAdaptorPool.putResource(packet);
     }
@@ -108,6 +110,11 @@ public abstract class Network {
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
+            if(pf != null)
+                pf.startPerform();
+            packet.makeBytes();
+            if(pf != null)
+                pf.endPerform();
             this.sendProtocol(packet);
         }
     }

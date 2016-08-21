@@ -17,6 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class UDPSender {
     Selector selector;
     DatagramChannel channel;
     DebugLog dl = new DebugLog("UDPSender");
+    PacketPerform ppf = null;
     
     public UDPSender(DatagramChannel channel, UDP udp) throws IOException{
         selector = Selector.open();
@@ -40,11 +42,16 @@ public class UDPSender {
         channel.register(selector, SelectionKey.OP_WRITE);
         nmanager = frame.getNetworkManager();
         this.udp = udp;
+        //for bench
+        if(frame.isBenchMode()){
+            ppf = new PacketPerform("UDP SENDER");
+            frame.addPerformance(MinT.PERFORM_METHOD.UDP_SEND, ppf);
+        }
     }
 
-    public void SendMsg(byte[] _msg, String dstIP, int _dstPort) throws UnknownHostException, IOException{
-        long stime = System.currentTimeMillis();
-        long etime = 0;
+    public void SendMsg(byte[] _msg, SocketAddress add) throws UnknownHostException, IOException{
+        if(ppf != null)
+            ppf.startPerform();
         int bsize = 0;
         ByteBufferPool bbp = nmanager.getByteBufferPool();
         ByteBuffer out = null;
@@ -52,15 +59,11 @@ public class UDPSender {
             out = bbp.getMemoryBuffer();
             out.put(_msg);
             out.flip();
-            InetAddress address = InetAddress.getByName(dstIP);
-            SocketAddress add = new InetSocketAddress(address, _dstPort);
             bsize = channel.send(out, add);
-    //        dl.printMessage("msg : "+msg);
-    //        dl.printMessage("address : "+dstIP+", dstPort:"+_dstPort); 
         }finally{
             bbp.putBuffer(out);
-            etime = System.currentTimeMillis();
-            udp.pperform.setPacketInfo(bsize, etime-stime);
+            if(ppf != null)
+                ppf.endPerform(bsize);
         }
     }
 }

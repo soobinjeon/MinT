@@ -39,11 +39,11 @@ public class Repository<T> extends Cache<T>{
         ArrayList<T> rlist = new ArrayList<>();
         for(T res : resources.values()){
             try {
-                dl.printMessage("s name : "+resName 
-                        +", "+(String)res.getClass().getMethod("getName").invoke(res));
+//                dl.printMessage("s name : "+resName 
+//                        +", "+(String)res.getClass().getMethod("getName").invoke(res));
                 String estr = (String)res.getClass().getMethod("getName").invoke(res);
                 if(resName.equals(estr)){
-                    dl.printMessage("matched : "+resName);
+//                    dl.printMessage("matched : "+resName);
                     rlist.add(res);
                 }
             } catch (Exception ex){

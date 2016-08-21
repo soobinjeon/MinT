@@ -31,6 +31,7 @@ public class MinTConfig {
     
     //UDP
     static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
+    static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;

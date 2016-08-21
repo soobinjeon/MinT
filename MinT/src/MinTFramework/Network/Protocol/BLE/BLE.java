@@ -53,7 +53,7 @@ public class BLE extends Network {
         if(!setBLEDevice()){
             String str = "BLE devices are not detected in the MinT: Please check it out";
             System.err.println(str);
-            dl.printMessage(str);
+//            dl.printMessage(str);
             isWorking(false);
             return;
         }

@@ -134,11 +134,11 @@ public class ResourceStorage {
      * @param req 
      */
     public ResData getProperty(Request req){
-        dl.printMessage("request RES : "+req.getResourceName());
+//        dl.printMessage("request RES : "+req.getResourceName());
         List<ThingProperty> rs = property.getbyResourceName(req.getResourceName());
         ArrayList<ResData> ol = new ArrayList<>();
         for(ThingProperty tp : rs){
-            dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
+//            dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
             ol.add(getProperty(req, tp));
         }
         
@@ -170,7 +170,7 @@ public class ResourceStorage {
         }
         else
             ret = null;
-        dl.printMessage("Last Pro : "+ret.getResourceString());
+//        dl.printMessage("Last Pro : "+ret.getResourceString());
         return ret;
     }
     
@@ -224,7 +224,7 @@ public class ResourceStorage {
         if(res.getStorageCategory().isLocal()){
             nr.setLocation(new StorageDirectory(currentNode,
                     res.getStorageDirectory().getGroup(), res.getName()));
-            dl.printMessage("new class : "+nr.getName()+", "+nr.getStorageDirectory().getSourceLocation());
+//            dl.printMessage("new class : "+nr.getName()+", "+nr.getStorageDirectory().getSourceLocation());
             ja.add(nr.getResourcetoJSON());
         }else
             ja.add(res.getResourcetoJSON());
