@@ -67,6 +67,7 @@ public abstract class ResourcePool {
         
         for (PoolWorkerThread threadPool1 : threadPool) {
             threadPool1.start();
+//            threadPool1.setPriority(queuecount);
         }
         System.out.println("Scheduler-"+name+" [QueueSIZE-"+getQueueTotalLength()+"|ThreadSIZE-"+totalThreadPoolSize+"] was started.");
     }

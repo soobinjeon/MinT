@@ -22,6 +22,7 @@ import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
+import java.io.IOException;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -44,7 +45,7 @@ public abstract class Network {
      * send packet
      * @param packet 
      */
-    abstract protected void sendProtocol(PacketDatagram packet);
+    abstract protected void sendProtocol(PacketDatagram packet)  throws IOException;
 
     abstract protected void interrupt();
     /**
@@ -106,7 +107,7 @@ public abstract class Network {
      * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public void send(PacketDatagram packet) throws NetworkException{
+    public void send(PacketDatagram packet) throws NetworkException, IOException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{

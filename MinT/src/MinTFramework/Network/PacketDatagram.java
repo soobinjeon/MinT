@@ -16,15 +16,15 @@
  */
 package MinTFramework.Network;
 
+import java.nio.ByteBuffer;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 /**
  * Packet Protocol for MinT
  * MinT Protocol
- * {DIR|INS|ID}{source}{Previous Departure}{final destination}{msg data}
- * |-header---||---------------------------route-------------||--data--|
- *             |                         name|address        || 256KB  | should make maximum size
+ * {DIR|INS|ID}{source}{final destination}{msg data}
+ * |-header---||----------route----------||--data--|
+ *            ||         address         || 256KB  | should make maximum size
  *  - MESSAGE HEADER
  *     - DIR : REQUEST(0), RESPONSE(1) (1 bit)
  *     - INS : GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4) (3 bit)
@@ -36,17 +36,22 @@ import java.util.regex.Pattern;
 public class PacketDatagram {
     public static final int HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
-    private String data="";
+    
     private byte[] packetdata = null;
-    private String packetdataString = null;
+    
     private final int Numberoftotalpacket = 5;
+    private String data="";
     private String Scheme = "mint:";
     private final String EMPTY_MSG = "-";
     private StringBuilder MakeData = new StringBuilder();
+    
     private HEADER_DIRECTION h_direction;
     private HEADER_INSTRUCTION h_instruction;
     private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
-
+    
+    private final int MAIN_HEADER_SIZE = 5;
+    private final int PACKET_HEADER_SIZE = MAIN_HEADER_SIZE 
+            + (NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE * 2);
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -85,51 +90,10 @@ public class PacketDatagram {
     public PacketDatagram(byte[] packet){
         packetdata = packet;
         try {
-//            packetdataString = TypeCaster.unzipStringFromBytes(packet);
-            packetdataString = new String(packet);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        makeData(packetdataString);
-    }
-    
-    /**
-     * Make Byte Packet Data
-     * @deprecated 
-     * @param rlist
-     * @param msgdata
-     * @return 
-     */
-    private void makeByteData(TreeMap<ROUTE, NetworkProfile> rlist, String msgdata){
-        byte[][] route = new byte[rlist.size()][];
-        byte[] msg = getStringtoByte(msgdata);
-        byte[] result;
-        int routesize = 0;
-        int msgsize = msg.length;
-        int i=0;
-        for(NetworkProfile pf : rlist.values()){
-            if(pf != null)
-                route[i] = getStringtoByte(pf.getProfile());
-            else
-                route[i] = getStringtoByte("");
-            routesize += route[i].length;
-            i++;
-        }
-        
-        result = new byte[routesize+msgsize];
-        
-        //insert route to byte
-        int prevlength = 0;
-        for(i=0;i<route.length;i++){
-            System.arraycopy(route[i], 0, result, prevlength, route[i].length);
-            prevlength += route[i].length;
-        }
-        
-        //insert msg
-        System.arraycopy(msg, 0, result, prevlength, msgsize);
-        
-        packetdata = result;
-        System.out.println("Before length : "+packetdata.length);
+        makeData(packetdata);
     }
     
     public void makeBytes() {
@@ -142,26 +106,46 @@ public class PacketDatagram {
      * @param msgdata 
      */
     private void makePacketData(int MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
-        MakeData.setLength(0);
-        MakeData.append(Scheme);
-        //String mdata = getProtocolData(DataAnalizer(msgdata));
-        MakeData.append(getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID)));
-        MakeData.append(getProtocolbyROUTE(ROUTE.SOURCE));
-        MakeData.append(getProtocolbyROUTE(ROUTE.PREV));
-        MakeData.append(getProtocolbyROUTE(ROUTE.DESTINATION));
-        MakeData.append(getProtocolData(DataAnalizer(msgdata)));
-//        result += getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID));
-//        result += getProtocolbyROUTE(ROUTE.SOURCE);
-//        result += getProtocolbyROUTE(ROUTE.PREV);
-//        result += getProtocolbyROUTE(ROUTE.DESTINATION);
-//        result += mdata;
+//        MakeData.setLength(0);
+//        MakeData.append(Scheme);
+//        MakeData.append(getProtocolData(makeHeadertoString(h_dir, h_ins, MSG_ID)));
+//        MakeData.append(getProtocolbyROUTE(ROUTE.SOURCE));
+//        MakeData.append(getProtocolbyROUTE(ROUTE.PREV));
+//        MakeData.append(getProtocolbyROUTE(ROUTE.DESTINATION));
+//        MakeData.append(getProtocolData(DataAnalizer(msgdata)));
+        
         try {
-//            this.packetdata = TypeCaster.zipStringToBytes(MakeData.toString());
-            packetdataString = MakeData.toString();
-            packetdata = packetdataString.getBytes();
+            byte[] strarray = DataAnalizer(msgdata).getBytes();
+            byte[] pack = new byte[PACKET_HEADER_SIZE + strarray.length];
+            byte[] header = makeHeadertoBytes(h_dir, h_ins, MSG_ID);
+            System.out.println("packet size : "+pack.length);
+            System.out.println("MSGDIR : "+h_dir.toString()+", MSGINT : "+h_ins.toString()+", MID : "+MSG_ID);
+            System.out.println("msgdat : "+msgdata);
+            int pos = MergePacket(pack, header, 0);
+            pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.SOURCE), pos);
+            pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.DESTINATION), pos);
+            pos = MergePacket(pack, strarray, pos);
+            
+            packetdata = pack;
+//            System.out.println(packetdataString);
+            for(int i=0;i<packetdata.length;i++){
+                String s1 = String.format("%8s", Integer.toBinaryString(packetdata[i] & 0xFF)).replace(' ','0');
+                System.out.print(s1+" ");
+            }
+            System.out.println("");
+            System.out.println(packetdata.length);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    private int MergePacket(byte[] parent, byte[] inserter, int pos){
+        int i = 0;
+//        if(pos + inserter.length > parent.length)
+        for(i=pos;i<inserter.length+pos;i++){
+            parent[i] = inserter[i-pos];
+        }
+        return i;
     }
     
     /**
@@ -170,22 +154,38 @@ public class PacketDatagram {
      * @param h_ins
      * @return 
      */
-    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id) {
-        return h_dir.getBit()+"|"+h_ins.getBit()+"|"+msg_id;
-    }
-    
-    private byte[] makeheader(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins){
-        byte theader = 0;
-        theader = (byte) (h_dir.getBit() << 3);
-        theader += (byte) h_ins.getBit();
+    private byte[] makeHeadertoBytes(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id){
+        byte[] theader = new byte[MAIN_HEADER_SIZE];
+        byte[] msgbytes = ByteBuffer.allocate(Integer.SIZE/8).putInt(msg_id).array();
+        
+        theader[0] = (byte) (h_dir.getBit() << 3);
+        theader[0] += (byte) h_ins.getBit();
+        
+        for(int i=1;i<theader.length;i++)
+            theader[i] = msgbytes[i-1];
         return theader;
     }
     
-    private void makeStringtoHeader(String data){
-        String[] temp = data.split("\\|");
-        this.h_direction = HEADER_DIRECTION.getHeaderDirection(Integer.parseInt(temp[0]));
-        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(Integer.parseInt(temp[1]));
-        this.HEADER_MSGID = Integer.parseInt(temp[2]);
+    private void makeBytestoHeader(byte[] packet){
+        for(int i=0;i<packet.length;i++){
+            String s1 = String.format("%8s", Integer.toBinaryString(packet[i] & 0xFF)).replace(' ','0');
+            System.out.print(s1+" ");
+        }
+        System.out.println("");
+            
+        byte header = packet[0];
+        byte[] msg_id = new byte[Integer.BYTES];
+        System.arraycopy(packet, 1, msg_id, 0, 4);
+        
+        System.out.println("test : "+header);
+        this.h_direction = HEADER_DIRECTION.getHeaderDirection(header & 8);
+        System.out.println("test : "+header);
+        System.out.println("test : "+(header & 7));
+        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(header & 7);
+        this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getInt();
+        System.out.println("H dir : "+h_direction.toString()
+                +" H Ins : "+h_instruction.toString()
+                +" MSG ID : "+HEADER_MSGID);
     }
     
     /**
@@ -197,19 +197,7 @@ public class PacketDatagram {
     }
     
     public String getPacketString(){
-        return packetdataString;
-    }
-    
-    /**
-     * Translate String to byte
-     * @param data
-     * @return 
-     */
-    private byte[] getStringtoByte(String data){
-        byte[] result;
-        String prev = getProtocolData(data);
-        result = prev.getBytes();
-        return result;
+        return String.valueOf(packetdata);
     }
     
     /**
@@ -217,22 +205,13 @@ public class PacketDatagram {
      * @param route
      * @return 
      */
-    private String getProtocolbyROUTE(ROUTE route){
+    private byte[] getProtocolbyROUTE(ROUTE route){
         NetworkProfile pf = this.routelist.get(route);
-        if(pf != null)
-            return getProtocolData(pf.getProfile());
-        else return getProtocolData("");
-    }
-    
-    /**
-     * inner protocol for MinT
-     * @param origin
-     * @return 
-     */
-    private String getProtocolData(String origin){
-        return "{"+origin+"}";
-//        Prodata.setLength(0);
-//        return Prodata.append("{").append(origin).append("}").toString();
+        if(pf != null){
+            return pf.getbyteAddress();
+        }
+//            return getProtocolData(pf.getProfile());
+        else return new byte[NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE];
     }
     
     /**
@@ -253,26 +232,22 @@ public class PacketDatagram {
      * Make Data from byte Packet(MinT Protocol)
      * @param packet 
      */
-    private void makeData(String spacket) {
-        spacket = spacket.trim();
-        spacket = spacket.split(this.Scheme)[1];
-        spacket = spacket.substring(1,spacket.length()-1);
-        Pattern p = Pattern.compile("\\}\\{");
-        String[] split = p.split(spacket);
-        
-//        System.out.println("Check Packet Data");
-//        for(String s : split){
-//            System.out.println("--"+s);
+    private void makeData(byte[] spacket) {
+        makeBytestoHeader(spacket);
+//        spacket = spacket.trim();
+//        spacket = spacket.split(this.Scheme)[1];
+//        spacket = spacket.substring(1,spacket.length()-1);
+//        Pattern p = Pattern.compile("\\}\\{");
+//        String[] split = p.split(spacket);
+//        
+//        if(split.length == Numberoftotalpacket){
+//            routelist.put(ROUTE.SOURCE, new NetworkProfile(split[1]));
+//            routelist.put(ROUTE.PREV, new NetworkProfile(split[2]));
+//            routelist.put(ROUTE.NEXT, null);
+//            routelist.put(ROUTE.DESTINATION, new NetworkProfile(split[3]));
+//            data = split[4];
+//            makeStringtoHeader(split[0]);
 //        }
-        
-        if(split.length == Numberoftotalpacket){
-            routelist.put(ROUTE.SOURCE, new NetworkProfile(split[1]));
-            routelist.put(ROUTE.PREV, new NetworkProfile(split[2]));
-            routelist.put(ROUTE.NEXT, null);
-            routelist.put(ROUTE.DESTINATION, new NetworkProfile(split[3]));
-            data = split[4];
-            makeStringtoHeader(split[0]);
-        }
     }
     
     public NetworkProfile getSource(){

@@ -132,12 +132,12 @@ public class Transportation implements NetworkLayers{
      */
     private NetworkProfile getFinalDestination(NetworkProfile dst) {
         NetworkProfile fdst = null;
-        if (dst.isNameProfile()) {
-            //라우팅 스토어에서 검색
+//        if (dst.isNameProfile()) {
+//            //라우팅 스토어에서 검색
+//            fdst = dst;
+//        } else {
             fdst = dst;
-        } else {
-            fdst = dst;
-        }
+//        }
         return fdst;
     }
     

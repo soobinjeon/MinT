@@ -130,13 +130,31 @@ public class TypeCaster {
         return result; // position위치(0)에서 부터 4바이트를 int로 변경하여 반환
     }
     
-//    public static String bytesToString(byte[] input) {
-//        StringBuilder s = new StringBuilder(input.length);
-//
-//        for (int i = 0; i < input.length; i++) {
-//            s.append((char) input[i]);
-//        }
-//
-//        return s.toString();
-//    }
+    public static String bytesToString(byte[] input) {
+        StringBuilder s = new StringBuilder(input.length);
+
+        for (int i = 0; i < input.length; i++) {
+            s.append((char) input[i]);
+        }
+
+        return s.toString();
+    }
+
+    public static byte[] longToBytes(long l) {
+        byte[] result = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            result[i] = (byte) (l & 0xFF);
+            l >>= 8;
+        }
+        return result;
+    }
+
+    public static long bytesToLong(byte[] b) {
+        long result = 0;
+        for (int i = 0; i < 8; i++) {
+            result <<= 8;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
 }

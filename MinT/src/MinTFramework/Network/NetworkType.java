@@ -76,4 +76,11 @@ public enum NetworkType {
         
         return NetworkType.NONE;
     }
+
+    public boolean isIPbased() {
+        if(id >=2 && id <=4)
+            return true;
+        else
+            return false;
+    }
 }
