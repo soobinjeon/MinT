@@ -82,6 +82,7 @@ public class UDP extends Network {
         channel.socket().bind(isa);
         channel.configureBlocking(false);
         channel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
+        channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
         
         sender = new UDPSender(channel, this);
 //        try {

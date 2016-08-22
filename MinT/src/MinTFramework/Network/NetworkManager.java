@@ -54,7 +54,7 @@ public class NetworkManager {
     private ByteBufferPool bytepool = null;
     
     //Message Response List
-    private final ConcurrentHashMap<Long,SendMSG> ResponseList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer,SendMSG> ResponseList = new ConcurrentHashMap<>();
     private PacketIDManager idmaker;
     
     //Temporary properties for check
@@ -264,7 +264,7 @@ public class NetworkManager {
      * get Response Msg List
      * @return 
      */
-    public synchronized ConcurrentHashMap<Long, SendMSG> getResponseList(){
+    public synchronized ConcurrentHashMap<Integer, SendMSG> getResponseList(){
         return ResponseList;
     }
     
@@ -345,7 +345,7 @@ public class NetworkManager {
         }
     }
 
-    public void putResponse(long responseKey, SendMSG sendmsg) {
+    public void putResponse(int responseKey, SendMSG sendmsg) {
         ResponseList.put(responseKey, sendmsg);
 //        System.out.println("size : "+ResponseList.size());
     }

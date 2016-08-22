@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PacketDatagram {
-    public static final long HEADER_MSGID_INITIALIZATION = 0;
+    public static final int HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
     private String data="";
     private byte[] packetdata = null;
@@ -43,10 +43,9 @@ public class PacketDatagram {
     private String Scheme = "mint:";
     private final String EMPTY_MSG = "-";
     private StringBuilder MakeData = new StringBuilder();
-    private StringBuilder Prodata = new StringBuilder();
     private HEADER_DIRECTION h_direction;
     private HEADER_INSTRUCTION h_instruction;
-    private long HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
+    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
 
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
@@ -61,7 +60,7 @@ public class PacketDatagram {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketDatagram(long msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+    public PacketDatagram(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
@@ -142,7 +141,7 @@ public class PacketDatagram {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(long MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
+    private void makePacketData(int MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
         MakeData.setLength(0);
         MakeData.append(Scheme);
         //String mdata = getProtocolData(DataAnalizer(msgdata));
@@ -171,8 +170,15 @@ public class PacketDatagram {
      * @param h_ins
      * @return 
      */
-    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, long msg_id) {
+    private String makeHeadertoString(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id) {
         return h_dir.getBit()+"|"+h_ins.getBit()+"|"+msg_id;
+    }
+    
+    private byte[] makeheader(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins){
+        byte theader = 0;
+        theader = (byte) (h_dir.getBit() << 3);
+        theader += (byte) h_ins.getBit();
+        return theader;
     }
     
     private void makeStringtoHeader(String data){
@@ -307,7 +313,7 @@ public class PacketDatagram {
         return this.h_instruction;
     }
     
-    public long getMSGID(){
+    public int getMSGID(){
         return HEADER_MSGID;
     }
     

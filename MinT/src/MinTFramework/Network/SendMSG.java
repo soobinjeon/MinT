@@ -27,11 +27,11 @@ public class SendMSG {
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
-    private long resKey;
+    private int resKey;
     private int SendHit = 0;
     
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, String msg,
-            ResponseHandler resHandle, long resKey){
+            ResponseHandler resHandle, int resKey){
         head_dir = hd;
         head_inst = hi;
         destination = dst;
@@ -48,7 +48,9 @@ public class SendMSG {
      * @param msg Resource and request
      * @param resKey 
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, String msg, long resKey){
+    public SendMSG(PacketDatagram.HEADER_DIRECTION hd
+            , PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst
+            , String msg, int resKey){
         this(hd,hi,dst,msg,null,resKey);
     }
     
@@ -59,7 +61,8 @@ public class SendMSG {
      * @param dst Destination profile
      * @param msg Resource and request
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, String msg){
+    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
+            , NetworkProfile dst, String msg){
         this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
@@ -71,8 +74,8 @@ public class SendMSG {
      * @param msg Resource and request
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, String msg,
-            ResponseHandler resHandle){   
+    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
+            , NetworkProfile dst, String msg, ResponseHandler resHandle){   
         this(hd,hi,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
@@ -96,7 +99,7 @@ public class SendMSG {
         return resHandle;
     }
     
-    public long getResponseKey(){
+    public int getResponseKey(){
         return resKey;
     }
     
@@ -120,7 +123,7 @@ public class SendMSG {
         SendHit ++;
     }
 
-    void setResKey(long makePacketID) {
+    void setResKey(int makePacketID) {
         resKey = makePacketID;
     }
 }

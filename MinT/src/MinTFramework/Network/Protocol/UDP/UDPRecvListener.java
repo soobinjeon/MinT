@@ -48,7 +48,7 @@ public class UDPRecvListener extends Thread{
         try{
             while(!Thread.currentThread().isInterrupted()){
 //                dl.printMessage(this.getID()+"-wait selector..");
-                int KeysReady = selector.select(500);
+                int KeysReady = selector.select();
 //                dl.printMessage("Selector Accepted");
                 RequestPendingConnection();
             }
