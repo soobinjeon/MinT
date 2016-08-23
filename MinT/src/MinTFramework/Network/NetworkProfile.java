@@ -25,7 +25,7 @@ import java.nio.ByteBuffer;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkProfile {
-    public static final int NETWORK_ADDRESS_BYTE_SIZE = 8;
+    public static final int NETWORK_ADDRESS_BYTE_SIZE = 9;
     private String id;
     private String address="";
     private String ipaddr="";
@@ -46,13 +46,26 @@ public class NetworkProfile {
         this.ntype = ntype;
         initialize();
     }
+    public NetworkProfile(byte[] pdata){
+        makeBytetoProfile(pdata);
+    }
     
+    public NetworkProfile(RecvMSG rmsg){
+        ntype = rmsg.getNetworkType();
+        address = rmsg.getAddress();
+        initialize();
+    }
+    
+    /**
+     * for making resource
+     * @param bytearray 
+     */
     public NetworkProfile(String bytearray){
         String[] temp = bytearray.split("\\"+Split);
 //        name = temp[0];
-        address = temp[1];
-        if(temp.length > 2)
-            ntype = NetworkType.getNetworkType(Integer.parseInt(temp[2]));
+        address = temp[0];
+        if(temp.length > 1)
+            ntype = NetworkType.getNetworkType(Integer.parseInt(temp[1]));
         initialize();
     }
     
@@ -146,9 +159,7 @@ public class NetworkProfile {
     }
     
     private void setIPMode(){
-        if(ntype == NetworkType.TCPIP 
-                || ntype == NetworkType.UDP 
-                || ntype == NetworkType.COAP){
+        if(ntype.isIPbased()){
             String[] p = this.address.split(":");
             if(p.length > 1 && p[1] != null){
                 this.ipaddr = p[0];
@@ -159,6 +170,7 @@ public class NetworkProfile {
 
     private void makebyte() {
         if(ntype == NetworkType.BLE){
+            //fill this method
             for(int i=0;i<addrbyte.length;i++)
                 addrbyte[i] = 0;
         }else if(ntype.isIPbased()){
@@ -174,13 +186,42 @@ public class NetworkProfile {
             //insert port
             tadd = tadd << 16;
             tadd += Port;
-            
-            addrbyte = ByteBuffer.allocate(NETWORK_ADDRESS_BYTE_SIZE).putLong(tadd).array();
-            for (int i = 0; i < addrbyte.length; i++) {
-                String s1 = String.format("%8s", Integer.toBinaryString(addrbyte[i] & 0xFF)).replace(' ', '0');
-                System.out.print(s1 + " ");
-            }
-            System.out.println("");
+            addrbyte = ByteBuffer.allocate(NETWORK_ADDRESS_BYTE_SIZE).putLong(1,tadd).array();
+            addrbyte[0] = (byte)ntype.getID();
+//            for (int i = 0; i < addrbyte.length; i++) {
+//                String s1 = String.format("%8s", Integer.toBinaryString(addrbyte[i] & 0xFF)).replace(' ', '0');
+//                System.out.print(s1 + " ");
+//            }
+//            System.out.println("");
+        }
+    }
+
+    private void makeBytetoProfile(byte[] pdata) {
+        StringBuilder addbuilder = new StringBuilder();
+        int nofntype = pdata[0]; //get Network Type at first 1byte
+        long tadd = ByteBuffer.wrap(pdata).getLong(1); //get Address at long type
+        long rdata = 0;
+        int shift = 16;
+        //copy byte array
+        System.arraycopy(pdata, 0, addrbyte, 0, pdata.length);
+        //set network type
+        this.ntype = NetworkType.getNetworkType(nofntype);
+        if(ntype.isIPbased()){
+            rdata = tadd & 0x0000ffff;
+            Port = (int)rdata;
+            rdata = (tadd >> shift+(12*3)) & 0x00000fff;
+            addbuilder.append(rdata).append(".");
+            rdata = (tadd >> shift+(12*2)) & 0x00000fff;
+            addbuilder.append(rdata).append(".");
+            rdata = (tadd >> shift+(12*1)) & 0x00000fff;
+            addbuilder.append(rdata).append(".");
+            rdata = (tadd >> shift) & 0x00000fff;
+            addbuilder.append(rdata).append(":").append(Port);
+            address = addbuilder.toString();
+            makeID();
+//            System.out.println(addbuilder.toString());
+        }else if(ntype == NetworkType.BLE){
+            //fill this method
         }
     }
 }

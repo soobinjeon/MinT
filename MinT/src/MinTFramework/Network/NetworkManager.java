@@ -234,7 +234,11 @@ public class NetworkManager {
      * @param num
      * @return 
      */
-    public synchronized ResponseHandler getResponseDataMatchbyID(long num){
+    public synchronized ResponseHandler getResponseDataMatchbyID(int num){
+        System.out.println("get num : "+num);
+        System.out.println("rlist len : "+ResponseList.size());
+        for(int sm : ResponseList.keySet())
+            System.out.println("ss : "+sm);
         SendMSG smsg = ResponseList.get(num);
         ResponseHandler resd = smsg.getResponseHandler();
         if(resd != null){

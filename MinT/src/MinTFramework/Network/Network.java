@@ -93,7 +93,7 @@ public abstract class Network {
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void putReceiveHandler(byte[] packet){
+    public void putReceiveHandler(RecvMSG packet){
         if(networkAdaptorPool == null){
 //            ndl.printMessage("Adaptor Null");
         }

@@ -29,7 +29,7 @@ public interface NetworkLayers {
      * Just Implement to EndPoint Layer
      * @param packet 
      */
-    public void EndPointReceive(byte[] packet);
+    public void EndPointReceive(RecvMSG recvmsg);
     
     /**
      * Layer Implements

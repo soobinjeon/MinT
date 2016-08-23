@@ -87,13 +87,13 @@ public class PacketDatagram {
      * MinT Protocol -> Data
      * @param packet 
      */
-    public PacketDatagram(byte[] packet){
-        packetdata = packet;
+    public PacketDatagram(RecvMSG packet){
+        packetdata = packet.getRecvBytes();
         try {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        makeData(packetdata);
+        makeData(packet);
     }
     
     public void makeBytes() {
@@ -167,25 +167,19 @@ public class PacketDatagram {
     }
     
     private void makeBytestoHeader(byte[] packet){
-        for(int i=0;i<packet.length;i++){
-            String s1 = String.format("%8s", Integer.toBinaryString(packet[i] & 0xFF)).replace(' ','0');
-            System.out.print(s1+" ");
-        }
-        System.out.println("");
-            
         byte header = packet[0];
-        byte[] msg_id = new byte[Integer.BYTES];
+        byte[] msg_id = new byte[Integer.SIZE/8];
         System.arraycopy(packet, 1, msg_id, 0, 4);
         
         System.out.println("test : "+header);
-        this.h_direction = HEADER_DIRECTION.getHeaderDirection(header & 8);
-        System.out.println("test : "+header);
-        System.out.println("test : "+(header & 7));
-        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(header & 7);
+        this.h_direction = HEADER_DIRECTION.getHeaderDirection((header & 0x08) >> 3);
+//        System.out.println("test : "+header);
+//        System.out.println("test : "+((header & 0x08) >> 3));
+        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(header & 0x07);
         this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getInt();
-        System.out.println("H dir : "+h_direction.toString()
-                +" H Ins : "+h_instruction.toString()
-                +" MSG ID : "+HEADER_MSGID);
+//        System.out.println("H dir : "+h_direction.toString()
+//                +" H Ins : "+h_instruction.toString()
+//                +" MSG ID : "+HEADER_MSGID);
     }
     
     /**
@@ -232,8 +226,32 @@ public class PacketDatagram {
      * Make Data from byte Packet(MinT Protocol)
      * @param packet 
      */
-    private void makeData(byte[] spacket) {
+    private void makeData(RecvMSG rcvmsg) {
+        byte[] nprofile = new byte[NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE];
+        int pos = MAIN_HEADER_SIZE;
+        byte[] spacket = rcvmsg.getRecvBytes();
+        byte[] msg;
         makeBytestoHeader(spacket);
+        System.arraycopy(spacket, pos, nprofile, 0, NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE);
+        for(int i=0;i<nprofile.length;i++){
+            String s1 = String.format("%8s", Integer.toBinaryString(nprofile[i] & 0xFF)).replace(' ','0');
+            System.out.print(s1+" ");
+        }
+        System.out.println("");
+        routelist.put(ROUTE.SOURCE, new NetworkProfile(nprofile));
+        pos += NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE;
+        System.arraycopy(spacket, pos, nprofile, 0, NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE);
+        routelist.put(ROUTE.DESTINATION, new NetworkProfile(nprofile));
+        routelist.put(ROUTE.PREV, new NetworkProfile(rcvmsg));
+        pos += NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE;
+        int msglen = spacket.length - pos;
+        msg = new byte[msglen];
+        System.arraycopy(spacket, pos, msg, 0, msglen);
+        data = new String(msg);
+        System.out.println("SOURCE : "+routelist.get(ROUTE.SOURCE).getProfile());
+        System.out.println("PREV : "+routelist.get(ROUTE.PREV).getProfile());
+        System.out.println("DEST : "+routelist.get(ROUTE.DESTINATION).getProfile());
+        System.out.println("msg : "+data);
 //        spacket = spacket.trim();
 //        spacket = spacket.split(this.Scheme)[1];
 //        spacket = spacket.substring(1,spacket.length()-1);

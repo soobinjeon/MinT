@@ -49,7 +49,7 @@ public class MatcherAndSerialization implements NetworkLayers{
     }
 
     @Override
-    public void EndPointReceive(byte[] packet) {
+    public void EndPointReceive(RecvMSG packet) {
         PacketDatagram matchedPacket = new PacketDatagram(packet);
         transportation.Receive(matchedPacket);
     }

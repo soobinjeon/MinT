@@ -151,6 +151,6 @@ public class Transportation implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void EndPointReceive(byte[] packet) {
+    public void EndPointReceive(RecvMSG packet) {
     }
 }

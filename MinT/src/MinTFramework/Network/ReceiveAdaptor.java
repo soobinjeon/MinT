@@ -25,7 +25,7 @@ import MinTFramework.Util.Benchmarks.Performance;
  *
  * @author soobin
  */
-public class ReceiveAdaptor extends PoolWorkerThread<byte[]>{
+public class ReceiveAdaptor extends PoolWorkerThread<RecvMSG>{
     private MatcherAndSerialization matcher;
     
     private Performance bench = null;
@@ -42,7 +42,7 @@ public class ReceiveAdaptor extends PoolWorkerThread<byte[]>{
     }
 
     @Override
-    protected void HandleResoure(byte[] resource) {
+    protected void HandleResoure(RecvMSG resource) {
         if(bench != null)
             bench.startPerform();
         matcher.EndPointReceive(resource);
