@@ -89,15 +89,9 @@ public class UDP extends Network {
         sendchannel = DatagramChannel.open();
         sendchannel.socket().bind(sendisa);
         sendchannel.configureBlocking(false);
-//        sendchannel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
         channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
         
         sender = new UDPSender(sendchannel, this);
-//        try {
-//            
-//            sender = new UDPSender(new DatagramSocket(PORT));
-//        } catch (SocketException ex) {
-//        }
     }
     
     /**
@@ -123,9 +117,6 @@ public class UDP extends Network {
     @Override
     protected void sendProtocol(PacketDatagram packet) throws IOException {
             NetworkProfile dst = packet.getNextNode();
-//            System.out.println("send next node UDP : "+dst.getProfile());
-//            System.out.println("send next node IP : "+dst.getIPAddr());
-//            System.out.println("send next node PORT : "+dst.getPort());
             SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
             sender.SendMsg(packet.getPacket(), add);
     }

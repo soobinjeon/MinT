@@ -45,7 +45,7 @@ public abstract class ResourcePool {
         this.name = name;
         this.totalQueueSize = ObjectQueueLength;
         this.totalThreadPoolSize = numOfThread;
-        this.ObjectQueue = new Object[ObjectQueueLength];
+        this.ObjectQueue = new Object[totalQueueSize];
         this.head = 0;
         this.tail = 0;
         this.queuecount = 0;
@@ -83,7 +83,7 @@ public abstract class ResourcePool {
     }
     
     public int getQueueTotalLength(){
-        return this.totalQueueSize;
+        return totalQueueSize;
     }
 
 //    /**
@@ -117,7 +117,7 @@ public abstract class ResourcePool {
      */
     public synchronized void putResource(Object res) {
         boolean isinterrupted = false;
-        while (queuecount >= ObjectQueue.length) {
+        while (queuecount >= totalQueueSize) {
             try {
                 wait();
                 break;

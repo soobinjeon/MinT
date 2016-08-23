@@ -307,6 +307,10 @@ public class NetworkManager {
         return NetworkSendPool.getQueueWaitingLength();
     }
     
+    public int getNetworkSenderQueueLength(){
+        return NetworkSendPool.getQueueTotalLength();
+    }
+    
     
     
     /**

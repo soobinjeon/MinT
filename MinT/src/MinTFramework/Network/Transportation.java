@@ -97,6 +97,7 @@ public class Transportation implements NetworkLayers{
                     ,fdst, sendmsg.Message());
         }
         else if(sendmsg.isRequestGET()){
+            //check resend information
             if(sendmsg.getSendHit() == 0){
                 sendmsg.setResKey(networkManager.getIDMaker().makePacketID());
                 networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
