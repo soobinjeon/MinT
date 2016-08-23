@@ -219,6 +219,7 @@ public class NetworkProfile {
             addbuilder.append(rdata).append(":").append(Port);
             address = addbuilder.toString();
             makeID();
+            setIPMode();
 //            System.out.println(addbuilder.toString());
         }else if(ntype == NetworkType.BLE){
             //fill this method

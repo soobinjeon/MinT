@@ -41,7 +41,10 @@ public class UDP extends Network {
     
     InetSocketAddress isa;
     DatagramChannel channel;
-
+    
+    InetSocketAddress sendisa;
+    DatagramChannel sendchannel;
+    
     private final int NUMofRecv_Listener_Threads = MinTConfig.UDP_NUM_OF_LISTENER_THREADS;
     private UDPRecvListener[] UDPListener;
     private final DebugLog log = new DebugLog("UDP.java");
@@ -69,20 +72,27 @@ public class UDP extends Network {
         } catch (IOException ex) {
         }
         MakeUDPReceiveListeners();
+        System.out.println("Set up UDP : "+profile.getProfile());
     }
     
     /**
      * set DatagramSocket make Sender and Receiver
      */
     private void setUDPSocket() throws IOException {
-        InetSocketAddress isa = new InetSocketAddress(PORT);
+        isa = new InetSocketAddress(PORT);
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
         channel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
-//        channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
         
-        sender = new UDPSender(channel, this);
+        sendisa = new InetSocketAddress(PORT+1);
+        sendchannel = DatagramChannel.open();
+        sendchannel.socket().bind(sendisa);
+        sendchannel.configureBlocking(false);
+//        sendchannel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
+        channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
+        
+        sender = new UDPSender(sendchannel, this);
 //        try {
 //            
 //            sender = new UDPSender(new DatagramSocket(PORT));
@@ -113,6 +123,9 @@ public class UDP extends Network {
     @Override
     protected void sendProtocol(PacketDatagram packet) throws IOException {
             NetworkProfile dst = packet.getNextNode();
+//            System.out.println("send next node UDP : "+dst.getProfile());
+//            System.out.println("send next node IP : "+dst.getIPAddr());
+//            System.out.println("send next node PORT : "+dst.getPort());
             SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
             sender.SendMsg(packet.getPacket(), add);
     }

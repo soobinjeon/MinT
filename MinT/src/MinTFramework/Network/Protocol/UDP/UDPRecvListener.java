@@ -90,8 +90,6 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
-            
-            //send byte to handler
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
         }catch(Exception e){
             e.printStackTrace();

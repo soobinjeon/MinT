@@ -138,16 +138,16 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
-            dl.printMessage("Starting UDP... "+ntype.getPort());
+            System.out.println("Starting UDP... "+ntype.getPort());
             networks.put(ntype, new UDP(frame.getNodeName(),ntype.getPort()));
-            dl.printMessage("Turned on UDP: "+ntype.getPort());
+            System.out.println("Turned on UDP: "+ntype.getPort());
         }
         else if(ntype == NetworkType.BLE){
-            dl.printMessage("Starting BLE...");
+            System.out.println("Starting BLE...");
             networks.put(ntype, new BLE(frame.getNodeName()));
-            dl.printMessage("Turned on BLE");
+            System.out.println("Turned on BLE");
         } else if (ntype == NetworkType.COAP) { // for CoAP, need to add
-            dl.printMessage("Turned on COAP");
+            System.out.println("Turned on COAP");
         }
         
         //Turn On All Network
@@ -235,10 +235,6 @@ public class NetworkManager {
      * @return 
      */
     public synchronized ResponseHandler getResponseDataMatchbyID(int num){
-        System.out.println("get num : "+num);
-        System.out.println("rlist len : "+ResponseList.size());
-        for(int sm : ResponseList.keySet())
-            System.out.println("ss : "+sm);
         SendMSG smsg = ResponseList.get(num);
         ResponseHandler resd = smsg.getResponseHandler();
         if(resd != null){

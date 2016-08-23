@@ -81,19 +81,19 @@ public class BenchAnalize {
     }
     
     public double getRequestperSec(){
-        return totalTime == 0 ? 0 : totalRequest / totalTime;
+        return totalTime == 0 ? 0 : totalRequest / getAvgTime();
     }
     
     public double getPacketperSec(){
-        return totalTime == 0 ? 0 : packets / totalTime;
+        return totalTime == 0 ? 0 : packets / getAvgTime();
     }
     
     public double getByteperSec(){
-        return totalTime == 0 ? 0 : totalbytes / totalTime;
+        return totalTime == 0 ? 0 : totalbytes / getAvgTime();
     }
     
     public double getBytesPerPacket(){
-        return packets == 0 ? 0 : totalbytes / packets;
+        return packets == 0 ? 0 : totalbytes / getAvgTime();
     }
     
     public double getTotalBytes(){
@@ -115,8 +115,8 @@ public class BenchAnalize {
                     , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
                     ,getBytesPerPacket(), getByteperSec()/1000, getPacketperSec()/1000);
         }else if(tp instanceof Performance){
-            System.out.format("Time:%.3f | T/R:%.8f | Req:%.0f | Req/Sec:%.2f%n"
-                    , getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec());
+            System.out.format("NoP:%d | Time:%.3f | T/R:%.8f | Req:%.0f | Req/Sec:%.2f%n"
+                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec());
         }
     }
 }

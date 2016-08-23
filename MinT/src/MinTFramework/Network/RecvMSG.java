@@ -36,6 +36,8 @@ public class RecvMSG {
     
     public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type){
         this(recvb, "", type);
+//        System.out.println("recv len : "+recvb.length);
+//        System.out.println(type.toString());
         this.addr = prevsocket;
         address = getIPAddress(addr);
     }

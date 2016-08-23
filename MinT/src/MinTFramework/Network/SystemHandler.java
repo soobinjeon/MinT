@@ -114,8 +114,8 @@ public class SystemHandler{
             if(reshandle != null){
 //                dl.printMessage("Response DISCOVERY");
                 ResponseData resdata = new ResponseData(rv_packet);
-                reshandle.Response(resdata);
                 UpdateDiscoverData(resdata);
+                reshandle.Response(resdata);
             }
 //            dl.printMessage(rv_packet.getMsgData());
         }
@@ -142,7 +142,7 @@ public class SystemHandler{
 //            dl.printMessage("PL : "+pl.getID()+", "
 //                    +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
 //        }
-//        
+////        
 //        dl.printMessage("Instruction List");
 //        for(Resource pl :resStorage.getInstruction()){
 //            dl.printMessage("IL : "+pl.getID()+", "
