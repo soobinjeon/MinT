@@ -120,7 +120,6 @@ public abstract class ResourcePool {
         while (queuecount >= totalQueueSize) {
             try {
                 wait();
-                break;
             } catch (InterruptedException e) {
                 System.out.println("puter Interrupted");
                 isinterrupted = true;
