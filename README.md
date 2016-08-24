@@ -1,4 +1,4 @@
-# Middleware for Cooperative Interactions of Things
+﻿# Middleware for Cooperative Interactions of Things
 
 ## Introduction
 다양한 시스템 환경에서 사물들이 서로 상호작용 할 수 있는 통합 미들웨어 플랫폼.
@@ -66,5 +66,48 @@
 ### 3.2 Application Project
 1. Application Example Project -> [MinT_Exam_Application](http://marsberry@sn.kangwon.ac.kr/LabThings/MinT_Exam_Application)
 
+## 4 Latest Update - MinT version 2.3
+
+### 4.1 주요 업데이트 내용
+
+* Network Layer
+	* 네트워크 레이어 생성
+	* Network Protocol -> Matcher/Serialization -> Transport -> System handle
+	* 각 스레드 풀에 따라 동작됨
+* Thread Pool
+	* All fixed Thread size
+	* System Thread Pool (Threads : 10)
+		* 시스템 관리 스레드 풀
+	* Receive Thread Pool (Threads: 50, Queue: 250000, Task class: RecvMSG.java)
+		* receive 관리 풀
+		* network listener -> |queuing| -> Matcher -> Transporter -> System Handler
+	* Send Thread Pool (Thread: 1, Queue: 250000, Task class: SendMSG.java)
+		* send 관리 풀
+		* 1개의 스레드밖에 동작이 안되고 있음
+			* UDP Sender가 포트 1개당 1개밖에 동작 안됨(여러개가 되지만 속도는 같음)
+		* System Handler -> |queuing| -> Transporter -> Serialization -> network sender
+
+* Packet Diagram
+	* 기존 String Array 에서 byte Array로 변경 완료
+	```java
+	 * Packet Protocol for MinT
+	 * MinT Protocol
+	 * {DIR|INS|ID}{source}{final destination}{msg data}
+	 * |-header---||----------route----------||--data--|
+	 *            || address(ip:port, ble)   ||        | should make maximum size
+	 *  - MESSAGE HEADER (total 5byte)
+	 *     - DIR : REQUEST(0), RESPONSE(1) (1 bit)
+	 *     - INS : GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4) (3 bit)
+	 *     - ID  : (4byte)
+	```
+* Performance Evaluation
+	* 성능 측정을 위한 클래스 구현
+	* Benchmark package
+
+### 4.2 버전 정보 및 소스
+
+- [MinT v2.3](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.3)
+
 ## Latest Edit
 > 09/17/2015
+> 08/24/2016
