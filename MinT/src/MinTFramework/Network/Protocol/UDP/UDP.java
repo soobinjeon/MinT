@@ -57,7 +57,6 @@ public class UDP extends Network {
      * @param frame MinT Frame
      * @param nm Network Manager
      */
-    @SuppressWarnings("LeakingThisInConstructor")
     public UDP(String nodeName, int port) {
         super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+port,NetworkType.UDP));
 //        log.printMessage(profile.getProfile());
@@ -73,6 +72,16 @@ public class UDP extends Network {
         }
         MakeUDPReceiveListeners();
         System.out.println("Set up UDP : "+profile.getProfile());
+    }
+    
+    /**
+     * set Thing's IP Address
+     * example :
+     * "111.111.111.111"
+     * @param addr 
+     */
+    public static void setIPAdress(String addr){
+        MinTConfig.IP_ADDRESS = addr;
     }
     
     /**
