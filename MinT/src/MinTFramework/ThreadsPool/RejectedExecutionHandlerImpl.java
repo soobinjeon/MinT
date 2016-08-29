@@ -14,25 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.ThreadsPool;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- *
+ * Rejected Queue Handler
+ * Basically this handler get a method to re-put a task in thread pool
+ * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ScheduleWorkerThread extends PoolWorkerThread<Service_OLD> {
-
-    public ScheduleWorkerThread(String name, int ID, ResourcePool pool) {
-        super(name+"-"+ID, ID, pool);
-    }
+public class RejectedExecutionHandlerImpl implements RejectedExecutionHandler {
 
     @Override
-    protected void HandleResoure(Service_OLD resource) {
-        resource.setParentThread(this);
-        resource.execute();
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        try {
+            executor.getQueue().put(r);
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while submitting task", e);
+        }
     }
 }

@@ -27,6 +27,7 @@ public class MinTConfig {
     
     //Network Adaptor
     static public final int NETWORK_WAITING_QUEUE = 250000;
+    static public final int NETWORK_RECEIVE_POOLSIZE = 10;
     static public final int NETWORK_THREADPOOL_NUM = 4;
     
     //UDP

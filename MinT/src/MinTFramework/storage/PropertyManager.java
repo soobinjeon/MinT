@@ -19,6 +19,8 @@ package MinTFramework.storage;
 import MinTFramework.Network.Request;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ThingProperty.PropertyRole;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -74,7 +76,7 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
          * need to get id and stop processor
         */
         if(pr.getPropertyRole() == PropertyRole.PERIODIC){
-            frame.putService(new ResourceThread(frame, pr, null));
+            this.executeResource(new ResourceProcExecutor(pr, null));
         }
         
         RS.addResource(pr);
@@ -87,21 +89,35 @@ public class PropertyManager extends ResourceManager implements ResourceManagerH
      * @return 
      */
     private ResData getResource(Request req, Resource res){
-        ResourceThread rt = new ResourceThread(frame,res,req);
-        frame.putService(rt);
+        ResourceProcCallable rt = new ResourceProcCallable(res,req);
+        Future<Object> getable = submitResource(rt);
         
-        boolean isStarted = false;
-        int cnt = 0;
-        while(!isStarted){
-            try {
-                Thread.sleep(5);
-            } catch (InterruptedException ex) {
-            }
-            if(!rt.isRunning())
-                isStarted = true;
+        try {
+            Resource retdata = (Resource)getable.get();
+            return retdata.getResourceData();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            return null;
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+            return null;
         }
-        return rt.getResource().getResourceData();
     }
     
-    
+//    private ResData getResource(Request req, Resource res){
+//        ResourceProcExecutor rt = new ResourceProcExecutor(res,req);
+//        this.executeResource(rt);
+//        
+//        boolean isStarted = false;
+//        
+//        while(!isStarted){
+//            try {
+//                Thread.sleep(5);
+//            } catch (InterruptedException ex) {
+//            }
+//            if(!rt.isRunning())
+//                isStarted = true;
+//        }
+//        return rt.getResource().getResourceData();
+//    }
 }

@@ -14,25 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.storage;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import MinTFramework.Network.Request;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ScheduleWorkerThread extends PoolWorkerThread<Service_OLD> {
-
-    public ScheduleWorkerThread(String name, int ID, ResourcePool pool) {
-        super(name+"-"+ID, ID, pool);
+public class ResourceProcess {
+    protected Resource res;
+    protected Request req;
+    protected ResourceThreadHandle rth = null;
+    protected boolean isRunning = true;
+    
+    public ResourceProcess(Resource res, Request req, ResourceThreadHandle rth) {
+        this.res = res;
+        this.req = req;
+        this.rth = rth;
     }
 
-    @Override
-    protected void HandleResoure(Service_OLD resource) {
-        resource.setParentThread(this);
-        resource.execute();
+    public boolean isRunning() {
+        return isRunning;
+    }
+    
+    public Resource getResource(){
+        return res;
+    }
+    
+    protected void processGet() {
+        Object result = res.get(req);
+        if(result != null){
+            res.data.setResource(result);
+        }
     }
 }

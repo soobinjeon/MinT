@@ -17,6 +17,10 @@
 package MinTFramework.storage;
 
 import MinTFramework.MinT;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.ThreadsPool.MinTthreadPools;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -26,6 +30,7 @@ import MinTFramework.MinT;
 public class ResourceManager {
     final protected ResourceStorage RS;
     final protected MinT frame;
+    final private SystemScheduler sysSched;
 //    private ResourceManagerHandle rhandle;
     /**
      * 
@@ -34,6 +39,7 @@ public class ResourceManager {
      */
     public ResourceManager(){
         frame = MinT.getInstance();
+        sysSched = frame.getSysteScheduler();
         RS = frame.getResStorage();
     }
 
@@ -42,5 +48,22 @@ public class ResourceManager {
             RS.setPropertyHandler(handle);
         else if(this instanceof InstructionManager)
             RS.setInstructionHandler(handle);
+    }
+    
+    /**
+     * Execute Resource Thread
+     * @param res 
+     */
+    protected void executeResource(Runnable res){
+        sysSched.executeProcess(MinTthreadPools.RESOURCE, res);
+    }
+    
+    /**
+     * Callback Resource Thread
+     * @param res
+     * @return 
+     */
+    protected Future<Object> submitResource(Callable res){
+        return sysSched.submitProcess(MinTthreadPools.RESOURCE, res);
     }
 }

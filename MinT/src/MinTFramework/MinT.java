@@ -16,8 +16,7 @@
  */
 package MinTFramework;
 
-import MinTFramework.SystemScheduler.Scheduler;
-import MinTFramework.SystemScheduler.Service;
+import MinTFramework.SystemScheduler.Service_OLD;
 import MinTFramework.storage.PropertyManager;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.InstructionManager;
@@ -34,6 +33,10 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
+import MinTFramework.SystemScheduler.SchedulePool;
+import MinTFramework.SystemScheduler.Service;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.ThreadsPool.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
@@ -53,7 +56,10 @@ public abstract class MinT {
     private DeviceManager devicemanager;
     private NetworkManager NTWmanager;
     private static MinT MinTFrame;
-    private Scheduler scheduler;
+    //System Scheduler
+    private SystemScheduler sched;
+    private SchedulePool scheduler;
+    
     private ResourceStorage resourceStorage;
     private PropertyManager PM;
     private InstructionManager IM;
@@ -73,7 +79,8 @@ public abstract class MinT {
      */
     public MinT(int serviceQueueLength, int numOfThread) {
         MinTFrame = this;
-        scheduler = new Scheduler("Serivce",serviceQueueLength, numOfThread);
+        scheduler = new SchedulePool("Serivce",serviceQueueLength, numOfThread);
+        sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
         PM = new PropertyManager();
@@ -213,13 +220,25 @@ public abstract class MinT {
     public void clearDeviceList() {
         devicemanager.clearDeviceList();
     }
-
+    
     /**
-     * Add service in Scheduler
-     * @param service Service object to add to scheduler
+     * get SystemScheduler
+     * @return 
      */
-    public void putService(Service service) {
+    public SystemScheduler getSysteScheduler(){
+        return sched;
+    }
+    
+    /**
+     * Add service in SchedulePool
+     * @param service Service_OLD object to add to scheduler
+     */
+    public void putService(Service_OLD service) {
         scheduler.putService(service);
+    }
+    
+    public void putServiceTest(Service service){
+        sched.executeProcess(MinTthreadPools.SYSTEM, service);
     }
 
 //    /**

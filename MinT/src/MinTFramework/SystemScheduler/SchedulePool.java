@@ -24,15 +24,19 @@ import MinTFramework.ThreadsPool.ResourcePool;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ScheduleWorkerThread extends PoolWorkerThread<Service_OLD> {
+public class SchedulePool extends ResourcePool{
 
-    public ScheduleWorkerThread(String name, int ID, ResourcePool pool) {
-        super(name+"-"+ID, ID, pool);
+    public SchedulePool(String name, int ObjectQueueLength, int numOfThread) {
+        super(name, ObjectQueueLength, numOfThread);
+    }
+    
+    public void putService(Service_OLD inres){
+        this.putResource(inres);
     }
 
     @Override
-    protected void HandleResoure(Service_OLD resource) {
-        resource.setParentThread(this);
-        resource.execute();
+    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
+        return new ScheduleWorkerThread("System Schedule Worker Thread", numofThread, parentPool);
     }
+    
 }
