@@ -25,28 +25,34 @@ import MinTFramework.Util.Benchmarks.Performance;
  *
  * @author soobin
  */
-public class ReceiveAdaptor extends PoolWorkerThread<RecvMSG>{
+public class ReceiveAdaptor implements Runnable{
     private MatcherAndSerialization matcher;
     
     private Performance bench = null;
     private MinT parent;
     
-    public ReceiveAdaptor(String name, int ID, ResourcePool pool) {
-        super(name, ID, pool);
+    private String name;
+    private RecvMSG resource;
+    
+    public ReceiveAdaptor(String name, RecvMSG recv) {
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
+        resource = recv;
+        this.name = name;
         if(parent.isBenchMode()){
-            bench = new Performance(this.getName());
+            bench = new Performance("ReceiveAdaptor");
             parent.addPerformance(MinT.PERFORM_METHOD.RECV_LAYER, bench);
         }
     }
 
     @Override
-    protected void HandleResoure(RecvMSG resource) {
-        if(bench != null)
+    public void run() {
+        if (bench != null) {
             bench.startPerform();
+        }
         matcher.EndPointReceive(resource);
-        if(bench != null)
+        if (bench != null) {
             bench.endPerform();
+        }
     }
 }

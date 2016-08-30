@@ -19,6 +19,8 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.ThreadsPool.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
@@ -34,8 +36,7 @@ public abstract class Network {
     protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
-    //Network Pools
-    private ReceiveAdaptPool networkAdaptorPool;
+    private SystemScheduler sysSched;
     
     private boolean isworking = true;
     
@@ -57,7 +58,7 @@ public abstract class Network {
     public Network(NetworkProfile npro) {
         this.frame = MinT.getInstance();
         this.networkmanager = frame.getNetworkManager();
-        networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
+        sysSched = frame.getSysteScheduler();
         byteBufferPool = networkmanager.getByteBufferPool();
         
         routing = networkmanager.getRoutingProtocol();
@@ -93,11 +94,8 @@ public abstract class Network {
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void putReceiveHandler(RecvMSG packet){
-        if(networkAdaptorPool == null){
-//            ndl.printMessage("Adaptor Null");
-        }
-        this.networkAdaptorPool.putResource(packet);
+    public void putReceiveHandler(ReceiveAdaptor recvadapt){
+        sysSched.submitProcess(MinTthreadPools.NET_RECV_HANDLE, recvadapt);
     }
 
     /**

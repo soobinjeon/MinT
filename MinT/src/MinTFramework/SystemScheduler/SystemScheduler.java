@@ -22,7 +22,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- *
+ * MinT Thread Scheduler
+ * Managed Process Pool list
+ *  - Service Pool (Cached Thread Pool)
+ *  - Network Receive Pool (Fixed Queue size)
+ *  - Network Send Pool (Fixed Queue size)
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
@@ -30,16 +34,20 @@ public class SystemScheduler extends Scheduler{
     
     public SystemScheduler(){
         //register System Pool
-        registMinTSystemthreadPool(MinTthreadPools.SYSTEM);
+        registerMinTSystemthreadPool(MinTthreadPools.SYSTEM);
         //register Resource Pool
-        registMinTSystemthreadPool(MinTthreadPools.RESOURCE);
+        registerMinTSystemthreadPool(MinTthreadPools.RESOURCE);
         //register Receive Pool
-        registMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
+        registerMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
         //register sender Pool
     }
     
-    private void registMinTSystemthreadPool(MinTthreadPools mtp){
-        registThreadPool(mtp.toString(), mtp.getServiceThread());
+    /**
+     * register System Thread Pool
+     * @param mtp 
+     */
+    private void registerMinTSystemthreadPool(MinTthreadPools mtp){
+        registerThreadPool(mtp.toString(), mtp.getServiceThread());
     }
     
     /**
@@ -71,12 +79,22 @@ public class SystemScheduler extends Scheduler{
     }
     
     /**
-     * submit process to target thread pool
+     * submit process to target thread pool with callback
      * 
      * @param target
      * @param run Callable type returned process
      */
     public Future<Object> submitProcess(MinTthreadPools target, Callable run){
+        return submitProcess(target.toString(), run);
+    }
+    
+    /**
+     * sub process for non-callback
+     * @param target
+     * @param run
+     * @return 
+     */
+    public Future<Object> submitProcess(MinTthreadPools target, Runnable run){
         return submitProcess(target.toString(), run);
     }
 }

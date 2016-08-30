@@ -8,6 +8,7 @@ package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.ReceiveAdaptor;
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.ByteBufferPool;
@@ -90,7 +91,8 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
-            udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
+            udp.putReceiveHandler(new ReceiveAdaptor("ReceiveAdaptor"
+                    ,new RecvMSG(fwdbyte,rd, NetworkType.UDP)));
         }catch(Exception e){
             e.printStackTrace();
         }finally{

@@ -16,6 +16,7 @@
  */
 package MinTFramework.SystemScheduler;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -23,10 +24,6 @@ import java.util.concurrent.Future;
 
 /**
  * System Process Scheduler
- * Managed Process Pool list
- *  - Service Pool (Cached Thread Pool)
- *  - Network Receive Pool (Fixed Queue size)
- *  - Network Send Pool (Fixed Queue size)
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
@@ -38,7 +35,7 @@ public class Scheduler {
      * @param name
      * @param pool 
      */
-    public void registThreadPool(String name, ExecutorService pool){
+    public void registerThreadPool(String name, ExecutorService pool){
         threadPools.put(name, pool);
     }
     
@@ -65,6 +62,14 @@ public class Scheduler {
         return retvalue;
     }
     
+    public Future<Object> submitProcess(String target, Runnable run){
+        ExecutorService exe = threadPools.get(target);
+        Future<Object> retvalue = null;
+        if(exe != null)
+            retvalue = (Future<Object>) exe.submit(run);
+        return retvalue;
+    }
+    
     /**
      * Stop All Thread Pool
      */
@@ -72,5 +77,21 @@ public class Scheduler {
         for(ExecutorService exe : threadPools.values()){
             exe.shutdownNow();
         }
+    }
+    
+    /**
+     * get Registered Thread Pools
+     * @return 
+     */
+    public Collection<ExecutorService> getRegisteredThreadPools(){
+        return threadPools.values();
+    }
+    
+    /**
+     * get Registered Thread Pool Size
+     * @return 
+     */
+    public int getRegisteredPoolSize(){
+        return threadPools.size();
     }
 }

@@ -44,9 +44,6 @@ public class NetworkManager {
     
     private RoutingProtocol routing;
     
-    //Network Recv Adaptor Pool for Handling the Recv Data
-    private ReceiveAdaptPool NetworkRecvAdaptPool;
-    
     //Network Send Adaptor Pool for Send Data
     private SendAdaptPool NetworkSendPool;
     
@@ -80,9 +77,6 @@ public class NetworkManager {
         routing = new MinTRoutingProtocol();
         
         idmaker = new PacketIDManager(ResponseList);
-        
-        NetworkRecvAdaptPool = new ReceiveAdaptPool("Receive Adaptor Pool", 
-                MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
         
         NetworkSendPool = new SendAdaptPool("Send Adaptor Pool", 
                 MinTConfig.NETWORK_WAITING_QUEUE, 1);
@@ -125,7 +119,6 @@ public class NetworkManager {
         }
         
         //run Threadpool for network
-        NetworkRecvAdaptPool.StartPool();
         NetworkSendPool.StartPool();
     }
 
@@ -269,17 +262,6 @@ public class NetworkManager {
     }
     
     /**
-     * get NetworkScheduler for operate network receiver
-     * @return 
-     */
-    protected ReceiveAdaptPool getNetworkAdaptorPool(){
-        if(NetworkRecvAdaptPool == null){
-            dl.printMessage("NRA NULL");
-        }
-        return NetworkRecvAdaptPool;
-    }
-    
-    /**
      * get Adapted Networks
      * @return 
      */
@@ -289,14 +271,6 @@ public class NetworkManager {
     
     public Network getNetwork(NetworkType ntype){
         return networks.get(ntype);
-    }
-    
-    /**
-     * get Network Queue waiting Length
-     * @return 
-     */
-    public int getNetworkAdaptorQueueWaitingLength(){
-        return NetworkRecvAdaptPool.getQueueWaitingLength();
     }
     
     /**
