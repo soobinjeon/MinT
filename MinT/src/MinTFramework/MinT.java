@@ -238,7 +238,8 @@ public abstract class MinT {
     }
     
     public void putServiceTest(Service service){
-        sched.executeProcess(MinTthreadPools.SYSTEM, service);
+        sched.addService(service);
+//        sched.executeProcess(MinTthreadPools.SYSTEM, service);
     }
 
 //    /**
@@ -517,6 +518,7 @@ public abstract class MinT {
     public void Start() {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
+        sched.startService();
         scheduler.StartPool();
     }
     

@@ -16,11 +16,14 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
+import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.ThreadsPool.MinTthreadPools;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
@@ -28,6 +31,9 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,18 +41,17 @@ import java.nio.channels.DatagramChannel;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
-    UDPSender sender;
-    final int PORT;
-    String cmd;
+    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER;};
+    private UDPSender sender;
+    private final int PORT;
     
-    InetSocketAddress isa;
-    DatagramChannel channel;
+    private InetSocketAddress isa;
+    private DatagramChannel channel;
     
-    InetSocketAddress sendisa;
-    DatagramChannel sendchannel;
+    private InetSocketAddress sendisa;
+    private DatagramChannel sendchannel;
     
     private final int NUMofRecv_Listener_Threads = MinTConfig.UDP_NUM_OF_LISTENER_THREADS;
-    private UDPRecvListener[] UDPListener;
     private final DebugLog log = new DebugLog("UDP.java");
 
     /**
@@ -134,12 +139,15 @@ public class UDP extends Network {
      * Make UDP Receive Listeners
      */
     private void MakeUDPReceiveListeners() {
-        UDPListener = new UDPRecvListener[NUMofRecv_Listener_Threads];
-        for(int i=0;i<UDPListener.length;i++){
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
+                , Executors.newCachedThreadPool());
+        for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
-                UDPListener[i] = new UDPRecvListener(channel, this);
-                UDPListener[i].start();
+                sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
+                        , new UDPRecvListener(channel, this));
+                System.out.println("listener opened");
             } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
         System.out.println("UDP - Receive Listeners are started");
@@ -147,10 +155,5 @@ public class UDP extends Network {
 
     @Override
     protected void interrupt() {
-        //Stop All Listener
-        for(int i=0;i<UDPListener.length;i++)
-            UDPListener[i].interrupt();
-        
-        //Stop All Sender
     }
 }

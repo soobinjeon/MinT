@@ -35,12 +35,11 @@ public enum MinTthreadPools {
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
             , new RejectedExecutionHandlerImpl())),
-    NET_RECV_HANDLE(new ThreadPoolExecutor(MinTConfig.NETWORK_RECEIVE_POOLSIZE
+    NET_RECV_HANDLE(new ThreadPoolExecutor((MinTConfig.NETWORK_RECEIVE_POOLSIZE/2)
             ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
-            , new RejectedExecutionHandlerImpl())),
-    NET_UDP_LISTEN(Executors.newCachedThreadPool());
+            , new RejectedExecutionHandlerImpl()));
 
     ExecutorService es;
 

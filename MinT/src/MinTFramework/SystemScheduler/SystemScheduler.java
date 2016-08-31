@@ -17,7 +17,9 @@
 package MinTFramework.SystemScheduler;
 
 import MinTFramework.ThreadsPool.MinTthreadPools;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -31,14 +33,16 @@ import java.util.concurrent.ThreadPoolExecutor;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class SystemScheduler extends Scheduler{
-    
+    private ArrayList<Service> serviceList;
     public SystemScheduler(){
+        serviceList = new ArrayList<>();
         //register System Pool
         registerMinTSystemthreadPool(MinTthreadPools.SYSTEM);
         //register Resource Pool
         registerMinTSystemthreadPool(MinTthreadPools.RESOURCE);
         //register Receive Pool
         registerMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
+        
         //register sender Pool
     }
     
@@ -46,8 +50,24 @@ public class SystemScheduler extends Scheduler{
      * register System Thread Pool
      * @param mtp 
      */
-    private void registerMinTSystemthreadPool(MinTthreadPools mtp){
+    public void registerMinTSystemthreadPool(MinTthreadPools mtp){
         registerThreadPool(mtp.toString(), mtp.getServiceThread());
+    }
+    
+    /**
+     * Add Service
+     * @param s 
+     */
+    public void addService(Service s){
+        serviceList.add(s);
+    }
+    
+    /**
+     * start MinT Service
+     */
+    public void startService(){
+        for(Service ts : serviceList)
+            executeProcess(MinTthreadPools.SYSTEM, ts);
     }
     
     /**

@@ -18,9 +18,11 @@ package MinTFramework.SystemScheduler;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * System Process Scheduler
@@ -88,10 +90,40 @@ public class Scheduler {
     }
     
     /**
+     * get Registered Thread
+     * @param target
+     * @return 
+     */
+    public ExecutorService getRegisteredThread(String target){
+        return threadPools.get(target);
+    }
+    
+    /**
      * get Registered Thread Pool Size
      * @return 
      */
     public int getRegisteredPoolSize(){
         return threadPools.size();
+    }
+    
+    /**
+     * get Number of Total Working Threads
+     * @return 
+     */
+    public int getTotalActiveThreads(){
+        int totalThreads = 0;
+        for(ExecutorService es : threadPools.values()){
+            ThreadPoolExecutor tpe = (ThreadPoolExecutor)es;
+            totalThreads += tpe.getActiveCount();
+        }
+        return totalThreads;
+    }
+    
+    /**
+     * get Registered Pool list
+     * @return 
+     */
+    public Iterator getRegisteredPoolList(){
+        return threadPools.keySet().iterator();
     }
 }

@@ -36,7 +36,7 @@ public abstract class Network {
     protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
-    private SystemScheduler sysSched;
+    protected SystemScheduler sysSched;
     
     private boolean isworking = true;
     
