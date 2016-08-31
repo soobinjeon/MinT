@@ -14,25 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import java.io.IOException;
+import java.nio.channels.DatagramChannel;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ScheduleWorkerThread extends PoolWorkerThread<Service_OLD> {
-
-    public ScheduleWorkerThread(String name, int ID, ResourcePool pool) {
-        super(name+"-"+ID, ID, pool);
+public class UDPSendThread extends Thread{
+    private DatagramChannel datachannel;
+    
+    public UDPSendThread(Runnable r, DatagramChannel datachannel){
+        super(r);
+        this.datachannel = datachannel;
+        System.out.println("created SenderThread: "+getPort());
     }
-
-    @Override
-    protected void HandleResoure(Service_OLD resource) {
-        resource.setParentThread(this);
-        resource.execute();
+    
+    public DatagramChannel getDataChannel(){
+        return datachannel;
+    }
+    
+    public String getPort(){
+        try {
+            return datachannel.getLocalAddress().toString();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return "";
     }
 }

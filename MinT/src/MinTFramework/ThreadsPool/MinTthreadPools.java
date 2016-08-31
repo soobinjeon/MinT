@@ -24,14 +24,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * MinT System Thread Pool Constructor
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public enum MinTthreadPools {
     SYSTEM(Executors.newCachedThreadPool()),
     RESOURCE(Executors.newCachedThreadPool()),
-    NET_SEND(new ThreadPoolExecutor(1, 10, 0
+    NET_SEND(new ThreadPoolExecutor(MinTConfig.NETWORK_SEND_POOLSIZE/2
+            , MinTConfig.NETWORK_SEND_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
             , new RejectedExecutionHandlerImpl())),

@@ -63,12 +63,6 @@ public abstract class Network {
         
         routing = networkmanager.getRoutingProtocol();
         profile = npro;
-        
-//        ndl.printMessage("Set Network listener");
-        if(frame.isBenchMode()){
-            pf = new Performance("Network Sender");
-            frame.addPerformance(MinT.PERFORM_METHOD.NETWORK_SEND, pf);
-        }
     }
     
     /**
@@ -109,12 +103,8 @@ public abstract class Network {
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
-            if(pf != null)
-                pf.startPerform();
             packet.makeBytes();
-            if(pf != null)
-                pf.endPerform();
-            this.sendProtocol(packet);
+            sendProtocol(packet);
         }
     }
     

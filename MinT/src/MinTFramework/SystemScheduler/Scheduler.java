@@ -39,6 +39,7 @@ public class Scheduler {
      */
     public void registerThreadPool(String name, ExecutorService pool){
         threadPools.put(name, pool);
+        System.out.println("Scheduler: Registered ThreadPool-"+name);
     }
     
     /**
@@ -125,5 +126,10 @@ public class Scheduler {
      */
     public Iterator getRegisteredPoolList(){
         return threadPools.keySet().iterator();
+    }
+    
+    public int getRegisteredPoolQueueSize(String target){
+        ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPools.get(target);
+        return tpe.getQueue().size();
     }
 }

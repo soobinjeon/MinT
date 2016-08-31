@@ -21,6 +21,8 @@ import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.ThreadsPool.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
@@ -45,7 +47,7 @@ public class NetworkManager {
     private RoutingProtocol routing;
     
     //Network Send Adaptor Pool for Send Data
-    private SendAdaptPool NetworkSendPool;
+    private SystemScheduler sysSched;
     
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
@@ -69,6 +71,7 @@ public class NetworkManager {
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
+        sysSched = frame.getSysteScheduler();
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
@@ -77,9 +80,6 @@ public class NetworkManager {
         routing = new MinTRoutingProtocol();
         
         idmaker = new PacketIDManager(ResponseList);
-        
-        NetworkSendPool = new SendAdaptPool("Send Adaptor Pool", 
-                MinTConfig.NETWORK_WAITING_QUEUE, 1);
     }
     
     /**
@@ -117,9 +117,6 @@ public class NetworkManager {
         for (NetworkType ty : networkList) {
             setOnNetwork(ty);
         }
-        
-        //run Threadpool for network
-        NetworkSendPool.StartPool();
     }
 
     /**
@@ -131,7 +128,7 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
-            System.out.println("Starting UDP... "+ntype.getPort());
+            System.out.println("Starting UDP...");
             networks.put(ntype, new UDP(frame.getNodeName(),ntype.getPort()));
             System.out.println("Turned on UDP: "+ntype.getPort());
         }
@@ -176,7 +173,7 @@ public class NetworkManager {
      * @param smsg 
      */
     public void SEND(SendMSG smsg){
-        NetworkSendPool.putResource(smsg);
+        sysSched.submitProcess(MinTthreadPools.NET_SEND, new SendAdaptor(smsg));
     }
     
     /**
@@ -272,20 +269,6 @@ public class NetworkManager {
     public Network getNetwork(NetworkType ntype){
         return networks.get(ntype);
     }
-    
-    /**
-     * get Sender Waiting Queue
-     * @return 
-     */
-    public int getNetworkSenderQueueWaitingLength(){
-        return NetworkSendPool.getQueueWaitingLength();
-    }
-    
-    public int getNetworkSenderQueueLength(){
-        return NetworkSendPool.getQueueTotalLength();
-    }
-    
-    
     
     /**
      * get ByteBufferPool

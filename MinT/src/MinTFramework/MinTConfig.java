@@ -28,11 +28,7 @@ public class MinTConfig {
     //Network Adaptor
     static public final int NETWORK_WAITING_QUEUE = 250000;
     static public final int NETWORK_RECEIVE_POOLSIZE = 10;
-    static public final int NETWORK_THREADPOOL_NUM = 4;
-    
-    //UDP
-    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
-    static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
+    static public final int NETWORK_SEND_POOLSIZE = 10;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;

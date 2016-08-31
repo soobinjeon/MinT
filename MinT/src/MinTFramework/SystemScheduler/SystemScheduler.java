@@ -19,7 +19,6 @@ package MinTFramework.SystemScheduler;
 import MinTFramework.ThreadsPool.MinTthreadPools;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -42,8 +41,8 @@ public class SystemScheduler extends Scheduler{
         registerMinTSystemthreadPool(MinTthreadPools.RESOURCE);
         //register Receive Pool
         registerMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
-        
         //register sender Pool
+        registerMinTSystemthreadPool(MinTthreadPools.NET_SEND);
     }
     
     /**
@@ -85,8 +84,7 @@ public class SystemScheduler extends Scheduler{
      * @return 
      */
     public int getQueueSize(MinTthreadPools tp){
-        ThreadPoolExecutor tpe = (ThreadPoolExecutor) threadPools.get(tp.toString());
-        return tpe.getQueue().size();
+        return getRegisteredPoolQueueSize(tp.toString());
     }
     
     /**

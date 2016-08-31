@@ -16,7 +16,6 @@
  */
 package MinTFramework;
 
-import MinTFramework.SystemScheduler.Service_OLD;
 import MinTFramework.storage.PropertyManager;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.InstructionManager;
@@ -33,10 +32,8 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
-import MinTFramework.SystemScheduler.SchedulePool;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.ThreadsPool.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
@@ -58,7 +55,6 @@ public abstract class MinT {
     private static MinT MinTFrame;
     //System Scheduler
     private SystemScheduler sched;
-    private SchedulePool scheduler;
     
     private ResourceStorage resourceStorage;
     private PropertyManager PM;
@@ -79,7 +75,6 @@ public abstract class MinT {
      */
     public MinT(int serviceQueueLength, int numOfThread) {
         MinTFrame = this;
-        scheduler = new SchedulePool("Serivce",serviceQueueLength, numOfThread);
         sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
@@ -233,13 +228,8 @@ public abstract class MinT {
      * Add service in SchedulePool
      * @param service Service_OLD object to add to scheduler
      */
-    public void putService(Service_OLD service) {
-        scheduler.putService(service);
-    }
-    
-    public void putServiceTest(Service service){
+    public void putService(Service service){
         sched.addService(service);
-//        sched.executeProcess(MinTthreadPools.SYSTEM, service);
     }
 
 //    /**
@@ -519,7 +509,6 @@ public abstract class MinT {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
         sched.startService();
-        scheduler.StartPool();
     }
     
     protected void isDebug(boolean isdebug){

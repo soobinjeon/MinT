@@ -16,14 +16,12 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.ThreadsPool.MinTthreadPools;
+import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
@@ -31,9 +29,10 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -41,17 +40,21 @@ import java.util.logging.Logger;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
-    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER;};
+    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
+    //UDP
+    static final int UDP_SENDER_THREAD_CORE = 1;
+    static final int UDP_SENDER_THREAD_MAX = 1;
+    static final int UDP_SENDER_THREAD_QUEUE = 25000;
+    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
+    static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
+    
     private UDPSender sender;
     private final int PORT;
     
     private InetSocketAddress isa;
     private DatagramChannel channel;
     
-    private InetSocketAddress sendisa;
-    private DatagramChannel sendchannel;
-    
-    private final int NUMofRecv_Listener_Threads = MinTConfig.UDP_NUM_OF_LISTENER_THREADS;
+    private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
     private final DebugLog log = new DebugLog("UDP.java");
 
     /**
@@ -76,6 +79,7 @@ public class UDP extends Network {
         } catch (IOException ex) {
         }
         MakeUDPReceiveListeners();
+        MakeUDPSender();
         System.out.println("Set up UDP : "+profile.getProfile());
     }
     
@@ -97,15 +101,7 @@ public class UDP extends Network {
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
-        
-        sendisa = new InetSocketAddress(PORT+1);
-        sendchannel = DatagramChannel.open();
-        sendchannel.socket().bind(sendisa);
-        sendchannel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
-        
-        sender = new UDPSender(sendchannel, this);
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
     
     /**
@@ -132,7 +128,18 @@ public class UDP extends Network {
     protected void sendProtocol(PacketDatagram packet) throws IOException {
             NetworkProfile dst = packet.getNextNode();
             SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
-            sender.SendMsg(packet.getPacket(), add);
+            sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
+                    , new UDPSender(this, packet.getPacket(), add));
+    }
+    
+    private void MakeUDPSender(){
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_SENDER.toString()
+                , new ThreadPoolExecutor(UDP_SENDER_THREAD_CORE
+                , UDP_SENDER_THREAD_MAX, 10
+                , TimeUnit.SECONDS
+                , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
+                , new UDPSendFactory(PORT)
+                , new RejectedExecutionHandlerImpl()));
     }
 
     /**
@@ -145,12 +152,15 @@ public class UDP extends Network {
             try {
                 sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
                         , new UDPRecvListener(channel, this));
-                System.out.println("listener opened");
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
         System.out.println("UDP - Receive Listeners are started");
+    }
+    
+    public int getPort(){
+        return PORT;
     }
 
     @Override
