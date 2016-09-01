@@ -25,31 +25,33 @@ import MinTFramework.Util.Benchmarks.Performance;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendAdaptor implements Runnable{
+public class SendAdapter extends Thread{
     private Transportation sender;
     
     private Performance bench = null;
     private MinT parent;
     
-    private SendMSG sendmsg;
     
-    public SendAdaptor(SendMSG sendmsg) {
+    public SendAdapter(Runnable r, String name) {
+        super(r, name);
         sender = new Transportation(NetworkLayers.LAYER_DIRECTION.SEND);
-        this.sendmsg = sendmsg;
         parent = MinT.getInstance();
-        if(parent.isBenchMode()){
-            bench = new PacketPerform("SendAdaptor");
-            parent.addPerformance(MinT.PERFORM_METHOD.SEND_LAYER, bench);
-        }
+//        if(parent.isBenchMode()){
+//            bench = new PacketPerform("SendAdaptor");
+//            parent.addPerformance(MinT.PERFORM_METHOD.SEND_LAYER, bench);
+//        }
+    }
+    
+    public Transportation getTransportation(){
+        return sender;
     }
 
-    @Override
-    public void run() {
-        if(bench != null)
-            bench.startPerform();
-        sender.EndPointSend(sendmsg);
-        if(bench != null)
-            bench.endPerform();
-    }
-    
+//    @Override
+//    public void run() {
+//        if(bench != null)
+//            bench.startPerform();
+//        sender.EndPointSend(sendmsg);
+//        if(bench != null)
+//            bench.endPerform();
+//    }
 }

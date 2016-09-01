@@ -173,7 +173,7 @@ public class NetworkManager {
      * @param smsg 
      */
     public void SEND(SendMSG smsg){
-        sysSched.submitProcess(MinTthreadPools.NET_SEND, new SendAdaptor(smsg));
+        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
     
     /**

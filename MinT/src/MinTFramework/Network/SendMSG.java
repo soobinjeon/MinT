@@ -21,7 +21,7 @@ package MinTFramework.Network;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendMSG {
+public class SendMSG implements Runnable{
     private PacketDatagram.HEADER_DIRECTION head_dir;
     private PacketDatagram.HEADER_INSTRUCTION head_inst;
     private NetworkProfile destination;
@@ -79,6 +79,14 @@ public class SendMSG {
         this(hd,hi,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
+    @Override
+    public void run() {
+        SendAdapter sendA = (SendAdapter)Thread.currentThread();
+        Transportation trans = sendA.getTransportation();
+        //put the sendmsg to transportation
+        trans.EndPointSend(this);
+    }
+    
     public PacketDatagram.HEADER_DIRECTION getHeader_Direction(){
         return head_dir;
     }
@@ -126,4 +134,5 @@ public class SendMSG {
     void setResKey(int makePacketID) {
         resKey = makePacketID;
     }
+
 }

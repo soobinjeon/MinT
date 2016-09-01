@@ -88,8 +88,8 @@ public abstract class Network {
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void putReceiveHandler(ReceiveAdaptor recvadapt){
-        sysSched.submitProcess(MinTthreadPools.NET_RECV_HANDLE, recvadapt);
+    public void putReceiveHandler(RecvMSG recvmsg){
+        sysSched.submitProcess(MinTthreadPools.NET_RECV_HANDLE, recvmsg);
     }
 
     /**

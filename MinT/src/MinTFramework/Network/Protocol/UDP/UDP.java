@@ -43,8 +43,8 @@ public class UDP extends Network {
     public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
     //UDP
     static final int UDP_SENDER_THREAD_CORE = 1;
-    static final int UDP_SENDER_THREAD_MAX = 1;
-    static final int UDP_SENDER_THREAD_QUEUE = 25000;
+    static final int UDP_SENDER_THREAD_MAX = 3;
+    static final int UDP_SENDER_THREAD_QUEUE = 200000;
     static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
     static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
     

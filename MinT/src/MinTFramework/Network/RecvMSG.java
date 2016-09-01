@@ -22,7 +22,7 @@ import java.net.SocketAddress;
  *
  * @author soobin
  */
-public class RecvMSG {
+public class RecvMSG implements Runnable {
     private NetworkType ntype;
     private byte[] recvbytes;
     private SocketAddress addr;
@@ -30,7 +30,7 @@ public class RecvMSG {
     
     public RecvMSG(byte[] recvb, String address, NetworkType type){
         recvbytes = recvb;
-        this.address = address;
+        address = address;
         ntype = type;
     }
     
@@ -38,8 +38,17 @@ public class RecvMSG {
         this(recvb, "", type);
 //        System.out.println("recv len : "+recvb.length);
 //        System.out.println(type.toString());
-        this.addr = prevsocket;
+        addr = prevsocket;
         address = getIPAddress(addr);
+    }
+    
+    @Override
+    public void run() {
+        ReceiveAdapter recvA = (ReceiveAdapter)Thread.currentThread();
+        MatcherAndSerialization matcher = recvA.getMatcher();
+        
+        //put the recvmsg to matcher
+        matcher.EndPointReceive(this);
     }
     
     private String getIPAddress(SocketAddress recvadd){
@@ -61,4 +70,5 @@ public class RecvMSG {
     public String getAddress() {
         return this.address;
     }
+
 }

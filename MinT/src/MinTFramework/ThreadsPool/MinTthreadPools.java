@@ -17,6 +17,8 @@
 package MinTFramework.ThreadsPool;
 
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.ReceiveAdaptorFactory;
+import MinTFramework.Network.SendAdapterFactory;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,11 +37,13 @@ public enum MinTthreadPools {
             , MinTConfig.NETWORK_SEND_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
+            , new SendAdapterFactory()
             , new RejectedExecutionHandlerImpl())),
     NET_RECV_HANDLE(new ThreadPoolExecutor((MinTConfig.NETWORK_RECEIVE_POOLSIZE/2)
             ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
+            , new ReceiveAdaptorFactory()
             , new RejectedExecutionHandlerImpl()));
 
     ExecutorService es;
