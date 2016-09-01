@@ -17,36 +17,48 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**
- *
+ * Receive Adapter Thread Pool
+ *  - A worker thread for Receiving thread pool
+ *  - intercept receiving data(RecvMSG) from endpoint networks
+ *  - send to Matcher
+ *  - 
  * @author soobin
  */
-public class ReceiveAdaptor extends PoolWorkerThread<RecvMSG>{
+public class ReceiveAdapter extends Thread{
     private MatcherAndSerialization matcher;
     
     private Performance bench = null;
     private MinT parent;
     
-    public ReceiveAdaptor(String name, int ID, ResourcePool pool) {
-        super(name, ID, pool);
+    public ReceiveAdapter(Runnable r, String name) {
+        super(r,name);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
-        if(parent.isBenchMode()){
-            bench = new Performance(this.getName());
-            parent.addPerformance(MinT.PERFORM_METHOD.RECV_LAYER, bench);
-        }
+//        if(parent.isBenchMode()){
+//            bench = new Performance("ReceiveAdaptor");
+//            parent.addPerformance(MinT.PERFORM_METHOD.RECV_LAYER, bench);
+//        }
+    }
+    
+    /**
+     * get Current Thread's Matcher
+     * @return 
+     */
+    public MatcherAndSerialization getMatcher(){
+        return matcher;
     }
 
-    @Override
-    protected void HandleResoure(RecvMSG resource) {
-        if(bench != null)
-            bench.startPerform();
-        matcher.EndPointReceive(resource);
-        if(bench != null)
-            bench.endPerform();
-    }
+//    @Override
+//    public void run() {
+//        if (bench != null) {
+//            bench.startPerform();
+//        }
+        
+//        if (bench != null) {
+//            bench.endPerform();
+//        }
+//    }
 }

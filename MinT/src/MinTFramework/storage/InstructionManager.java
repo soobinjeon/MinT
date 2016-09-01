@@ -16,7 +16,6 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.MinT;
 import MinTFramework.Network.Request;
 
 /**
@@ -58,7 +57,7 @@ public class InstructionManager extends ResourceManager implements ResourceManag
      * @param res 
      */
     private void setDevice(Request req, Resource res) {
-        ResourceThread rt = new ResourceThread(frame,res,req);
-        frame.putService(rt);
+        ResourceProcExecutor rt = new ResourceProcExecutor(res,req);
+        executeResource(rt);
     }
 }

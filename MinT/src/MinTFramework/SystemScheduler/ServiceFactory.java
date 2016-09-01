@@ -14,25 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.SystemScheduler;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import java.util.concurrent.ThreadFactory;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendAdaptPool extends ResourcePool{
-
-    public SendAdaptPool(String name, int ObjectQueueLength, int numOfThread) {
-        super(name, ObjectQueueLength, numOfThread);
-    }
-
+public class ServiceFactory implements ThreadFactory{
+    static int threadNo = 0;
     @Override
-    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
-        return new SendAdaptor("Send Adaptor", numofThread, parentPool);
+    public Thread newThread(Runnable r) {
+        ++threadNo;
+        return new Thread(r, "MinTService-"+threadNo);
     }
     
 }

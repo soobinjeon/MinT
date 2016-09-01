@@ -14,29 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.storage;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import java.util.concurrent.ThreadFactory;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Scheduler extends ResourcePool{
-
-    public Scheduler(String name, int ObjectQueueLength, int numOfThread) {
-        super(name, ObjectQueueLength, numOfThread);
-    }
-    
-    public void putService(Service inres){
-        this.putResource(inres);
-    }
-
+public class ResourceProcFactory implements ThreadFactory{
+    static int threadNo;
     @Override
-    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
-        return new ScheduleWorkerThread("System Schedule Worker Thread", numofThread, parentPool);
+    public Thread newThread(Runnable r) {
+        ++threadNo;
+        return new Thread(r, "Resource-"+threadNo);
     }
     
 }

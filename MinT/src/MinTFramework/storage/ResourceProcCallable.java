@@ -14,25 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.storage;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import MinTFramework.Network.Request;
+import java.util.concurrent.Callable;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ScheduleWorkerThread extends PoolWorkerThread<Service> {
+public class ResourceProcCallable extends ResourceProcess implements Callable{
 
-    public ScheduleWorkerThread(String name, int ID, ResourcePool pool) {
-        super(name+"-"+ID, ID, pool);
+    public ResourceProcCallable(Resource res, Request req) {
+        this(res,req,null);
     }
-
+    
+    public ResourceProcCallable(Resource res, Request req, ResourceThreadHandle rth) {
+        super(res,req,rth);
+    }
+    
     @Override
-    protected void HandleResoure(Service resource) {
-        resource.setParentThread(this);
-        resource.execute();
+    public Object call() throws Exception {
+        if(res instanceof ThingProperty){
+            //get Processor
+            processGet();
+        }
+        
+        //set Processor
+        res.set(req);
+        
+        if(rth != null)
+            rth.ThreadEndHandle();
+        isRunning = false;
+        
+        return res;
     }
 }

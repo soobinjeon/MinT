@@ -22,7 +22,12 @@ import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.DebugLog;
 
 /**
- *
+ * MinT Matcher and Serialization
+ * Matcher
+ *  - Match packet from end point network
+ *  - 
+ * Serialization
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
@@ -48,6 +53,10 @@ public class MatcherAndSerialization implements NetworkLayers{
         }
     }
 
+    /**
+     * get Packet from Endpoint Receiver
+     * @param packet 
+     */
     @Override
     public void EndPointReceive(RecvMSG packet) {
         PacketDatagram matchedPacket = new PacketDatagram(packet);
@@ -55,6 +64,7 @@ public class MatcherAndSerialization implements NetworkLayers{
     }
     
     /**
+     * send Packet to End point network
      * @param packet 
      */
     @Override
@@ -77,23 +87,16 @@ public class MatcherAndSerialization implements NetworkLayers{
             }
 
             //set Response Handler
-            //        this.networkHandler.
             try {
-//                dl.printMessage("Send Network-" + sendNetwork.getNetworkType());
-//                dl.printMessage("Packet :" + packet.getPacketString());
-//                dl.printMessage("Packet Length : "+packet.getPacket().length);
-                
                 if(bench_send != null)
                     bench_send.endPerform();
                 
                 sendNetwork.send(packet);
-//                networkManager.setSendHandlerCnt();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
-//            dl.printMessage("Error : There are no Networks");
-//            System.out.println("Error : There are no Networks");
+            System.out.println("Error : There are no Networks");
         }
     }
 

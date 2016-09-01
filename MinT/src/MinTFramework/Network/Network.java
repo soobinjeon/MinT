@@ -19,6 +19,8 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
@@ -34,8 +36,7 @@ public abstract class Network {
     protected NetworkProfile profile;
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
-    //Network Pools
-    private ReceiveAdaptPool networkAdaptorPool;
+    protected SystemScheduler sysSched;
     
     private boolean isworking = true;
     
@@ -57,17 +58,11 @@ public abstract class Network {
     public Network(NetworkProfile npro) {
         this.frame = MinT.getInstance();
         this.networkmanager = frame.getNetworkManager();
-        networkAdaptorPool = networkmanager.getNetworkAdaptorPool();
+        sysSched = frame.getSysteScheduler();
         byteBufferPool = networkmanager.getByteBufferPool();
         
         routing = networkmanager.getRoutingProtocol();
         profile = npro;
-        
-//        ndl.printMessage("Set Network listener");
-        if(frame.isBenchMode()){
-            pf = new Performance("Network Sender");
-            frame.addPerformance(MinT.PERFORM_METHOD.NETWORK_SEND, pf);
-        }
     }
     
     /**
@@ -93,11 +88,8 @@ public abstract class Network {
      * call Receive Handler after Receiving data 
      * @param packet 
      */
-    public void putReceiveHandler(RecvMSG packet){
-        if(networkAdaptorPool == null){
-//            ndl.printMessage("Adaptor Null");
-        }
-        this.networkAdaptorPool.putResource(packet);
+    public void putReceiveHandler(RecvMSG recvmsg){
+        sysSched.submitProcess(MinTthreadPools.NET_RECV_HANDLE, recvmsg);
     }
 
     /**
@@ -111,12 +103,8 @@ public abstract class Network {
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
-            if(pf != null)
-                pf.startPerform();
             packet.makeBytes();
-            if(pf != null)
-                pf.endPerform();
-            this.sendProtocol(packet);
+            sendProtocol(packet);
         }
     }
     

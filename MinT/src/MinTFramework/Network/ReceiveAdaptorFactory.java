@@ -16,21 +16,20 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
+import java.util.concurrent.ThreadFactory;
 
 /**
  *
  * @author soobin
  */
-public class ReceiveAdaptPool extends ResourcePool{
-    public ReceiveAdaptPool(String name, int ObjectQueueLength, int numOfThread) {
-        super(name, ObjectQueueLength, numOfThread);
-    }
-
+public class ReceiveAdaptorFactory implements ThreadFactory{
+    private String name = "ReceiveAdaptor";
+    static int threadNo = 0;
+    
     @Override
-    protected PoolWorkerThread makeWorkerThread(int numofThread, ResourcePool parentPool) {
-        return new ReceiveAdaptor("Receive Adaptor", numofThread, parentPool);
+    public Thread newThread(Runnable r) {
+        ++threadNo;
+        return new ReceiveAdapter(r, name+": "+threadNo);
     }
     
 }

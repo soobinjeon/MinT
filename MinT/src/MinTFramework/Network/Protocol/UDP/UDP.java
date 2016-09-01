@@ -21,6 +21,7 @@ import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
+import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
@@ -28,6 +29,11 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -35,18 +41,21 @@ import java.nio.channels.DatagramChannel;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
-    UDPSender sender;
-    final int PORT;
-    String cmd;
+    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
+    //UDP
+    static final int UDP_SENDER_THREAD_CORE = 1;
+    static final int UDP_SENDER_THREAD_MAX = 3;
+    static final int UDP_SENDER_THREAD_QUEUE = 200000;
+    static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
+    static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
     
-    InetSocketAddress isa;
-    DatagramChannel channel;
+    private UDPSender sender;
+    private final int PORT;
     
-    InetSocketAddress sendisa;
-    DatagramChannel sendchannel;
+    private InetSocketAddress isa;
+    private DatagramChannel channel;
     
-    private final int NUMofRecv_Listener_Threads = MinTConfig.UDP_NUM_OF_LISTENER_THREADS;
-    private UDPRecvListener[] UDPListener;
+    private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
     private final DebugLog log = new DebugLog("UDP.java");
 
     /**
@@ -71,6 +80,7 @@ public class UDP extends Network {
         } catch (IOException ex) {
         }
         MakeUDPReceiveListeners();
+        MakeUDPSender();
         System.out.println("Set up UDP : "+profile.getProfile());
     }
     
@@ -92,15 +102,7 @@ public class UDP extends Network {
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
-        
-        sendisa = new InetSocketAddress(PORT+1);
-        sendchannel = DatagramChannel.open();
-        sendchannel.socket().bind(sendisa);
-        sendchannel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_SNDBUF, MinTConfig.UDP_RECV_BUFF_SIZE);
-        
-        sender = new UDPSender(sendchannel, this);
+        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
     
     /**
@@ -127,30 +129,47 @@ public class UDP extends Network {
     protected void sendProtocol(PacketDatagram packet) throws IOException {
             NetworkProfile dst = packet.getNextNode();
             SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
-            sender.SendMsg(packet.getPacket(), add);
+            sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
+                    , new UDPSender(this, packet.getPacket(), add));
+    }
+    
+    private void MakeUDPSender(){
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_SENDER.toString()
+                , new ThreadPoolExecutor(UDP_SENDER_THREAD_CORE
+                , UDP_SENDER_THREAD_MAX, 10
+                , TimeUnit.SECONDS
+                , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
+                , new UDPSendFactory(PORT)
+                , new RejectedExecutionHandlerImpl()));
     }
 
     /**
      * Make UDP Receive Listeners
      */
     private void MakeUDPReceiveListeners() {
-        UDPListener = new UDPRecvListener[NUMofRecv_Listener_Threads];
-        for(int i=0;i<UDPListener.length;i++){
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
+                , Executors.newCachedThreadPool(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "UDP_Receive_Listener");
+            }
+        }));
+        for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
-                UDPListener[i] = new UDPRecvListener(channel, this);
-                UDPListener[i].start();
+                sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
+                        , new UDPRecvListener(channel, this));
             } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
         System.out.println("UDP - Receive Listeners are started");
     }
+    
+    public int getPort(){
+        return PORT;
+    }
 
     @Override
     protected void interrupt() {
-        //Stop All Listener
-        for(int i=0;i<UDPListener.length;i++)
-            UDPListener[i].interrupt();
-        
-        //Stop All Sender
     }
 }

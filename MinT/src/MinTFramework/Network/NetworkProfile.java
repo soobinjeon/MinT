@@ -20,7 +20,9 @@ import MinTFramework.Util.DebugLog;
 import java.nio.ByteBuffer;
 
 /**
- *
+ * Network Profile
+ *  - Network Profiling with endpoint network info
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */

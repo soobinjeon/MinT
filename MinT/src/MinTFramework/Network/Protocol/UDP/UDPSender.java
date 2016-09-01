@@ -24,46 +24,42 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 
-public class UDPSender {
-    MinT frame = MinT.getInstance();
+public class UDPSender implements Runnable {
+    MinT frame;
     NetworkManager nmanager;
     UDP udp;
-    Selector selector;
-    DatagramChannel channel;
+//    Selector selector;
     DebugLog dl = new DebugLog("UDPSender");
     PacketPerform ppf = null;
     
-    public UDPSender(DatagramChannel channel, UDP udp) throws IOException{
-        selector = Selector.open();
-        this.channel = channel;
-        channel.register(selector, SelectionKey.OP_WRITE);
+    byte[] _sendMsg;
+    SocketAddress sendAddr;
+    
+    public UDPSender(UDP udp, byte[] _msg, SocketAddress add) throws IOException{
+        frame = MinT.getInstance();
         nmanager = frame.getNetworkManager();
         this.udp = udp;
-        //for bench
-        if(frame.isBenchMode()){
-            ppf = new PacketPerform("UDP SENDER");
-            frame.addPerformance(MinT.PERFORM_METHOD.UDP_SEND, ppf);
-        }
+        _sendMsg = _msg;
+        sendAddr = add;
     }
-
-    public void SendMsg(byte[] _msg, SocketAddress add) throws UnknownHostException, IOException{
-        if(ppf != null)
-            ppf.startPerform();
+    
+    @Override
+    public void run() {
+        UDPSendThread ust = (UDPSendThread)Thread.currentThread();
+        DatagramChannel channel = ust.getDataChannel();
         int bsize = 0;
         ByteBufferPool bbp = nmanager.getByteBufferPool();
         ByteBuffer out = null;
         try{        
             out = bbp.getMemoryBuffer();
-            out.put(_msg);
+            out.put(_sendMsg);
             out.flip();
-            bsize = channel.send(out, add);
+            bsize = channel.send(out, sendAddr);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }finally{
             bbp.putBuffer(out);
-            if(ppf != null)
-                ppf.endPerform(bsize);
         }
     }
 }

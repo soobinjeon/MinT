@@ -17,77 +17,32 @@
 package MinTFramework.SystemScheduler;
 
 import MinTFramework.MinT;
-import MinTFramework.ThreadsPool.PoolWorkerThread;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Service {
-    private int id;
-    private int prior;
-    private boolean isInterrupted = false;
+public abstract class Service implements Runnable{
     protected final MinT frame;
-    private PoolWorkerThread parentThread;
-    /***
-     * Service Constructor
-     * Deafult id=0, prior = 0;
-     * @param _frame 
-     */
-    public Service(MinT _frame) {
-        id = ScheduleWorkerThread.NOT_WORKING_THREAD_SERVICE_ID;
-        prior = 0;
-        frame = _frame;
-        isInterrupted = false;
-    }
-    
-    public Service(){
-        this(null);
-    }
-    
-    /**
-     * @deprecated
-     * Use Main Thread Method
-     * set Service Prior
-        NOT USED UNTIL NOW
-     * @param pri 
-     */
-    public void setPrior(int pri){
-        this.prior = pri;
-    }
-    
-    public void setID(int id){
-        this.id = id;
-    }
-    
-    /**
-     * @deprecated 
-     * Use Main Thread Method
-     * @return 
-     */
-    public int getPrior() {
-        return this.prior;
+    protected String name;
+    public Service(String name) {
+        this.name = name;
+        frame = MinT.getInstance();
     }
 
-    public int getID() {
-        return this.id;
+    public String getSerivceName() {
+        return this.name;
     }
     
-    public void serviceInterrupt(){
-            isInterrupted = true;
+    @Override
+    public void run(){
+        execute();
     }
     
-    protected boolean isServiceInterrupted(){
-        return isInterrupted;
-    }
     /**
      * Scheduler execute this method
      * App develper must 
      */
     abstract public void execute();
-
-    void setParentThread(ScheduleWorkerThread aThis) {
-        parentThread = aThis;
-    }
 }

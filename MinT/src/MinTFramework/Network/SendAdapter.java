@@ -17,42 +17,42 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.ThreadsPool.PoolWorkerThread;
-import MinTFramework.ThreadsPool.ResourcePool;
-import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.Benchmarks.Performance;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * Send Adapter Thread Pool
+ *  - A worker thread for Sending thread pool
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendAdaptor extends PoolWorkerThread<SendMSG>{
+public class SendAdapter extends Thread{
     private Transportation sender;
     
     private Performance bench = null;
     private MinT parent;
     
-    public SendAdaptor(String name, int ID, ResourcePool pool) {
-        super(name, ID, pool);
+    
+    public SendAdapter(Runnable r, String name) {
+        super(r, name);
         sender = new Transportation(NetworkLayers.LAYER_DIRECTION.SEND);
-        
         parent = MinT.getInstance();
-        if(parent.isBenchMode()){
-            bench = new PacketPerform(this.getName());
-            parent.addPerformance(MinT.PERFORM_METHOD.SEND_LAYER, bench);
-        }
-    }
-
-    @Override
-    protected void HandleResoure(SendMSG resource) {
-        if(bench != null)
-            bench.startPerform();
-        sender.EndPointSend(resource);
-        if(bench != null)
-            bench.endPerform();
+//        if(parent.isBenchMode()){
+//            bench = new PacketPerform("SendAdaptor");
+//            parent.addPerformance(MinT.PERFORM_METHOD.SEND_LAYER, bench);
+//        }
     }
     
+    public Transportation getTransportation(){
+        return sender;
+    }
+
+//    @Override
+//    public void run() {
+//        if(bench != null)
+//            bench.startPerform();
+//        sender.EndPointSend(sendmsg);
+//        if(bench != null)
+//            bench.endPerform();
+//    }
 }

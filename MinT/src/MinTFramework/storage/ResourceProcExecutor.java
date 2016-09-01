@@ -16,36 +16,25 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.MinT;
 import MinTFramework.Network.Request;
-import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.ThingProperty.PropertyRole;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ResourceThread extends Service{
-    private Resource res;
-    private Request req;
-    private ResourceThreadHandle rth = null;
-    private boolean isRunning = true;
-    public ResourceThread(MinT _frame, Resource res, Request req) {
-        this(_frame,res,req,null);
+public class ResourceProcExecutor extends ResourceProcess implements Runnable{
+    
+    public ResourceProcExecutor(Resource res, Request req) {
+        this(res,req,null);
     }
     
-    public ResourceThread(MinT _frame, Resource res, Request req, ResourceThreadHandle rth) {
-        super(_frame);
-        this.res = res;
-        this.req = req;
-        this.rth = rth;
+    public ResourceProcExecutor(Resource res, Request req, ResourceThreadHandle rth) {
+        super(res,req,rth);
     }
-
     @Override
-    public void execute() {
+    public void run() {
         if(res instanceof ThingProperty){
             ThingProperty pr = (ThingProperty)res;
             if(pr.getPropertyRole() == PropertyRole.PERIODIC){
@@ -71,20 +60,5 @@ public class ResourceThread extends Service{
         if(rth != null)
             rth.ThreadEndHandle();
         isRunning = false;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
-    }
-    
-    public Resource getResource(){
-        return res;
-    }
-    
-    private void processGet() {
-        Object result = res.get(req);
-        if(result != null){
-            res.data.setResource(result);
-        }
     }
 }

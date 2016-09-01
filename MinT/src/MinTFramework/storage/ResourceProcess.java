@@ -14,29 +14,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework;
+package MinTFramework.storage;
+
+import MinTFramework.Network.Request;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class MinTConfig {
-    static public final int DEFAULT_THREAD_NUM = 10;
-    static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 10000;
+public class ResourceProcess {
+    protected Resource res;
+    protected Request req;
+    protected ResourceThreadHandle rth = null;
+    protected boolean isRunning = true;
     
-    //Network Adaptor
-    static public final int NETWORK_RECEIVE_WAITING_QUEUE = 10000;
-    static public final int NETWORK_SEND_WAITING_QUEUE = 10000;
-    static public final int NETWORK_RECEIVE_POOLSIZE = 5;
-    static public final int NETWORK_SEND_POOLSIZE = 5;
+    public ResourceProcess(Resource res, Request req, ResourceThreadHandle rth) {
+        this.res = res;
+        this.req = req;
+        this.rth = rth;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
     
-    static public boolean DebugMode = false;
-    static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
+    public Resource getResource(){
+        return res;
+    }
     
-    //for Network
-    static public final int RESPONSE_ID_MAX = 120000;
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
-    static public String IP_ADDRESS = "";
+    protected void processGet() {
+        Object result = res.get(req);
+        if(result != null){
+            res.data.setResource(result);
+        }
+    }
 }

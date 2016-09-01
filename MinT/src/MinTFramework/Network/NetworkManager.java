@@ -21,6 +21,8 @@ import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
@@ -31,7 +33,9 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * Network Manager
+ *  - Managing hold process of networks
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
@@ -44,11 +48,8 @@ public class NetworkManager {
     
     private RoutingProtocol routing;
     
-    //Network Recv Adaptor Pool for Handling the Recv Data
-    private ReceiveAdaptPool NetworkRecvAdaptPool;
-    
     //Network Send Adaptor Pool for Send Data
-    private SendAdaptPool NetworkSendPool;
+    private SystemScheduler sysSched;
     
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
@@ -72,6 +73,7 @@ public class NetworkManager {
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
+        sysSched = frame.getSysteScheduler();
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
@@ -80,12 +82,6 @@ public class NetworkManager {
         routing = new MinTRoutingProtocol();
         
         idmaker = new PacketIDManager(ResponseList);
-        
-        NetworkRecvAdaptPool = new ReceiveAdaptPool("Receive Adaptor Pool", 
-                MinTConfig.NETWORK_WAITING_QUEUE, MinTConfig.NETWORK_THREADPOOL_NUM);
-        
-        NetworkSendPool = new SendAdaptPool("Send Adaptor Pool", 
-                MinTConfig.NETWORK_WAITING_QUEUE, 1);
     }
     
     /**
@@ -123,10 +119,6 @@ public class NetworkManager {
         for (NetworkType ty : networkList) {
             setOnNetwork(ty);
         }
-        
-        //run Threadpool for network
-        NetworkRecvAdaptPool.StartPool();
-        NetworkSendPool.StartPool();
     }
 
     /**
@@ -138,7 +130,7 @@ public class NetworkManager {
      */
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP){
-            System.out.println("Starting UDP... "+ntype.getPort());
+            System.out.println("Starting UDP...");
             networks.put(ntype, new UDP(frame.getNodeName(),ntype.getPort()));
             System.out.println("Turned on UDP: "+ntype.getPort());
         }
@@ -183,7 +175,7 @@ public class NetworkManager {
      * @param smsg 
      */
     public void SEND(SendMSG smsg){
-        NetworkSendPool.putResource(smsg);
+        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
     
     /**
@@ -269,17 +261,6 @@ public class NetworkManager {
     }
     
     /**
-     * get NetworkScheduler for operate network receiver
-     * @return 
-     */
-    protected ReceiveAdaptPool getNetworkAdaptorPool(){
-        if(NetworkRecvAdaptPool == null){
-            dl.printMessage("NRA NULL");
-        }
-        return NetworkRecvAdaptPool;
-    }
-    
-    /**
      * get Adapted Networks
      * @return 
      */
@@ -290,28 +271,6 @@ public class NetworkManager {
     public Network getNetwork(NetworkType ntype){
         return networks.get(ntype);
     }
-    
-    /**
-     * get Network Queue waiting Length
-     * @return 
-     */
-    public int getNetworkAdaptorQueueWaitingLength(){
-        return NetworkRecvAdaptPool.getQueueWaitingLength();
-    }
-    
-    /**
-     * get Sender Waiting Queue
-     * @return 
-     */
-    public int getNetworkSenderQueueWaitingLength(){
-        return NetworkSendPool.getQueueWaitingLength();
-    }
-    
-    public int getNetworkSenderQueueLength(){
-        return NetworkSendPool.getQueueTotalLength();
-    }
-    
-    
     
     /**
      * get ByteBufferPool

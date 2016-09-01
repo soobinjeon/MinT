@@ -19,10 +19,12 @@ package MinTFramework.Network;
 import java.net.SocketAddress;
 
 /**
- *
+ * Receive Message
+ *  - call Matcher when receive data is put in the receiving thread pool
+ *  - 
  * @author soobin
  */
-public class RecvMSG {
+public class RecvMSG implements Runnable {
     private NetworkType ntype;
     private byte[] recvbytes;
     private SocketAddress addr;
@@ -30,7 +32,7 @@ public class RecvMSG {
     
     public RecvMSG(byte[] recvb, String address, NetworkType type){
         recvbytes = recvb;
-        this.address = address;
+        address = address;
         ntype = type;
     }
     
@@ -38,27 +40,58 @@ public class RecvMSG {
         this(recvb, "", type);
 //        System.out.println("recv len : "+recvb.length);
 //        System.out.println(type.toString());
-        this.addr = prevsocket;
+        addr = prevsocket;
         address = getIPAddress(addr);
     }
     
+    @Override
+    public void run() {
+        ReceiveAdapter recvA = (ReceiveAdapter)Thread.currentThread();
+        MatcherAndSerialization matcher = recvA.getMatcher();
+        
+        //put the recvmsg to matcher
+        matcher.EndPointReceive(this);
+    }
+    
+    /**
+     * get IP Address
+     * @param recvadd
+     * @return 
+     */
     private String getIPAddress(SocketAddress recvadd){
         return recvadd.toString().substring(1);
     }
     
+    /**
+     * get Received Byte Array
+     * @return 
+     */
     public byte[] getRecvBytes(){
         return recvbytes;
     }
     
+    /**
+     * get Socket Address
+     * @return 
+     */
     public SocketAddress getSocketAddr(){
         return addr;
     }
     
+    /**
+     * get Network Type
+     * @return 
+     */
     public NetworkType getNetworkType(){
         return ntype;
     }
-
+    
+    /**
+     * get Address
+     * @return 
+     */
     public String getAddress() {
         return this.address;
     }
+
 }
