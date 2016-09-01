@@ -45,7 +45,7 @@ public class UDPSendFactory implements ThreadFactory{
             sendchannel = DatagramChannel.open();
             sendchannel.socket().bind(sendisa);
             System.out.println("Sender Factory("+threadNo+"): create sender-"+(port+threadNo));
-            return new UDPSendThread(r, sendchannel);
+            return new UDPSendThread(r, sendchannel, "UDP_Sender-"+threadNo);
         } catch (SocketException ex) {
             System.out.println("use addr: "+(port+threadNo));
             ex.printStackTrace();

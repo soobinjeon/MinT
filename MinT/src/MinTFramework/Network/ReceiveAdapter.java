@@ -20,7 +20,11 @@ import MinTFramework.MinT;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**
- *
+ * Receive Adapter Thread Pool
+ *  - A worker thread for Receiving thread pool
+ *  - intercept receiving data(RecvMSG) from endpoint networks
+ *  - send to Matcher
+ *  - 
  * @author soobin
  */
 public class ReceiveAdapter extends Thread{

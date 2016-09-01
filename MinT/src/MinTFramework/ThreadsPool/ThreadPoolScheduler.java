@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.SystemScheduler;
+package MinTFramework.ThreadsPool;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,11 +25,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * System Process Scheduler
+ * System Process Thread Pool Scheduler
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Scheduler {
+public class ThreadPoolScheduler {
     protected HashMap<String, ExecutorService> threadPools = new HashMap<>();
     
     /**

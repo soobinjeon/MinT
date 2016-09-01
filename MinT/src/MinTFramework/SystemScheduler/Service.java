@@ -23,7 +23,7 @@ import MinTFramework.MinT;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Service extends Thread{
+public abstract class Service implements Runnable{
     protected final MinT frame;
     protected String name;
     public Service(String name) {

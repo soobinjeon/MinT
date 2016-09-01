@@ -17,7 +17,19 @@
 package MinTFramework.Network;
 
 /**
- *
+ * Network Layer Interface
+ * Layer structure
+ * -----------System Handler-----------
+ * -----|------------------------^-----
+ * -----V------------------------|-----
+ * ------------Transporter-------------
+ * -----|------------------------^-----
+ * -----V------------------------|-----
+ * -------Matcher/Serialization--------
+ * -----|------------------------^-----
+ * -----V------------------------|-----
+ * ---------End Point Networks---------
+ * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */

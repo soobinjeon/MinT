@@ -16,22 +16,22 @@
  */
 package MinTFramework.SystemScheduler;
 
-import MinTFramework.ThreadsPool.MinTthreadPools;
+import MinTFramework.ThreadsPool.ThreadPoolScheduler;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * MinT Thread Scheduler
- * Managed Process Pool list
- *  - Service Pool (Cached Thread Pool)
- *  - Network Receive Pool (Fixed Queue size)
- *  - Network Send Pool (Fixed Queue size)
+ * MinT Thread ThreadPoolScheduler
+ Managed Process Pool list
+  - Service Pool (Cached Thread Pool)
+  - Network Receive Pool (Fixed Queue size)
+  - Network Send Pool (Fixed Queue size)
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SystemScheduler extends Scheduler{
+public class SystemScheduler extends ThreadPoolScheduler{
     private ArrayList<Service> serviceList;
     public SystemScheduler(){
         serviceList = new ArrayList<>();

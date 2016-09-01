@@ -19,7 +19,9 @@ package MinTFramework.Network;
 import java.net.SocketAddress;
 
 /**
- *
+ * Receive Message
+ *  - call Matcher when receive data is put in the receiving thread pool
+ *  - 
  * @author soobin
  */
 public class RecvMSG implements Runnable {
@@ -51,22 +53,43 @@ public class RecvMSG implements Runnable {
         matcher.EndPointReceive(this);
     }
     
+    /**
+     * get IP Address
+     * @param recvadd
+     * @return 
+     */
     private String getIPAddress(SocketAddress recvadd){
         return recvadd.toString().substring(1);
     }
     
+    /**
+     * get Received Byte Array
+     * @return 
+     */
     public byte[] getRecvBytes(){
         return recvbytes;
     }
     
+    /**
+     * get Socket Address
+     * @return 
+     */
     public SocketAddress getSocketAddr(){
         return addr;
     }
     
+    /**
+     * get Network Type
+     * @return 
+     */
     public NetworkType getNetworkType(){
         return ntype;
     }
-
+    
+    /**
+     * get Address
+     * @return 
+     */
     public String getAddress() {
         return this.address;
     }

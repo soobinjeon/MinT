@@ -17,11 +17,12 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**
- *
+ * Send Adapter Thread Pool
+ *  - A worker thread for Sending thread pool
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */

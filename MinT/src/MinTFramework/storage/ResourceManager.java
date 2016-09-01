@@ -18,7 +18,7 @@ package MinTFramework.storage;
 
 import MinTFramework.MinT;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.ThreadsPool.MinTthreadPools;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 

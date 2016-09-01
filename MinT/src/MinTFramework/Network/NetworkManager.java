@@ -22,7 +22,7 @@ import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.ThreadsPool.MinTthreadPools;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
@@ -33,7 +33,9 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * Network Manager
+ *  - Managing hold process of networks
+ *  - 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */

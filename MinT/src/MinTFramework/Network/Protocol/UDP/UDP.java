@@ -31,6 +31,7 @@ import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -147,7 +148,12 @@ public class UDP extends Network {
      */
     private void MakeUDPReceiveListeners() {
         sysSched.registerThreadPool(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
-                , Executors.newCachedThreadPool());
+                , Executors.newCachedThreadPool(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r, "UDP_Receive_Listener");
+            }
+        }));
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
                 sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()

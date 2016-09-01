@@ -27,8 +27,8 @@ import java.nio.channels.DatagramChannel;
 public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
     
-    public UDPSendThread(Runnable r, DatagramChannel datachannel){
-        super(r);
+    public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
+        super(r,name);
         this.datachannel = datachannel;
         System.out.println("created SenderThread: "+getPort());
     }

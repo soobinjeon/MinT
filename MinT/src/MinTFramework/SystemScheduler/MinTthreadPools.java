@@ -14,11 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.ThreadsPool;
+package MinTFramework.SystemScheduler;
 
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.ReceiveAdaptorFactory;
 import MinTFramework.Network.SendAdapterFactory;
+import MinTFramework.SystemScheduler.ServiceFactory;
+import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
+import MinTFramework.storage.ResourceProcFactory;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,18 +34,18 @@ import java.util.concurrent.TimeUnit;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public enum MinTthreadPools {
-    SYSTEM(Executors.newCachedThreadPool()),
-    RESOURCE(Executors.newCachedThreadPool()),
-    NET_SEND(new ThreadPoolExecutor(MinTConfig.NETWORK_SEND_POOLSIZE/2
+    SYSTEM(Executors.newCachedThreadPool(new ServiceFactory())),
+    RESOURCE(Executors.newCachedThreadPool(new ResourceProcFactory())),
+    NET_SEND(new ThreadPoolExecutor(1
             , MinTConfig.NETWORK_SEND_POOLSIZE, 0
             , TimeUnit.SECONDS
-            , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
+            , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_SEND_WAITING_QUEUE)
             , new SendAdapterFactory()
             , new RejectedExecutionHandlerImpl())),
-    NET_RECV_HANDLE(new ThreadPoolExecutor((MinTConfig.NETWORK_RECEIVE_POOLSIZE/2)
+    NET_RECV_HANDLE(new ThreadPoolExecutor(1
             ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 0
             , TimeUnit.SECONDS
-            , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_WAITING_QUEUE)
+            , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)
             , new ReceiveAdaptorFactory()
             , new RejectedExecutionHandlerImpl()));
 

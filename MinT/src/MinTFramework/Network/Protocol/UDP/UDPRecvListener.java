@@ -8,7 +8,6 @@ package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.ReceiveAdapter;
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Util.Benchmarks.PacketPerform;
 import MinTFramework.Util.ByteBufferPool;
