@@ -55,10 +55,6 @@ public class SystemHandler{
         /**
          * get, post using resource storage
          */
-//        dl.printMessage("Processing SystemHandler");
-//        dl.printMessage(recv_packet.getPacketString());
-//        dl.printMessage("pk_length : "+recv_packet.getPacket().length);
-        //Request req = new Request("Device2", 0, src);
         if(recv_packet.getHeader_Direction().isRequest()){
             SystemHandleRequest(recv_packet);
         }else if(recv_packet.getHeader_Direction().isResponse()){
@@ -66,12 +62,14 @@ public class SystemHandler{
         }
     }
     
+    /**
+     * Request handle by requesting from other node
+     * @param rv_packet 
+     */
     private void SystemHandleRequest(PacketDatagram rv_packet){
+        Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
+        
         if(rv_packet.getHeader_Instruction().isGet()){
-//            dl.printMessage("set get");
-//            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
-            
-            Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
             ResData res = resStorage.getProperty(req);
             String ret = "";
             
@@ -81,25 +79,25 @@ public class SystemHandler{
                 ret = "";
             nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
                     , rv_packet.getSource(), ret, rv_packet.getMSGID()));
-//            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
-//            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }else if(rv_packet.getHeader_Instruction().isSet()){
-            
+            resStorage.setInstruction(req);
         }else if(rv_packet.getHeader_Instruction().isPost()){
-            
+            resStorage.setInstruction(req);
         }else if(rv_packet.getHeader_Instruction().isDelete()){
             
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
-//            dl.printMessage("set DISCOVERY");
             String ret = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
             nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }
     }
     
+    /**
+     * Response handler when this node receives a response message from other node what is requested by this node.
+     * @param rv_packet 
+     */
     private void SystemHandleResponse(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Instruction().isGet()){
-//            dl.printMessage("Response get");
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null)
                 reshandle.Response(new ResponseData(rv_packet));
@@ -112,12 +110,10 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Instruction().isDiscovery()){
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null){
-//                dl.printMessage("Response DISCOVERY");
                 ResponseData resdata = new ResponseData(rv_packet);
                 UpdateDiscoverData(resdata);
                 reshandle.Response(resdata);
             }
-//            dl.printMessage(rv_packet.getMsgData());
         }
     }
     
@@ -136,18 +132,6 @@ public class SystemHandler{
         for(int i=0;i<jis.size();i++){
             resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.instruction, (JSONObject)jis.get(i), resdata);
         }
-        
-//        dl.printMessage("Property List");
-//        for(Resource pl :resStorage.getProperties()){
-//            dl.printMessage("PL : "+pl.getID()+", "
-//                    +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
-//        }
-////        
-//        dl.printMessage("Instruction List");
-//        for(Resource pl :resStorage.getInstruction()){
-//            dl.printMessage("IL : "+pl.getID()+", "
-//                    +pl.getName()+", "+pl.getDeviceType()+", "+pl.getStorageCategory());
-//        }
     }
 
 }
