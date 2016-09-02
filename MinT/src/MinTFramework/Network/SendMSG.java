@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Util.Benchmarks.Performance;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -83,8 +85,13 @@ public class SendMSG implements Runnable{
     public void run() {
         SendAdapter sendA = (SendAdapter)Thread.currentThread();
         Transportation trans = sendA.getTransportation();
+        Performance bench = sendA.getBench();
         //put the sendmsg to transportation
+        if(bench != null)
+            bench.startPerform();
         trans.EndPointSend(this);
+        if(bench != null)
+            bench.endPerform();
     }
     
     public PacketDatagram.HEADER_DIRECTION getHeader_Direction(){

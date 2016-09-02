@@ -17,8 +17,6 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.Util.Benchmarks.PacketPerform;
-import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -36,7 +34,7 @@ public class MatcherAndSerialization implements NetworkLayers{
     private MinT frame;
     private NetworkManager networkManager;
     private DebugLog dl = new DebugLog("MatcherAndSerialization");
-    private Performance bench_send = null;
+//    private Performance bench_send = null;
     
     public MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION layerDirection){
         frame = MinT.getInstance();
@@ -46,10 +44,10 @@ public class MatcherAndSerialization implements NetworkLayers{
             transportation = new Transportation(layerDirection);
         
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND){
-            if(frame.isBenchMode()){
-                bench_send = new PacketPerform("M/S-sender");
-                frame.addPerformance(MinT.PERFORM_METHOD.MaS_Sender, bench_send);
-            }
+//            if(frame.isBenchMode()){
+//                bench_send = new PacketPerform("M/S-sender");
+//                frame.addPerformance(MinT.PERFORM_METHOD.MaS_Sender, bench_send);
+//            }
         }
     }
 
@@ -69,8 +67,8 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public void Send(PacketDatagram packet) {
-        if(bench_send != null)
-            bench_send.startPerform();
+//        if(bench_send != null)
+//            bench_send.startPerform();
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
         Network sendNetwork = networkManager.getNetworks().get(nnodetype);
         
@@ -88,8 +86,8 @@ public class MatcherAndSerialization implements NetworkLayers{
 
             //set Response Handler
             try {
-                if(bench_send != null)
-                    bench_send.endPerform();
+//                if(bench_send != null)
+//                    bench_send.endPerform();
                 
                 sendNetwork.send(packet);
             } catch (Exception ex) {

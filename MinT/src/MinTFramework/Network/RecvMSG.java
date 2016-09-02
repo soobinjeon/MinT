@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Util.Benchmarks.Performance;
 import java.net.SocketAddress;
 
 /**
@@ -48,9 +49,13 @@ public class RecvMSG implements Runnable {
     public void run() {
         ReceiveAdapter recvA = (ReceiveAdapter)Thread.currentThread();
         MatcherAndSerialization matcher = recvA.getMatcher();
-        
+        Performance bench = recvA.getBench();
         //put the recvmsg to matcher
+        if(bench != null)
+            bench.startPerform();
         matcher.EndPointReceive(this);
+        if(bench != null)
+            bench.endPerform();
     }
     
     /**

@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
+import MinTFramework.MinT;
+import MinTFramework.Util.Benchmarks.PacketPerform;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 
@@ -26,11 +28,17 @@ import java.nio.channels.DatagramChannel;
  */
 public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
-    
+    private MinT parent;
+    private PacketPerform bench = null;
     public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
         super(r,name);
         this.datachannel = datachannel;
-        System.out.println("created SenderThread: "+getPort());
+        
+        parent = MinT.getInstance();
+        if(parent.getBenchmark().isBenchMode()){
+            bench = new PacketPerform("SendAdaptor");
+            parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
+        }
     }
     
     public DatagramChannel getDataChannel(){
@@ -44,5 +52,15 @@ public class UDPSendThread extends Thread{
             ex.printStackTrace();
         }
         return "";
+    }
+    
+    public PacketPerform getBench(){
+        return bench;
+    }
+    
+    @Override
+    public void finalize() throws Throwable{
+        super.finalize();
+        System.out.println("end of thread Sender-");
     }
 }

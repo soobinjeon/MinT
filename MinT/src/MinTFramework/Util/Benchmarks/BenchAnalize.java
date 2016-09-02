@@ -16,7 +16,6 @@
  */
 package MinTFramework.Util.Benchmarks;
 
-import MinTFramework.MinT.PERFORM_METHOD;
 import java.util.ArrayList;
 
 /**
@@ -37,11 +36,19 @@ public class BenchAnalize {
     
 //    private INSTANCE instance;
     private Performance tp;
-    private PERFORM_METHOD pm;
-    public BenchAnalize(PERFORM_METHOD pm, ArrayList<Performance> pf){
+    private String pm;
+    public BenchAnalize(String pm){
         this.pm = pm;
-        pflist = pf;
-        Initialize();
+        pflist = new ArrayList<>();
+//        Initialize();
+    }
+    
+    /**
+     * add Performance
+     * @param p 
+     */
+    public void addPerformance(Performance p){
+        pflist.add(p);
     }
 
     private void Initialize() {
@@ -109,7 +116,7 @@ public class BenchAnalize {
     }
     
     public void print(){
-        System.out.print(pm.toString()+"-Total : ");
+        System.out.print(pm+"-Total : ");
         if(tp instanceof PacketPerform){
             System.out.format("NoP:%d | T:%.3f | T/R:%.8f | Req:%.0f | Req/s:%.2f | Bytes/P:%.2f | Bytes/s:%.2fK | Pk/s:%.2fK%n"
                     , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
@@ -117,6 +124,11 @@ public class BenchAnalize {
         }else if(tp instanceof Performance){
             System.out.format("NoP:%d | Time:%.3f | T/R:%.8f | Req:%.0f | Req/Sec:%.2f%n"
                     , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec());
+        }else{
+            System.out.println("");
         }
+    }
+
+    public void analize() {
     }
 }

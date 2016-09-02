@@ -34,15 +34,13 @@ import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.Util.Benchmarks.Performance;
+import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import MinTFramework.Util.Benchmarks.BenchAnalize;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -62,12 +60,6 @@ public abstract class MinT {
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
-    public static enum PERFORM_METHOD{
-        NETWORK_SEND,UDP_RECV, UDP_SEND, RECV_LAYER, SEND_LAYER, Trans_Sender, MaS_Sender;
-    }
-    private ConcurrentHashMap<PERFORM_METHOD, ArrayList<Performance>> benchmarks;
-    private boolean BenchMode = false;
-    
     /**
      * 
      * @param serviceQueueLength Maximym service queue length
@@ -81,8 +73,6 @@ public abstract class MinT {
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        benchmarks = new ConcurrentHashMap();
-        setupBenchMark();
     }
     
     /**
@@ -460,42 +450,14 @@ public abstract class MinT {
     /***************************
      * BenchMarks
      ****************************/
-    public void setBenchMode(boolean bm){
-        BenchMode = bm;
+    private MinTBenchmark mintBench = new MinTBenchmark(1000, getSysteScheduler());
+    
+    public MinTBenchmark getBenchmark(){
+        return mintBench;
     }
     
-    public boolean isBenchMode(){
-        return BenchMode;
-    }
-    
-    private void setupBenchMark() {
-        for(PERFORM_METHOD pm : PERFORM_METHOD.values()){
-            ArrayList<Performance> na = new ArrayList();
-            benchmarks.put(pm, na);
-        }
-    }
-    
-    public void addPerformance(PERFORM_METHOD pm, Performance p){
-        ArrayList<Performance> pl = benchmarks.get(pm);
-        if(pl != null){
-            pl.add(p);
-        }
-    }
-    
-//    public ConcurrentHashMap<PERFORM_METHOD, ArrayList<Performance>> getBenchmarks(){
-//        return benchmarks;
-//    }
-    
-    public ArrayList<Performance> getBenchmarks(PERFORM_METHOD pm){
-        return benchmarks.get(pm);
-    }
-    
-    public BenchAnalize getBenchAnalize(PERFORM_METHOD pm){
-        ArrayList<Performance> pl = benchmarks.get(pm);
-        if(pl == null)
-            return null;
-        else
-            return new BenchAnalize(pm, pl);
+    public void setBench(boolean isbench){
+        mintBench.setBenchMode(isbench);
     }
     
     /***************************
@@ -509,6 +471,7 @@ public abstract class MinT {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
         sched.startService();
+        mintBench.startBench();
     }
     
     protected void isDebug(boolean isdebug){

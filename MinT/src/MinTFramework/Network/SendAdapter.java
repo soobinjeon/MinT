@@ -17,6 +17,7 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**
@@ -37,14 +38,18 @@ public class SendAdapter extends Thread{
         super(r, name);
         sender = new Transportation(NetworkLayers.LAYER_DIRECTION.SEND);
         parent = MinT.getInstance();
-//        if(parent.isBenchMode()){
-//            bench = new PacketPerform("SendAdaptor");
-//            parent.addPerformance(MinT.PERFORM_METHOD.SEND_LAYER, bench);
-//        }
+        if(parent.getBenchmark().isBenchMode()){
+            bench = new Performance("SendAdaptor");
+            parent.getBenchmark().addPerformance(MinTthreadPools.NET_SEND.toString(), bench);
+        }
     }
     
     public Transportation getTransportation(){
         return sender;
+    }
+    
+    public Performance getBench(){
+        return bench;
     }
 
 //    @Override

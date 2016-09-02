@@ -17,6 +17,7 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**
@@ -33,14 +34,15 @@ public class ReceiveAdapter extends Thread{
     private Performance bench = null;
     private MinT parent;
     
+    
     public ReceiveAdapter(Runnable r, String name) {
         super(r,name);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
-//        if(parent.isBenchMode()){
-//            bench = new Performance("ReceiveAdaptor");
-//            parent.addPerformance(MinT.PERFORM_METHOD.RECV_LAYER, bench);
-//        }
+        if(parent.getBenchmark().isBenchMode()){
+            bench = new Performance("ReceiveAdaptor");
+            parent.getBenchmark().addPerformance(MinTthreadPools.NET_RECV_HANDLE.toString(), bench);
+        }
     }
     
     /**
@@ -50,15 +52,14 @@ public class ReceiveAdapter extends Thread{
     public MatcherAndSerialization getMatcher(){
         return matcher;
     }
-
-//    @Override
-//    public void run() {
-//        if (bench != null) {
-//            bench.startPerform();
-//        }
-        
-//        if (bench != null) {
-//            bench.endPerform();
-//        }
-//    }
+    
+    public Performance getBench(){
+        return bench;
+    }
+    
+    @Override
+    public void finalize() throws Throwable{
+        super.finalize();
+        System.out.println("end of thread-Receiver");
+    }
 }

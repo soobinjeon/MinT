@@ -30,6 +30,7 @@ public class Performance {
     private boolean isdebug = false;
     private BENCHMARK_TYPE benchtype = BENCHMARK_TYPE.DEFAULT;
     private String Name;
+    private boolean isAlive = false;
     
     public static enum BENCHMARK_TYPE {DEFAULT, PACKET;}
     
@@ -43,6 +44,7 @@ public class Performance {
         isdebug = isdebug;
         benchtype = bt;
         Name = name;
+        isAlive = true;
     }
     
     public void reset(){
@@ -89,7 +91,7 @@ public class Performance {
     }
     
     public void print(){
-        System.out.format("Time:%.3f | Request:%d | Req/Sec:%.2f%n"
+        System.out.format(Name+": Time:%.3f | Req:%.2f | Req/Sec:%.2f%n"
                 , time, request, getRequestperSec());
     }
 }

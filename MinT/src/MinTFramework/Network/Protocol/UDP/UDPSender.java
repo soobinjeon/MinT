@@ -48,7 +48,11 @@ public class UDPSender implements Runnable {
     public void run() {
         UDPSendThread ust = (UDPSendThread)Thread.currentThread();
         DatagramChannel channel = ust.getDataChannel();
+        PacketPerform bench = ust.getBench();
         int bsize = 0;
+        
+        if(bench != null)
+            bench.startPerform();
         ByteBufferPool bbp = nmanager.getByteBufferPool();
         ByteBuffer out = null;
         try{        
@@ -60,6 +64,8 @@ public class UDPSender implements Runnable {
             ex.printStackTrace();
         }finally{
             bbp.putBuffer(out);
+            if(bench != null)
+                bench.endPerform(out.limit());
         }
     }
 }

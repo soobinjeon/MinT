@@ -37,13 +37,13 @@ public enum MinTthreadPools {
     SYSTEM(Executors.newCachedThreadPool(new ServiceFactory())),
     RESOURCE(Executors.newCachedThreadPool(new ResourceProcFactory())),
     NET_SEND(new ThreadPoolExecutor(1
-            , MinTConfig.NETWORK_SEND_POOLSIZE, 0
+            , MinTConfig.NETWORK_SEND_POOLSIZE, 5
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_SEND_WAITING_QUEUE)
             , new SendAdapterFactory()
             , new RejectedExecutionHandlerImpl())),
     NET_RECV_HANDLE(new ThreadPoolExecutor(1
-            ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 0
+            ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 5
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)
             , new ReceiveAdaptorFactory()
