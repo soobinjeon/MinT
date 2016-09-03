@@ -16,6 +16,9 @@
  */
 package MinTFramework.Util.Benchmarks;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -29,8 +32,8 @@ public class Performance {
     private double time = 0;
     private boolean isdebug = false;
     private BENCHMARK_TYPE benchtype = BENCHMARK_TYPE.DEFAULT;
-    private String Name;
-    private boolean isAlive = false;
+    protected String Name;
+    protected boolean iscalibrating = false;
     
     public static enum BENCHMARK_TYPE {DEFAULT, PACKET;}
     
@@ -44,7 +47,19 @@ public class Performance {
         isdebug = isdebug;
         benchtype = bt;
         Name = name;
-        isAlive = true;
+    }
+    
+    /**
+     * for Performance copy
+     * @param name
+     * @param request
+     * @param totaltime 
+     */
+    public Performance(String name, double request, double time){
+        this(name, true, BENCHMARK_TYPE.DEFAULT);
+        this.request = request;
+        this.totaltime = totaltime * 1000;
+        this.time = time;
     }
     
     public void reset(){
@@ -56,12 +71,15 @@ public class Performance {
     }
     
     public void startPerform(){
+        iscalibrating = true;
         stime = System.currentTimeMillis();
     }
     
     public void endPerform(){
         etime = System.currentTimeMillis();
         setPacketInfo(stime, etime);
+        iscalibrating = false;
+        notifyAll();
     }
     
     private void setInfo(){
@@ -93,5 +111,24 @@ public class Performance {
     public void print(){
         System.out.format(Name+": Time:%.3f | Req:%.2f | Req/Sec:%.2f%n"
                 , time, request, getRequestperSec());
+    }
+    
+    /**
+     * return current performance
+     * @return 
+     */
+    public Performance getPerformance(){
+        while(iscalibrating){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+            }
+        }
+        Performance tp = null;
+        synchronized(this){
+            tp = new Performance(Name, request, time);
+            reset();
+        }
+        return tp;
     }
 }

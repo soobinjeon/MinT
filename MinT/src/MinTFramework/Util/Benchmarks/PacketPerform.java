@@ -31,6 +31,19 @@ public class PacketPerform extends Performance{
         super(Name, isdebug, BENCHMARK_TYPE.PACKET);
     }
     
+    /**
+     * for Performance copy
+     * @param name
+     * @param request
+     * @param totaltime 
+     */
+    public PacketPerform(String name, double request, double time
+            , int totalbytes, int packets){
+        super(name, request, time);
+        this.totalbytes = totalbytes;
+        this.packets = packets;
+    }
+    
     @Override
     public void reset(){
         super.reset();
@@ -39,8 +52,8 @@ public class PacketPerform extends Performance{
     }
     
     public void endPerform(int bytesize){
-        endPerform();
         setPacketInfo(bytesize);
+        endPerform();
     }
     
     private void setPacketInfo(int bytesize){
@@ -66,5 +79,26 @@ public class PacketPerform extends Performance{
     
     public double getTotalPackets(){
         return packets;
+    }
+    
+    /**
+     * return current performance
+     * @return 
+     */
+    @Override
+    public PacketPerform getPerformance(){
+        while(iscalibrating){
+            try {
+                wait();
+            } catch (InterruptedException ex) {
+            }
+        }
+        PacketPerform tp = null;
+        synchronized(this){
+            tp = new PacketPerform(Name, getRequest(), getTotalTime()
+                    ,totalbytes, packets);
+            reset();
+        }
+        return tp;
     }
 }

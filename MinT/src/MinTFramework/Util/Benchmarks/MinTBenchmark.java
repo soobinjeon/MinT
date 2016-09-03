@@ -28,14 +28,13 @@ import java.util.concurrent.Executors;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class MinTBenchmark {
-    private long period = 0;
+    private long period = 1000;
     private ThreadPoolScheduler scheduler;
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
     
     private boolean isBenchMode = false;
     
-    public MinTBenchmark(long period, ThreadPoolScheduler scheduler) {
-        this.period = period;
+    public MinTBenchmark(ThreadPoolScheduler scheduler) {
         benchmarks = new ConcurrentHashMap();
         this.scheduler = scheduler;
     }
@@ -64,7 +63,8 @@ public class MinTBenchmark {
         });
     }
     
-    public void setBenchMode(boolean bm){
+    public void setBenchMode(boolean bm, int period){
+        this.period = period;
         isBenchMode = bm;
     }
     
@@ -78,7 +78,7 @@ public class MinTBenchmark {
         return na;
     }
     
-    public synchronized void addPerformance(String pm, Performance p){
+    public synchronized void addPerformance(String pm, PacketPerform p){
         BenchAnalize pl = benchmarks.get(pm);
         if(pl == null)
             pl = setupBenchMark(pm);

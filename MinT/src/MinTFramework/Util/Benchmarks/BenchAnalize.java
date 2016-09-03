@@ -29,17 +29,20 @@ public class BenchAnalize {
     private int numofPerform = 0;
     private double totalTime = 0;
     private double totalRequest = 0;
-    protected ArrayList<Performance> pflist;
-    
     private int totalbytes = 0;
     private int packets = 0;
     
 //    private INSTANCE instance;
     private Performance tp;
     private String pm;
+    
+    protected ArrayList<PacketPerform> pflist;
+    protected ArrayList<PacketPerform> datas;
+    
     public BenchAnalize(String pm){
         this.pm = pm;
         pflist = new ArrayList<>();
+        datas = new ArrayList<>();
 //        Initialize();
     }
     
@@ -47,17 +50,22 @@ public class BenchAnalize {
      * add Performance
      * @param p 
      */
-    public void addPerformance(Performance p){
+    public void addPerformance(PacketPerform p){
         pflist.add(p);
     }
 
     private void Initialize() {
-        for(Performance pf : pflist){
-            numofPerform ++;
-            totalTime += pf.getTotalTime();
-            totalRequest += pf.getRequest();
-            if(pf instanceof PacketPerform){
-                PacketPerform pkf = (PacketPerform)pf;
+        for(PacketPerform pf : pflist){
+//            if(pf instanceof Performance){
+//                Performance nf = pf.getPerformance();
+//                if(nf.getRequest() > 0){
+//                    numofPerform ++;
+//                    totalTime += pf.getTotalTime();
+//                    totalRequest += pf.getRequest();
+//                }
+            PacketPerform pkf = pf.getPerformance();
+            if(pkf.getRequest() > 0){
+                
                 totalbytes += pkf.getTotalBytes();
                 packets += pkf.getTotalPackets();
             }

@@ -450,14 +450,14 @@ public abstract class MinT {
     /***************************
      * BenchMarks
      ****************************/
-    private MinTBenchmark mintBench = new MinTBenchmark(1000, getSysteScheduler());
+    private MinTBenchmark mintBench = new MinTBenchmark(getSysteScheduler());
     
     public MinTBenchmark getBenchmark(){
         return mintBench;
     }
     
-    public void setBench(boolean isbench){
-        mintBench.setBenchMode(isbench);
+    public void setBenchmark(int period, boolean isbench){
+        mintBench.setBenchMode(isbench, period);
     }
     
     /***************************
