@@ -456,7 +456,8 @@ public abstract class MinT {
         return mintBench;
     }
     
-    public void setBench(boolean isbench){
+    public void setBenchmark(int period, boolean isbench){
+        mintBench = new MinTBenchmark(period, getSysteScheduler());
         mintBench.setBenchMode(isbench);
     }
     
@@ -471,7 +472,8 @@ public abstract class MinT {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
         sched.startService();
-        mintBench.startBench();
+        if(mintBench != null)
+            mintBench.startBench();
     }
     
     protected void isDebug(boolean isdebug){
