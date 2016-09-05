@@ -39,6 +39,15 @@ public class BenchAnalize {
 //    protected ArrayList<Performance> pflist;
     protected ArrayList<PerformData> datas;
     
+    protected ArrayList<Long> totaltime = new ArrayList<>();
+    protected ArrayList<Double> avgtime = new ArrayList<>();
+    protected ArrayList<Long> TRequest = new ArrayList<>();
+    protected ArrayList<Long> Tpackets = new ArrayList<>();
+    protected ArrayList<Long> Tbytes = new ArrayList<>();
+    protected ArrayList<Double> ReqperSec = new ArrayList<>();
+    protected ArrayList<Double> PckperSec = new ArrayList<>();
+    protected ArrayList<Integer> NofPerform = new ArrayList<>();
+    
     public BenchAnalize(String pm){
         this.pm = pm;
         pflist = new ConcurrentHashMap<>();
@@ -73,6 +82,16 @@ public class BenchAnalize {
 //            System.out.println("insert - "+numofPerform+", "+totalTime+", "+totalRequest+", "+totalbytes+", "+packets);
             datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
+        
+        int idx = datas.size()-1;
+        totaltime.add(datas.get(idx).getTotalTime());
+        avgtime.add(datas.get(idx).getAvgTime());
+        TRequest.add(datas.get(idx).getRequest());
+        Tpackets.add(datas.get(idx).getTotalPackets());
+        Tbytes.add(datas.get(idx).getTotalBytes());
+        NofPerform.add(datas.get(idx).getNumofPerform());
+        ReqperSec.add(datas.get(idx).getRequestperSec());
+        PckperSec.add(datas.get(idx).getPacketperSec());
     }
     
     private void resetParam(){

@@ -56,41 +56,94 @@ public class MinTExporter extends ExcelExporter{
         createLabel(excelSheet);
         ArrayList<PerformData> datas = ben.getDatas();
         int cnt = 1;
-        for(PerformData pd : datas){
-            super.addNumber(excelSheet, 0, cnt, cnt);
-            super.addNumber(excelSheet, 1, cnt, pd.getNumofPerform());
-            super.addNumber(excelSheet, 2, cnt, pd.getTime());
-            super.addNumber(excelSheet, 3, cnt, pd.getAvgTime());
-            super.addNumber(excelSheet, 4, cnt, pd.getRequest());
-            super.addNumber(excelSheet, 5, cnt, pd.getRequestperSec());
-            super.addNumber(excelSheet, 6, cnt, pd.getTotalPackets());
-            super.addNumber(excelSheet, 7, cnt, pd.getPacketperSec());
-            super.addNumber(excelSheet, 8, cnt, pd.getTotalBytes());
-            cnt++;
-        }
+        addTime(excelSheet, 0, datas);
         
+        addIntegerDatas(excelSheet, 1, cnt, ben.NofPerform);
+        addLongDatas(excelSheet, 2, cnt, ben.totaltime);
+        addDoubleDatas(excelSheet, 3, cnt, ben.avgtime);
+        addLongDatas(excelSheet, 4, cnt, ben.TRequest);
+        addDoubleDatas(excelSheet, 5, cnt, ben.ReqperSec);
+        addLongDatas(excelSheet, 6, cnt, ben.Tpackets);
+        addDoubleDatas(excelSheet, 7, cnt, ben.PckperSec);
+        addLongDatas(excelSheet, 8, cnt, ben.Tbytes);
+    }
+    
+    private void addIntegerDatas(WritableSheet excelSheet, int col, int cnt, ArrayList<Integer> datas) throws WriteException {
+        int total = 0;
+        int avgcnt = 0;
+        for(int i=0;i<datas.size();i++){
+            int data = datas.get(i);
+            total += data;
+            if(data > 0)
+                avgcnt ++;
+            super.addNumber(excelSheet, col, i+cnt, data);
+        }
+        int loc = datas.size() + 2;
         //sum
-        addLabel(excelSheet, 0, cnt+1, "Sum");
-        for(int i=1;i<9;i++){
-            addFormula(excelSheet,i, cnt+1, getCellFucntion(
-                    getCellString(i, 1)
-                    ,getCellString(i, cnt)
-                    ,"SUM"));
+        super.addNumber(excelSheet, col, loc, total);
+        //avg
+        double average = avgcnt == 0 ? 0 : (double)(total/(avgcnt));
+        super.addNumber(excelSheet, col, loc+1, average);
+    }
+    
+    private void addLongDatas(WritableSheet excelSheet, int col, int cnt, ArrayList<Long> datas) throws WriteException {
+        long total = 0;
+        int avgcnt = 0;
+        for(int i=0;i<datas.size();i++){
+            long data = datas.get(i);
+            total += data;
+            if(data > 0)
+                avgcnt ++;
+            super.addNumber(excelSheet, col, i+cnt, datas.get(i));
         }
-        
-        //average
-        addLabel(excelSheet, 0, cnt+2, "Average");
-        for(int i=1;i<9;i++){
-            addFormula(excelSheet,i, cnt+2, getCellFucntion(
-                    getCellString(i, 1)
-                    ,getCellString(i, cnt)
-                    ,"AVERAGE"));
+        int loc = datas.size() + 2;
+        //sum
+        super.addNumber(excelSheet, col, loc, total);
+        //avg
+        double average = avgcnt == 0 ? 0 : (double)(total/(avgcnt));
+        super.addNumber(excelSheet, col, loc+1, average);
+    }
+    
+    private void addDoubleDatas(WritableSheet excelSheet, int col, int cnt, ArrayList<Double> datas) throws WriteException {
+        double total = 0;
+        int avgcnt = 0;
+        for(int i=0;i<datas.size();i++){
+            double data = datas.get(i);
+            total += data;
+            if(data > 0)
+                avgcnt ++;
+            super.addNumber(excelSheet, col, i+cnt, datas.get(i));
+        }
+        int loc = datas.size() + 2;
+        //sum
+        super.addNumber(excelSheet, col, loc, total);
+        //avg
+        double average = avgcnt == 0 ? 0 : (double)(total/(avgcnt));
+        super.addNumber(excelSheet, col, loc+1, average);
+    }
+    
+    private void addTime(WritableSheet excelSheet, int cnt, ArrayList<PerformData> datas) throws WriteException {
+        for(int i=0;i<datas.size();i++){
+            super.addNumber(excelSheet, cnt, i, i+1);
         }
     }
     
     private StringBuffer getCellFucntion(String start, String end, String Function){
         StringBuffer buf = new StringBuffer();
         buf.append(Function).append("(").append(start).append(":").append(end).append(")");
+        return buf;
+    }
+    
+    private StringBuffer getAverageIf(String start, String end, String condition){
+        StringBuffer buf = new StringBuffer();
+        buf.append("AVERAGEIF").append("(")
+                .append(start).append(":").append(end)
+                .append(",")
+                .append("\"").append(condition).append("\"")
+                .append(",")
+                .append(start).append(":").append(end)
+                .append(")");
+        System.out.println("print- "+buf.toString());
         return buf;
     }
     
@@ -115,4 +168,6 @@ public class MinTExporter extends ExcelExporter{
             ex.printStackTrace();
         }
     }
+
+
 }

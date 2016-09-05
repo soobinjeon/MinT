@@ -56,7 +56,7 @@ public class MinTBenchmark {
                             break;
                         }
                         for(BenchAnalize ba : benchmarks.values()){
-                            System.out.println(ba.getName()+"-Analizing..");
+//                            System.out.println(ba.getName()+"-Analizing..");
                             ba.analize();
                         }
                         Thread.sleep(period);
