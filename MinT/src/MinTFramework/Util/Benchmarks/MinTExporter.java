@@ -59,18 +59,19 @@ public class MinTExporter extends ExcelExporter{
         for(PerformData pd : datas){
             super.addNumber(excelSheet, 0, cnt, cnt);
             super.addNumber(excelSheet, 1, cnt, pd.getNumofPerform());
-            super.addNumber(excelSheet, 2, cnt, pd.getAvgTime());
-            super.addNumber(excelSheet, 3, cnt, pd.getRequest());
-            super.addNumber(excelSheet, 4, cnt, pd.getRequestperSec());
-            super.addNumber(excelSheet, 5, cnt, pd.getTotalPackets());
-            super.addNumber(excelSheet, 6, cnt, pd.getPacketperSec());
-            super.addNumber(excelSheet, 7, cnt, pd.getTotalBytes());
+            super.addNumber(excelSheet, 2, cnt, pd.getTime());
+            super.addNumber(excelSheet, 3, cnt, pd.getAvgTime());
+            super.addNumber(excelSheet, 4, cnt, pd.getRequest());
+            super.addNumber(excelSheet, 5, cnt, pd.getRequestperSec());
+            super.addNumber(excelSheet, 6, cnt, pd.getTotalPackets());
+            super.addNumber(excelSheet, 7, cnt, pd.getPacketperSec());
+            super.addNumber(excelSheet, 8, cnt, pd.getTotalBytes());
             cnt++;
         }
         
         //sum
         addLabel(excelSheet, 0, cnt+1, "Sum");
-        for(int i=1;i<8;i++){
+        for(int i=1;i<9;i++){
             addFormula(excelSheet,i, cnt+1, getCellFucntion(
                     getCellString(i, 1)
                     ,getCellString(i, cnt)
@@ -79,7 +80,7 @@ public class MinTExporter extends ExcelExporter{
         
         //average
         addLabel(excelSheet, 0, cnt+2, "Average");
-        for(int i=1;i<8;i++){
+        for(int i=1;i<9;i++){
             addFormula(excelSheet,i, cnt+2, getCellFucntion(
                     getCellString(i, 1)
                     ,getCellString(i, cnt)
@@ -103,12 +104,13 @@ public class MinTExporter extends ExcelExporter{
             char a = 48;
             addLabel(excelSheet, 0, 0, "time");
             addLabel(excelSheet, 1, 0, "Num of Threads");
-            addLabel(excelSheet, 2, 0, "Running Time");
-            addLabel(excelSheet, 3, 0, "Total Requests");
-            addLabel(excelSheet, 4, 0, "Reqeust/Sec");
-            addLabel(excelSheet, 5, 0, "Total Packets");
-            addLabel(excelSheet, 6, 0, "Packet/Sec");
-            addLabel(excelSheet, 7, 0, "Total bytes");
+            addLabel(excelSheet, 2, 0, "Total Running Time");
+            addLabel(excelSheet, 3, 0, "Avg Running Time");
+            addLabel(excelSheet, 4, 0, "Total Requests");
+            addLabel(excelSheet, 5, 0, "Reqeust/Sec");
+            addLabel(excelSheet, 6, 0, "Total Packets");
+            addLabel(excelSheet, 7, 0, "Packet/Sec");
+            addLabel(excelSheet, 8, 0, "Total bytes");
         } catch (WriteException ex) {
             ex.printStackTrace();
         }

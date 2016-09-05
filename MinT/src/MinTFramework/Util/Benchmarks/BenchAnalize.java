@@ -17,6 +17,7 @@
 package MinTFramework.Util.Benchmarks;
 
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -25,7 +26,7 @@ import java.util.ArrayList;
  */
 public class BenchAnalize {
 //    private enum INSTANCE {PERFORM, PACKETPERFORM;}
-    
+    private int psize = 0;
     private int numofPerform = 0;
     private long totalTime = 0;
     private long totalRequest = 0;
@@ -34,13 +35,14 @@ public class BenchAnalize {
     
 //    private INSTANCE instance;
     private String pm;
-    
-    protected ArrayList<Performance> pflist;
+    ConcurrentHashMap<Integer, Performance> pflist;
+//    protected ArrayList<Performance> pflist;
     protected ArrayList<PerformData> datas;
     
     public BenchAnalize(String pm){
         this.pm = pm;
-        pflist = new ArrayList<>();
+        pflist = new ConcurrentHashMap<>();
+//        pflist = new ArrayList<>();
         datas = new ArrayList<>();
 //        Initialize();
     }
@@ -50,7 +52,7 @@ public class BenchAnalize {
      * @param p 
      */
     public void addPerformance(Performance p){
-        pflist.add(p);
+        pflist.put(psize++, p);
     }
     
     public void analize() {
@@ -58,7 +60,7 @@ public class BenchAnalize {
             datas.add(new PerformData(datas.size()+1, pm, 0, 0, 0, 0, 0));
         else{
             resetParam();
-            for(Performance pf : pflist){
+            for(Performance pf : pflist.values()){
                 Performance nf = pf.getPerformance();
                 if(nf.getRequest() > 0){
                     numofPerform ++;
@@ -68,7 +70,7 @@ public class BenchAnalize {
                     packets += nf.getTotalPackets();
                 }
             }
-            System.out.println("insert - "+numofPerform+", "+totalTime+", "+totalRequest+", "+totalbytes+", "+packets);
+//            System.out.println("insert - "+numofPerform+", "+totalTime+", "+totalRequest+", "+totalbytes+", "+packets);
             datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
     }
@@ -82,14 +84,14 @@ public class BenchAnalize {
     }
     
     public void printAllBenches(){
-        for(Performance pf : pflist){
+        for(Performance pf : pflist.values()){
             pf.print();
         }
     }
     
     public void printAllBenchList(){
         int cnt = 0;
-        for(Performance pf: pflist){
+        for(Performance pf: pflist.values()){
             System.out.println(cnt+": "+pf.Name);
             cnt++;
         }

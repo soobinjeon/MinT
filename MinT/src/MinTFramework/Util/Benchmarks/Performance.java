@@ -61,14 +61,14 @@ public class Performance {
     }
     
     public synchronized void startPerform(){
-        while(isgettering){
-            try {
-                System.out.println("------------------------------------insert start waiting!!!");
-                wait();
-            } catch (InterruptedException ex) {
-                System.out.println("------------------------------------exit start waiting!!!");
-            }
-        }
+//        while(isgettering){
+//            try {
+////                System.out.println("------------------------------------insert start waiting!!!");
+//                wait();
+//            } catch (InterruptedException ex) {
+////                System.out.println("------------------------------------exit start waiting!!!");
+//            }
+//        }
         iscalibrating = true;
         stime = System.currentTimeMillis();
     }
@@ -144,10 +144,10 @@ public class Performance {
     public synchronized Performance getPerformance(){
         while(iscalibrating){
             try {
-                System.out.println("------------------------------------insert waiting!!!");
+//                System.out.println("------------------------------------insert waiting!!!");
                 wait();
             } catch (InterruptedException ex) {
-                System.out.println("------------------------------------exit waiting!!!");
+//                System.out.println("------------------------------------exit waiting!!!");
             }
         }
         isgettering = true;
@@ -157,7 +157,7 @@ public class Performance {
         reset();
 //        System.out.println("tp tst after: "+tp.getTotalTime() + ", "+tp.getRequest());
         isgettering = false;
-        notifyAll();
+//        notifyAll();
         return tp;
     }
 }
