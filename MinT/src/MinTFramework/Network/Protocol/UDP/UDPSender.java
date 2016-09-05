@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class UDPSender implements Runnable {
     UDP udp;
 //    Selector selector;
     DebugLog dl = new DebugLog("UDPSender");
-    PacketPerform ppf = null;
+    Performance ppf = null;
     
     byte[] _sendMsg;
     SocketAddress sendAddr;
@@ -48,7 +48,7 @@ public class UDPSender implements Runnable {
     public void run() {
         UDPSendThread ust = (UDPSendThread)Thread.currentThread();
         DatagramChannel channel = ust.getDataChannel();
-        PacketPerform bench = ust.getBench();
+        Performance bench = ust.getBench();
         int bsize = 0;
         
         if(bench != null)

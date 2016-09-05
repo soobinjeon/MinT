@@ -55,7 +55,7 @@ public class RecvMSG implements Runnable {
             bench.startPerform();
         matcher.EndPointReceive(this);
         if(bench != null)
-            bench.endPerform();
+            bench.endPerform(0);
     }
     
     /**

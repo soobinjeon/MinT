@@ -27,19 +27,21 @@ public class BenchAnalize {
 //    private enum INSTANCE {PERFORM, PACKETPERFORM;}
     
     private int numofPerform = 0;
-    private double totalTime = 0;
-    private double totalRequest = 0;
-    protected ArrayList<Performance> pflist;
-    
-    private int totalbytes = 0;
-    private int packets = 0;
+    private long totalTime = 0;
+    private long totalRequest = 0;
+    private long totalbytes = 0;
+    private long packets = 0;
     
 //    private INSTANCE instance;
-    private Performance tp;
     private String pm;
+    
+    protected ArrayList<Performance> pflist;
+    protected ArrayList<PerformData> datas;
+    
     public BenchAnalize(String pm){
         this.pm = pm;
         pflist = new ArrayList<>();
+        datas = new ArrayList<>();
 //        Initialize();
     }
     
@@ -50,19 +52,33 @@ public class BenchAnalize {
     public void addPerformance(Performance p){
         pflist.add(p);
     }
-
-    private void Initialize() {
-        for(Performance pf : pflist){
-            numofPerform ++;
-            totalTime += pf.getTotalTime();
-            totalRequest += pf.getRequest();
-            if(pf instanceof PacketPerform){
-                PacketPerform pkf = (PacketPerform)pf;
-                totalbytes += pkf.getTotalBytes();
-                packets += pkf.getTotalPackets();
+    
+    public void analize() {
+        if(pflist.size() == 0)
+            datas.add(new PerformData(datas.size()+1, pm, 0, 0, 0, 0, 0));
+        else{
+            resetParam();
+            for(Performance pf : pflist){
+                Performance nf = pf.getPerformance();
+                if(nf.getRequest() > 0){
+                    numofPerform ++;
+                    totalTime += nf.getTotalTime();
+                    totalRequest += nf.getRequest();
+                    totalbytes += nf.getTotalBytes();
+                    packets += nf.getTotalPackets();
+                }
             }
-            tp = pf;
+            System.out.println("insert - "+numofPerform+", "+totalTime+", "+totalRequest+", "+totalbytes+", "+packets);
+            datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
+    }
+    
+    private void resetParam(){
+        numofPerform = 0;
+        totalTime = 0;
+        totalRequest = 0;
+        totalbytes = 0;
+        packets = 0;
     }
     
     public void printAllBenches(){
@@ -71,64 +87,30 @@ public class BenchAnalize {
         }
     }
     
-    public double getTotalTime(){
-        return totalTime;
+    public void printAllBenchList(){
+        int cnt = 0;
+        for(Performance pf: pflist){
+            System.out.println(cnt+": "+pf.Name);
+            cnt++;
+        }
     }
     
-    public int getNumofPerform(){
-        return numofPerform;
-    }
-    
-    public double getAvgTime(){
-        return numofPerform == 0 ? 0 : totalTime / numofPerform;
-    }
-    
-    public double getRequest(){
-        return totalRequest;
-    }
-    
-    public double getRequestperSec(){
-        return totalTime == 0 ? 0 : totalRequest / getAvgTime();
-    }
-    
-    public double getPacketperSec(){
-        return totalTime == 0 ? 0 : packets / getAvgTime();
-    }
-    
-    public double getByteperSec(){
-        return totalTime == 0 ? 0 : totalbytes / getAvgTime();
-    }
-    
-    public double getBytesPerPacket(){
-        return packets == 0 ? 0 : totalbytes / getAvgTime();
-    }
-    
-    public double getTotalBytes(){
-        return totalbytes;
-    }
-    
-    public double getTotalPackets(){
-        return packets;
-    }
-    
-    public double getSECperRequest(){
-        return totalRequest == 0 ? 0 : getAvgTime() / totalRequest;
+    public ArrayList<PerformData> getDatas(){
+        return this.datas;
     }
     
     public void print(){
-        System.out.print(pm+"-Total : ");
-        if(tp instanceof PacketPerform){
-            System.out.format("NoP:%d | T:%.3f | T/R:%.8f | Req:%.0f | Req/s:%.2f | Bytes/P:%.2f | Bytes/s:%.2fK | Pk/s:%.2fK%n"
-                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
-                    ,getBytesPerPacket(), getByteperSec()/1000, getPacketperSec()/1000);
-        }else if(tp instanceof Performance){
-            System.out.format("NoP:%d | Time:%.3f | T/R:%.8f | Req:%.0f | Req/Sec:%.2f%n"
-                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec());
-        }else{
-            System.out.println("");
-        }
+//        System.out.print(pm+"-Total : ");
+//        if(tp instanceof Performance){
+//            System.out.format("NoP:%d | T:%.3f | T/R:%.8f | Req:%.0f | Req/s:%.2f | Bytes/P:%.2f | Bytes/s:%.2fK | Pk/s:%.2fK%n"
+//                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
+//                    ,getBytesPerPacket(), getByteperSec()/1000, getPacketperSec()/1000);
+//        }else{
+//            System.out.println("");
+//        }
     }
 
-    public void analize() {
+    String getName() {
+        return this.pm;
     }
 }

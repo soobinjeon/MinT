@@ -122,7 +122,8 @@ public class ThreadPoolScheduler {
     }
     
     /**
-     * get Registered Pool list
+     * get Registered Pool list key
+     * String Type
      * @return 
      */
     public Iterator getRegisteredPoolList(){

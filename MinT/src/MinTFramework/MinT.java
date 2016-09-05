@@ -73,6 +73,7 @@ public abstract class MinT {
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
+        mintBench = new MinTBenchmark(getSysteScheduler());
     }
     
     /**
@@ -450,15 +451,19 @@ public abstract class MinT {
     /***************************
      * BenchMarks
      ****************************/
-    private MinTBenchmark mintBench = new MinTBenchmark(1000, getSysteScheduler());
+    private MinTBenchmark mintBench = null;
     
     public MinTBenchmark getBenchmark(){
         return mintBench;
     }
     
     public void setBenchmark(int period, boolean isbench){
-        mintBench = new MinTBenchmark(period, getSysteScheduler());
-        mintBench.setBenchMode(isbench);
+        
+        mintBench.setBenchMode(isbench, period);
+    }
+    
+    public void endBench(){
+        mintBench.endBench();
     }
     
     /***************************

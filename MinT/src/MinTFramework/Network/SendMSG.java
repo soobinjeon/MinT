@@ -91,7 +91,7 @@ public class SendMSG implements Runnable{
             bench.startPerform();
         trans.EndPointSend(this);
         if(bench != null)
-            bench.endPerform();
+            bench.endPerform(0);
     }
     
     public PacketDatagram.HEADER_DIRECTION getHeader_Direction(){

@@ -28,14 +28,13 @@ import java.util.concurrent.Executors;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class MinTBenchmark {
-    private long period = 0;
+    private long period = 1000;
     private ThreadPoolScheduler scheduler;
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
     
     private boolean isBenchMode = false;
     
-    public MinTBenchmark(long period, ThreadPoolScheduler scheduler) {
-        this.period = period;
+    public MinTBenchmark(ThreadPoolScheduler scheduler) {
         benchmarks = new ConcurrentHashMap();
         this.scheduler = scheduler;
     }
@@ -51,20 +50,32 @@ public class MinTBenchmark {
             @Override
             public void run() {
                 try {
-                    while(Thread.currentThread().isInterrupted()){
+                    while(!Thread.currentThread().isInterrupted()){
+                        if(!isBenchMode){
+                            System.out.println("bench End");
+                            break;
+                        }
                         for(BenchAnalize ba : benchmarks.values()){
+                            System.out.println(ba.getName()+"-Analizing..");
                             ba.analize();
                         }
                         Thread.sleep(period);
                     }
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+//                    ex.printStackTrace();
+                    System.out.println("Bench End!");
                 }
             }
         });
     }
     
-    public void setBenchMode(boolean bm){
+    public void endBench(){
+        isBenchMode = false;
+        makeExcelData();
+    }
+    
+    public void setBenchMode(boolean bm, int period){
+        this.period = period;
         isBenchMode = bm;
     }
     
@@ -78,10 +89,15 @@ public class MinTBenchmark {
         return na;
     }
     
-    public synchronized void addPerformance(String pm, Performance p){
+    public BenchAnalize addBenchMark(String pm){
         BenchAnalize pl = benchmarks.get(pm);
         if(pl == null)
             pl = setupBenchMark(pm);
+        return pl;
+    }
+    
+    public synchronized void addPerformance(String pm, Performance p){
+        BenchAnalize pl = addBenchMark(pm);
         pl.addPerformance(p);
     }
     
@@ -105,5 +121,8 @@ public class MinTBenchmark {
 //            return new BenchAnalize(pm, pl);
 //    }
 
-    
+    private void makeExcelData() {
+        MinTExporter ex = new MinTExporter("test.xls", (int)period);
+        ex.makeExcel(getBenchmarks());
+    }
 }

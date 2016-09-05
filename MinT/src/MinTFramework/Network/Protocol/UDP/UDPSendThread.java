@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
-import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 
@@ -29,14 +29,14 @@ import java.nio.channels.DatagramChannel;
 public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
     private MinT parent;
-    private PacketPerform bench = null;
+    private Performance bench = null;
     public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
         super(r,name);
         this.datachannel = datachannel;
         
         parent = MinT.getInstance();
         if(parent.getBenchmark().isBenchMode()){
-            bench = new PacketPerform("SendAdaptor");
+            bench = new Performance("SendAdaptor");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
         }
     }
@@ -54,7 +54,7 @@ public class UDPSendThread extends Thread{
         return "";
     }
     
-    public PacketPerform getBench(){
+    public Performance getBench(){
         return bench;
     }
     

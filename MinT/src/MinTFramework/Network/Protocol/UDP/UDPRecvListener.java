@@ -9,7 +9,7 @@ import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.RecvMSG;
-import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class UDPRecvListener extends Thread{
     UDP udp = null;
     NetworkManager networkmanager = null;
     DebugLog dl = new DebugLog("UDPRecvAdaptor");
-    private PacketPerform bench = null;
+    private Performance bench = null;
     private MinT parent;
     public UDPRecvListener(DatagramChannel channel, UDP udp) throws IOException{
         this.udp = udp;
@@ -41,7 +41,7 @@ public class UDPRecvListener extends Thread{
         parent = MinT.getInstance();
         
         if(parent.getBenchmark().isBenchMode()){
-            bench = new PacketPerform("UDP Recv");
+            bench = new Performance("UDP Recv");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString(), bench);
         }
     }
