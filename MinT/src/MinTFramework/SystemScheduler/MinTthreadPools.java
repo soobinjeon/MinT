@@ -36,14 +36,14 @@ import java.util.concurrent.TimeUnit;
 public enum MinTthreadPools {
     SYSTEM(Executors.newCachedThreadPool(new ServiceFactory())),
     RESOURCE(Executors.newCachedThreadPool(new ResourceProcFactory())),
-    NET_SEND(new ThreadPoolExecutor(1
+    NET_SEND(new ThreadPoolExecutor(MinTConfig.NETWORK_SEND_POOLSIZE
             , MinTConfig.NETWORK_SEND_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_SEND_WAITING_QUEUE)
             , new SendAdapterFactory()
             , new RejectedExecutionHandlerImpl())),
-    NET_RECV_HANDLE(new ThreadPoolExecutor(2500
-            ,2500, 0
+    NET_RECV_HANDLE(new ThreadPoolExecutor(MinTConfig.NETWORK_SEND_POOLSIZE
+            ,MinTConfig.NETWORK_RECEIVE_POOLSIZE, 0
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)
             , new ReceiveAdaptorFactory()
