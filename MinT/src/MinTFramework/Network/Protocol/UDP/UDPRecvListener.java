@@ -15,6 +15,7 @@ import MinTFramework.Util.DebugLog;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -92,8 +93,10 @@ public class UDPRecvListener extends Thread{
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
+        }catch(ClosedByInterruptException e){
+            System.out.println("Thread Stop Interrupt");
         }catch(Exception e){
-            e.printStackTrace();
+            System.out.println("Thread Stop Interrupt");
         }finally{
             bbp.putBuffer(req);
             if(bench != null)

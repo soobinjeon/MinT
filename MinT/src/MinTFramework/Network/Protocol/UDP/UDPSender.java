@@ -61,7 +61,7 @@ public class UDPSender implements Runnable {
             out.flip();
             bsize = channel.send(out, sendAddr);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println("Thread Stop Interrupt");
         }finally{
             bbp.putBuffer(out);
             if(bench != null)
