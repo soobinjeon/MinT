@@ -62,6 +62,14 @@ public class SystemScheduler extends ThreadPoolScheduler{
     }
     
     /**
+     * 실행 중 서비스 실행할 수 있도록 수정 필요함.
+     * @param s 
+     */
+    public void addExecuteService(Service s){
+        executeProcess(MinTthreadPools.SYSTEM, s);
+    }
+    
+    /**
      * start MinT Service
      */
     public void startService(){

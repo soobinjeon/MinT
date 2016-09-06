@@ -222,6 +222,14 @@ public abstract class MinT {
     public void putService(Service service){
         sched.addService(service);
     }
+    
+    /**
+     * Add Service after MinT
+     * @param service 
+     */
+    public void executeService(Service service){
+        sched.addExecuteService(service);
+    }
 
 //    /**
 //     * Print service name and id in thread in scheduler
@@ -324,6 +332,17 @@ public abstract class MinT {
      */
     public void GETbyDeviceType(DeviceType dt){
         
+    }
+    
+    /**
+     * 
+     * @param dst
+     * @param resName
+     * @param resHandle 
+     */
+    public void REQUEST_SET(NetworkProfile dst, String resName, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
+                ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,resName, resHandle));
     }
     
     /**
@@ -457,13 +476,15 @@ public abstract class MinT {
         return mintBench;
     }
     
-    public void setBenchmark(int period, boolean isbench){
-        
+    public void startBenchmark(int period, boolean isbench, String filename){
         mintBench.setBenchMode(isbench, period);
+        mintBench.startBench(filename);
     }
     
-    public void endBench(){
-        mintBench.endBench();
+    public void endBenchmark(){
+        if(mintBench.isBenchMode()){
+            mintBench.endBench();
+        }
     }
     
     /***************************
@@ -477,8 +498,8 @@ public abstract class MinT {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
         sched.startService();
-        if(mintBench != null)
-            mintBench.startBench();
+//        if(mintBench != null)
+//            mintBench.startBench();
     }
     
     protected void isDebug(boolean isdebug){

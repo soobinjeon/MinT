@@ -55,8 +55,8 @@ public class MinTExporter extends ExcelExporter{
     private void writeData(BenchAnalize ben, WritableSheet excelSheet) throws WriteException {
         createLabel(excelSheet);
         ArrayList<PerformData> datas = ben.getDatas();
-        int cnt = 1;
-        addTime(excelSheet, 0, datas);
+        int cnt = 4;
+        addTime(excelSheet, 0, cnt, datas);
         
         addIntegerDatas(excelSheet, 1, cnt, ben.NofPerform);
         addLongDatas(excelSheet, 2, cnt, ben.totaltime);
@@ -78,7 +78,7 @@ public class MinTExporter extends ExcelExporter{
                 avgcnt ++;
             super.addNumber(excelSheet, col, i+cnt, data);
         }
-        int loc = datas.size() + 2;
+        int loc = 1;
         //sum
         super.addNumber(excelSheet, col, loc, total);
         //avg
@@ -96,7 +96,7 @@ public class MinTExporter extends ExcelExporter{
                 avgcnt ++;
             super.addNumber(excelSheet, col, i+cnt, datas.get(i));
         }
-        int loc = datas.size() + 2;
+        int loc = 1;
         //sum
         super.addNumber(excelSheet, col, loc, total);
         //avg
@@ -114,7 +114,7 @@ public class MinTExporter extends ExcelExporter{
                 avgcnt ++;
             super.addNumber(excelSheet, col, i+cnt, datas.get(i));
         }
-        int loc = datas.size() + 2;
+        int loc = 1;
         //sum
         super.addNumber(excelSheet, col, loc, total);
         //avg
@@ -122,9 +122,9 @@ public class MinTExporter extends ExcelExporter{
         super.addNumber(excelSheet, col, loc+1, average);
     }
     
-    private void addTime(WritableSheet excelSheet, int cnt, ArrayList<PerformData> datas) throws WriteException {
+    private void addTime(WritableSheet excelSheet, int col, int startrow, ArrayList<PerformData> datas) throws WriteException {
         for(int i=0;i<datas.size();i++){
-            super.addNumber(excelSheet, cnt, i, i+1);
+            super.addNumber(excelSheet, col, i+startrow, i+1);
         }
     }
     
@@ -164,6 +164,10 @@ public class MinTExporter extends ExcelExporter{
             addLabel(excelSheet, 6, 0, "Total Packets");
             addLabel(excelSheet, 7, 0, "Packet/Sec");
             addLabel(excelSheet, 8, 0, "Total bytes");
+            
+            //sum, avg
+            addLabel(excelSheet, 0, 1, "Summary");
+            addLabel(excelSheet, 0, 2, "Average");
         } catch (WriteException ex) {
             ex.printStackTrace();
         }

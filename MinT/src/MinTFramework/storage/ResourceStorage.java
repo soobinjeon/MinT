@@ -181,9 +181,10 @@ public class ResourceStorage {
      * @param req 
      */
     public void setInstruction(Request req){
-        Resource rs = instruction.get(req.getResourceName());
-        if(rs != null)
-            IMhandle.set(req, rs);
+        List<ThingInstruction> rs = instruction.getbyResourceName(req.getResourceName());
+        for(ThingInstruction tp : rs){
+            IMhandle.set(req, tp);
+        }
     }
     
     public List<String> getPropertyList(){

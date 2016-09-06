@@ -56,7 +56,16 @@ public class ExcelExporter {
     }
 
     public void initWorkbook(){
-        File file = new File(inputFile);
+        File file = new File(inputFile+".xls");
+        int fcnt = 0;
+        while(true){
+            if(file.exists()){
+                file = new File(inputFile+" ("+fcnt+")"+".xls");
+                fcnt++;
+            }else
+                break;
+        }
+        
         WorkbookSettings wbSettings = new WorkbookSettings();
 
         wbSettings.setLocale(new Locale("en", "EN"));

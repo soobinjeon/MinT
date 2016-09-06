@@ -41,7 +41,7 @@ public class UDPRecvListener extends Thread{
         channel.register(selector, SelectionKey.OP_READ);
         parent = MinT.getInstance();
         
-        if(parent.getBenchmark().isBenchMode()){
+        if(parent.getBenchmark() != null){
             bench = new Performance("UDP Recv");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString(), bench);
         }

@@ -134,4 +134,17 @@ public class BenchAnalize {
     String getName() {
         return this.pm;
     }
+    
+    public void clearBuffer(){
+        this.resetParam();
+        datas.clear();
+        totaltime.clear();
+        avgtime.clear();
+        TRequest.clear();
+        Tpackets.clear();
+        Tbytes.clear();
+        ReqperSec.clear();
+        PckperSec.clear();
+        NofPerform.clear();
+    }
 }

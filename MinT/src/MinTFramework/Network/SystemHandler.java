@@ -84,7 +84,8 @@ public class SystemHandler{
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }else if(rv_packet.getHeader_Instruction().isSet()){
-            
+            Request req = new Request(rv_packet.getMsgData(), 0, rv_packet.getSource());
+            resStorage.setInstruction(req);
         }else if(rv_packet.getHeader_Instruction().isPost()){
             
         }else if(rv_packet.getHeader_Instruction().isDelete()){

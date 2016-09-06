@@ -28,23 +28,30 @@ import java.util.concurrent.Executors;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class MinTBenchmark {
+    private final String bname = "MinT Benchmark";
     private long period = 1000;
     private ThreadPoolScheduler scheduler;
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
     
     private boolean isBenchMode = false;
     
+    private String Filename = "result";
+    
     public MinTBenchmark(ThreadPoolScheduler scheduler) {
         benchmarks = new ConcurrentHashMap();
         this.scheduler = scheduler;
     }
     
-    public void startBench() {
+    public void startBench(){
+        startBench("result");
+    }
+    public void startBench(String filename) {
         if(!isBenchMode)
             return;
-        
+        System.out.println("Start BenchMarks... - "+filename);
+        Filename = filename;
         //do Something
-        String bname = "MinT Benchmark";
+        
         scheduler.registerThreadPool(bname, Executors.newCachedThreadPool());
         scheduler.executeProcess(bname, new Runnable() {
             @Override
@@ -52,7 +59,7 @@ public class MinTBenchmark {
                 try {
                     while(!Thread.currentThread().isInterrupted()){
                         if(!isBenchMode){
-                            System.out.println("bench End");
+                            System.out.println("bench End!");
                             break;
                         }
                         for(BenchAnalize ba : benchmarks.values()){
@@ -70,8 +77,15 @@ public class MinTBenchmark {
     }
     
     public void endBench(){
-        isBenchMode = false;
-        makeExcelData();
+        if(isBenchMode){
+            isBenchMode = false;
+            scheduler.shutdownNowSelectedPool(bname);
+            makeExcelData(Filename);
+            
+            //clear buffer
+            for(BenchAnalize ba : benchmarks.values())
+                ba.clearBuffer();
+        }
     }
     
     public void setBenchMode(boolean bm, int period){
@@ -90,6 +104,7 @@ public class MinTBenchmark {
     }
     
     public BenchAnalize addBenchMark(String pm){
+//        System.out.println("Add BenchMark: "+pm);
         BenchAnalize pl = benchmarks.get(pm);
         if(pl == null)
             pl = setupBenchMark(pm);
@@ -121,8 +136,8 @@ public class MinTBenchmark {
 //            return new BenchAnalize(pm, pl);
 //    }
 
-    private void makeExcelData() {
-        MinTExporter ex = new MinTExporter("test.xls", (int)period);
+    private void makeExcelData(String filename) {
+        MinTExporter ex = new MinTExporter(filename, (int)period);
         ex.makeExcel(getBenchmarks());
     }
 }
