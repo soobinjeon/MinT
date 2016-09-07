@@ -17,6 +17,7 @@
 package MinTFramework.Network;
 
 import MinTFramework.storage.datamap.Information;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -26,15 +27,33 @@ public class Request extends Information {
     String targetRes;
     NetworkProfile RequestNode = null;
     
+    protected final String RESOURCENAME = "rn";
+    protected final String REQUESTMETHOD = "rm";
+    
+    protected String messageString = "";
     /**
-     * 
+     * set Request for SystemHandler
      * @param res Resource Name or ID
      * @param _getResource 
+     * @param tn 
      */
     public Request(String res, Object _getResource, NetworkProfile tn) {
         super(_getResource);
-        targetRes = res;
+        if(res == null)
+            targetRes = "";
+        else
+            targetRes = res;
         RequestNode = tn;
+    }
+    
+    /**
+     * set Request for Sender
+     * @param res Resource Name for requesting
+     * @param _getResource Request Method
+     */
+    public Request(String res, Object _getResource){
+        this(res, _getResource, null);
+        setMessageString();
     }
 
     @Override
@@ -56,5 +75,16 @@ public class Request extends Information {
      */
     public NetworkProfile getRequestNode(){
         return RequestNode;
+    }
+    
+    private void setMessageString(){
+        JSONObject resObject = new JSONObject();
+        resObject.put(RESOURCENAME, targetRes);
+        resObject.put(REQUESTMETHOD, super.getResourceString());
+        messageString = resObject.toJSONString();
+    }
+    
+    public String getMessageString(){
+        return this.messageString;
     }
 }

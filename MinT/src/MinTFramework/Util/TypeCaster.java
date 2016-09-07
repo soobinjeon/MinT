@@ -100,7 +100,10 @@ public class TypeCaster {
             buff.order(order);
             buff.putChar((Character)value);
         }
-        else
+        else if(value instanceof String){
+            buff = ByteBuffer.wrap(((String)value).getBytes());
+            buff.order(order);
+        }else
             return null;
 
 //        System.out.println("intTobyte : " + buff);

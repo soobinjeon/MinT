@@ -28,8 +28,8 @@ public class MinTConfig {
     //Network Adaptor
     static public final int NETWORK_RECEIVE_WAITING_QUEUE = 10000;
     static public final int NETWORK_SEND_WAITING_QUEUE = 10000;
-    static public final int NETWORK_RECEIVE_POOLSIZE = 5;
-    static public final int NETWORK_SEND_POOLSIZE = 5;
+    static public  int NETWORK_RECEIVE_POOLSIZE = 5;
+    static public  int NETWORK_SEND_POOLSIZE = 5;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;

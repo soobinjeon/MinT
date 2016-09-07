@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class UDP extends Network {
     public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
     //UDP
-    static final int UDP_SENDER_THREAD_CORE = 1;
+    static final int UDP_SENDER_THREAD_CORE = 3;
     static final int UDP_SENDER_THREAD_MAX = 3;
     static final int UDP_SENDER_THREAD_QUEUE = 200000;
     static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
