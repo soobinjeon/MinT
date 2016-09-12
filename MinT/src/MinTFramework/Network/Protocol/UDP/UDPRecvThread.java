@@ -14,26 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.ThreadsPool;
-
-import java.util.concurrent.RejectedExecutionHandler;
-import java.util.concurrent.ThreadPoolExecutor;
+package MinTFramework.Network.Protocol.UDP;
 
 /**
- * Rejected Queue Handler
- * Basically this handler get a method to re-put a task in thread pool
- * 
- * @aut`hor soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
- * youngtak Han <gksdudxkr@gmail.com>
+ *
+ * @author Administrator
  */
-public class RejectedExecutionHandlerImpl implements RejectedExecutionHandler {
-
-    @Override
-    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-        try {
-            executor.getQueue().put(r);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while submitting task", e);
-        }
+public class UDPRecvThread extends Thread{
+    public UDPRecvThread(Runnable r, String name){
+        super(r, name);
+        
+        setPriority(MAX_PRIORITY);
     }
 }

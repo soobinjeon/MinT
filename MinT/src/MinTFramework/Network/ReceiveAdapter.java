@@ -33,18 +33,21 @@ public class ReceiveAdapter extends Thread{
     
     private Performance bench = null;
     private MinT parent;
-    
+    private boolean isBenchMode = false;
     
     public ReceiveAdapter(Runnable r, String name) {
         super(r,name);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
-        if(parent.getBenchmark().isBenchMode()){
+        checkBench();
+    }
+    public void checkBench(){
+        if (!isBenchMode && parent.getBenchmark().isBenchMode()) {
             bench = new Performance("ReceiveAdaptor");
             parent.getBenchmark().addPerformance(MinTthreadPools.NET_RECV_HANDLE.toString(), bench);
+            isBenchMode = true;
         }
     }
-    
     /**
      * get Current Thread's Matcher
      * @return 
@@ -60,6 +63,6 @@ public class ReceiveAdapter extends Thread{
     @Override
     public void finalize() throws Throwable{
         super.finalize();
-        System.out.println("end of thread-Receiver");
+//        System.out.println("end of thread-Receiver");
     }
 }

@@ -77,6 +77,12 @@ public class SystemScheduler extends ThreadPoolScheduler{
             executeProcess(MinTthreadPools.SYSTEM, ts);
     }
     
+    public void setPoolsize(MinTthreadPools tp, int i){
+        ThreadPoolExecutor exe = getThreadPool(tp);
+        exe.setCorePoolSize(i);
+        exe.setMaximumPoolSize(i);
+    }
+    
     /**
      * get ThreadPool
      * @param tp

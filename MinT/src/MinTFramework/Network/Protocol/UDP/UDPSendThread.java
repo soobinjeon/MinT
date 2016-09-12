@@ -30,14 +30,22 @@ public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
     private MinT parent;
     private Performance bench = null;
+    private boolean isBenchMode = false;
+    
     public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
         super(r,name);
         this.datachannel = datachannel;
-        
+        this.setPriority(MAX_PRIORITY);
         parent = MinT.getInstance();
-        if(parent.getBenchmark().isBenchMode()){
+        checkBench();
+        
+    }
+    
+    public void checkBench(){
+        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
             bench = new Performance("SendAdaptor");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
+            isBenchMode = true;
         }
     }
     
