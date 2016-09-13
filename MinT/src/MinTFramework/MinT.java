@@ -73,7 +73,7 @@ public abstract class MinT {
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        mintBench = new MinTBenchmark(getSysteScheduler());
+        mintBench = new MinTBenchmark(getSysteScheduler(), 500);
     }
     
     /**
@@ -476,8 +476,8 @@ public abstract class MinT {
         return mintBench;
     }
     
-    public void startBenchmark(int period, boolean isbench, String filename){
-        mintBench.setBenchMode(isbench, period);
+    public void startBenchmark(String filename){
+//        mintBench.setBenchMode(isbench, period);
         mintBench.startBench(filename);
     }
     
@@ -497,9 +497,9 @@ public abstract class MinT {
     public void Start() {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
-        sched.startService();
-//        if(mintBench != null)
-//            mintBench.startBench();
+        sched.StartScheduler();
+        if(mintBench != null)
+            mintBench.makeBenchMark();
     }
     
     protected void isDebug(boolean isdebug){

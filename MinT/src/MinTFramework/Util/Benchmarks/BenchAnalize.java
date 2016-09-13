@@ -63,8 +63,10 @@ public class BenchAnalize {
     public void addPerformance(Performance p){
         pflist.put(psize++, p);
     }
-    
     public void analize() {
+        analize(null);
+    }
+    public void analize(BenchAnalize others) {
         if(pflist.size() == 0)
             datas.add(new PerformData(datas.size()+1, pm, 0, 0, 0, 0, 0));
         else{
@@ -84,6 +86,12 @@ public class BenchAnalize {
         }
         
         int idx = datas.size()-1;
+        insertAnalysisData(idx, datas);
+        if(others != null)
+            others.insertAnalysisData(idx, datas);
+    }
+    
+    public void insertAnalysisData(int idx, ArrayList<PerformData> datas){
         totaltime.add(datas.get(idx).getTotalTime());
         avgtime.add(datas.get(idx).getAvgTime());
         TRequest.add(datas.get(idx).getRequest());

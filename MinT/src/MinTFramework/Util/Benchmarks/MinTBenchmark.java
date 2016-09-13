@@ -32,65 +32,67 @@ public class MinTBenchmark {
     private long period = 1000;
     private ThreadPoolScheduler scheduler;
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
+    private ConcurrentHashMap<String, BenchAnalize> poolsinfo;
     
     private boolean isBenchMode = false;
     
     private String Filename = "result";
     
-    public MinTBenchmark(ThreadPoolScheduler scheduler) {
+    public MinTBenchmark(ThreadPoolScheduler scheduler, long pd) {
         benchmarks = new ConcurrentHashMap();
+        poolsinfo = new ConcurrentHashMap();
         this.scheduler = scheduler;
+        this.period = pd;
     }
     
-    public void startBench(){
-        startBench("result");
-    }
-    public void startBench(String filename) {
-        if(!isBenchMode)
-            return;
-        System.out.println("Start BenchMarks... - "+filename);
-        Filename = filename;
+    public void makeBenchMark() {
+//        if(!isBenchMode)
+//            return;
         //do Something
         
-        scheduler.registerThreadPool(bname, Executors.newCachedThreadPool());
+        scheduler.registerThreadPool(bname, Executors.newSingleThreadExecutor());
         scheduler.executeProcess(bname, new Runnable() {
             @Override
             public void run() {
                 try {
                     while(!Thread.currentThread().isInterrupted()){
-                        if(!isBenchMode){
-                            System.out.println("bench End!");
-                            break;
-                        }
                         for(BenchAnalize ba : benchmarks.values()){
 //                            System.out.println(ba.getName()+"-Analizing..");
-                            ba.analize();
+                            BenchAnalize pba = poolsinfo.get(ba.getName());
+                            ba.analize(pba);
                         }
+                        
+                        if(!isBenchMode)
+                            ClearBuffer();
+                        
                         Thread.sleep(period);
                     }
                 } catch (InterruptedException ex) {
-//                    ex.printStackTrace();
                     System.out.println("Bench End!");
                 }
             }
         });
     }
     
+    private void ClearBuffer(){
+        //clear buffer
+        for(BenchAnalize ba : benchmarks.values())
+            ba.clearBuffer();
+    }
+    
+    public void startBench(String filename){
+        isBenchMode = true;
+        System.out.println("Start BenchMarks... - "+filename);
+        Filename = filename;
+        ClearBuffer();
+    }
     public void endBench(){
         if(isBenchMode){
             isBenchMode = false;
-            scheduler.shutdownNowSelectedPool(bname);
+//            scheduler.shutdownNowSelectedPool(bname);
             makeExcelData(Filename);
-            
-            //clear buffer
-            for(BenchAnalize ba : benchmarks.values())
-                ba.clearBuffer();
+            ClearBuffer();
         }
-    }
-    
-    public void setBenchMode(boolean bm, int period){
-        this.period = period;
-        isBenchMode = bm;
     }
     
     public boolean isBenchMode(){
@@ -98,8 +100,13 @@ public class MinTBenchmark {
     }
     
     private BenchAnalize setupBenchMark(String pm){
+        //insert BA to benchmarks
         BenchAnalize na = new BenchAnalize(pm);
         benchmarks.put(pm, na);
+        
+        //insert Pool Info
+        BenchAnalize pool = new BenchAnalize(pm);
+        poolsinfo.put(pm, pool);
         return na;
     }
     

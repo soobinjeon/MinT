@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public enum MinTthreadPools {
+    THREAD_ADJUST(Executors.newSingleThreadExecutor()),
     SYSTEM(Executors.newCachedThreadPool(new ServiceFactory())),
     RESOURCE(Executors.newCachedThreadPool(new ResourceProcFactory())),
     NET_SEND(new ThreadPoolExecutor(MinTConfig.NETWORK_SEND_POOLSIZE
