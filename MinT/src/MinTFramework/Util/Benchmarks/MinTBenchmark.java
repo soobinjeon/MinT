@@ -49,7 +49,7 @@ public class MinTBenchmark {
 //        if(!isBenchMode)
 //            return;
         //do Something
-        
+        System.out.println("Make BenchMark!");
         scheduler.registerThreadPool(bname, Executors.newSingleThreadExecutor());
         scheduler.executeProcess(bname, new Runnable() {
             @Override
@@ -88,9 +88,10 @@ public class MinTBenchmark {
     }
     public void endBench(){
         if(isBenchMode){
-            isBenchMode = false;
+            System.out.println("end BenchMode!");
 //            scheduler.shutdownNowSelectedPool(bname);
             makeExcelData(Filename);
+            isBenchMode = false;
             ClearBuffer();
         }
     }
@@ -133,6 +134,10 @@ public class MinTBenchmark {
     
     public ArrayList<String> getBenchmarkList(){
         return new ArrayList<>(benchmarks.keySet());
+    }
+    
+    public ConcurrentHashMap<String, BenchAnalize> getPoolsInfo() {
+        return poolsinfo;
     }
     
 //    public BenchAnalize getBenchAnalize(PERFORM_METHOD pm){

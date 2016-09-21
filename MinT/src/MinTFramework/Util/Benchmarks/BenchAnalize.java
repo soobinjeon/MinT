@@ -39,15 +39,16 @@ public class BenchAnalize {
 //    protected ArrayList<Performance> pflist;
     protected ArrayList<PerformData> datas;
     
-    protected ArrayList<Long> totaltime = new ArrayList<>();
-    protected ArrayList<Double> avgtime = new ArrayList<>();
-    protected ArrayList<Long> TRequest = new ArrayList<>();
-    protected ArrayList<Long> Tpackets = new ArrayList<>();
-    protected ArrayList<Long> Tbytes = new ArrayList<>();
-    protected ArrayList<Double> ReqperSec = new ArrayList<>();
-    protected ArrayList<Double> PckperSec = new ArrayList<>();
-    protected ArrayList<Integer> NofPerform = new ArrayList<>();
+    public ArrayList<Long> totaltime = new ArrayList<>();
+    public ArrayList<Double> avgtime = new ArrayList<>();
+    public ArrayList<Long> TRequest = new ArrayList<>();
+    public ArrayList<Long> Tpackets = new ArrayList<>();
+    public ArrayList<Long> Tbytes = new ArrayList<>();
+    public ArrayList<Double> ReqperSec = new ArrayList<>();
+    public ArrayList<Double> PckperSec = new ArrayList<>();
+    public ArrayList<Integer> NofPerform = new ArrayList<>();
     
+    private boolean isInserting = false;
     public BenchAnalize(String pm){
         this.pm = pm;
         pflist = new ConcurrentHashMap<>();
@@ -81,25 +82,44 @@ public class BenchAnalize {
                     packets += nf.getTotalPackets();
                 }
             }
-//            System.out.println("insert - "+numofPerform+", "+totalTime+", "+totalRequest+", "+totalbytes+", "+packets);
             datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
         
-        int idx = datas.size()-1;
-        insertAnalysisData(idx, datas);
+        insertAnalysisData(false,datas);
         if(others != null)
-            others.insertAnalysisData(idx, datas);
+            others.insertAnalysisData(true, datas);
     }
     
-    public void insertAnalysisData(int idx, ArrayList<PerformData> datas){
-        totaltime.add(datas.get(idx).getTotalTime());
-        avgtime.add(datas.get(idx).getAvgTime());
-        TRequest.add(datas.get(idx).getRequest());
-        Tpackets.add(datas.get(idx).getTotalPackets());
-        Tbytes.add(datas.get(idx).getTotalBytes());
-        NofPerform.add(datas.get(idx).getNumofPerform());
-        ReqperSec.add(datas.get(idx).getRequestperSec());
-        PckperSec.add(datas.get(idx).getPacketperSec());
+    public synchronized void insertAnalysisData(boolean isother, ArrayList<PerformData> datas){
+        isInserting = true;
+        int idx = datas.size()-1;
+        int inidx = 0;
+//        try{
+            inidx = datas.size()-1;
+            if(idx >= 0){
+//                if(!isother){
+////                    System.err.println("Origin-size: "+idx+", inidx: "+inidx);
+//                }else{
+//                    System.err.println("Other-size: "+idx+", inidx: "+inidx);
+//                }
+                totaltime.add(datas.get(idx).getTotalTime());
+                avgtime.add(datas.get(idx).getAvgTime());
+                TRequest.add(datas.get(idx).getRequest());
+                Tpackets.add(datas.get(idx).getTotalPackets());
+                Tbytes.add(datas.get(idx).getTotalBytes());
+                NofPerform.add(datas.get(idx).getNumofPerform());
+                ReqperSec.add(datas.get(idx).getRequestperSec());
+                PckperSec.add(datas.get(idx).getPacketperSec());
+            }else{
+                System.err.printf("IDX is Zero");
+            }
+        isInserting = false;
+        notifyAll();
+//        }catch(Exception e){
+//            System.err.printf("InsertAnalysis Out of Bound Error");
+//            System.err.printf("IDX: "+idx);
+//            e.printStackTrace();
+//        }
     }
     
     private void resetParam(){
@@ -143,7 +163,16 @@ public class BenchAnalize {
         return this.pm;
     }
     
-    public void clearBuffer(){
+    public synchronized void clearBuffer(){
+        while(isInserting){
+            try {
+                System.out.println("------------------------------------insert waiting!!!");
+                wait();
+            } catch (InterruptedException ex) {
+                System.out.println("------------------------------------exit waiting!!!");
+            }
+        }
+//        System.out.println("------------------------------------exit waiting!!!");
         this.resetParam();
         datas.clear();
         totaltime.clear();

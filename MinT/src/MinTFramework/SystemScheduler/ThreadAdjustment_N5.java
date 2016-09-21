@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ThreadAdjustment implements Runnable{
+public class ThreadAdjustment_N5 implements Runnable{
     MinT frame = MinT.getInstance();
     MinTBenchmark bench;
     ConcurrentHashMap<String, BenchAnalize> pools;
@@ -49,7 +49,7 @@ public class ThreadAdjustment implements Runnable{
     
     private int MAX_THREAD = 2;
     private double MAX_TH = 0;
-    public ThreadAdjustment() {
+    public ThreadAdjustment_N5() {
         bench = frame.getBenchmark();
         pools = bench.getPoolsInfo();
         THarray = new LimitedQueue(TRequestSize);

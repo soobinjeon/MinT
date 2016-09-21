@@ -80,12 +80,12 @@ public class SystemScheduler extends ThreadPoolScheduler{
     }
     
     private void startThreadAdjust(){
-        executeProcess(MinTthreadPools.THREAD_ADJUST, new ThreadAdjustment());
+        executeProcess(MinTthreadPools.THREAD_ADJUST, new ThreadAdjustment_N5());
     }
     
     public void StartScheduler(){
         startService();
-//        startThreadAdjust();
+        startThreadAdjust();
     }
     
     public void setPoolsize(MinTthreadPools tp, int i){

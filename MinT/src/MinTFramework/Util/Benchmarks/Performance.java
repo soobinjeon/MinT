@@ -70,11 +70,13 @@ public class Performance {
 //            }
 //        }
         iscalibrating = true;
-        stime = System.currentTimeMillis();
+//        stime = System.currentTimeMillis();
+        stime = System.nanoTime();
     }
     
     public synchronized void endPerform(int bytesize){
-        etime = System.currentTimeMillis();
+//        etime = System.currentTimeMillis();
+        etime = System.nanoTime();
         setPacketInfo(stime, etime);
         setPacketInfo(bytesize);
         iscalibrating = false;
@@ -101,7 +103,8 @@ public class Performance {
     }
     
     public double getTime(){
-        return totaltime == 0 ? 0 : (double)(totaltime / 1000.0);
+        double sec = 1000000000.0;
+        return totaltime == 0 ? 0 : (double)(totaltime / sec);
     }
     
     public long getRequest(){

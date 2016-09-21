@@ -120,4 +120,12 @@ public class OSUtil {
             return getLinuxIPAddress();
         }
     }
+    
+    public static void busySleep(long nanos) {
+        long elapsed;
+        final long startTime = System.nanoTime();
+        do {
+            elapsed = System.nanoTime() - startTime;
+        } while (elapsed < nanos);
+    }
 }
