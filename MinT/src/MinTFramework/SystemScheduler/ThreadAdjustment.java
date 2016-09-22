@@ -62,7 +62,7 @@ public class ThreadAdjustment implements Runnable{
         try{
             System.out.println("Start Thread Adjustment");
             while(!Thread.currentThread().isInterrupted()){
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 
                 AdjustRecvHandler();
             }
@@ -74,43 +74,42 @@ public class ThreadAdjustment implements Runnable{
 
     private void AdjustRecvHandler() {
         BenchAnalize Ht = pools.get(MinTthreadPools.NET_RECV_HANDLE.toString());
-        BenchAnalize St = pools.get(UDP.UDP_Thread_Pools.UDP_SENDER.toString());
+//        BenchAnalize St = pools.get(UDP.UDP_Thread_Pools.UDP_SENDER.toString());
         BenchAnalize Rt = pools.get(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString());
         
-        
-        
-        if(Ht != null){
-            THt = calibrateHTrend(Ht,THarray);
-        }
-        if(Ht != null && St != null && Rt != null){
+        if(Ht != null && Rt != null){
             double Hdata = getData(Ht);
-            double Sdata = getData(St);
             double Rdata = getData(Rt);
             
+            //store information
+            THt = calibrateHTrend(THarray);
             AddHTtrend(Hdata);
-            AccumRequestNn(Hdata, Rdata);
+            AccumRequestNn(Ht, Rt);
             
             //Queue를 이용한 처리
             double queueP = getQueueWegiht(recvpool);
+            
             double result = THt == 0 ? 0 : (Rdata - Hdata) / THt;
+            
             arrayRequestNn.add(result);
 //            result = result >= 0 ? Math.round(result) : result;
             System.out.println("originR: "+result+", RL: "+arrayRequestNn);
-            if(result >= 0)
+            
+//            if(result >= 0)
                 result = Math.round(result);
-            else if(isDecreaseTrend(arrayRequestNn)){
-                result = result;
-            }else
-                result = 0;
+//            else if(isDecreaseTrend(arrayRequestNn)){
+//                result = result;
+//            }else
+//                result = 0;
             
             double nextN = result + queueP;
-            int nN =  (int)nextN + PrevN;
+            int nN =  (int)nextN + Nt;
             
             //not working, decrease number of Thread
-            if(Hdata == 0)
+            if(THt == 0)
                 nN = nN - 1;
             
-            MAX_THREAD = setMAXThread(THt, MAX_THREAD);
+            MAX_THREAD = setMAXThread(THarray, MAX_THREAD);
             
             if(nN < 1)
                 Nt = 1;
@@ -122,9 +121,12 @@ public class ThreadAdjustment implements Runnable{
             //지속적으로 Number of Thread가 올라가는데도 성능이 증가하지 않으면 멈춤
             
             PrevN = Nt;
-            System.out.printf("queueP: %.2f",queueP);
+            System.out.println("------------------------------------------------------------------------------------------");
+            System.out.printf("QeueP: %.2f",queueP);
             System.out.println("");
-            System.out.printf("result: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
+            System.out.println("THArray: "+THarray);
+            System.out.println("");
+            System.out.printf("AccHt: %.2f, RNn: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",accumReqeustNn,result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
             System.out.println("");
 //            System.out.println("result: "+result+", TH : "+THt+" NExt N : "+nextN+", NT: "+ Nt);
             System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);//+"("+Rt.ReqperSec.size()+"), Time: "+getTime(Rt)+", Time: "+getRequest(Rt));
@@ -133,7 +135,7 @@ public class ThreadAdjustment implements Runnable{
             frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
             Rt.clearBuffer();
             Ht.clearBuffer();
-            St.clearBuffer();
+//            St.clearBuffer();
         }
             
     }
@@ -185,8 +187,10 @@ public class ThreadAdjustment implements Runnable{
         THarray.add(Ht);
     }
     
-    private void AccumRequestNn(double Ht, double Rt) {
-        accumReqeustNn += Rt - Ht;
+    private void AccumRequestNn(BenchAnalize Ht, BenchAnalize Rt) {
+        double Hdata = getRequest(Ht);
+        double Rdata = getRequest(Rt);
+        accumReqeustNn += Rdata - Hdata;
     }
     
     /**
@@ -194,7 +198,7 @@ public class ThreadAdjustment implements Runnable{
      * @param Ht
      * @return 
      */
-    private double calibrateHTrend(BenchAnalize Ht, LimitedQueue<Double> array) {
+    private double calibrateHTrend_OLD(BenchAnalize Ht, LimitedQueue<Double> array) {
         double cht = getData(Ht);
         
         if(cht > 0)
@@ -217,18 +221,20 @@ public class ThreadAdjustment implements Runnable{
      * @param Ht
      * @return 
      */
-    
-    private double calibrateHTrend_OLD(LimitedQueue<Double> array) {
+    private double calibrateHTrend(LimitedQueue<Double> array) {
         double res = 0;
         double size = array.size();
         
-        for(int i=0;i<size;i++)
-            res += array.get(i);
+        int cnt = 0;
+        double ret = 0;
+        for(int i=0;i<size;i++){
+            ret = array.get(i);
+            if(ret > 0)
+                cnt ++;
+            res += ret;
+        }
         
-        if(size < TRequestSize)
-            return 0;
-        
-        return res == 0 || size == 0 ? 0 : res/size;
+        return res == 0 || cnt == 0 ? 0 : res/cnt;
     }
 
     private double getQueueWegiht(ThreadPoolExecutor recvpool) {
@@ -242,10 +248,23 @@ public class ThreadAdjustment implements Runnable{
         return N;
     }
 
-    private int setMAXThread(double THt, int max_thread) {
-        if(THt > MAX_TH){
-            MAX_TH = THt;
+    private int setMAXThread(LimitedQueue<Double> THarr, int max_thread) {
+        int arrsize = THarr.size() - 1;
+        double thn = 0;
+        double n = 0;
+        double n_1 = 0;
+        if(arrsize > 0){
+            n = THarr.get(arrsize);
+            n_1 = THarr.get(arrsize-1);
+            thn = n - n_1;
+        }
+        System.out.println("N: "+n+", N-1: "+n_1+", THN: "+thn+", MAX_TH: "+MAX_TH);
+        if(thn < 0 && n > MAX_TH){
+            MAX_TH = n;
             return max_thread + 1;
+//        }else if(n > MAX_TH){
+//            MAX_TH = n;
+//            return max_thread;
         }else
             return max_thread;
     }

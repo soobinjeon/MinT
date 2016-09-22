@@ -16,6 +16,7 @@
  */
 package MinTFramework.Util.Benchmarks;
 
+import MinTFramework.SystemScheduler.ThreadAdjustment_N6;
 import MinTFramework.ThreadsPool.ThreadPoolScheduler;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,11 +34,11 @@ public class MinTBenchmark {
     private ThreadPoolScheduler scheduler;
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
     private ConcurrentHashMap<String, BenchAnalize> poolsinfo;
-    
+//    private final ThreadAdjustment_N6 TAJ = new ThreadAdjustment_N6();
     private boolean isBenchMode = false;
     
     private String Filename = "result";
-    
+    private long bcount = 0;
     public MinTBenchmark(ThreadPoolScheduler scheduler, long pd) {
         benchmarks = new ConcurrentHashMap();
         poolsinfo = new ConcurrentHashMap();
@@ -60,11 +61,12 @@ public class MinTBenchmark {
 //                            System.out.println(ba.getName()+"-Analizing..");
                             BenchAnalize pba = poolsinfo.get(ba.getName());
                             ba.analize(pba);
+//                            ba.analize();
                         }
-                        
+//                        TAJ.AdjustRecvHandler(benchmarks,bcount);
                         if(!isBenchMode)
                             ClearBuffer();
-                        
+                        bcount++;
                         Thread.sleep(period);
                     }
                 } catch (InterruptedException ex) {
@@ -78,6 +80,7 @@ public class MinTBenchmark {
         //clear buffer
         for(BenchAnalize ba : benchmarks.values())
             ba.clearBuffer();
+        bcount = 0;
     }
     
     public void startBench(String filename){
