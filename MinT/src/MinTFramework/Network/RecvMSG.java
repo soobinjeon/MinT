@@ -48,6 +48,7 @@ public class RecvMSG implements Runnable {
     @Override
     public void run() {
         ReceiveAdapter recvA = (ReceiveAdapter)Thread.currentThread();
+        recvA.checkBench();
         MatcherAndSerialization matcher = recvA.getMatcher();
         Performance bench = recvA.getBench();
         //put the recvmsg to matcher

@@ -151,7 +151,7 @@ public class UDP extends Network {
                 , Executors.newCachedThreadPool(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "UDP_Receive_Listener");
+                return new UDPRecvThread(r, "UDP_Receive_Listener");
             }
         }));
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){

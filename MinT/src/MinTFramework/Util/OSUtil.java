@@ -74,6 +74,11 @@ public class OSUtil {
                     }
                 }
             }
+            
+            if(hostAddr == null || hostAddr.equals("")){
+                hostAddr = "127.0.0.1";
+            }
+            
         } catch (SocketException e) {
             e.printStackTrace();
         }

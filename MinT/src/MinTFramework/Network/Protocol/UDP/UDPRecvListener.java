@@ -33,6 +33,7 @@ public class UDPRecvListener extends Thread{
     DebugLog dl = new DebugLog("UDPRecvAdaptor");
     private Performance bench = null;
     private MinT parent;
+    private boolean isBenchMode = false;
     public UDPRecvListener(DatagramChannel channel, UDP udp) throws IOException{
         this.udp = udp;
         networkmanager = udp.getNetworkManager();
@@ -40,10 +41,15 @@ public class UDPRecvListener extends Thread{
         this.channel = channel;
         channel.register(selector, SelectionKey.OP_READ);
         parent = MinT.getInstance();
+        checkBench();
         
-        if(parent.getBenchmark() != null){
+    }
+    
+    public void checkBench(){
+        if(!isBenchMode && parent.getBenchmark() != null && parent.getBenchmark().isBenchMode()){
             bench = new Performance("UDP Recv");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString(), bench);
+            isBenchMode = true;
         }
     }
 
@@ -54,6 +60,7 @@ public class UDPRecvListener extends Thread{
 //                dl.printMessage(this.getID()+"-wait selector..");
                 int KeysReady = selector.select();
 //                dl.printMessage("Selector Accepted");
+                checkBench();
                 RequestPendingConnection();
             }
         }catch(IOException e){

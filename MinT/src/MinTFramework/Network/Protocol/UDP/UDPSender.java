@@ -47,6 +47,7 @@ public class UDPSender implements Runnable {
     @Override
     public void run() {
         UDPSendThread ust = (UDPSendThread)Thread.currentThread();
+        ust.checkBench();
         DatagramChannel channel = ust.getDataChannel();
         Performance bench = ust.getBench();
         int bsize = 0;
