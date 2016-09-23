@@ -77,7 +77,8 @@ public class OSUtil {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        return hostAddr;
+//        System.out.println("OSUTILL return ip is "+hostAddr);
+        return hostAddr.equals("") ? "127.0.0.1" : hostAddr;
     }
 
     private static String getWindowsIPAddress() {
@@ -99,7 +100,7 @@ public class OSUtil {
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
-        return ip != null ? ip.getHostAddress() : null;
+        return ip != null ? ip.getHostAddress() : "";
     }
 
     public static String getIPAddress() {
