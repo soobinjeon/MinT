@@ -42,7 +42,7 @@ public class UDPSendThread extends Thread{
     }
     
     public void checkBench(){
-        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
+        if(!isBenchMode && parent.getBenchmark().isMakeBench()){
             bench = new Performance("SendAdaptor");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
             isBenchMode = true;
