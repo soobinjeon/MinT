@@ -35,6 +35,8 @@ public class SystemScheduler extends ThreadPoolScheduler{
     private ArrayList<Service> serviceList;
     public SystemScheduler(){
         serviceList = new ArrayList<>();
+        //System Scheduler
+        registerMinTSystemthreadPool(MinTthreadPools.THREAD_ADJUST);
         //register System Pool
         registerMinTSystemthreadPool(MinTthreadPools.SYSTEM);
         //register Resource Pool
@@ -62,11 +64,34 @@ public class SystemScheduler extends ThreadPoolScheduler{
     }
     
     /**
+     * 실행 중 서비스 실행할 수 있도록 수정 필요함.
+     * @param s 
+     */
+    public void addExecuteService(Service s){
+        executeProcess(MinTthreadPools.SYSTEM, s);
+    }
+    
+    /**
      * start MinT Service
      */
-    public void startService(){
+    private void startService(){
         for(Service ts : serviceList)
             executeProcess(MinTthreadPools.SYSTEM, ts);
+    }
+    
+    private void startThreadAdjust(){
+        executeProcess(MinTthreadPools.THREAD_ADJUST, new ThreadAdjustment());
+    }
+    
+    public void StartScheduler(){
+        startService();
+        startThreadAdjust();
+    }
+    
+    public void setPoolsize(MinTthreadPools tp, int i){
+        ThreadPoolExecutor exe = getThreadPool(tp);
+        exe.setCorePoolSize(i);
+        exe.setMaximumPoolSize(i);
     }
     
     /**

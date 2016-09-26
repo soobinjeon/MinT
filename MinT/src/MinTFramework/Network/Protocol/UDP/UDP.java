@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class UDP extends Network {
     public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
     //UDP
-    static final int UDP_SENDER_THREAD_CORE = 1;
+    static final int UDP_SENDER_THREAD_CORE = 3;
     static final int UDP_SENDER_THREAD_MAX = 3;
     static final int UDP_SENDER_THREAD_QUEUE = 200000;
     static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
@@ -78,6 +78,7 @@ public class UDP extends Network {
         try {
             this.setUDPSocket();
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
         MakeUDPReceiveListeners();
         MakeUDPSender();
@@ -102,7 +103,7 @@ public class UDP extends Network {
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
+//        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
     
     /**
@@ -151,7 +152,7 @@ public class UDP extends Network {
                 , Executors.newCachedThreadPool(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "UDP_Receive_Listener");
+                return new UDPRecvThread(r, "UDP_Receive_Listener");
             }
         }));
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){

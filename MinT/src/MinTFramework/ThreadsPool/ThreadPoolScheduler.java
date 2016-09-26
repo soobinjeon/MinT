@@ -84,6 +84,16 @@ public class ThreadPoolScheduler {
     }
     
     /**
+     * Stop Selected Thread Pool
+     * @param name 
+     */
+    public void shutdownNowSelectedPool(String name){
+        ExecutorService exe = threadPools.get(name);
+        if(exe != null)
+            exe.shutdownNow();
+    }
+    
+    /**
      * get Registered Thread Pools
      * @return 
      */
@@ -122,7 +132,8 @@ public class ThreadPoolScheduler {
     }
     
     /**
-     * get Registered Pool list
+     * get Registered Pool list key
+     * String Type
      * @return 
      */
     public Iterator getRegisteredPoolList(){

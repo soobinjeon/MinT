@@ -62,7 +62,7 @@ public class BLE extends Network {
         System.out.println("BLE addr : "+profile.getAddress());
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);
-        this.startReceiveThread();
+//        this.startReceiveThread();
     }
     
     /**

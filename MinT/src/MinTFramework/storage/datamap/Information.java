@@ -16,12 +16,8 @@
  */
 package MinTFramework.storage.datamap;
 
-import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.Util.TypeCaster;
-import java.io.IOException;
 import java.nio.ByteOrder;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Cache Data Class for Local Cache
@@ -41,11 +37,14 @@ public abstract class Information {
     
     public void setResource(Object setres){
         try{
+            if(setres == null)
+                setres = new String("");
+            
             if(setres instanceof Boolean){
-                res = TypeCaster.zipStringToBytes(Boolean.toString((Boolean)setres));
+                res = TypeCaster.ObjectTobyte(Boolean.toString((Boolean)setres), ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else if(setres instanceof String){
-                res = TypeCaster.zipStringToBytes((String) setres);
+                res = TypeCaster.ObjectTobyte((String) setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else{
                 res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
@@ -62,11 +61,12 @@ public abstract class Information {
     
     private String getStringResource(){
         String str = null;
-        try {
-            str =  TypeCaster.unzipStringFromBytes(res);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+//        try {
+//            str =  TypeCaster.unzipStringFromBytes(res);
+            str =  TypeCaster.bytesToString(res);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
         
         return str;
     }
@@ -101,7 +101,7 @@ public abstract class Information {
      */
     public Integer getResourceInt(){
         if(isStringvalue)
-            return null;
+            return (int)Double.parseDouble(getStringResource());
         else
             return (int)getNumberResource();
     }
@@ -113,7 +113,7 @@ public abstract class Information {
      */
     public Float getResourceFloat(){
         if(isStringvalue)
-            return null;
+            return (float)Double.parseDouble(getStringResource());
         else
             return (float)getNumberResource();
     }
@@ -125,22 +125,23 @@ public abstract class Information {
      */
     public Double getResourceDouble(){
         if(isStringvalue)
-            return null;
+            return Double.parseDouble(getStringResource());
         else
             return (double)getNumberResource();
     }
     
     /**
+     * Not Use Long Type
      * get Long type Information
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Long getResourceLong(){
-        if(isStringvalue)
-            return null;
-        else
-            return (long)getNumberResource();
-    }
+//    public Long getResourceLong(){
+//        if(isStringvalue)
+//            return Long.parseLong(getStringResource());
+//        else
+//            return (long)getNumberResource();
+//    }
     
     /**
      * get Short type Information
@@ -149,7 +150,7 @@ public abstract class Information {
      */
     public Short getResourceShort(){
         if(isStringvalue)
-            return null;
+            return (short)Double.parseDouble(getStringResource());
         else
             return (short)getNumberResource();
     }

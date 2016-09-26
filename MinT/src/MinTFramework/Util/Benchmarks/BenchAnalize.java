@@ -16,8 +16,8 @@
  */
 package MinTFramework.Util.Benchmarks;
 
-import MinTFramework.MinT.PERFORM_METHOD;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -26,97 +26,162 @@ import java.util.ArrayList;
  */
 public class BenchAnalize {
 //    private enum INSTANCE {PERFORM, PACKETPERFORM;}
-    
+    private int psize = 0;
     private int numofPerform = 0;
-    private double totalTime = 0;
-    private double totalRequest = 0;
-    protected ArrayList<Performance> pflist;
-    
-    private int totalbytes = 0;
-    private int packets = 0;
+    private long totalTime = 0;
+    private long totalRequest = 0;
+    private long totalbytes = 0;
+    private long packets = 0;
     
 //    private INSTANCE instance;
-    private Performance tp;
-    private PERFORM_METHOD pm;
-    public BenchAnalize(PERFORM_METHOD pm, ArrayList<Performance> pf){
+    private String pm;
+    ConcurrentHashMap<Integer, Performance> pflist;
+//    protected ArrayList<Performance> pflist;
+    protected ArrayList<PerformData> datas;
+    
+    public ArrayList<Long> totaltime = new ArrayList<>();
+    public ArrayList<Double> avgtime = new ArrayList<>();
+    public ArrayList<Long> TRequest = new ArrayList<>();
+    public ArrayList<Long> Tpackets = new ArrayList<>();
+    public ArrayList<Long> Tbytes = new ArrayList<>();
+    public ArrayList<Double> ReqperSec = new ArrayList<>();
+    public ArrayList<Double> PckperSec = new ArrayList<>();
+    public ArrayList<Integer> NofPerform = new ArrayList<>();
+    
+    private boolean isInserting = false;
+    public BenchAnalize(String pm){
         this.pm = pm;
-        pflist = pf;
-        Initialize();
+        pflist = new ConcurrentHashMap<>();
+//        pflist = new ArrayList<>();
+        datas = new ArrayList<>();
+//        Initialize();
     }
-
-    private void Initialize() {
-        for(Performance pf : pflist){
-            numofPerform ++;
-            totalTime += pf.getTotalTime();
-            totalRequest += pf.getRequest();
-            if(pf instanceof PacketPerform){
-                PacketPerform pkf = (PacketPerform)pf;
-                totalbytes += pkf.getTotalBytes();
-                packets += pkf.getTotalPackets();
+    
+    /**
+     * add Performance
+     * @param p 
+     */
+    public void addPerformance(Performance p){
+        pflist.put(psize++, p);
+    }
+    public void analize() {
+        analize(null);
+    }
+    public void analize(BenchAnalize others) {
+        if(pflist.size() == 0)
+            datas.add(new PerformData(datas.size()+1, pm, 0, 0, 0, 0, 0));
+        else{
+            resetParam();
+            for(Performance pf : pflist.values()){
+                Performance nf = pf.getPerformance();
+                if(nf.getRequest() > 0){
+                    numofPerform ++;
+                    totalTime += nf.getTotalTime();
+                    totalRequest += nf.getRequest();
+                    totalbytes += nf.getTotalBytes();
+                    packets += nf.getTotalPackets();
+                }
             }
-            tp = pf;
+            datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
+        
+        insertAnalysisData(false,datas);
+        if(others != null)
+            others.insertAnalysisData(true, datas);
+    }
+    
+    public synchronized void insertAnalysisData(boolean isother, ArrayList<PerformData> datas){
+        isInserting = true;
+        int idx = datas.size()-1;
+        int inidx = 0;
+//        try{
+            inidx = datas.size()-1;
+            if(idx >= 0){
+//                if(!isother){
+////                    System.err.println("Origin-size: "+idx+", inidx: "+inidx);
+//                }else{
+//                    System.err.println("Other-size: "+idx+", inidx: "+inidx);
+//                }
+                totaltime.add(datas.get(idx).getTotalTime());
+                avgtime.add(datas.get(idx).getAvgTime());
+                TRequest.add(datas.get(idx).getRequest());
+                Tpackets.add(datas.get(idx).getTotalPackets());
+                Tbytes.add(datas.get(idx).getTotalBytes());
+                NofPerform.add(datas.get(idx).getNumofPerform());
+                ReqperSec.add(datas.get(idx).getRequestperSec());
+                PckperSec.add(datas.get(idx).getPacketperSec());
+            }else{
+                System.err.printf("IDX is Zero");
+            }
+        isInserting = false;
+        notifyAll();
+//        }catch(Exception e){
+//            System.err.printf("InsertAnalysis Out of Bound Error");
+//            System.err.printf("IDX: "+idx);
+//            e.printStackTrace();
+//        }
+    }
+    
+    private void resetParam(){
+        numofPerform = 0;
+        totalTime = 0;
+        totalRequest = 0;
+        totalbytes = 0;
+        packets = 0;
     }
     
     public void printAllBenches(){
-        for(Performance pf : pflist){
+        for(Performance pf : pflist.values()){
             pf.print();
         }
     }
     
-    public double getTotalTime(){
-        return totalTime;
+    public void printAllBenchList(){
+        int cnt = 0;
+        for(Performance pf: pflist.values()){
+            System.out.println(cnt+": "+pf.Name);
+            cnt++;
+        }
     }
     
-    public int getNumofPerform(){
-        return numofPerform;
-    }
-    
-    public double getAvgTime(){
-        return numofPerform == 0 ? 0 : totalTime / numofPerform;
-    }
-    
-    public double getRequest(){
-        return totalRequest;
-    }
-    
-    public double getRequestperSec(){
-        return totalTime == 0 ? 0 : totalRequest / getAvgTime();
-    }
-    
-    public double getPacketperSec(){
-        return totalTime == 0 ? 0 : packets / getAvgTime();
-    }
-    
-    public double getByteperSec(){
-        return totalTime == 0 ? 0 : totalbytes / getAvgTime();
-    }
-    
-    public double getBytesPerPacket(){
-        return packets == 0 ? 0 : totalbytes / getAvgTime();
-    }
-    
-    public double getTotalBytes(){
-        return totalbytes;
-    }
-    
-    public double getTotalPackets(){
-        return packets;
-    }
-    
-    public double getSECperRequest(){
-        return totalRequest == 0 ? 0 : getAvgTime() / totalRequest;
+    public ArrayList<PerformData> getDatas(){
+        return this.datas;
     }
     
     public void print(){
-        System.out.print(pm.toString()+"-Total : ");
-        if(tp instanceof PacketPerform){
-            System.out.format("NoP:%d | T:%.3f | T/R:%.8f | Req:%.0f | Req/s:%.2f | Bytes/P:%.2f | Bytes/s:%.2fK | Pk/s:%.2fK%n"
-                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
-                    ,getBytesPerPacket(), getByteperSec()/1000, getPacketperSec()/1000);
-        }else if(tp instanceof Performance){
-            System.out.format("NoP:%d | Time:%.3f | T/R:%.8f | Req:%.0f | Req/Sec:%.2f%n"
-                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec());
+//        System.out.print(pm+"-Total : ");
+//        if(tp instanceof Performance){
+//            System.out.format("NoP:%d | T:%.3f | T/R:%.8f | Req:%.0f | Req/s:%.2f | Bytes/P:%.2f | Bytes/s:%.2fK | Pk/s:%.2fK%n"
+//                    , getNumofPerform(), getAvgTime(), getSECperRequest(), totalRequest, getRequestperSec()
+//                    ,getBytesPerPacket(), getByteperSec()/1000, getPacketperSec()/1000);
+//        }else{
+//            System.out.println("");
+//        }
+    }
+
+    String getName() {
+        return this.pm;
+    }
+    
+    public synchronized void clearBuffer(){
+        while(isInserting){
+            try {
+                System.out.println("------------------------------------insert waiting!!!");
+                wait();
+            } catch (InterruptedException ex) {
+                System.out.println("------------------------------------exit waiting!!!");
+            }
         }
+//        System.out.println("------------------------------------exit waiting!!!");
+        this.resetParam();
+        datas.clear();
+        totaltime.clear();
+        avgtime.clear();
+        TRequest.clear();
+        Tpackets.clear();
+        Tbytes.clear();
+        ReqperSec.clear();
+        PckperSec.clear();
+        NofPerform.clear();
     }
 }

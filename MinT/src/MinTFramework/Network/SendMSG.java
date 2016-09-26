@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Util.Benchmarks.Performance;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -30,12 +32,15 @@ public class SendMSG implements Runnable{
     private int resKey;
     private int SendHit = 0;
     
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, String msg,
+    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, int resKey){
         head_dir = hd;
         head_inst = hi;
         destination = dst;
-        this.msg = msg;
+        if(msg == null)
+            this.msg = "";
+        else
+            this.msg = msg.getMessageString();
         this.resHandle = resHandle;
         this.resKey = resKey;
     }
@@ -50,7 +55,7 @@ public class SendMSG implements Runnable{
      */
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd
             , PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst
-            , String msg, int resKey){
+            , Request msg, int resKey){
         this(hd,hi,dst,msg,null,resKey);
     }
     
@@ -62,7 +67,7 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      */
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
-            , NetworkProfile dst, String msg){
+            , NetworkProfile dst, Request msg){
         this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
@@ -75,7 +80,7 @@ public class SendMSG implements Runnable{
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
-            , NetworkProfile dst, String msg, ResponseHandler resHandle){   
+            , NetworkProfile dst, Request msg, ResponseHandler resHandle){   
         this(hd,hi,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
@@ -83,8 +88,13 @@ public class SendMSG implements Runnable{
     public void run() {
         SendAdapter sendA = (SendAdapter)Thread.currentThread();
         Transportation trans = sendA.getTransportation();
+        Performance bench = sendA.getBench();
         //put the sendmsg to transportation
+        if(bench != null)
+            bench.startPerform();
         trans.EndPointSend(this);
+        if(bench != null)
+            bench.endPerform(0);
     }
     
     public PacketDatagram.HEADER_DIRECTION getHeader_Direction(){

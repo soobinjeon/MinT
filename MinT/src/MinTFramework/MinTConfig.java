@@ -26,10 +26,10 @@ public class MinTConfig {
     static public final int DEFAULT_REQEUSTQUEUE_LENGTH = 10000;
     
     //Network Adaptor
-    static public final int NETWORK_RECEIVE_WAITING_QUEUE = 10000;
-    static public final int NETWORK_SEND_WAITING_QUEUE = 10000;
-    static public final int NETWORK_RECEIVE_POOLSIZE = 5;
-    static public final int NETWORK_SEND_POOLSIZE = 5;
+    static public final int NETWORK_RECEIVE_WAITING_QUEUE = 100000;
+    static public final int NETWORK_SEND_WAITING_QUEUE = 100000;
+    static public  int NETWORK_RECEIVE_POOLSIZE = 1;
+    static public  int NETWORK_SEND_POOLSIZE = 1;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
@@ -39,4 +39,7 @@ public class MinTConfig {
     static public final int INTERNET_TCPUDP_PORT = 6513;
     static public final int INTERNET_COAP_PORT = 6514;
     static public String IP_ADDRESS = "";
+    
+    //for Android
+    static public String ANDROID_FILE_PATH = "";
 }

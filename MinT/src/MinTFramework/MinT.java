@@ -34,15 +34,13 @@ import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import MinTFramework.Util.Benchmarks.Performance;
+import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import MinTFramework.Util.Benchmarks.BenchAnalize;
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -62,27 +60,23 @@ public abstract class MinT {
     DeviceClassification deviceClassification;
     DeviceType deviceType;
     
-    public static enum PERFORM_METHOD{
-        NETWORK_SEND,UDP_RECV, UDP_SEND, RECV_LAYER, SEND_LAYER, Trans_Sender, MaS_Sender;
-    }
-    private ConcurrentHashMap<PERFORM_METHOD, ArrayList<Performance>> benchmarks;
-    private boolean BenchMode = false;
-    
     /**
      * 
      * @param serviceQueueLength Maximym service queue length
      * @param numOfThread number of workerthread in framework
      */
-    public MinT(int serviceQueueLength, int numOfThread) {
+    public MinT(int serviceQueueLength, int numOfThread, String AndroidFilePath) {
         MinTFrame = this;
+        if(AndroidFilePath != null)
+            MinTConfig.ANDROID_FILE_PATH = AndroidFilePath;
+        
         sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        benchmarks = new ConcurrentHashMap();
-        setupBenchMark();
+        mintBench = new MinTBenchmark(getSysteScheduler(), 500);
     }
     
     /**
@@ -90,7 +84,15 @@ public abstract class MinT {
      * Default number of WorkerThread and Servicequeuelength : 5
      */
     public MinT() {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
+    }
+    
+    /**
+     * Set up for Android Platform
+     * @param AndroidFilePath set Android File Path
+     */
+    public MinT(String AndroidFilePath){
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, AndroidFilePath);
     }
     
     public static MinT getInstance(){
@@ -117,7 +119,7 @@ public abstract class MinT {
      */
     public MinT(int serviceQueueLength, int numOfThread, 
             DeviceClassification deviceClassification, DeviceType deviceType) {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
         }
@@ -231,6 +233,14 @@ public abstract class MinT {
     public void putService(Service service){
         sched.addService(service);
     }
+    
+    /**
+     * Add Service after MinT
+     * @param service 
+     */
+    public void executeService(Service service){
+        sched.addExecuteService(service);
+    }
 
 //    /**
 //     * Print service name and id in thread in scheduler
@@ -336,14 +346,25 @@ public abstract class MinT {
     }
     
     /**
+     * 
+     * @param dst
+     * @param requestdata (new Request(Resource Name, Resource Method)
+     * @param resHandle 
+     */
+    public void REQUEST_SET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
+                ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,requestdata, resHandle));
+    }
+    
+    /**
      * Request directly Resource Data to other Node
      * @param dst destination Node Information
      * @param resName Resource Name
      * @param resHandle Response Handler
      */
-    public void REQUEST_GET(NetworkProfile dst, String resName, ResponseHandler resHandle){
+    public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,resName, resHandle));
+                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,requestdata, resHandle));
     }
     
     /**
@@ -353,7 +374,7 @@ public abstract class MinT {
      */
     public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST,
-                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,"",resHandle));
+                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,null,resHandle));
     }
     
     /**
@@ -460,42 +481,21 @@ public abstract class MinT {
     /***************************
      * BenchMarks
      ****************************/
-    public void setBenchMode(boolean bm){
-        BenchMode = bm;
+    private MinTBenchmark mintBench = null;
+    
+    public MinTBenchmark getBenchmark(){
+        return mintBench;
     }
     
-    public boolean isBenchMode(){
-        return BenchMode;
+    public void startBenchmark(String filename){
+//        mintBench.setBenchMode(isbench, period);
+        mintBench.startBench(filename);
     }
     
-    private void setupBenchMark() {
-        for(PERFORM_METHOD pm : PERFORM_METHOD.values()){
-            ArrayList<Performance> na = new ArrayList();
-            benchmarks.put(pm, na);
+    public void endBenchmark(){
+        if(mintBench.isBenchMode()){
+            mintBench.endBench();
         }
-    }
-    
-    public void addPerformance(PERFORM_METHOD pm, Performance p){
-        ArrayList<Performance> pl = benchmarks.get(pm);
-        if(pl != null){
-            pl.add(p);
-        }
-    }
-    
-//    public ConcurrentHashMap<PERFORM_METHOD, ArrayList<Performance>> getBenchmarks(){
-//        return benchmarks;
-//    }
-    
-    public ArrayList<Performance> getBenchmarks(PERFORM_METHOD pm){
-        return benchmarks.get(pm);
-    }
-    
-    public BenchAnalize getBenchAnalize(PERFORM_METHOD pm){
-        ArrayList<Performance> pl = benchmarks.get(pm);
-        if(pl == null)
-            return null;
-        else
-            return new BenchAnalize(pm, pl);
     }
     
     /***************************
@@ -508,7 +508,9 @@ public abstract class MinT {
     public void Start() {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
-        sched.startService();
+        sched.StartScheduler();
+        if(mintBench != null)
+            mintBench.makeBenchMark();
     }
     
     protected void isDebug(boolean isdebug){

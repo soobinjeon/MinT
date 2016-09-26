@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Util.Benchmarks.PacketPerform;
+import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class UDPSender implements Runnable {
     UDP udp;
 //    Selector selector;
     DebugLog dl = new DebugLog("UDPSender");
-    PacketPerform ppf = null;
+    Performance ppf = null;
     
     byte[] _sendMsg;
     SocketAddress sendAddr;
@@ -47,8 +47,13 @@ public class UDPSender implements Runnable {
     @Override
     public void run() {
         UDPSendThread ust = (UDPSendThread)Thread.currentThread();
+        ust.checkBench();
         DatagramChannel channel = ust.getDataChannel();
+        Performance bench = ust.getBench();
         int bsize = 0;
+        
+        if(bench != null)
+            bench.startPerform();
         ByteBufferPool bbp = nmanager.getByteBufferPool();
         ByteBuffer out = null;
         try{        
@@ -58,8 +63,11 @@ public class UDPSender implements Runnable {
             bsize = channel.send(out, sendAddr);
         } catch (IOException ex) {
             ex.printStackTrace();
+            System.out.println("Sender Closed by Thread Stop Interrupt");
         }finally{
             bbp.putBuffer(out);
+            if(bench != null)
+                bench.endPerform(out.limit());
         }
     }
 }

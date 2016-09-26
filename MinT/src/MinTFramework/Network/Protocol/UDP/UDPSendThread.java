@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
+import MinTFramework.MinT;
+import MinTFramework.Util.Benchmarks.Performance;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
 
@@ -26,11 +28,31 @@ import java.nio.channels.DatagramChannel;
  */
 public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
+    private MinT parent;
+    private Performance bench = null;
+    private boolean isBenchMode = false;
     
     public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
         super(r,name);
         this.datachannel = datachannel;
-        System.out.println("created SenderThread: "+getPort());
+        this.setPriority(MAX_PRIORITY);
+        parent = MinT.getInstance();
+        checkBench();
+        
+    }
+    
+    /**
+     * Sender Bench Check
+     * Not Use some problem
+     * 보내는쪽 버퍼가 낮으면 벤치가 동작하지 않음
+     * start 후 Send 네트워크 문제로 endbench가 실행되지 않아 MinTAnalize에서 Performance check 할때 기다림
+     */
+    public void checkBench(){
+//        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
+//            bench = new Performance("SendAdaptor");
+//            parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
+//            isBenchMode = true;
+//        }
     }
     
     public DatagramChannel getDataChannel(){
@@ -44,5 +66,15 @@ public class UDPSendThread extends Thread{
             ex.printStackTrace();
         }
         return "";
+    }
+    
+    public Performance getBench(){
+        return bench;
+    }
+    
+    @Override
+    public void finalize() throws Throwable{
+        super.finalize();
+        System.out.println("end of thread Sender-");
     }
 }

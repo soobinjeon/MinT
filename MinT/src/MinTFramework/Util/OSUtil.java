@@ -20,11 +20,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Formatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,7 +59,30 @@ public class OSUtil {
             Logger.getLogger(OSUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    private static String getAndroidIPAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface
+                    .getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf
+                        .getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    System.out.println("ip1--:" + inetAddress);
+                    System.out.println("ip2--:" + inetAddress.getHostAddress());
 
+                    // for getting IPV4 format
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address){
+                        String ip = inetAddress.getHostAddress().toString();
+                        System.out.println("ip---::" + ip);
+                        return ip;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
     private static String getLinuxIPAddress() {
         String hostAddr = "";
 
@@ -74,10 +100,27 @@ public class OSUtil {
                     }
                 }
             }
+            
+            if(hostAddr == null || hostAddr.equals("")){
+                hostAddr = "127.0.0.1";
+            }
+            
         } catch (SocketException e) {
-            e.printStackTrace();
+            System.out.println("start Android get");
+            try {
+                hostAddr = getAndroidIPAddress();
+            } catch (Exception ex) {
+                System.out.println("Not Linux and Android");
+            }
+            
         }
-        return hostAddr;
+        String retaddr;
+        if(hostAddr != null && !hostAddr.equals("")){
+            retaddr = hostAddr;
+        }else
+            retaddr = "127.0.0.1";
+        System.out.println("OSUTILL return ip is "+retaddr);
+        return retaddr;
     }
 
     private static String getWindowsIPAddress() {
@@ -99,7 +142,7 @@ public class OSUtil {
         } catch (UnknownHostException ex) {
             ex.printStackTrace();
         }
-        return ip != null ? ip.getHostAddress() : null;
+        return ip != null ? ip.getHostAddress() : "";
     }
 
     public static String getIPAddress() {
@@ -114,5 +157,13 @@ public class OSUtil {
         } else {
             return getLinuxIPAddress();
         }
+    }
+    
+    public static void busySleep(long nanos) {
+        long elapsed;
+        final long startTime = System.nanoTime();
+        do {
+            elapsed = System.nanoTime() - startTime;
+        } while (elapsed < nanos);
     }
 }

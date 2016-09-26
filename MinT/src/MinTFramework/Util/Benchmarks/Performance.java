@@ -22,74 +22,145 @@ package MinTFramework.Util.Benchmarks;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Performance {
-    private double request = 0;
-    private long stime = 0;
-    private long etime = 0;
-    private long totaltime = 0;
-    private double time = 0;
-    private boolean isdebug = false;
-    private BENCHMARK_TYPE benchtype = BENCHMARK_TYPE.DEFAULT;
-    private String Name;
+    protected int period = 0;
+    protected long request = 0;
+    protected long stime = 0;
+    protected long etime = 0;
+    protected long totaltime = 0;
+    protected long totalbytes = 0;
+    protected long packets = 0;
     
-    public static enum BENCHMARK_TYPE {DEFAULT, PACKET;}
+    
+    protected String Name;
+    protected boolean iscalibrating = false;
+    protected boolean isgettering = false;
     
     public Performance(String name){
-        this(name, true, BENCHMARK_TYPE.DEFAULT);
-    }
-    public Performance(String name, BENCHMARK_TYPE bt){
-        this(name, true, bt);
-    }
-    public Performance(String name, boolean isdebug, BENCHMARK_TYPE bt){
-        isdebug = isdebug;
-        benchtype = bt;
         Name = name;
+    }
+    
+    /**
+     * for Performance copy
+     * @param name
+     * @param request
+     * @param totaltime 
+     */
+    public Performance(String name, long request, long time, long totalbytes, long packets){
+        this(name);
+        this.request = request;
+        this.totaltime = time;
+        this.totalbytes = totalbytes;
+        this.packets = packets;
     }
     
     public void reset(){
         request = 0;
-        stime = 0;
-        etime = 0;
         totaltime = 0;
-        time = 0;
+        totalbytes = 0;
+        packets = 0;
     }
     
-    public void startPerform(){
-        stime = System.currentTimeMillis();
+    public synchronized void startPerform(){
+//        while(isgettering){
+//            try {
+////                System.out.println("------------------------------------insert start waiting!!!");
+//                wait();
+//            } catch (InterruptedException ex) {
+////                System.out.println("------------------------------------exit start waiting!!!");
+//            }
+//        }
+        iscalibrating = true;
+//        stime = System.currentTimeMillis();
+        stime = System.nanoTime();
     }
     
-    public void endPerform(){
-        etime = System.currentTimeMillis();
+    public synchronized void endPerform(int bytesize){
+//        etime = System.currentTimeMillis();
+        etime = System.nanoTime();
         setPacketInfo(stime, etime);
+        setPacketInfo(bytesize);
+        iscalibrating = false;
+        notifyAll();
     }
     
     private void setInfo(){
         request ++;
     }
     
-    public synchronized void setPacketInfo(long st, long et){
+    private void setPacketInfo(int bytesize){
+        totalbytes += bytesize;
+        packets ++;
+    }
+    
+    public void setPacketInfo(long st, long et){
         setInfo();
-        this.totaltime += et - st;
-        this.time = (double)(totaltime / 1000.0);
+        totaltime += et - st;
+//        System.out.println("total time : st-"+st+", et-"+et+", ttime-" + totaltime);
     }
     
-    public double getTotalTime(){
-        return time;
+    public long getTotalTime(){
+        return totaltime;
     }
     
-    public double getRequest(){
+    public double getTime(){
+        double sec = 1000000000.0;
+        return totaltime == 0 ? 0 : (double)(totaltime / sec);
+    }
+    
+    public long getRequest(){
         return request;
     }
     
     public double getRequestperSec(){
-        return time == 0 ? 0 : request / time;
+        return getTime() == 0 ? 0 : request / getTime();
     }
     
-    public BENCHMARK_TYPE getBenchType(){
-        return benchtype;
+    public double getPacketperSec(){
+        return getTime() == 0 ? 0 : packets / getTime();
     }
     
+    public double getByteperSec(){
+        return getTime() == 0 ? 0 : totalbytes / getTime();
+    }
+    
+    public double getBytesPerPacket(){
+        return totalbytes / packets;
+    }
+    
+    public long getTotalBytes(){
+        return totalbytes;
+    }
+    
+    public long getTotalPackets(){
+        return packets;
+    }
+      
     public void print(){
-        System.out.format("Time:%.3f | Request:%d | Req/Sec:%.2f%n"
-                , time, request, getRequestperSec());
+        System.out.format(Name+": Time:%.3f | Req:%.2f | Req/Sec:%.2f%n"
+                , getTime(), request, getRequestperSec());
+    }
+    
+    /**
+     * return current performance
+     * @return 
+     */
+    public synchronized Performance getPerformance(){
+        while(iscalibrating){
+            try {
+//                System.out.println("------------------------------------insert waiting!!!");
+                wait();
+            } catch (InterruptedException ex) {
+//                System.out.println("------------------------------------exit waiting!!!");
+            }
+        }
+        isgettering = true;
+        Performance tp = null;
+        tp = new Performance(Name, request, totaltime, totalbytes, packets);
+//        System.out.println("tp tst before: "+tp.getTotalTime() + ", "+tp.getRequest());
+        reset();
+//        System.out.println("tp tst after: "+tp.getTotalTime() + ", "+tp.getRequest());
+        isgettering = false;
+//        notifyAll();
+        return tp;
     }
 }

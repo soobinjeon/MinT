@@ -233,7 +233,7 @@ public class PacketDatagram {
         int msglen = spacket.length - pos;
         msg = new byte[msglen];
         System.arraycopy(spacket, pos, msg, 0, msglen);
-        data = new String(msg);
+        data = DataAnalizer(new String(msg));
         
 //        System.out.println("SOURCE : "+routelist.get(ROUTE.SOURCE).getProfile());
 //        System.out.println("PREV : "+routelist.get(ROUTE.PREV).getProfile());

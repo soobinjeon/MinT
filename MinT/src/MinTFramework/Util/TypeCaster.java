@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -31,6 +32,7 @@ import java.util.zip.GZIPOutputStream;
  * @author soobin
  */
 public class TypeCaster {
+    public static final Charset MinTCharset = Charset.forName("utf-8");
     //GZIPOutputStream을 이용하여 문자열 압축하기
     public static byte[] zipStringToBytes(String input) throws IOException {
 
@@ -100,7 +102,11 @@ public class TypeCaster {
             buff.order(order);
             buff.putChar((Character)value);
         }
-        else
+        else if(value instanceof String){
+            String strv = (String)value;
+            buff = ByteBuffer.wrap(MinTCharset.encode(strv).array());
+            buff.order(order);
+        }else
             return null;
 
 //        System.out.println("intTobyte : " + buff);
@@ -131,13 +137,15 @@ public class TypeCaster {
     }
     
     public static String bytesToString(byte[] input) {
-        StringBuilder s = new StringBuilder(input.length);
-
-        for (int i = 0; i < input.length; i++) {
-            s.append((char) input[i]);
-        }
-
-        return s.toString();
+//        StringBuilder s = new StringBuilder(input.length);
+//
+//        for (int i = 0; i < input.length; i++) {
+//            s.append((char) input[i]);
+//        }
+        String ret = null;
+        ret = MinTCharset.decode(ByteBuffer.wrap(input)).toString();
+//        return s.toString();
+        return ret;
     }
 
     public static byte[] longToBytes(long l) {
