@@ -24,8 +24,6 @@ import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.Util.LimitedQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Thread Pool Adjustment
@@ -78,7 +76,6 @@ public class ThreadAdjustment implements Runnable{
 
         if(Ht != null && Rt != null){
             System.out.println("------------------------------------------------------------------------------------------");
-            System.out.println("1-HT size: "+Ht.TRequest.size()+", RtSize: "+Rt.TRequest.size());
             double Hdata = getData(Ht);
             double Rdata = getData(Rt);
             
@@ -122,6 +119,8 @@ public class ThreadAdjustment implements Runnable{
             //지속적으로 Number of Thread가 올라가는데도 성능이 증가하지 않으면 멈춤
             
             PrevN = Nt;
+            
+            // for Debug
             System.out.printf("QeueP: %.2f",queueP);
             System.out.println("");
             System.out.println("THArray: "+THarray);
@@ -132,11 +131,10 @@ public class ThreadAdjustment implements Runnable{
             System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);//+"("+Rt.ReqperSec.size()+"), Time: "+getTime(Rt)+", Time: "+getRequest(Rt));
             System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);//+"("+Ht.ReqperSec.size()+"), Time: "+getTime(Ht)+", Time: "+getRequest(Ht));
 //            System.out.println("UDP_SEND is not Null() - "+Sdata);
+            
             frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
-            System.out.println("2- HT size: "+Ht.TRequest.size()+", RtSize: "+Rt.TRequest.size());
             Rt.clearBuffer();
             Ht.clearBuffer();
-            System.out.println("3- HT size: "+Ht.TRequest.size()+", RtSize: "+Rt.TRequest.size());
 //            St.clearBuffer();
         }
             
