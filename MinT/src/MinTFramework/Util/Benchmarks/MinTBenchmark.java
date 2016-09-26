@@ -35,7 +35,9 @@ public class MinTBenchmark {
     private ConcurrentHashMap<String, BenchAnalize> benchmarks;
     private ConcurrentHashMap<String, BenchAnalize> poolsinfo;
 //    private final ThreadAdjustment_N6 TAJ = new ThreadAdjustment_N6();
+    private boolean isMakeBench = false;
     private boolean isBenchMode = false;
+//    private boo
     
     private String Filename = "result";
     private long bcount = 0;
@@ -74,6 +76,7 @@ public class MinTBenchmark {
                 }
             }
         });
+        isMakeBench = true;
     }
     
     private void ClearBuffer(){
@@ -101,6 +104,10 @@ public class MinTBenchmark {
     
     public boolean isBenchMode(){
         return isBenchMode;
+    }
+    
+    public boolean isMakeBench(){
+        return isMakeBench;
     }
     
     private BenchAnalize setupBenchMark(String pm){

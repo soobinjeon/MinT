@@ -46,7 +46,7 @@ public class UDPRecvListener extends Thread{
     }
     
     public void checkBench(){
-        if(!isBenchMode && parent.getBenchmark() != null && parent.getBenchmark().isBenchMode()){
+        if(!isBenchMode && parent.getBenchmark() != null && parent.getBenchmark().isMakeBench()){
             bench = new Performance("UDP Recv");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString(), bench);
             isBenchMode = true;

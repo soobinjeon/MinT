@@ -44,7 +44,7 @@ public class ReceiveAdapter extends Thread{
         checkBench();
     }
     public void checkBench(){
-        if (!isBenchMode && parent.getBenchmark().isBenchMode()) {
+        if (!isBenchMode && parent.getBenchmark().isMakeBench()) {
             bench = new Performance("ReceiveAdaptor");
             parent.getBenchmark().addPerformance(MinTthreadPools.NET_RECV_HANDLE.toString(), bench);
             isBenchMode = true;
