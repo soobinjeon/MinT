@@ -65,8 +65,11 @@ public abstract class MinT {
      * @param serviceQueueLength Maximym service queue length
      * @param numOfThread number of workerthread in framework
      */
-    public MinT(int serviceQueueLength, int numOfThread) {
+    public MinT(int serviceQueueLength, int numOfThread, String AndroidFilePath) {
         MinTFrame = this;
+        if(AndroidFilePath != null)
+            MinTConfig.ANDROID_FILE_PATH = AndroidFilePath;
+        
         sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
@@ -81,7 +84,15 @@ public abstract class MinT {
      * Default number of WorkerThread and Servicequeuelength : 5
      */
     public MinT() {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
+    }
+    
+    /**
+     * Set up for Android Platform
+     * @param AndroidFilePath set Android File Path
+     */
+    public MinT(String AndroidFilePath){
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, AndroidFilePath);
     }
     
     public static MinT getInstance(){
@@ -108,7 +119,7 @@ public abstract class MinT {
      */
     public MinT(int serviceQueueLength, int numOfThread, 
             DeviceClassification deviceClassification, DeviceType deviceType) {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
         }

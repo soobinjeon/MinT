@@ -41,12 +41,18 @@ public class UDPSendThread extends Thread{
         
     }
     
+    /**
+     * Sender Bench Check
+     * Not Use some problem
+     * 보내는쪽 버퍼가 낮으면 벤치가 동작하지 않음
+     * start 후 Send 네트워크 문제로 endbench가 실행되지 않아 MinTAnalize에서 Performance check 할때 기다림
+     */
     public void checkBench(){
-        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
-            bench = new Performance("SendAdaptor");
-            parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
-            isBenchMode = true;
-        }
+//        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
+//            bench = new Performance("SendAdaptor");
+//            parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
+//            isBenchMode = true;
+//        }
     }
     
     public DatagramChannel getDataChannel(){

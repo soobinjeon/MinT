@@ -244,7 +244,7 @@ public class ThreadAdjustment implements Runnable{
         double accdata = AccumQW + queueP;
         int N = (int)(accdata / 1);
         AccumQW = accdata - (double)N;
-        System.out.println("queueP: "+queueP+", accdata: "+accdata+", N: "+N+", AccumQW: "+AccumQW);
+        System.out.println("Qsize: "+RecvHandleQueueSize+", queueP: "+queueP+", accdata: "+accdata+", N: "+N+", AccumQW: "+AccumQW);
         return N;
     }
 

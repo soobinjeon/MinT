@@ -39,4 +39,7 @@ public class MinTConfig {
     static public final int INTERNET_TCPUDP_PORT = 6513;
     static public final int INTERNET_COAP_PORT = 6514;
     static public String IP_ADDRESS = "";
+    
+    //for Android
+    static public String ANDROID_FILE_PATH = "";
 }

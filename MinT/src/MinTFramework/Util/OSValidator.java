@@ -24,7 +24,10 @@ package MinTFramework.Util;
 public class OSValidator {
   
     private static String OS = System.getProperty("os.name").toLowerCase();
-  
+    
+    public static void printOS(){
+        System.out.println("OS: "+OS);
+    }
     public static boolean isWindows() {
   
         return (OS.indexOf("win") >= 0);

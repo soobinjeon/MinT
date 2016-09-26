@@ -23,7 +23,7 @@ package MinTFramework.Network.Protocol.UDP;
 public class UDPRecvThread extends Thread{
     public UDPRecvThread(Runnable r, String name){
         super(r, name);
-        
-        setPriority(MAX_PRIORITY);
+        System.out.println("RECV Listener Default Priority");
+//        setPriority(MAX_PRIORITY);
     }
 }

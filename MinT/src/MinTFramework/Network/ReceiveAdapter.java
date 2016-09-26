@@ -39,6 +39,8 @@ public class ReceiveAdapter extends Thread{
         super(r,name);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
+//        System.out.println("Handler Max Priority"+MAX_PRIORITY);
+//        setPriority(MAX_PRIORITY);
         checkBench();
     }
     public void checkBench(){

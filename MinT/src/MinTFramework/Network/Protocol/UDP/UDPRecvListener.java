@@ -34,11 +34,11 @@ public class UDPRecvListener extends Thread{
     private Performance bench = null;
     private MinT parent;
     private boolean isBenchMode = false;
-    public UDPRecvListener(DatagramChannel channel, UDP udp) throws IOException{
+    public UDPRecvListener(DatagramChannel _channel, UDP udp) throws IOException{
         this.udp = udp;
         networkmanager = udp.getNetworkManager();
         selector = Selector.open();
-        this.channel = channel;
+        channel = _channel;
         channel.register(selector, SelectionKey.OP_READ);
         parent = MinT.getInstance();
         checkBench();
@@ -82,8 +82,9 @@ public class UDPRecvListener extends Thread{
     }
     
     private void read(SelectionKey key){
-        if(bench != null)
+        if(bench != null){
             bench.startPerform();
+        }
         ByteBufferPool bbp = networkmanager.getByteBufferPool();
         ByteBuffer req = null;
         byte[] fwdbyte = null;
@@ -101,13 +102,16 @@ public class UDPRecvListener extends Thread{
             req.get(fwdbyte, 0, req.limit());
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
         }catch(ClosedByInterruptException e){
-            System.out.println("Thread Stop Interrupt");
+            System.out.println("Thread Stop Interrupt - ClosedByInterruptException");
+            e.printStackTrace();
         }catch(Exception e){
-            System.out.println("Thread Stop Interrupt");
+            System.out.println("Thread Stop Interrupt - Closed By Exception");
+            e.printStackTrace();
         }finally{
             bbp.putBuffer(req);
-            if(bench != null)
+            if(bench != null){
                 bench.endPerform(req.limit());
+            }
         }
     }
 }
