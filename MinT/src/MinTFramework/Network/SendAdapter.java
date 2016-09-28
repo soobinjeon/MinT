@@ -38,7 +38,7 @@ public class SendAdapter extends Thread{
         super(r, name);
         sender = new Transportation(NetworkLayers.LAYER_DIRECTION.SEND);
         parent = MinT.getInstance();
-        if(parent.getBenchmark().isBenchMode()){
+        if(parent.getBenchmark().isMakeBench()){
             bench = new Performance("SendAdaptor");
             parent.getBenchmark().addPerformance(MinTthreadPools.NET_SEND.toString(), bench);
         }

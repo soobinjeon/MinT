@@ -78,6 +78,7 @@ public class UDP extends Network {
         try {
             this.setUDPSocket();
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
         MakeUDPReceiveListeners();
         MakeUDPSender();
@@ -102,7 +103,7 @@ public class UDP extends Network {
         channel = DatagramChannel.open();
         channel.socket().bind(isa);
         channel.configureBlocking(false);
-        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
+//        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
     
     /**
@@ -151,7 +152,7 @@ public class UDP extends Network {
                 , Executors.newCachedThreadPool(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                return new Thread(r, "UDP_Receive_Listener");
+                return new UDPRecvThread(r, "UDP_Receive_Listener");
             }
         }));
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){

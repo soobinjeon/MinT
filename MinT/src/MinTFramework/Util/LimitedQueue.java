@@ -16,39 +16,27 @@
  */
 package MinTFramework.Util;
 
+import java.util.LinkedList;
+
 /**
  *
- * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
- * youngtak Han <gksdudxkr@gmail.com>
+ * @author Administrator
+ * @param <E>
  */
-public class OSValidator {
-  
-    private static String OS = System.getProperty("os.name").toLowerCase();
-    
-    public static void printOS(){
-        System.out.println("OS: "+OS);
+public class LimitedQueue<E> extends LinkedList<E> {
+
+    private int limit;
+
+    public LimitedQueue(int limit) {
+        this.limit = limit;
     }
-    public static boolean isWindows() {
-  
-        return (OS.indexOf("win") >= 0);
-  
-    }
-  
-    public static boolean isMac() {
-  
-        return (OS.indexOf("mac") >= 0);
-  
-    }
-  
-    public static boolean isUnix() {
-  
-        return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
-  
-    }
-  
-    public static boolean isSolaris() {
-  
-        return (OS.indexOf("sunos") >= 0);
-  
+
+    @Override
+    public boolean add(E o) {
+        boolean added = super.add(o);
+        while (added && size() > limit) {
+            super.remove();
+        }
+        return added;
     }
 }

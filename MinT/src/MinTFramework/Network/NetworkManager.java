@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Network Manager
@@ -284,20 +286,37 @@ public class NetworkManager {
      * Make ByteBuffer for Recv Byte Data
      */
     private void makeBytebuffer() {
+        String fileName = "bufferpool.dat";
+        File bfile = null;
         try {
-            String fileName = "bufferpool.dat";
-            File bfile = new File(fileName);;
-
+            bfile = new File(fileName);
             if (!existFile(fileName)) {
                 bfile.createNewFile();
             }
             bfile.deleteOnExit();
-
-            bytepool = new ByteBufferPool(20*1024, 40 * 2048, bfile);
         } catch (IOException ex) {
+            //if Android
+            System.out.println("Android File Set up: "+MinTConfig.ANDROID_FILE_PATH+"/bufferpool.dat");
+            try {
+                fileName = MinTConfig.ANDROID_FILE_PATH+"/bufferpool.dat";
+                bfile = new File(fileName);
+                if (!existFile(fileName)) {
+                    bfile.createNewFile();
+                }
+                bfile.deleteOnExit();
+            } catch (Exception e) {
+                System.out.println("Android Error");
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            bytepool = new ByteBufferPool(20 * 1024, 40 * 2048, bfile);
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
-    
+
     private Boolean existFile(String isLivefile) {
         File f1 = new File(isLivefile);
 

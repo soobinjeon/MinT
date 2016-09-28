@@ -14,41 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Util;
+package MinTFramework.ThreadsPool;
+
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- *
+ * Rejected Queue Handler
+ * Basically this handler get a method to re-put a task in thread pool
+ * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class OSValidator {
-  
-    private static String OS = System.getProperty("os.name").toLowerCase();
-    
-    public static void printOS(){
-        System.out.println("OS: "+OS);
-    }
-    public static boolean isWindows() {
-  
-        return (OS.indexOf("win") >= 0);
-  
-    }
-  
-    public static boolean isMac() {
-  
-        return (OS.indexOf("mac") >= 0);
-  
-    }
-  
-    public static boolean isUnix() {
-  
-        return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 );
-  
-    }
-  
-    public static boolean isSolaris() {
-  
-        return (OS.indexOf("sunos") >= 0);
-  
+public class SenderRejectedExecutionHandlerImpl implements RejectedExecutionHandler {
+
+    @Override
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+//        try {
+//            executor.getQueue().put(r);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException("Interrupted while submitting task", e);
+//        }
     }
 }

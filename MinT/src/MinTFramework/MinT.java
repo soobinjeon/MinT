@@ -65,15 +65,18 @@ public abstract class MinT {
      * @param serviceQueueLength Maximym service queue length
      * @param numOfThread number of workerthread in framework
      */
-    public MinT(int serviceQueueLength, int numOfThread) {
+    public MinT(int serviceQueueLength, int numOfThread, String AndroidFilePath) {
         MinTFrame = this;
+        if(AndroidFilePath != null)
+            MinTConfig.ANDROID_FILE_PATH = AndroidFilePath;
+        
         sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        mintBench = new MinTBenchmark(getSysteScheduler());
+        mintBench = new MinTBenchmark(getSysteScheduler(), 500);
     }
     
     /**
@@ -81,7 +84,15 @@ public abstract class MinT {
      * Default number of WorkerThread and Servicequeuelength : 5
      */
     public MinT() {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
+    }
+    
+    /**
+     * Set up for Android Platform
+     * @param AndroidFilePath set Android File Path
+     */
+    public MinT(String AndroidFilePath){
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, AndroidFilePath);
     }
     
     public static MinT getInstance(){
@@ -108,7 +119,7 @@ public abstract class MinT {
      */
     public MinT(int serviceQueueLength, int numOfThread, 
             DeviceClassification deviceClassification, DeviceType deviceType) {
-        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM);
+        this(MinTConfig.DEFAULT_REQEUSTQUEUE_LENGTH, MinTConfig.DEFAULT_THREAD_NUM, null);
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
         }
@@ -476,8 +487,8 @@ public abstract class MinT {
         return mintBench;
     }
     
-    public void startBenchmark(int period, boolean isbench, String filename){
-        mintBench.setBenchMode(isbench, period);
+    public void startBenchmark(String filename){
+//        mintBench.setBenchMode(isbench, period);
         mintBench.startBench(filename);
     }
     
@@ -497,9 +508,9 @@ public abstract class MinT {
     public void Start() {
         devicemanager.initAllDevice();
         NTWmanager.onStart();
-        sched.startService();
-//        if(mintBench != null)
-//            mintBench.startBench();
+        sched.StartScheduler();
+        if(mintBench != null)
+            mintBench.makeBenchMark();
     }
     
     protected void isDebug(boolean isdebug){
