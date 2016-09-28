@@ -55,6 +55,12 @@ public class ThreadAdjustment implements Runnable{
         recvpool = frame.getSysteScheduler().getThreadPool(MinTthreadPools.NET_RECV_HANDLE);
     }
     
+    /**
+     * System Schedule - Thread Pool size of Receive Handle Adjustment
+     * Adaptive thread control on real-time request handling from network receive listener (UDP receiver, BLE recv,..)
+     * processing time period : 1 second
+     * Necessary data to processing : from benchmark
+     */
     @Override
     public void run() {
         try{
@@ -69,6 +75,31 @@ public class ThreadAdjustment implements Runnable{
         }
     }
 
+    /**
+     * Thread pool size of receive handle adjustment
+     * Data info
+     * R_t: Request per Sec (request/sec)
+     * H_t: Handle per Sec (r/s)
+     * TH_t: throughput per handle thread (r/s)
+     * N_t: Current Number of Threads
+     * 
+     * algorithm
+     * N_t+1 = evaluation(PN_t+1)
+     * 
+     * Evaluation
+     *  - 1, PN_t+1 smaller than 1
+     *  - M_t+1, PN_t+1 b bigger than M_t+1
+     *  - PN_t+1, otherwise
+     * 
+     * PN_t+1 = round( (R_t - H_t) / TH_t ) + QW_t + N_t
+     * TH_t = (R_t-2 / N_t- + R_t-1 / N_t-1 + R_t / N_t) / 3
+     * 
+     * QW_t = (int)C_t
+     * Q_acc,t+1 = C_t - QW_t
+     * C_t = QS_t / QS_max + Q_acc,t
+     *   - QS_max : Max queue size
+     *   - QS_t : Current Handle queue size
+     */ 
     private void AdjustRecvHandler() {
         BenchAnalize Ht = pools.get(MinTthreadPools.NET_RECV_HANDLE.toString());
 //        BenchAnalize St = pools.get(UDP.UDP_Thread_Pools.UDP_SENDER.toString());
@@ -90,15 +121,9 @@ public class ThreadAdjustment implements Runnable{
             double result = THt == 0 ? 0 : (Rdata - Hdata) / THt;
             
             arrayRequestNn.add(result);
-//            result = result >= 0 ? Math.round(result) : result;
             System.out.println("originR: "+result+", RL: "+arrayRequestNn);
             
-//            if(result >= 0)
-                result = Math.round(result);
-//            else if(isDecreaseTrend(arrayRequestNn)){
-//                result = result;
-//            }else
-//                result = 0;
+            result = Math.round(result);
             
             double nextN = result + queueP;
             int nN =  (int)nextN + Nt;
@@ -107,6 +132,7 @@ public class ThreadAdjustment implements Runnable{
             if(THt == 0)
                 nN = nN - 1;
             
+            //지속적으로 Number of Thread가 올라가는데도 성능이 증가하지 않으면 멈춤
             MAX_THREAD = setMAXThread(THarray, MAX_THREAD);
             
             if(nN < 1)
@@ -115,8 +141,6 @@ public class ThreadAdjustment implements Runnable{
                 Nt = MAX_THREAD;
             else
                 Nt = nN;
-            
-            //지속적으로 Number of Thread가 올라가는데도 성능이 증가하지 않으면 멈춤
             
             PrevN = Nt;
             
@@ -127,10 +151,8 @@ public class ThreadAdjustment implements Runnable{
             System.out.println("");
             System.out.printf("AccHt: %.2f, RNn: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",accumReqeustNn,result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
             System.out.println("");
-//            System.out.println("result: "+result+", TH : "+THt+" NExt N : "+nextN+", NT: "+ Nt);
-            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);//+"("+Rt.ReqperSec.size()+"), Time: "+getTime(Rt)+", Time: "+getRequest(Rt));
-            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);//+"("+Ht.ReqperSec.size()+"), Time: "+getTime(Ht)+", Time: "+getRequest(Ht));
-//            System.out.println("UDP_SEND is not Null() - "+Sdata);
+            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);
+            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);
             
             frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
             Rt.clearBuffer();
@@ -176,10 +198,6 @@ public class ThreadAdjustment implements Runnable{
         double reqsum = 0;
         for(double d : input.TRequest)
             reqsum += d;
-//        int size = input.TRequest.size() - 1;
-//        if(size < 0)
-//            return 0;
-//        return input.TRequest.get(size);
         return reqsum;
     }
     
@@ -195,29 +213,6 @@ public class ThreadAdjustment implements Runnable{
         double Hdata = getTotalRequest(Ht);
         double Rdata = getTotalRequest(Rt);
         accumReqeustNn += Rdata - Hdata;
-    }
-    
-    /**
-     * get Current Ht
-     * @param Ht
-     * @return 
-     */
-    private double calibrateHTrend_OLD(BenchAnalize Ht, LimitedQueue<Double> array) {
-        double cht = getData(Ht);
-        
-        if(cht > 0)
-            return cht;
-        else{
-            double res = 0;
-            double size = array.size();
-
-            for(int i=0;i<size;i++){
-                double t = array.get(i);
-                if(t > 0)
-                    res = t;
-            }
-            return res;
-        }
     }
     
     /**
@@ -266,9 +261,6 @@ public class ThreadAdjustment implements Runnable{
         if(thn < 0 && n > MAX_TH){
             MAX_TH = n;
             return max_thread + 1;
-//        }else if(n > MAX_TH){
-//            MAX_TH = n;
-//            return max_thread;
         }else
             return max_thread;
     }
