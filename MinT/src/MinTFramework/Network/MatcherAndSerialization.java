@@ -57,7 +57,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public void EndPointReceive(RecvMSG packet) {
-        PacketDatagram matchedPacket = new PacketDatagram(packet);
+        PacketDatagram_coap matchedPacket = new PacketDatagram_coap(packet);
         transportation.Receive(matchedPacket);
     }
     
@@ -66,7 +66,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Send(PacketDatagram packet) {
+    public void Send(PacketDatagram_coap packet) {
 //        if(bench_send != null)
 //            bench_send.startPerform();
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
@@ -103,7 +103,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Receive(PacketDatagram packet) {
+    public void Receive(PacketDatagram_coap packet) {
     }
 
     /**

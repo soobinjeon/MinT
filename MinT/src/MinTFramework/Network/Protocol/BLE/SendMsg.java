@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.PacketDatagram_coap;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +29,7 @@ import static java.lang.Thread.sleep;
  */
 public class SendMsg implements Runnable {
 
-    PacketDatagram outPacket;
+    PacketDatagram_coap outPacket;
     DeviceBLE deviceBLE;
     MessageReceiveImpl msgReceiveImpl;
 
@@ -38,7 +38,7 @@ public class SendMsg implements Runnable {
      * @param deviceBLE 
      * @param outPacket 
      */
-    public SendMsg(DeviceBLE deviceBLE, PacketDatagram outPacket) {
+    public SendMsg(DeviceBLE deviceBLE, PacketDatagram_coap outPacket) {
         this.deviceBLE = deviceBLE;
         this.outPacket = outPacket;
     }
