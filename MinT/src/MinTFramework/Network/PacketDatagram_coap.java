@@ -52,11 +52,12 @@ public class PacketDatagram_coap {
     private String data="";
     private final String EMPTY_MSG = "-";
     
-    private int h_ver = 0x01;
-    private HEADER_TYPE h_type;
-    private int h_tkl;
-    private HEADER_CODE h_code;
-    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
+    //CoAP Header
+    private int h_ver = 0x01;                                   //Ver
+    private HEADER_TYPE h_type;                                 //T
+    private int h_tkl;                                          //TKL
+    private HEADER_CODE h_code;                                 //Code
+    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;     //Message ID
     
     private final int MAIN_HEADER_SIZE = 4;
     private final int PACKET_HEADER_SIZE = MAIN_HEADER_SIZE 
@@ -183,7 +184,7 @@ public class PacketDatagram_coap {
         this.h_ver = ((headerFirstByte & 0xC0) >> 6);   //0xC0 = 1100 0000
         this.h_type = HEADER_TYPE.getHeaderType((headerFirstByte & 0x30) >> 4);  //0x30 = 0011 0000
         this.h_tkl = headerFirstByte & 0x0F;         //0x0F = 0000 1111
-        this.h_code = HEADER_CODE.getHeaderDirection(headerSecondByte);
+        this.h_code = HEADER_CODE.getHeaderCode(headerSecondByte);
         this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getInt();
     }
     
@@ -294,7 +295,7 @@ public class PacketDatagram_coap {
         return this.h_ver;
     }
     
-    public HEADER_TYPE getHeader_Direction(){
+    public HEADER_TYPE getHeader_Type(){
         return this.h_type;
     }
     
@@ -302,7 +303,7 @@ public class PacketDatagram_coap {
         return this.h_tkl;
     }
     
-    public HEADER_CODE getHeader_Instruction(){
+    public HEADER_CODE getHeader_Code(){
         return this.h_code;
     }
     
@@ -358,6 +359,8 @@ public class PacketDatagram_coap {
         PUT(0, 3),
         DELETE(0, 4),
         
+        DISCOVERY(0, 5),    //DISCOVERY??
+        
         //Response
             //Success
         CREATED(2, 1),
@@ -410,7 +413,7 @@ public class PacketDatagram_coap {
             return detailCode;
         }
          
-        public static HEADER_CODE getHeaderDirection(int code){
+        public static HEADER_CODE getHeaderCode(int code){
             for(HEADER_CODE h : HEADER_CODE.values()){
                 if(h.getCode() == code)
                     return h;
@@ -418,7 +421,7 @@ public class PacketDatagram_coap {
             return null;
         }
         
-        public static HEADER_CODE getHeaderDirection(int classCode, int detailCode){
+        public static HEADER_CODE getHeaderCode(int classCode, int detailCode){
             for(HEADER_CODE h : HEADER_CODE.values()){
                 if((h.getClassCode() == classCode) && (h.getDetailCode() == detailCode))
                     return h;
@@ -428,6 +431,15 @@ public class PacketDatagram_coap {
                 
         boolean isRequest() {return classCode == 1;}
         boolean isResponse() {return classCode != 1;}
+        
+        boolean isGet() {return this == GET;}
+        boolean isPost() {return this == POST;}
+        boolean isPut() {return this == PUT;}
+        boolean isDelete() {return this == DELETE;}
+        
+        boolean isDiscovery() {return this == DISCOVERY;}
+        
+        boolean NeedResponse() {return this == GET;}
         
         boolean isSuccess() {return classCode == 2;}
         boolean isClientError() {return classCode == 4;}

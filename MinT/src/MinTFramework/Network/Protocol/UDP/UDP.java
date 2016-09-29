@@ -19,7 +19,7 @@ package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.PacketDatagram_coap;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
@@ -127,7 +127,7 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(PacketDatagram packet) throws IOException {
+    protected void sendProtocol(PacketDatagram_coap packet) throws IOException {
             NetworkProfile dst = packet.getNextNode();
             SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
             sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()

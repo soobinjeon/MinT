@@ -47,13 +47,13 @@ public interface NetworkLayers {
      * Layer Implements
      * @param packet 
      */
-    public void Receive(PacketDatagram packet);
+    public void Receive(PacketDatagram_coap packet);
     
     /**
      * Layer Implements
      * @param packet 
      */
-    public void Send(PacketDatagram packet);
+    public void Send(PacketDatagram_coap packet);
     
     public void EndPointSend(SendMSG sendmsg);
 }

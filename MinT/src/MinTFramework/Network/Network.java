@@ -46,7 +46,7 @@ public abstract class Network {
      * send packet
      * @param packet 
      */
-    abstract protected void sendProtocol(PacketDatagram packet)  throws IOException;
+    abstract protected void sendProtocol(PacketDatagram_coap packet)  throws IOException;
 
     abstract protected void interrupt();
     /**
@@ -99,7 +99,7 @@ public abstract class Network {
      * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public void send(PacketDatagram packet) throws NetworkException, IOException{
+    public void send(PacketDatagram_coap packet) throws NetworkException, IOException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{

@@ -19,7 +19,7 @@ package MinTFramework.Network.Protocol.BLE;
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.PacketDatagram_coap;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
 import java.util.logging.Level;
@@ -121,7 +121,7 @@ public class BLE extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(PacketDatagram packet) {
+    protected void sendProtocol(PacketDatagram_coap packet) {
         //System.out.println(packet);
         String dst = setDestination(packet.getNextNode());
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)

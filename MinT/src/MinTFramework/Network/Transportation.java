@@ -50,7 +50,7 @@ public class Transportation implements NetworkLayers{
     }
 
     @Override
-    public void Receive(PacketDatagram packet) {
+    public void Receive(PacketDatagram_coap packet) {
         if(isFinalDestination(packet.getDestinationNode())){
             syshandle.startHandle(packet);
 //            networkManager.setHandlerCount();
@@ -72,7 +72,7 @@ public class Transportation implements NetworkLayers{
      * Stop Over Method
      * @param packet 
      */
-    private void stopOver(PacketDatagram packet) {
+    private void stopOver(PacketDatagram_coap packet) {
         
     }
     
@@ -83,14 +83,16 @@ public class Transportation implements NetworkLayers{
 //            bench_send.startPerform();
         NetworkProfile fdst = getFinalDestination(sendmsg.getDestination());
         
-        PacketDatagram npacket = null;
+        PacketDatagram_coap npacket = null;
         if(sendmsg.isResponse()){
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
+            npacket = new PacketDatagram_coap(sendmsg.getResponseKey(), sendmsg.getVersion()
+                    ,sendmsg.getHeader_Type(), sendmsg.getTokenLength()
+                    ,sendmsg.getHeader_Code(), null, null, getNextNode(sendmsg.getDestination())
                     ,fdst, sendmsg.Message());
         }else if(sendmsg.isRequest()){
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
+            npacket = new PacketDatagram_coap(sendmsg.getResponseKey(), sendmsg.getVersion()
+                    ,sendmsg.getHeader_Type(), sendmsg.getTokenLength()
+                    ,sendmsg.getHeader_Code(), null, null, getNextNode(sendmsg.getDestination())
                     ,fdst, sendmsg.Message());
         }
         else if(sendmsg.isRequestGET()){
@@ -100,8 +102,9 @@ public class Transportation implements NetworkLayers{
                 networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
             }
             
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
+            npacket = new PacketDatagram_coap(sendmsg.getResponseKey(), sendmsg.getVersion()
+                    ,sendmsg.getHeader_Type(), sendmsg.getTokenLength()
+                    ,sendmsg.getHeader_Code(), null, null, getNextNode(sendmsg.getDestination())
                     ,fdst, sendmsg.Message());
         }
         //msg sending count
@@ -140,7 +143,7 @@ public class Transportation implements NetworkLayers{
     }
     
     @Override
-    public void Send(PacketDatagram packet) {
+    public void Send(PacketDatagram_coap packet) {
         serialization.Send(packet);
     }
     
