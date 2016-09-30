@@ -106,7 +106,7 @@ public class ThreadAdjustment implements Runnable{
         BenchAnalize Rt = pools.get(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString());
 
         if(Ht != null && Rt != null){
-            System.out.println("------------------------------------------------------------------------------------------");
+//            System.out.println("------------------------------------------------------------------------------------------");
             double Hdata = getData(Ht);
             double Rdata = getData(Rt);
             
@@ -121,7 +121,7 @@ public class ThreadAdjustment implements Runnable{
             double result = THt == 0 ? 0 : (Rdata - Hdata) / THt;
             
             arrayRequestNn.add(result);
-            System.out.println("originR: "+result+", RL: "+arrayRequestNn);
+//            System.out.println("originR: "+result+", RL: "+arrayRequestNn);
             
             result = Math.round(result);
             
@@ -145,14 +145,14 @@ public class ThreadAdjustment implements Runnable{
             PrevN = Nt;
             
             // for Debug
-            System.out.printf("QeueP: %.2f",queueP);
-            System.out.println("");
-            System.out.println("THArray: "+THarray);
-            System.out.println("");
-            System.out.printf("AccHt: %.2f, RNn: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",accumReqeustNn,result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
-            System.out.println("");
-            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);
-            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);
+//            System.out.printf("QeueP: %.2f",queueP);
+//            System.out.println("");
+//            System.out.println("THArray: "+THarray);
+//            System.out.println("");
+//            System.out.printf("AccHt: %.2f, RNn: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",accumReqeustNn,result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
+//            System.out.println("");
+//            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);
+//            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);
             
             frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
             Rt.clearBuffer();
@@ -243,7 +243,7 @@ public class ThreadAdjustment implements Runnable{
         double accdata = AccumQW + queueP;
         int N = (int)(accdata / 1);
         AccumQW = accdata - (double)N;
-        System.out.println("Qsize: "+RecvHandleQueueSize+", queueP: "+queueP+", accdata: "+accdata+", N: "+N+", AccumQW: "+AccumQW);
+//        System.out.println("Qsize: "+RecvHandleQueueSize+", queueP: "+queueP+", accdata: "+accdata+", N: "+N+", AccumQW: "+AccumQW);
         return N;
     }
 
@@ -257,7 +257,7 @@ public class ThreadAdjustment implements Runnable{
             n_1 = THarr.get(arrsize-1);
             thn = n - n_1;
         }
-        System.out.println("N: "+n+", N-1: "+n_1+", THN: "+thn+", MAX_TH: "+MAX_TH);
+//        System.out.println("N: "+n+", N-1: "+n_1+", THN: "+thn+", MAX_TH: "+MAX_TH);
         if(thn < 0 && n > MAX_TH){
             MAX_TH = n;
             return max_thread + 1;

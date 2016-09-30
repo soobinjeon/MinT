@@ -328,6 +328,17 @@ public abstract class MinT {
     }
     
     /**
+     * 
+     * @param ntype type of Network
+     * @param addr Current Internet Address for UDP, TCP/IP or CoAP
+     * @param port Internet Port for UDP, TCP/IP or CoAP
+     */
+    public void addNetwork(NetworkType ntype, String addr){
+        MinTConfig.IP_ADDRESS = addr;
+        addNetwork(ntype);
+    }
+    
+    /**
      * GET Resource Data matched to filled Resource
      * @deprecated 
      * @param msg 

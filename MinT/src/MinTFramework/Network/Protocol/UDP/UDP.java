@@ -25,7 +25,9 @@ import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.Util.OSUtil;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 import java.net.SocketAddress;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
@@ -41,6 +43,8 @@ import java.util.concurrent.TimeUnit;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class UDP extends Network {
+    private final int PORT;
+    
     public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
     //UDP
     static final int UDP_SENDER_THREAD_CORE = 3;
@@ -50,30 +54,41 @@ public class UDP extends Network {
     static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
     
     private UDPSender sender;
-    private final int PORT;
-    
     private InetSocketAddress isa;
     private DatagramChannel channel;
-    
     private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
+    
+    //Group Communication (Multicast)
+    private MulticastSocket groupsocket;
+    private InetAddress mulAddress;
+    
     private final DebugLog log = new DebugLog("UDP.java");
 
     /**
-     * UDP communication structor
-     *
+     * UDP communication structure
+     * UDP ports are divided to receiver and sender depending on each role
+     * Receiver
+     *    port number : set by MinTConfig (CoAP default : 5683)
+     *    Datagram channel constructor is created by UDP
+     * 
+     * Sender
+     *    port number : Receiver port + n
+     *    Datagram Channel constructor is created by UDPSendFactory.java
+     *    fix it: need to create in here
+     * 
      * @param port port that want to use
      * @param _ap Protocol
      * @param frame MinT Frame
      * @param nm Network Manager
      */
-    public UDP(String nodeName, int port) {
-        super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+port,NetworkType.UDP));
+    public UDP(String nodeName, NetworkType ntype) {
+        super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+ntype.getPort(),ntype));
 //        log.printMessage(profile.getProfile());
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
             log.printMessage(profile.getProfile());
         }
-        PORT = port;
+        PORT = ntype.getPort();
         this.portOpen();
         try {
             this.setUDPSocket();
@@ -99,11 +114,18 @@ public class UDP extends Network {
      * set DatagramSocket make Sender and Receiver
      */
     private void setUDPSocket() throws IOException {
+        //Data Communication Channel
         isa = new InetSocketAddress(PORT);
-        channel = DatagramChannel.open();
+        channel = DatagramChannel.open().setOption(StandardSocketOptions.SO_REUSEADDR, true);
         channel.socket().bind(isa);
         channel.configureBlocking(false);
 //        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
+        
+        //Group Communication Channel (Multicasting)
+        mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
+        groupsocket = new MulticastSocket(PORT);
+        groupsocket.setReuseAddress(true);
+        groupsocket.joinGroup(mulAddress);
     }
     
     /**

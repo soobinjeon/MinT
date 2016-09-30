@@ -24,8 +24,8 @@ import MinTFramework.MinTConfig;
  */
 public enum NetworkType {
     BLE(1,"BLE",null),
-    UDP(2,"UDP",MinTConfig.INTERNET_TCPUDP_PORT),
-    TCPIP(3,"TCP/IP",MinTConfig.INTERNET_TCPUDP_PORT),
+    UDP(2,"UDP",MinTConfig.INTERNET_COAP_PORT),
+    TCPIP(3,"TCP/IP",MinTConfig.INTERNET_COAP_PORT),
     COAP(4,"COAP",MinTConfig.INTERNET_COAP_PORT),
     NFC(5,"NFC",null), 
     BLUETOOTH(6,"BLUETOOTH",null),

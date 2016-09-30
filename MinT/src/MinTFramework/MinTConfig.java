@@ -36,9 +36,9 @@ public class MinTConfig {
     
     //for Network
     static public final int RESPONSE_ID_MAX = 120000;
-    static public final int INTERNET_TCPUDP_PORT = 6513;
-    static public final int INTERNET_COAP_PORT = 6514;
+    static public final int INTERNET_COAP_PORT = 5683;
     static public String IP_ADDRESS = "";
+    static public final String CoAP_MULTICAST_ADDRESS = "224.0.1.187";
     
     //for Android
     static public String ANDROID_FILE_PATH = "";
