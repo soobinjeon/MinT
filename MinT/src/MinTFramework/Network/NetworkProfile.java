@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinTConfig;
 import MinTFramework.Util.DebugLog;
 import java.nio.ByteBuffer;
 
@@ -106,7 +107,7 @@ public class NetworkProfile {
         return Port;
     }
     public String getIPAddr(){
-        return this.ipaddr;
+        return ipaddr;
     }
     
     public NetworkType getNetworkType(){
@@ -167,6 +168,10 @@ public class NetworkProfile {
                 this.ipaddr = p[0];
                 this.Port = Integer.parseInt(p[1]);
             }
+            else if(p.length > 0 && p[0] != null){
+                this.ipaddr = p[0];
+                this.Port = MinTConfig.INTERNET_COAP_PORT;
+            }
         }
     }
 
@@ -190,11 +195,6 @@ public class NetworkProfile {
             tadd += Port;
             addrbyte = ByteBuffer.allocate(NETWORK_ADDRESS_BYTE_SIZE).putLong(1,tadd).array();
             addrbyte[0] = (byte)ntype.getID();
-//            for (int i = 0; i < addrbyte.length; i++) {
-//                String s1 = String.format("%8s", Integer.toBinaryString(addrbyte[i] & 0xFF)).replace(' ', '0');
-//                System.out.print(s1 + " ");
-//            }
-//            System.out.println("");
         }
     }
 
@@ -222,7 +222,6 @@ public class NetworkProfile {
             address = addbuilder.toString();
             makeID();
             setIPMode();
-//            System.out.println(addbuilder.toString());
         }else if(ntype == NetworkType.BLE){
             //fill this method
         }

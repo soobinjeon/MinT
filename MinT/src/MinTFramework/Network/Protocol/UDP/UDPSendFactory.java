@@ -16,9 +16,14 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
+import MinTFramework.MinTConfig;
+import MinTFramework.Network.NetworkProfile;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ThreadFactory;
 
@@ -30,8 +35,17 @@ import java.util.concurrent.ThreadFactory;
 public class UDPSendFactory implements ThreadFactory{
     static int threadNo = 0;
     private int port;
-    public UDPSendFactory(int PORT){
+    private boolean isMulticast = false;
+    private NetworkProfile profile;
+    
+    public UDPSendFactory(int PORT, boolean _isMulticast, NetworkProfile _profile){
         port = PORT;
+        isMulticast = _isMulticast;
+        profile = _profile;
+    }
+    
+    public UDPSendFactory(int PORT){
+        this(PORT, false, null);
     }
 
     @Override
@@ -44,6 +58,17 @@ public class UDPSendFactory implements ThreadFactory{
             sendisa = new InetSocketAddress(nport);
             sendchannel = DatagramChannel.open();
             sendchannel.socket().bind(sendisa);
+            if(isMulticast){
+                System.out.println("SET Multicast Option to Port: "+nport);
+                InetAddress inetaddress = InetAddress.getByName(profile.getIPAddr());
+                NetworkInterface interf= NetworkInterface.getByInetAddress(inetaddress);
+                InetAddress mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
+                
+                sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_IF, interf);
+                sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_TTL, 5);
+                sendchannel.join(mulAddress, interf);
+            }
+                
             System.out.println("Sender Factory("+threadNo+"): create sender-"+(port+threadNo));
             return new UDPSendThread(r, sendchannel, "UDP_Sender-"+threadNo);
         } catch (SocketException ex) {

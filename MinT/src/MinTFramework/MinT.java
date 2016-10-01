@@ -297,23 +297,34 @@ public abstract class MinT {
         return NTWmanager;
     }
     
-    /**
-     * add Network
-     * @param ntype 
-     */
-    public void addNetwork(NetworkType ntype){
-        NTWmanager.AddNetwork(ntype);
-    }
+//    /**
+//     * add Network
+//     * @param ntype 
+//     */
+//    private void addNetwork(NetworkType ntype){
+//        NTWmanager.AddNetwork(ntype);
+//    }
+    
+//    /**
+//     * @deprecated 
+//     * add Network with Port
+//     * !!Caution!! Network Port was fixed
+//     * @param ntype
+//     * @param port  Internet Port for UDP, TCP/IP or CoAP
+//     */
+//    public void addNetwork(NetworkType ntype, Integer port){
+//        ntype.setPort(port);
+//        addNetwork(ntype);
+//    }
     
     /**
-     * add Network with Port
-     * !!Caution!! Network Port was fixed
-     * @param ntype
-     * @param port  Internet Port for UDP, TCP/IP or CoAP
+     * 
+     * @param ntype type of Network
+     * @param addr Current Internet Address for UDP, TCP/IP or CoAP
      */
-    public void addNetwork(NetworkType ntype, Integer port){
-        ntype.setPort(port);
-        addNetwork(ntype);
+    public void addNetwork(NetworkType ntype, String addr){
+        MinTConfig.IP_ADDRESS = addr;
+        NTWmanager.AddNetwork(ntype);
     }
     
     /**
@@ -323,19 +334,8 @@ public abstract class MinT {
      * @param port Internet Port for UDP, TCP/IP or CoAP
      */
     public void addNetwork(NetworkType ntype, String addr, Integer port){
-        MinTConfig.IP_ADDRESS = addr;
-        addNetwork(ntype, port);
-    }
-    
-    /**
-     * 
-     * @param ntype type of Network
-     * @param addr Current Internet Address for UDP, TCP/IP or CoAP
-     * @param port Internet Port for UDP, TCP/IP or CoAP
-     */
-    public void addNetwork(NetworkType ntype, String addr){
-        MinTConfig.IP_ADDRESS = addr;
-        addNetwork(ntype);
+        ntype.setPort(port);
+        addNetwork(ntype, addr);
     }
     
     /**

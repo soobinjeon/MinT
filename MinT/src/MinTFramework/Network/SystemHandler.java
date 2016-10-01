@@ -70,7 +70,7 @@ public class SystemHandler{
         if(rv_packet.getHeader_Instruction().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
-//            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
+            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
             
             Request req = new RequestHandle(rv_packet.getMsgData(), rv_packet.getSource());
             ResData res = resStorage.getProperty(req);

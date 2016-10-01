@@ -27,8 +27,9 @@ import MinTFramework.Util.OSUtil;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.net.StandardProtocolFamily;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -45,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class UDP extends Network {
     private final int PORT;
     
-    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER;};
+    public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER, UDP_MULTICAST_SENDER;};
     //UDP
     static final int UDP_SENDER_THREAD_CORE = 3;
     static final int UDP_SENDER_THREAD_MAX = 3;
@@ -59,7 +60,8 @@ public class UDP extends Network {
     private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
     
     //Group Communication (Multicast)
-    private MulticastSocket groupsocket;
+    private DatagramChannel groupchannel;
+    NetworkInterface interf;
     private InetAddress mulAddress;
     
     private final DebugLog log = new DebugLog("UDP.java");
@@ -83,7 +85,6 @@ public class UDP extends Network {
      */
     public UDP(String nodeName, NetworkType ntype) {
         super(new NetworkProfile(nodeName,OSUtil.getIPAddress()+":"+ntype.getPort(),ntype));
-//        log.printMessage(profile.getProfile());
         if(!MinTConfig.IP_ADDRESS.equals("")){
             profile.setAddress(MinTConfig.IP_ADDRESS);
             log.printMessage(profile.getProfile());
@@ -97,6 +98,7 @@ public class UDP extends Network {
         }
         MakeUDPReceiveListeners();
         MakeUDPSender();
+        MakeUDPMulticastSender();
         System.out.println("Set up UDP : "+profile.getProfile());
     }
     
@@ -114,18 +116,19 @@ public class UDP extends Network {
      * set DatagramSocket make Sender and Receiver
      */
     private void setUDPSocket() throws IOException {
-        //Data Communication Channel
-        isa = new InetSocketAddress(PORT);
-        channel = DatagramChannel.open().setOption(StandardSocketOptions.SO_REUSEADDR, true);
-        channel.socket().bind(isa);
-        channel.configureBlocking(false);
-//        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
-        
-        //Group Communication Channel (Multicasting)
+        //Data Communication with Multicast
+        InetAddress inetaddress = InetAddress.getByName(profile.getIPAddr());
+        interf= NetworkInterface.getByInetAddress(inetaddress);
         mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
-        groupsocket = new MulticastSocket(PORT);
-        groupsocket.setReuseAddress(true);
-        groupsocket.joinGroup(mulAddress);
+        isa = new InetSocketAddress(PORT);
+        channel = DatagramChannel.open(StandardProtocolFamily.INET)
+                .setOption(StandardSocketOptions.SO_REUSEADDR, true)
+                .bind(isa)
+                .setOption(StandardSocketOptions.IP_MULTICAST_IF, interf);
+        channel.configureBlocking(false);
+        channel.join(mulAddress, interf);
+        
+//        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
     
     /**
@@ -150,10 +153,13 @@ public class UDP extends Network {
      */
     @Override
     protected void sendProtocol(PacketDatagram packet) throws IOException {
-            NetworkProfile dst = packet.getNextNode();
-            SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
-            sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
-                    , new UDPSender(this, packet.getPacket(), add));
+        //if Data Packet
+        NetworkProfile dst = packet.getNextNode();
+        SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
+        sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
+                , new UDPSender(this, packet.getPacket(), add));
+
+        //if multicast
     }
     
     private void MakeUDPSender(){
@@ -163,6 +169,16 @@ public class UDP extends Network {
                 , TimeUnit.SECONDS
                 , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
                 , new UDPSendFactory(PORT)
+                , new RejectedExecutionHandlerImpl()));
+    }
+    
+    private void MakeUDPMulticastSender(){
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_SENDER.toString()
+                , new ThreadPoolExecutor(1
+                , 1, 10
+                , TimeUnit.SECONDS
+                , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
+                , new UDPSendFactory(PORT, true, profile)
                 , new RejectedExecutionHandlerImpl()));
     }
 

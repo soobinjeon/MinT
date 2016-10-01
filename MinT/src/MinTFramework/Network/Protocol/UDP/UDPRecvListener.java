@@ -71,13 +71,15 @@ public class UDPRecvListener extends Thread{
     private void RequestPendingConnection(){
 //        dl.printMessage("in the RequestPending..");
         Iterator selectedKeys = selector.selectedKeys().iterator();
-        while(selectedKeys.hasNext()){
-                SelectionKey key = (SelectionKey) selectedKeys.next();
-                selectedKeys.remove();
-                if(!key.isValid())
-                    continue;
-                if(key.isReadable())
-                    read(key);
+        while (selectedKeys.hasNext()) {
+            SelectionKey key = (SelectionKey) selectedKeys.next();
+            selectedKeys.remove();
+            if (!key.isValid()) {
+                continue;
+            }
+            if (key.isReadable()) {
+                read(key);
+            }
         }
     }
     
@@ -100,6 +102,7 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
+            System.out.println("string: "+new String(fwdbyte));
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
         }catch(ClosedByInterruptException e){
             System.out.println("Thread Stop Interrupt - ClosedByInterruptException");
