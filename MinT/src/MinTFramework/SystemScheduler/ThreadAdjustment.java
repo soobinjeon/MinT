@@ -196,6 +196,10 @@ public class ThreadAdjustment implements Runnable{
         if(input == null)
             return -1;
         double reqsum = 0;
+        
+        if(input.TRequest == null)
+            return 0;
+        
         for(double d : input.TRequest)
             reqsum += d;
         return reqsum;

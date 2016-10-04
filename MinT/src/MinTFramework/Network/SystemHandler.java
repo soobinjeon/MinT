@@ -70,17 +70,27 @@ public class SystemHandler{
         if(rv_packet.getHeader_Instruction().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
-            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
+//            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
             
             Request req = new RequestHandle(rv_packet.getMsgData(), rv_packet.getSource());
-            ResData res = resStorage.getProperty(req);
+            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceString());
             
-            if(res != null)
-                req = new Request(null, res.getResourceString());
-            else
-                req = null;
-            nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET
-                    , rv_packet.getSource(), req, rv_packet.getMSGID()));
+            //Temporary Routing Discover Mode
+            if (req.getResourceName().equals(".well-known")) {
+                if (req.getResourceString().equals("rd")) {
+                    System.out.println("Routing Discover Mode");
+                    
+                }
+            } else {
+                ResData res = resStorage.getProperty(req);
+
+                if (res != null) {
+                    req = new Request(null, res.getResourceString());
+                } else {
+                    req = null;
+                }
+                nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE, PacketDatagram.HEADER_INSTRUCTION.GET, rv_packet.getSource(), req, rv_packet.getMSGID()));
+            }
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
         }else if(rv_packet.getHeader_Instruction().isSet()){

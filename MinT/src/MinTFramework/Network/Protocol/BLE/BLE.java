@@ -133,4 +133,9 @@ public class BLE extends Network {
     @Override
     protected void interrupt() {
     }
+
+    @Override
+    protected void sendMulticast(PacketDatagram packet) {
+        //Do Something
+    }
 }

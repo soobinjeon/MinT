@@ -47,7 +47,7 @@ public abstract class Network {
      * @param packet 
      */
     abstract protected void sendProtocol(PacketDatagram packet)  throws IOException;
-
+    abstract protected void sendMulticast(PacketDatagram packet);
     abstract protected void interrupt();
     /**
      * *
@@ -105,6 +105,15 @@ public abstract class Network {
         else{
             packet.makeBytes();
             sendProtocol(packet);
+        }
+    }
+    
+    public void sendAllNodes(PacketDatagram packet) throws NetworkException{
+        if(!isWorking())
+            throw new NetworkException(NetworkException.NE.NetworkNotWorking);
+        else{
+            packet.makeBytes();
+            sendMulticast(packet);
         }
     }
     

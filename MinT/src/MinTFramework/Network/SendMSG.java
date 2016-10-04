@@ -31,6 +31,9 @@ public class SendMSG implements Runnable{
     private ResponseHandler resHandle;
     private int resKey;
     private int SendHit = 0;
+    private boolean isMulticast = false;
+    private NetworkProfile FinalDestination;
+    private NetworkProfile nextNode;
     
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, int resKey){
@@ -72,6 +75,19 @@ public class SendMSG implements Runnable{
     }
     
     /**
+     * Request only
+     * @param hd Direction (Request, Response)
+     * @param hi for Instruction (SET, POST, PUT, DELETE)
+     * @param dst Destination profile
+     * @param msg Resource and request
+     */
+    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
+            , NetworkProfile dst, Request msg, boolean _isMulticast){
+        this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
+        this.isMulticast = _isMulticast;
+    }
+    
+    /**
      * send for response
      * @param hd Direction (Request, Response)
      * @param hi Instruction (GET, DISCOVERY)
@@ -92,7 +108,11 @@ public class SendMSG implements Runnable{
         //put the sendmsg to transportation
         if(bench != null)
             bench.startPerform();
-        trans.EndPointSend(this);
+        try{
+            trans.EndPointSend(this);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         if(bench != null)
             bench.endPerform(0);
     }
@@ -122,7 +142,7 @@ public class SendMSG implements Runnable{
     }
     
     public boolean isRequest(){
-        return head_dir.isRequest() && !head_inst.NeedResponse();
+        return this.resHandle == null || head_dir.isRequest() && !head_inst.NeedResponse();
     }
     
     public boolean isResponse(){
@@ -145,4 +165,32 @@ public class SendMSG implements Runnable{
         resKey = makePacketID;
     }
 
+    /**
+     * set FinalDestination from Transportation Module for send
+     * @param fdst 
+     */
+    public void setFinalDestination(NetworkProfile fdst) {
+        FinalDestination = fdst;
+    }
+    
+    public NetworkProfile getFinalDestination(){
+        return FinalDestination;
+    }
+
+    /**
+     * set NextNode from Transportation Module for send
+     * @param _nextNode 
+     */
+    public void setNextNode(NetworkProfile _nextNode) {
+        nextNode = _nextNode;
+    }
+    
+    public NetworkProfile getNextNode(){
+        return nextNode;
+    }
+    
+    public boolean isMulticastMode(){
+        return isMulticast;
+    }
+    
 }

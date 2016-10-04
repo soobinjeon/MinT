@@ -189,6 +189,15 @@ public class NetworkManager {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
     
+    public void SEND_Multicast(Request requestdata){
+        SEND_Multicast(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
+                ,PacketDatagram.HEADER_INSTRUCTION.GET, null ,requestdata, true));
+    }
+    
+    private void SEND_Multicast(SendMSG smsg){
+        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
+    }
+    
     /**
      * get PacketID 
      * @return 

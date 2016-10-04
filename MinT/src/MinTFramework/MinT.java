@@ -362,9 +362,9 @@ public abstract class MinT {
      * @param requestdata (new Request(Resource Name, Resource Method)
      * @param resHandle 
      */
-    public void REQUEST_SET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+    public void REQUEST_SET(NetworkProfile dst, Request requestdata){//, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,requestdata, resHandle));
+                ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,requestdata));
     }
     
     /**

@@ -51,9 +51,8 @@ public class Transportation implements NetworkLayers{
 
     @Override
     public void Receive(PacketDatagram packet) {
-        if(isFinalDestination(packet.getDestinationNode())){
+        if(isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())){
             syshandle.startHandle(packet);
-//            networkManager.setHandlerCount();
         }
         else{
             stopOver(packet);
@@ -67,6 +66,18 @@ public class Transportation implements NetworkLayers{
         }
         return false;//currnetProfile.equals(destinationNode);
     }
+    
+    /**
+     * is Multicast Packet with CoAP or UDP
+     * @param destinationNode
+     * @return 
+     */
+    private boolean isMulticast(NetworkProfile destinationNode){
+        if(destinationNode.getAddress().equals(""))
+            return true;
+        else
+            return false;
+    }
 
     /**
      * Stop Over Method
@@ -77,39 +88,33 @@ public class Transportation implements NetworkLayers{
     }
     
     @Override
-    public void EndPointSend(SendMSG sendmsg) {
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
-//        if(bench_send != null)
-//            bench_send.startPerform();
         NetworkProfile fdst = getFinalDestination(sendmsg.getDestination());
         
+        sendmsg.setFinalDestination(fdst);
+        sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
         PacketDatagram npacket = null;
         if(sendmsg.isResponse()){
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
-                    ,fdst, sendmsg.Message());
+            npacket = serialization.EndPointSend(sendmsg);
         }else if(sendmsg.isRequest()){
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
-                    ,fdst, sendmsg.Message());
-        }
-        else if(sendmsg.isRequestGET()){
+            npacket = serialization.EndPointSend(sendmsg);
+        }else if(sendmsg.isRequestGET()){
             //check resend information
             if(sendmsg.getSendHit() == 0){
                 sendmsg.setResKey(networkManager.getIDMaker().makePacketID());
                 networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
             }
-            
-            npacket = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-                    ,sendmsg.getHeader_Instruction(), null, null, getNextNode(sendmsg.getDestination())
-                    ,fdst, sendmsg.Message());
+            npacket = serialization.EndPointSend(sendmsg);
         }
+        
         //msg sending count
         sendmsg.Sended();
-//        if(bench_send != null)
-//            bench_send.endPerform();
+        
         //send packet
         Send(npacket);
+        
+        return npacket;
     }
     
     /**
@@ -139,9 +144,46 @@ public class Transportation implements NetworkLayers{
         return fdst;
     }
     
+    /**
+     * send packet to each network module
+     * @param packet 
+     */
     @Override
     public void Send(PacketDatagram packet) {
-        serialization.Send(packet);
+        try {
+            //For Group Message
+            if (packet.getSendMSG().isMulticastMode()) {
+                for(Network sendNetwork : networkManager.getNetworks().values()){
+                    MakeSourceProfile(packet, sendNetwork);
+                    sendNetwork.sendAllNodes(packet);
+                }
+            } //For private message
+            else {
+                NetworkType nnodetype = packet.getNextNode().getNetworkType();
+                Network sendNetwork = networkManager.getNetworks().get(nnodetype);
+                MakeSourceProfile(packet, sendNetwork);
+                sendNetwork.send(packet);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void MakeSourceProfile(PacketDatagram packet, Network sendNetwork) {
+        //Send Message
+        if (sendNetwork != null) {
+            //set Source Node
+            if (packet.getSource() == null) {
+                packet.setSource(sendNetwork.getProfile());
+            }
+
+            //set Previous Node
+            if (packet.getPreviosNode() == null) {
+                packet.setPrevNode(sendNetwork.getProfile());
+            }
+        } else {
+            System.out.println("Error : There are no Networks");
+        }
     }
     
     /**

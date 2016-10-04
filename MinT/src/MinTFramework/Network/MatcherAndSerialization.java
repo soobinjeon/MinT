@@ -62,40 +62,12 @@ public class MatcherAndSerialization implements NetworkLayers{
     }
     
     /**
+     * @deprecated 
      * send Packet to End point network
      * @param packet 
      */
     @Override
     public void Send(PacketDatagram packet) {
-//        if(bench_send != null)
-//            bench_send.startPerform();
-        NetworkType nnodetype = packet.getNextNode().getNetworkType();
-        Network sendNetwork = networkManager.getNetworks().get(nnodetype);
-        
-        //Send Message
-        if (sendNetwork != null) {
-            //set Source Node
-            if (packet.getSource() == null) {
-                packet.setSource(sendNetwork.getProfile());
-            }
-
-            //set Previous Node
-            if (packet.getPreviosNode() == null) {
-                packet.setPrevNode(sendNetwork.getProfile());
-            }
-
-            //set Response Handler
-            try {
-//                if(bench_send != null)
-//                    bench_send.endPerform();
-                
-                sendNetwork.send(packet);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            System.out.println("Error : There are no Networks");
-        }
     }
 
     /**
@@ -107,11 +79,14 @@ public class MatcherAndSerialization implements NetworkLayers{
     }
 
     /**
-     * @deprecated 
      * @param sendmsg 
      */
     @Override
-    public void EndPointSend(SendMSG sendmsg) {
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
+        PacketDatagram packet = new PacketDatagram(sendmsg);
+//        PacketDatagram packet = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
+//        ,sendmsg.getHeader_Instruction(), null, null, sendmsg.getNextNode()
+//        ,sendmsg.getFinalDestination(), sendmsg.Message());
+        return packet;
     }
-    
 }

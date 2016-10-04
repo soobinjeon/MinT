@@ -55,5 +55,5 @@ public interface NetworkLayers {
      */
     public void Send(PacketDatagram packet);
     
-    public void EndPointSend(SendMSG sendmsg);
+    public PacketDatagram EndPointSend(SendMSG sendmsg);
 }

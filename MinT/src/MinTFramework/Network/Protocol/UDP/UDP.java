@@ -124,7 +124,8 @@ public class UDP extends Network {
         channel = DatagramChannel.open(StandardProtocolFamily.INET)
                 .setOption(StandardSocketOptions.SO_REUSEADDR, true)
                 .bind(isa)
-                .setOption(StandardSocketOptions.IP_MULTICAST_IF, interf);
+                .setOption(StandardSocketOptions.IP_MULTICAST_IF, interf)
+                .setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
         channel.configureBlocking(false);
         channel.join(mulAddress, interf);
         
@@ -158,8 +159,22 @@ public class UDP extends Network {
         SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
         sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
                 , new UDPSender(this, packet.getPacket(), add));
-
-        //if multicast
+    }
+    
+    /**
+     * Send Multi cast
+     * @param packet 
+     */
+    @Override
+    protected void sendMulticast(PacketDatagram packet) {
+        try {
+            //send to CoAP Group Address with CoAP port
+            SocketAddress add = new InetSocketAddress(MinTConfig.CoAP_MULTICAST_ADDRESS, PORT);
+            sysSched.submitProcess(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
+                    , new UDPSender(this, packet.getPacket(), add));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
     
     private void MakeUDPSender(){
@@ -173,7 +188,8 @@ public class UDP extends Network {
     }
     
     private void MakeUDPMulticastSender(){
-        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_SENDER.toString()
+        System.out.println("Register Multicast Sender");
+        sysSched.registerThreadPool(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
                 , new ThreadPoolExecutor(1
                 , 1, 10
                 , TimeUnit.SECONDS

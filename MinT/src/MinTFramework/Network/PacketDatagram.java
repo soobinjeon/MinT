@@ -42,6 +42,7 @@ public class PacketDatagram {
     private String data="";
     private final String EMPTY_MSG = "-";
     
+    private SendMSG sendMsg = null;
     private HEADER_DIRECTION h_direction;
     private HEADER_INSTRUCTION h_instruction;
     private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
@@ -72,6 +73,16 @@ public class PacketDatagram {
         h_instruction = h_ins;
         data = msg;
         HEADER_MSGID = msgid;
+    }
+    
+    /**
+     * Data -> MinT Protocol for Sender
+     * @param _smsg  
+     */
+    public PacketDatagram(SendMSG _smsg){
+        this(_smsg.getResponseKey(), _smsg.getHeader_Direction(), _smsg.getHeader_Instruction()
+                ,null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
+        sendMsg = _smsg;
     }
     
     public PacketDatagram(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
@@ -267,6 +278,10 @@ public class PacketDatagram {
 //        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
     }
     
+    public void setDestinationNode(NetworkProfile dst){
+        routelist.put(ROUTE.DESTINATION, dst);
+    }
+    
     public String getMsgData(){
         return data;
     }
@@ -281,6 +296,10 @@ public class PacketDatagram {
     
     public int getMSGID(){
         return HEADER_MSGID;
+    }
+    
+    public SendMSG getSendMSG(){
+        return sendMsg;
     }
     
 //    public PacketDatagram getclone(){
