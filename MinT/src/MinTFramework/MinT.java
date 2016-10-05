@@ -27,7 +27,7 @@ import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketDatagram_coap;
+import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Request;
 import MinTFramework.Network.ResponseHandler;
@@ -352,8 +352,8 @@ public abstract class MinT {
      * @param resHandle 
      */
     public void REQUEST_PUT(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram_coap.HEADER_TYPE.NON, 0
-                ,PacketDatagram_coap.HEADER_CODE.PUT, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.PUT, dst,requestdata, resHandle));
     }
     
     /**
@@ -363,8 +363,8 @@ public abstract class MinT {
      * @param resHandle Response Handler
      */
     public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram_coap.HEADER_TYPE.NON, 0
-                ,PacketDatagram_coap.HEADER_CODE.GET, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
     /**
@@ -373,8 +373,8 @@ public abstract class MinT {
      * @param resHandle Response Handler
      */
     public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram_coap.HEADER_TYPE.NON, 0
-                ,PacketDatagram_coap.HEADER_CODE.DISCOVERY, dst,null,resHandle));
+        NTWmanager.SEND(new SendMSG(0x01, PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.DISCOVERY, dst,null,resHandle));
     }
     
     /**

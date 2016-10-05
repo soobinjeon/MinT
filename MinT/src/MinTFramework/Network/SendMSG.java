@@ -25,17 +25,17 @@ import MinTFramework.Util.Benchmarks.Performance;
  */
 public class SendMSG implements Runnable{
     private int head_version;
-    private PacketDatagram_coap.HEADER_TYPE head_type;
+    private PacketDatagram.HEADER_TYPE head_type;
     private int head_tokenLength;
-    private PacketDatagram_coap.HEADER_CODE head_code;
+    private PacketDatagram.HEADER_CODE head_code;
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
     private int resKey;
     private int SendHit = 0;
     
-    public SendMSG(int hv, PacketDatagram_coap.HEADER_TYPE ht, int tkl, 
-            PacketDatagram_coap.HEADER_CODE hc, NetworkProfile dst, Request msg,
+    public SendMSG(int hv, PacketDatagram.HEADER_TYPE ht, int tkl, 
+            PacketDatagram.HEADER_CODE hc, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, int resKey){
         head_version = hv;
         head_type = ht;
@@ -58,8 +58,8 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      * @param resKey 
      */
-    public SendMSG(int hv, PacketDatagram_coap.HEADER_TYPE ht, int tkl
-            , PacketDatagram_coap.HEADER_CODE hc, NetworkProfile dst
+    public SendMSG(int hv, PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc, NetworkProfile dst
             , Request msg, int resKey){
         this(hv, ht, tkl, hc, dst,msg,null,resKey);
     }
@@ -71,10 +71,10 @@ public class SendMSG implements Runnable{
      * @param dst Destination profile
      * @param msg Resource and request
      */
-    public SendMSG(int hv, PacketDatagram_coap.HEADER_TYPE ht, int tkl
-            , PacketDatagram_coap.HEADER_CODE hc
+    public SendMSG(int hv, PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc
             , NetworkProfile dst, Request msg){
-        this(hv, ht, tkl, hc,dst,msg,null,PacketDatagram_coap.HEADER_MSGID_INITIALIZATION);
+        this(hv, ht, tkl, hc,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
     /**
@@ -85,10 +85,10 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
-    public SendMSG(int hv, PacketDatagram_coap.HEADER_TYPE ht, int tkl
-            , PacketDatagram_coap.HEADER_CODE hc
+    public SendMSG(int hv, PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc
             , NetworkProfile dst, Request msg, ResponseHandler resHandle){   
-        this(hv, ht, tkl, hc,dst,msg,resHandle,PacketDatagram_coap.HEADER_MSGID_INITIALIZATION);
+        this(hv, ht, tkl, hc,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
     @Override
@@ -108,7 +108,7 @@ public class SendMSG implements Runnable{
         return head_version;
     }
     
-    public PacketDatagram_coap.HEADER_TYPE getHeader_Type(){
+    public PacketDatagram.HEADER_TYPE getHeader_Type(){
         return head_type;
     }
     
@@ -116,7 +116,7 @@ public class SendMSG implements Runnable{
         return head_tokenLength;
     }
     
-    public PacketDatagram_coap.HEADER_CODE getHeader_Code(){
+    public PacketDatagram.HEADER_CODE getHeader_Code(){
         return head_code;
     }
         
@@ -138,7 +138,7 @@ public class SendMSG implements Runnable{
     
     public boolean isRequest(){
         //return head_code.isRequest() && !head_code.NeedResponse();
-        return head_code.isRequest();
+        return head_code.isPost();
     }
     
     public boolean isResponse(){
@@ -146,7 +146,7 @@ public class SendMSG implements Runnable{
     }
     
     public boolean isRequestGET(){
-        return head_code.isRequest() && this.resHandle != null;
+        return (head_code.isGet() || head_code.isPut() || head_code.isDelete()) && this.resHandle != null;
     }
     
     public int getSendHit(){

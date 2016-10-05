@@ -16,13 +16,13 @@
  */
 package MinTFramework.Network.Protocol.BLE;
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.PacketDatagram_coap;
+import MinTFramework.Network.PacketDatagram;
 import java.net.*;
 
 public class BLESender {
 
     InetAddress address;
-    PacketDatagram_coap msg;
+    PacketDatagram msg;
     int seq;
     DeviceBLE deviceBLE;
 
@@ -30,7 +30,7 @@ public class BLESender {
         this.deviceBLE = deviceBLE;
     }
 
-    public void SendMsg(PacketDatagram_coap msg, String dst) {
+    public void SendMsg(PacketDatagram msg, String dst) {
         this.msg = msg;
                 
         new Thread(new SendMsg(deviceBLE, msg)).start();

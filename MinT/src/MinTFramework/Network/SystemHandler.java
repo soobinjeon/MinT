@@ -39,7 +39,7 @@ public class SystemHandler{
         nmanager = frame.getNetworkManager();
     }
     
-    public void startHandle(PacketDatagram_coap recv_pk){
+    public void startHandle(PacketDatagram recv_pk){
         SystemHandler(recv_pk);
     }
     
@@ -51,7 +51,7 @@ public class SystemHandler{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(PacketDatagram_coap recv_packet){
+    private void SystemHandler(PacketDatagram recv_packet){
         /**
          * get, post using resource storage
          */
@@ -59,6 +59,8 @@ public class SystemHandler{
 //        dl.printMessage(recv_packet.getPacketString());
 //        dl.printMessage("pk_length : "+recv_packet.getPacket().length);
         //Request req = new Request("Device2", 0, src);
+        System.out.println(recv_packet.getPacketString());
+        System.out.println(recv_packet.getHeader_Code().toString());
         if(recv_packet.getHeader_Code().isRequest()){
             SystemHandleRequest(recv_packet);
         }else if(recv_packet.getHeader_Code().isResponse()){
@@ -66,7 +68,7 @@ public class SystemHandler{
         }
     }
     
-    private void SystemHandleRequest(PacketDatagram_coap rv_packet){
+    private void SystemHandleRequest(PacketDatagram rv_packet){
         if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
@@ -79,8 +81,8 @@ public class SystemHandler{
                 req = new Request(null, res.getResourceString());
             else
                 req = null;
-            nmanager.SEND(new SendMSG(0x01, PacketDatagram_coap.HEADER_TYPE.NON, 0, 
-                    PacketDatagram_coap.HEADER_CODE.CONTENT
+            nmanager.SEND(new SendMSG(0x01, PacketDatagram.HEADER_TYPE.NON, 0, 
+                    PacketDatagram.HEADER_CODE.CONTENT
                     , rv_packet.getSource(), req, rv_packet.getMSGID()));
 //            System.out.println("Sended Data to "+rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Thread Status ["+frame.getNumberofWorkingThreads()+"/"+MinTConfig.DEFAULT_THREAD_NUM+"]");
@@ -94,24 +96,24 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Code().isDiscovery()){
 //            dl.printMessage("set DISCOVERY");
             Request ret = new Request(null, resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString());
-            nmanager.SEND(new SendMSG(0x01, PacketDatagram_coap.HEADER_TYPE.NON, 0,
-                    PacketDatagram_coap.HEADER_CODE.DISCOVERY
+            nmanager.SEND(new SendMSG(0x01, PacketDatagram.HEADER_TYPE.NON, 0,
+                    PacketDatagram.HEADER_CODE.DISCOVERY
                     , rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }
     }
     
-    private void SystemHandleResponse(PacketDatagram_coap rv_packet){
+    private void SystemHandleResponse(PacketDatagram rv_packet){
         Request senderRequest = new RequestHandle(rv_packet.getMsgData(), rv_packet.getSource());
-        if(rv_packet.getHeader_Code().isGet()){
+        if(rv_packet.getHeader_Code().isContent()){
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null)
                 reshandle.Response(new ResponseData(rv_packet, senderRequest.getResource()));
-        }else if(rv_packet.getHeader_Code().isPut()){
-            
-        }else if(rv_packet.getHeader_Code().isPost()){
-            
-        }else if(rv_packet.getHeader_Code().isDelete()){
-            
+//        }else if(rv_packet.getHeader_Code().isPut()){
+//            
+//        }else if(rv_packet.getHeader_Code().isPost()){
+//            
+//        }else if(rv_packet.getHeader_Code().isDelete()){
+//            
         }else if(rv_packet.getHeader_Code().isDiscovery()){
             ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(reshandle != null){

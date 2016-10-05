@@ -57,8 +57,13 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public void EndPointReceive(RecvMSG packet) {
-        PacketDatagram_coap matchedPacket = new PacketDatagram_coap(packet);
+        try{
+        PacketDatagram matchedPacket = new PacketDatagram(packet);
+        System.out.println("maked packet: "+matchedPacket.getPacketString());
         transportation.Receive(matchedPacket);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -66,7 +71,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Send(PacketDatagram_coap packet) {
+    public void Send(PacketDatagram packet) {
 //        if(bench_send != null)
 //            bench_send.startPerform();
         NetworkType nnodetype = packet.getNextNode().getNetworkType();
@@ -103,7 +108,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Receive(PacketDatagram_coap packet) {
+    public void Receive(PacketDatagram packet) {
     }
 
     /**
