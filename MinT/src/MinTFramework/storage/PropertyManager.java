@@ -16,7 +16,7 @@
  */
 package MinTFramework.storage;
 
-import MinTFramework.Network.Request;
+import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.concurrent.ExecutionException;

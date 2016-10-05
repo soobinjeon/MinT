@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.Resource;
 
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.storage.datamap.Information;
 import org.json.simple.JSONObject;
 
@@ -23,7 +24,7 @@ import org.json.simple.JSONObject;
  *
  * @author soobin
  */
-public class Request extends Information {
+public class Request_OLD extends Information {
     String targetRes;
     NetworkProfile RequestNode = null;
     
@@ -37,7 +38,7 @@ public class Request extends Information {
      * @param _getResource 
      * @param tn 
      */
-    public Request(String res, Object _getResource, NetworkProfile tn) {
+    public Request_OLD(String res, Object _getResource, NetworkProfile tn) {
         super(_getResource);
         if(res == null)
             targetRes = "";
@@ -51,14 +52,9 @@ public class Request extends Information {
      * @param res Resource Name for requesting
      * @param _getResource Request Method
      */
-    public Request(String res, Object _getResource){
+    public Request_OLD(String res, Object _getResource){
         this(res, _getResource, null);
         setMessageString();
-    }
-
-    @Override
-    public Object getClone() {
-        return new Request(targetRes, getResource(), RequestNode);
     }
     
     /**

@@ -28,10 +28,4 @@ public class ResData extends Information{
     public ResData(Object _getResource) {
         super(_getResource);
     }
-
-    @Override
-    public Object getClone() {
-        return new ResData(this.getResource());
-    }
-    
 }

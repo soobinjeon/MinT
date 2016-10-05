@@ -17,7 +17,7 @@
 package MinTFramework.Network.Routing.MinTSharing;
 
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.ResponseData;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Util.DebugLog;

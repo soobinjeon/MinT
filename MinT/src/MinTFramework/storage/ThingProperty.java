@@ -17,7 +17,7 @@
 package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
-import MinTFramework.Network.Request;
+import MinTFramework.Network.Resource.Request;
 import org.json.simple.JSONObject;
 
 /**
