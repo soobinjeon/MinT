@@ -44,7 +44,7 @@ import java.util.TreeMap;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PacketDatagram {
-    public static final int HEADER_MSGID_INITIALIZATION = 0;
+    public static final short HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
     
     private byte[] packetdata = null;
@@ -58,7 +58,7 @@ public class PacketDatagram {
     private HEADER_TYPE h_type;                                 //T
     private int h_tkl;                                          //TKL
     private HEADER_CODE h_code;                                 //Code
-    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;     //Message ID
+    private short HEADER_MSGID = HEADER_MSGID_INITIALIZATION;     //Message ID
     
     private final int MAIN_HEADER_SIZE = 4;
     private final int PACKET_HEADER_SIZE = MAIN_HEADER_SIZE 
@@ -76,7 +76,7 @@ public class PacketDatagram {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketDatagram(int msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
+    public PacketDatagram(short msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
@@ -131,7 +131,7 @@ public class PacketDatagram {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(int MSG_ID, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, String msgdata){
+    private void makePacketData(short MSG_ID, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, String msgdata){
         try {
             byte[] strarray = DataAnalizer(msgdata).getBytes();
             byte[] pack = new byte[PACKET_HEADER_SIZE + strarray.length];
@@ -173,9 +173,9 @@ public class PacketDatagram {
      * @param h_ins
      * @return 
      */
-    private byte[] makeHeadertoBytes(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, int msg_id){
+    private byte[] makeHeadertoBytes(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, short msg_id){
         byte[] theader = new byte[MAIN_HEADER_SIZE];
-        byte[] msgbytes = ByteBuffer.allocate(Short.SIZE/8).putShort((short)msg_id).array();
+        byte[] msgbytes = ByteBuffer.allocate(Short.SIZE/8).putShort(msg_id).array();
         
         theader[0] = (byte) (h_ver << 6);
         theader[0] |= (byte) (h_type.getType() << 4);
@@ -196,7 +196,7 @@ public class PacketDatagram {
         this.h_type = HEADER_TYPE.getHeaderType((headerFirstByte & 0x30) >> 4);  //0x30 = 0011 0000
         this.h_tkl = headerFirstByte & 0x0F;         //0x0F = 0000 1111
         this.h_code = HEADER_CODE.getHeaderCode(headerSecondByte);
-        this.HEADER_MSGID = (int)ByteBuffer.wrap(msg_id).getShort();
+        this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getShort();
     }
     
     /**
@@ -318,7 +318,7 @@ public class PacketDatagram {
         return this.h_code;
     }
     
-    public int getMSGID(){
+    public short getMSGID(){
         return HEADER_MSGID;
     }
     
@@ -451,14 +451,18 @@ public class PacketDatagram {
         boolean isPost() {return this == POST;}
         boolean isPut() {return this == PUT;}
         boolean isDelete() {return this == DELETE;}
-        
+
+        boolean isCreated() {return this == CREATED;}
+        boolean isDeleted() {return this == DELETED;}
+        boolean isValid() {return this == VALID;}
+        boolean isChanged() {return this == CHANGED;}
         boolean isContent() {return this == CONTENT;}
+        boolean isContinue() {return this == CONTINUE;}
         
-        boolean isDiscovery() {return this == DISCOVERY;}
+        boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
         
-        boolean NeedResponse() {return this == GET;}
-        
-        boolean isSuccess() {return classCode == 2;}
+        boolean isSuccessResponse() {return classCode == 2;}
+        boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
         boolean isClientError() {return classCode == 4;}
         boolean isServerError() {return classCode == 5;}
     }

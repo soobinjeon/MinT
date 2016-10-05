@@ -24,16 +24,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PacketIDManager {
-    private final int DEFAULT_ID = 1;
-    private int id = DEFAULT_ID;
+    private final short DEFAULT_ID = 1;
+    private short id = DEFAULT_ID;
     private boolean cycled = false;
-    private ConcurrentHashMap<Integer,SendMSG> idlist;
-    public PacketIDManager(ConcurrentHashMap<Integer,SendMSG> IDList){
+    private ConcurrentHashMap<Short,SendMSG> idlist;
+    public PacketIDManager(ConcurrentHashMap<Short,SendMSG> IDList){
         idlist = IDList;
     }
     
-    public synchronized int makePacketID(){
-        if(id == Integer.MAX_VALUE){
+    public synchronized short makePacketID(){
+        if(id == Short.MAX_VALUE){
             id = DEFAULT_ID;
             cycled = true;
         }

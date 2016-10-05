@@ -59,7 +59,6 @@ public class SystemHandler{
         /**
          * get, post using resource storage
          */
-        System.out.println("recvpacket: "+recv_packet.getPacketString());
         if(recv_packet.getHeader_Code().isRequest()){
             SystemHandleRequest(recv_packet);
         }else if(recv_packet.getHeader_Code().isResponse()){
@@ -115,13 +114,10 @@ public class SystemHandler{
      * @param rv_packet 
      */
     private void SystemHandleResponse(PacketDatagram rv_packet){
-        System.out.println("recvpacket: "+rv_packet.getPacketString());
         Request senderRequest = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
         if(rv_packet.getHeader_Code().isContent()){
-            System.out.println("in content");
             if(senderRequest.getResourcebyName(Request.MSG_ATTR.WellKnown) != null){
                 try{
-                System.out.println("Response Discover Data");
                 ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
     //                dl.printMessage("Response DISCOVERY");
                 ResponseData resdata = new ResponseData(rv_packet,senderRequest.getResourceData().getResource());
@@ -136,6 +132,16 @@ public class SystemHandler{
                 if(reshandle != null)
                     reshandle.Response(new ResponseData(rv_packet, senderRequest.getResourceData().getResource()));
             }
+        }else if(rv_packet.getHeader_Code().isDeleted()){
+            
+        }else if(rv_packet.getHeader_Code().isValid()){
+            
+        }else if(rv_packet.getHeader_Code().isChanged()){
+                        
+        }else if(rv_packet.getHeader_Code().isCreated()){
+            
+        }else if(rv_packet.getHeader_Code().isContinue()){
+            
         }
     }
     

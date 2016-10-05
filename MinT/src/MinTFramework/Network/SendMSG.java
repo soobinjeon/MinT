@@ -33,7 +33,7 @@ public class SendMSG implements Runnable{
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
-    private int resKey;
+    private short resKey;
     private int SendHit = 0;
     private boolean isUDPMulticast = false;
     private NetworkProfile FinalDestination;
@@ -41,7 +41,7 @@ public class SendMSG implements Runnable{
     
     public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl, 
             PacketDatagram.HEADER_CODE hc, NetworkProfile dst, Request msg,
-            ResponseHandler resHandle, int resKey){
+            ResponseHandler resHandle, short resKey){
         head_version = MinTConfig.COAP_VERSION;
         head_type = ht;
         head_tokenLength = tkl;
@@ -65,7 +65,7 @@ public class SendMSG implements Runnable{
      */
     public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
             , PacketDatagram.HEADER_CODE hc, NetworkProfile dst
-            , Request msg, int resKey){
+            , Request msg, short resKey){
         this(ht, tkl, hc, dst,msg,null,resKey);
     }
     
@@ -142,7 +142,7 @@ public class SendMSG implements Runnable{
         return resHandle;
     }
     
-    public int getResponseKey(){
+    public short getResponseKey(){
         return resKey;
     }
     
@@ -167,7 +167,7 @@ public class SendMSG implements Runnable{
         SendHit ++;
     }
 
-    void setResKey(int makePacketID) {
+    void setResKey(short makePacketID) {
         resKey = makePacketID;
     }
 
