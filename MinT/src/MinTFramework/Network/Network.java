@@ -104,7 +104,7 @@ public abstract class Network {
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
             packet.makeBytes();
-            sendProtocol(packet);
+            sendProtocol(packet);   //send extends class(UDP, BLE, ...)
         }
     }
     

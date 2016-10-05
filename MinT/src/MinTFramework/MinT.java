@@ -363,9 +363,9 @@ public abstract class MinT {
      * @param requestdata (new Request(Resource Name, Resource Method)
      * @param resHandle 
      */
-    public void REQUEST_SET(NetworkProfile dst, SendMessage requestdata){//, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,requestdata));
+    public void REQUEST_PUT(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.PUT, dst,requestdata, resHandle));
     }
     
     /**
@@ -374,20 +374,9 @@ public abstract class MinT {
      * @param resName Resource Name
      * @param resHandle Response Handler
      */
-    public void REQUEST_GET(NetworkProfile dst, SendMessage requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,requestdata, resHandle));
-    }
-    
-    /**
-     * Discover resources from other Node
-     * @param dst 
-     * @param resHandle Response Handler
-     */
-    public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST,
-                PacketDatagram.HEADER_INSTRUCTION.GET, dst,new SendMessage()
-                        .AddAttribute(Request.MSG_ATTR.WellKnown, null),resHandle));
+    public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
     /**

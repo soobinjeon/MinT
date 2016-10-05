@@ -17,13 +17,8 @@
 package MinTFramework.Network.Routing.MinTSharing;
 
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.Resource.ResponseData;
-import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
-import MinTFramework.storage.ResourceStorage;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 /**
  *
@@ -37,14 +32,14 @@ public class MinTRoutingProtocol extends RoutingProtocol{
     }
     
     public void getDISCOVERY(NetworkProfile dts){
-        frame.DISCOVERY(dts, new ResponseHandler() {
-            @Override
-            public void Response(ResponseData resdata) {
-                JSONObject discovery = resStorage.getDiscoveryResource(resdata.getResourceString());
-                JSONArray jpr = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
-                for(int i=0;i<jpr.size();i++){
-                    resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
-                }
+//        frame.DISCOVERY(dts, new ResponseHandler() {
+//            @Override
+//            public void Response(ResponseData resdata) {
+//                JSONObject discovery = resStorage.getDiscoveryResource(resdata.getResourceString());
+//                JSONArray jpr = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+//                for(int i=0;i<jpr.size();i++){
+//                    resStorage.addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject)jpr.get(i), resdata);
+//                }
                 
 //                for(Resource pl :resStorage.getProperties()){
 //                    dl.printMessage("PL : "+pl.getName()+", "+pl.getStorageDirectory().getSourceLocation());
@@ -54,7 +49,7 @@ public class MinTRoutingProtocol extends RoutingProtocol{
 //                JSONArray jis = (JSONArray)discovery.get(ResourceStorage.RESOURCE_TYPE.instruction);
                 
                 
-            }
-        });
+//            }
+//        });
     }
 }

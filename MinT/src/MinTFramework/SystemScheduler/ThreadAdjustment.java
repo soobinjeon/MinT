@@ -151,8 +151,10 @@ public class ThreadAdjustment implements Runnable{
 //            System.out.println("");
 //            System.out.printf("AccHt: %.2f, RNn: %.2f, TH: %.2f, MTHt:%.2f, MT: %d, Next N: %.2f, nN: %d, NT: %d",accumReqeustNn,result,THt,MAX_TH,MAX_THREAD,nextN,nN, Nt);
 //            System.out.println("");
-//            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);
-//            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);
+////            System.out.println("result: "+result+", TH : "+THt+" NExt N : "+nextN+", NT: "+ Nt);
+//            System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);//+"("+Rt.ReqperSec.size()+"), Time: "+getTime(Rt)+", Time: "+getRequest(Rt));
+//            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);//+"("+Ht.ReqperSec.size()+"), Time: "+getTime(Ht)+", Time: "+getRequest(Ht));
+//            System.out.println("UDP_SEND is not Null() - "+Sdata);
             
             frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
             Rt.clearBuffer();

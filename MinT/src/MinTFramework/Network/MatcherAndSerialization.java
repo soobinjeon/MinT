@@ -57,8 +57,13 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public void EndPointReceive(RecvMSG packet) {
+        try{
         PacketDatagram matchedPacket = new PacketDatagram(packet);
+        System.out.println("maked packet: "+matchedPacket.getPacketString());
         transportation.Receive(matchedPacket);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     
     /**

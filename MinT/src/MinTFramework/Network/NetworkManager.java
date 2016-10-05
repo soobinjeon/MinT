@@ -16,7 +16,6 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.Resource.Request;
 import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
@@ -193,8 +192,8 @@ public class NetworkManager {
     }
     
     public void SEND_UDP_Multicast(SendMessage requestdata){
-        SEND_Multicast(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.GET, null 
+        SEND_Multicast(new SendMSG(PacketDatagram.HEADER_TYPE.NON
+                ,0 ,PacketDatagram.HEADER_CODE.POST, null
                 ,requestdata.AddAttribute(Request.MSG_ATTR.WellKnown, null), true));
     }
     

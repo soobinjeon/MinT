@@ -59,9 +59,10 @@ public class SystemHandler{
         /**
          * get, post using resource storage
          */
-        if(recv_packet.getHeader_Direction().isRequest()){
+        System.out.println("recvpacket: "+recv_packet.getPacketString());
+        if(recv_packet.getHeader_Code().isRequest()){
             SystemHandleRequest(recv_packet);
-        }else if(recv_packet.getHeader_Direction().isResponse()){
+        }else if(recv_packet.getHeader_Code().isResponse()){
             SystemHandleResponse(recv_packet);
         }
     }
@@ -71,14 +72,30 @@ public class SystemHandler{
      * @param rv_packet 
      */
     private void SystemHandleRequest(PacketDatagram rv_packet){
-        if(rv_packet.getHeader_Instruction().isGet()){
+        if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
             
             Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
-            
+
+            //Directly
+            ResData res = resStorage.getProperty(req);
+
+            if (res != null) {
+                req = new SendMessage(null, res.getResourceString());
+            } else {
+                req = null;
+            }
+            nmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                    , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), req, rv_packet.getMSGID()));
+
+        }else if(rv_packet.getHeader_Code().isPut()){
+            Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
+            resStorage.setInstruction(req);
+        }else if(rv_packet.getHeader_Code().isPost()){
+            Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
             //Temporary Routing Discover Mode
             if (isDiscover(req)) {
                 System.out.println("Routing Discover Mode");
@@ -86,28 +103,10 @@ public class SystemHandler{
                 Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
                 Request ret = new SendMessage(null, resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString())
                         .AddAttribute(Request.MSG_ATTR.WellKnown, "Discover");
-                nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE
-                        , PacketDatagram.HEADER_INSTRUCTION.GET, rv_packet.getSource(), ret, rv_packet.getMSGID()));    
+                nmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                        , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));    
             }
-            //Directly
-            else {
-                ResData res = resStorage.getProperty(req);
-
-                if (res != null) {
-                    req = new SendMessage(null, res.getResourceString());
-                } else {
-                    req = null;
-                }
-                nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE
-                        , PacketDatagram.HEADER_INSTRUCTION.GET, rv_packet.getSource(), req, rv_packet.getMSGID()));
-            }
-        }else if(rv_packet.getHeader_Instruction().isSet()){
-            Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-            resStorage.setInstruction(req);
-        }else if(rv_packet.getHeader_Instruction().isPost()){
-//            resStorage.setInstruction(req);
-        }else if(rv_packet.getHeader_Instruction().isDelete()){
-            
+        }else if(rv_packet.getHeader_Code().isDelete()){
         }
     }
     
@@ -116,8 +115,10 @@ public class SystemHandler{
      * @param rv_packet 
      */
     private void SystemHandleResponse(PacketDatagram rv_packet){
+        System.out.println("recvpacket: "+rv_packet.getPacketString());
         Request senderRequest = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-        if(rv_packet.getHeader_Instruction().isGet()){
+        if(rv_packet.getHeader_Code().isContent()){
+            System.out.println("in content");
             if(senderRequest.getResourcebyName(Request.MSG_ATTR.WellKnown) != null){
                 try{
                 System.out.println("Response Discover Data");
@@ -135,12 +136,6 @@ public class SystemHandler{
                 if(reshandle != null)
                     reshandle.Response(new ResponseData(rv_packet, senderRequest.getResourceData().getResource()));
             }
-        }else if(rv_packet.getHeader_Instruction().isSet()){
-            
-        }else if(rv_packet.getHeader_Instruction().isPost()){
-            
-        }else if(rv_packet.getHeader_Instruction().isDelete()){
-            
         }
     }
     

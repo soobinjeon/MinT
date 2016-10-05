@@ -25,10 +25,20 @@ import java.util.TreeMap;
  * {DIR|INS|ID}{source}{final destination}{msg data}
  * |-header---||----------route----------||--data--|
  *            || address(ip:port, ble)   ||        | should make maximum size
- *  - MESSAGE HEADER (total 5byte)
- *     - DIR : REQUEST(0), RESPONSE(1) (1 bit)
- *     - INS : GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4) (3 bit)
- *     - ID  : (4byte)
+ * 
+ * CoAP Header (4 bytes)
+ * 0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |Ver| T |  TKL  |      Code     |          Message ID           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Token (if any, TKL bytes) ..,
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Options (if any) ...,
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1 1 1 1 1 1 1 1|    Payload (if any)...
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * 
  * 
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
@@ -43,11 +53,14 @@ public class PacketDatagram {
     private final String EMPTY_MSG = "-";
     
     private SendMSG sendMsg = null;
-    private HEADER_DIRECTION h_direction;
-    private HEADER_INSTRUCTION h_instruction;
-    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;
+    //CoAP Header
+    private int h_ver = 0x01;                                   //Ver
+    private HEADER_TYPE h_type;                                 //T
+    private int h_tkl;                                          //TKL
+    private HEADER_CODE h_code;                                 //Code
+    private int HEADER_MSGID = HEADER_MSGID_INITIALIZATION;     //Message ID
     
-    private final int MAIN_HEADER_SIZE = 5;
+    private final int MAIN_HEADER_SIZE = 4;
     private final int PACKET_HEADER_SIZE = MAIN_HEADER_SIZE 
             + (NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE * 2);
     private enum ROUTE{
@@ -63,14 +76,16 @@ public class PacketDatagram {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketDatagram(int msgid, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+    public PacketDatagram(int msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
         routelist.put(ROUTE.NEXT,next);
         routelist.put(ROUTE.DESTINATION,dest);
-        h_direction = h_dir;
-        h_instruction = h_ins;
+        this.h_ver = h_ver;
+        this.h_type = h_type;
+        this.h_tkl = h_tkl;
+        this.h_code = h_code;
         data = msg;
         HEADER_MSGID = msgid;
     }
@@ -80,14 +95,14 @@ public class PacketDatagram {
      * @param _smsg  
      */
     public PacketDatagram(SendMSG _smsg){
-        this(_smsg.getResponseKey(), _smsg.getHeader_Direction(), _smsg.getHeader_Instruction()
-                ,null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
+        this(_smsg.getResponseKey(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
+                ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
         sendMsg = _smsg;
     }
     
-    public PacketDatagram(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, 
+    public PacketDatagram(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
-        this(HEADER_MSGID_INITIALIZATION, h_dir, h_ins, src, prev, next, dest, msg);
+        this(HEADER_MSGID_INITIALIZATION, h_ver, h_type, h_tkl, h_code, src, prev, next, dest, msg);
     }
     
     /**
@@ -108,7 +123,7 @@ public class PacketDatagram {
      * this method is only used in Network Send Method
      */
     public void makeBytes() {
-        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
+        makePacketData(this.HEADER_MSGID,this.h_ver, this.h_type, this.h_tkl, this.h_code, data);
     }
     
     /**
@@ -116,11 +131,11 @@ public class PacketDatagram {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(int MSG_ID, HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, String msgdata){
+    private void makePacketData(int MSG_ID, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, String msgdata){
         try {
             byte[] strarray = DataAnalizer(msgdata).getBytes();
             byte[] pack = new byte[PACKET_HEADER_SIZE + strarray.length];
-            byte[] header = makeHeadertoBytes(h_dir, h_ins, MSG_ID);
+            byte[] header = makeHeadertoBytes(h_ver, h_type, h_tkl, h_code, MSG_ID);
 //            System.out.println("packet size : "+pack.length);
 //            System.out.println("");
 //            System.out.println("MSGDIR : "+h_dir.toString()+", MSGINT : "+h_ins.toString()+", MID : "+MSG_ID);
@@ -158,25 +173,30 @@ public class PacketDatagram {
      * @param h_ins
      * @return 
      */
-    private byte[] makeHeadertoBytes(HEADER_DIRECTION h_dir, HEADER_INSTRUCTION h_ins, int msg_id){
+    private byte[] makeHeadertoBytes(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, int msg_id){
         byte[] theader = new byte[MAIN_HEADER_SIZE];
-        byte[] msgbytes = ByteBuffer.allocate(Integer.SIZE/8).putInt(msg_id).array();
+        byte[] msgbytes = ByteBuffer.allocate(Short.SIZE/8).putShort((short)msg_id).array();
         
-        theader[0] = (byte) (h_dir.getBit() << 3);
-        theader[0] += (byte) h_ins.getBit();
+        theader[0] = (byte) (h_ver << 6);
+        theader[0] |= (byte) (h_type.getType() << 4);
+        theader[0] |= (byte) h_tkl;
+        theader[1] |= (byte) h_code.getCode();
         
-        for(int i=1;i<theader.length;i++)
-            theader[i] = msgbytes[i-1];
+        for(int i=2;i<theader.length;i++)
+            theader[i] = msgbytes[i-2];
         return theader;
     }
     
     private void makeBytestoHeader(byte[] packet){
-        byte header = packet[0];
-        byte[] msg_id = new byte[Integer.SIZE/8];
-        System.arraycopy(packet, 1, msg_id, 0, 4);
-        this.h_direction = HEADER_DIRECTION.getHeaderDirection((header & 0x08) >> 3);
-        this.h_instruction = HEADER_INSTRUCTION.getHeaderInstruction(header & 0x07);
-        this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getInt();
+        byte headerFirstByte = packet[0];
+        byte headerSecondByte = packet[1];
+        byte[] msg_id = new byte[Integer.SIZE / 16];
+        System.arraycopy(packet, 2, msg_id, 0, 2);
+        this.h_ver = ((headerFirstByte & 0xC0) >> 6);   //0xC0 = 1100 0000
+        this.h_type = HEADER_TYPE.getHeaderType((headerFirstByte & 0x30) >> 4);  //0x30 = 0011 0000
+        this.h_tkl = headerFirstByte & 0x0F;         //0x0F = 0000 1111
+        this.h_code = HEADER_CODE.getHeaderCode(headerSecondByte);
+        this.HEADER_MSGID = (int)ByteBuffer.wrap(msg_id).getShort();
     }
     
     /**
@@ -278,20 +298,24 @@ public class PacketDatagram {
 //        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
     }
     
-    public void setDestinationNode(NetworkProfile dst){
-        routelist.put(ROUTE.DESTINATION, dst);
-    }
-    
     public String getMsgData(){
         return data;
     }
     
-    public HEADER_DIRECTION getHeader_Direction(){
-        return this.h_direction;
+    public int getHeader_Version(){
+        return this.h_ver;
     }
     
-    public HEADER_INSTRUCTION getHeader_Instruction(){
-        return this.h_instruction;
+    public HEADER_TYPE getHeader_Type(){
+        return this.h_type;
+    }
+    
+    public int getHeader_TokenLength(){
+        return this.h_tkl;
+    }
+    
+    public HEADER_CODE getHeader_Code(){
+        return this.h_code;
     }
     
     public int getMSGID(){
@@ -307,48 +331,136 @@ public class PacketDatagram {
 //        System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
 //        return new PacketDatagram(routelist.get(ROUTE.NEXT), nbyte);
 //    }
+    /*
+    CON : Confirmable
+    NON : Non-Confirmable
+    ACK : Acknowledgement
+    RST : Reset
+    */
+    public static enum HEADER_TYPE {
+        CON(1), NON(2), ACK(3), RST(4);
+        private int type;
+        HEADER_TYPE(int type){
+            this.type = type;
+        }
+        public int getType(){
+            return type;
+        }
+        public static HEADER_TYPE getHeaderType(int type){
+            for(HEADER_TYPE h : HEADER_TYPE.values()){
+                if(h.getType() == type)
+                    return h;
+            }
+            return null;
+        }
+        public boolean isCON() {return this == CON;}
+        public boolean isNON() {return this == NON;}
+        public boolean isACK() {return this == ACK;}
+        public boolean isRST() {return this == RST;}
+    }
     
-    public static enum HEADER_DIRECTION {
-        REQUEST(0), RESPONSE(1);
-        private int num;
-        HEADER_DIRECTION(int num){
-            this.num = num;
+    /*
+    3-bit : class code
+    5-bit : detail code
+    "c.dd"
+    c : 0-7 (class code)
+    dd : 00-31 (detail code)
+    */
+    public static enum HEADER_CODE {
+        EMPTY(0, 0),
+        //Request
+        GET(0, 1),
+        POST(0, 2),
+        PUT(0, 3),
+        DELETE(0, 4),
+        
+        DISCOVERY(0, 5),    //DISCOVERY??
+        
+        //Response
+            //Success
+        CREATED(2, 1),
+        DELETED(2, 2),
+        VALID(2, 3),
+        CHANGED(2, 4),
+        CONTENT(2, 5),
+        CONTINUE(2, 31),
+
+            //Client Error
+        BAD_REQUEST(4, 0),
+        UNAUTHORIZED(4, 1),
+        BAD_OPTION(4, 2),
+        FORBIDDEN(4, 3),
+        NOT_FOUND(4, 4),
+        METHOD_NOT_ALLOWED(4, 5),
+        NOT_ACCEPTABLE(4, 6),
+        REQUEST_ENTITY_INCOMPLETE(4, 8),
+        PRECONDITION_FAILED(4, 12),
+        REQUEST_ENTITY_TOO_LARGE(4, 13),
+        UNSUPPORTED_CONTENT_FORMAT(4, 15),
+
+            //Server Error
+        INTERNAL_SERVER_ERROR(5, 0),
+        NOT_IMPLEMENTED(5, 1),
+        BAD_GATEWAY(5, 2),
+        SERVICE_UNAVAILABLE(5, 3),
+        GATEWAY_TIMEOUT(5, 4),
+        PROXY_NOT_SUPPORTED(5, 5);
+                
+        int code;
+        int classCode;
+        int detailCode;
+        
+        HEADER_CODE(int classCode, int detailCode){
+            this.classCode = classCode;
+            this.detailCode = detailCode;
+            code = classCode << 5 | detailCode;
         }
-        public int getBit(){
-            return num;
+        
+        public int getCode(){
+            return code;
         }
-        public static HEADER_DIRECTION getHeaderDirection(int i){
-            for(HEADER_DIRECTION h : HEADER_DIRECTION.values()){
-                if(h.getBit() == i)
+        
+        public int getClassCode(){
+            return classCode;
+        }
+        
+        public int getDetailCode(){
+            return detailCode;
+        }
+         
+        public static HEADER_CODE getHeaderCode(int code){
+            for(HEADER_CODE h : HEADER_CODE.values()){
+                if(h.getCode() == code)
                     return h;
             }
             return null;
         }
-
-        boolean isRequest() {return this == REQUEST;}
-        boolean isResponse() {return this == RESPONSE;}
-    }
-    public static enum HEADER_INSTRUCTION {
-        GET(0), SET(1), POST(2), DELETE(3);
-        private int num;
-        HEADER_INSTRUCTION(int num){
-            this.num = num;
-        }
-        public int getBit(){
-            return num;
-        }
-        public static HEADER_INSTRUCTION getHeaderInstruction(int i){
-            for(HEADER_INSTRUCTION h : HEADER_INSTRUCTION.values()){
-                if(h.getBit() == i)
+        
+        public static HEADER_CODE getHeaderCode(int classCode, int detailCode){
+            for(HEADER_CODE h : HEADER_CODE.values()){
+                if((h.getClassCode() == classCode) && (h.getDetailCode() == detailCode))
                     return h;
             }
             return null;
         }
-
-        public boolean isGet() {return this == GET;}
-        public boolean isSet() {return this == SET;}
-        public boolean isPost() {return this == POST;}
-        public boolean isDelete() {return this == DELETE;}
-        public boolean NeedResponse() {return this == GET;}
+                
+        boolean isRequest() {return classCode == 0;}
+        boolean isResponse() {return classCode != 0;}
+        
+        boolean isGet() {return this == GET;}
+        boolean isPost() {return this == POST;}
+        boolean isPut() {return this == PUT;}
+        boolean isDelete() {return this == DELETE;}
+        
+        boolean isContent() {return this == CONTENT;}
+        
+        boolean isDiscovery() {return this == DISCOVERY;}
+        
+        boolean NeedResponse() {return this == GET;}
+        
+        boolean isSuccess() {return classCode == 2;}
+        boolean isClientError() {return classCode == 4;}
+        boolean isServerError() {return classCode == 5;}
     }
+    
 }

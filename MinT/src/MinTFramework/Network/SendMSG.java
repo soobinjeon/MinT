@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
 
@@ -25,8 +26,10 @@ import MinTFramework.Util.Benchmarks.Performance;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class SendMSG implements Runnable{
-    private PacketDatagram.HEADER_DIRECTION head_dir;
-    private PacketDatagram.HEADER_INSTRUCTION head_inst;
+    private int head_version;
+    private PacketDatagram.HEADER_TYPE head_type;
+    private int head_tokenLength;
+    private PacketDatagram.HEADER_CODE head_code;
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
@@ -36,10 +39,13 @@ public class SendMSG implements Runnable{
     private NetworkProfile FinalDestination;
     private NetworkProfile nextNode;
     
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst, Request msg,
+    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl, 
+            PacketDatagram.HEADER_CODE hc, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, int resKey){
-        head_dir = hd;
-        head_inst = hi;
+        head_version = MinTConfig.COAP_VERSION;
+        head_type = ht;
+        head_tokenLength = tkl;
+        head_code = hc;
         destination = dst;
         if(msg == null)
             this.msg = "";
@@ -57,10 +63,10 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      * @param resKey 
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd
-            , PacketDatagram.HEADER_INSTRUCTION hi, NetworkProfile dst
+    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc, NetworkProfile dst
             , Request msg, int resKey){
-        this(hd,hi,dst,msg,null,resKey);
+        this(ht, tkl, hc, dst,msg,null,resKey);
     }
     
     /**
@@ -70,21 +76,10 @@ public class SendMSG implements Runnable{
      * @param dst Destination profile
      * @param msg Resource and request
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
-            , NetworkProfile dst, Request msg){
-        this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
-    }
-    
-    /**
-     * Request only
-     * @param hd Direction (Request, Response)
-     * @param hi for Instruction (SET, POST, PUT, DELETE)
-     * @param dst Destination profile
-     * @param msg Resource and request
-     */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
+    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc
             , NetworkProfile dst, Request msg, boolean _isMulticast){
-        this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
+        this(ht, tkl, hc,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
         this.isUDPMulticast = _isMulticast;
     }
     
@@ -96,9 +91,10 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
-    public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
+    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
+            , PacketDatagram.HEADER_CODE hc
             , NetworkProfile dst, Request msg, ResponseHandler resHandle){   
-        this(hd,hi,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
+        this(ht, tkl, hc,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
     }
     
     @Override
@@ -118,14 +114,22 @@ public class SendMSG implements Runnable{
             bench.endPerform(0);
     }
     
-    public PacketDatagram.HEADER_DIRECTION getHeader_Direction(){
-        return head_dir;
+    public int getVersion(){
+        return head_version;
     }
     
-    public PacketDatagram.HEADER_INSTRUCTION getHeader_Instruction(){
-        return head_inst;
+    public PacketDatagram.HEADER_TYPE getHeader_Type(){
+        return head_type;
     }
     
+    public int getTokenLength(){
+        return head_tokenLength;
+    }
+    
+    public PacketDatagram.HEADER_CODE getHeader_Code(){
+        return head_code;
+    }
+        
     public NetworkProfile getDestination(){
         return destination;
     }
@@ -143,15 +147,16 @@ public class SendMSG implements Runnable{
     }
     
     public boolean isRequest(){
-        return this.resHandle == null || head_dir.isRequest() && !head_inst.NeedResponse();
+        //return head_code.isRequest() && !head_code.NeedResponse();
+        return head_code.isPost();
     }
     
     public boolean isResponse(){
-        return head_dir.isResponse();
+        return head_code.isResponse();
     }
     
     public boolean isRequestGET(){
-        return head_dir.isRequest() && head_inst.NeedResponse() && this.resHandle != null;
+        return (head_code.isGet() || head_code.isPut() || head_code.isDelete()) && this.resHandle != null;
     }
     
     public int getSendHit(){
