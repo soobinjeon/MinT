@@ -329,7 +329,7 @@ public class PacketDatagram {
         boolean isResponse() {return this == RESPONSE;}
     }
     public static enum HEADER_INSTRUCTION {
-        GET(0), SET(1), POST(2), DELETE(3), DISCOVERY(4);
+        GET(0), SET(1), POST(2), DELETE(3);
         private int num;
         HEADER_INSTRUCTION(int num){
             this.num = num;
@@ -349,7 +349,6 @@ public class PacketDatagram {
         public boolean isSet() {return this == SET;}
         public boolean isPost() {return this == POST;}
         public boolean isDelete() {return this == DELETE;}
-        public boolean isDiscovery() {return this == DISCOVERY;}
-        public boolean NeedResponse() {return this == GET || this == DISCOVERY;}
+        public boolean NeedResponse() {return this == GET;}
     }
 }

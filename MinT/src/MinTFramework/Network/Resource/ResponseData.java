@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.Resource;
 
+import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.PacketDatagram;
 import MinTFramework.storage.datamap.Information;
 
 /**
@@ -51,10 +53,4 @@ public class ResponseData extends Information{
     public PacketDatagram getPacketProtocol(){
         return this.recv_packet;
     }
-    
-    @Override
-    public Object getClone() {
-        return new ResponseData(recv_packet, getResource());
-    }
-    
 }

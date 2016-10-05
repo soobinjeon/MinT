@@ -19,7 +19,7 @@ package MinTFramework.storage;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.Request;
+import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.DebugLog;
 import org.json.simple.JSONObject;
 
@@ -86,7 +86,7 @@ public abstract class Resource{
     }
     
     public void put(Request _data){
-        data.setResource(_data.getResource());
+        data.setResource(_data.getInformation().getResource());
     }
     
     abstract public void set(Request req);

@@ -27,7 +27,7 @@ import java.nio.ByteOrder;
  *   - incorrect type : null
  * @author soobin
  */
-public abstract class Information {
+public class Information {
     protected byte[] res;
     protected boolean isStringvalue = true;
     
@@ -191,6 +191,4 @@ public abstract class Information {
     public int getLength(){
         return res != null ? res.length : 0;
     }
-    
-    public abstract Object getClone();
 }

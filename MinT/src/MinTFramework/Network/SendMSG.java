@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
 
 /**

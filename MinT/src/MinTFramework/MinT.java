@@ -29,7 +29,8 @@ import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.Request;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
@@ -362,7 +363,7 @@ public abstract class MinT {
      * @param requestdata (new Request(Resource Name, Resource Method)
      * @param resHandle 
      */
-    public void REQUEST_SET(NetworkProfile dst, Request requestdata){//, ResponseHandler resHandle){
+    public void REQUEST_SET(NetworkProfile dst, SendMessage requestdata){//, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
                 ,PacketDatagram.HEADER_INSTRUCTION.SET, dst,requestdata));
     }
@@ -373,7 +374,7 @@ public abstract class MinT {
      * @param resName Resource Name
      * @param resHandle Response Handler
      */
-    public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+    public void REQUEST_GET(NetworkProfile dst, SendMessage requestdata, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
                 ,PacketDatagram.HEADER_INSTRUCTION.GET, dst,requestdata, resHandle));
     }
@@ -385,7 +386,8 @@ public abstract class MinT {
      */
     public void DISCOVERY(NetworkProfile dst, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST,
-                PacketDatagram.HEADER_INSTRUCTION.DISCOVERY, dst,null,resHandle));
+                PacketDatagram.HEADER_INSTRUCTION.GET, dst,new SendMessage()
+                        .AddAttribute(Request.MSG_ATTR.WellKnown, null),resHandle));
     }
     
     /**
@@ -394,7 +396,7 @@ public abstract class MinT {
      * @return 
      */
     public ResData GETLocalResource(String resName){
-        Request req = new Request(resName, 0, null);
+        Request req = new SendMessage(resName, 0);
         return this.resourceStorage.getProperty(req);
     }
     

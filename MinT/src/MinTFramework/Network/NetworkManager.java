@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.Resource.Request;
 import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;

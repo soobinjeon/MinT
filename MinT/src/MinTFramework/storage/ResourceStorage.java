@@ -18,8 +18,8 @@ package MinTFramework.storage;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.Request;
-import MinTFramework.Network.ResponseData;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingProperty.PropertyRole;
@@ -238,10 +238,11 @@ public class ResourceStorage {
      */
     public JSONObject getDiscoveryResource(String data){
         try{
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject)jsonParser.parse(data);
-        return jsonObject;
-        }catch(Exception e){
+            System.out.println("json data: "+data);
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(data);
+            return jsonObject;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
