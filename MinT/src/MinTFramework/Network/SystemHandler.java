@@ -17,7 +17,6 @@
 package MinTFramework.Network;
 
 import MinTFramework.Network.Resource.ResponseData;
-import MinTFramework.Network.Resource.RequestHandle;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
@@ -78,14 +77,14 @@ public class SystemHandler{
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
             
             Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getInformation().getResourceString());
+//            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
             
             //Temporary Routing Discover Mode
             if (isDiscover(req)) {
                 System.out.println("Routing Discover Mode");
-                String dic = resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString();
-                System.out.println("str: "+dic);
-                Request ret = new SendMessage(null, resStorage.DiscoverLocalResource(rv_packet.getDestinationNode()).toJSONString())
+                
+                Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
+                Request ret = new SendMessage(null, resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString())
                         .AddAttribute(Request.MSG_ATTR.WellKnown, "Discover");
                 nmanager.SEND(new SendMSG(PacketDatagram.HEADER_DIRECTION.RESPONSE
                         , PacketDatagram.HEADER_INSTRUCTION.GET, rv_packet.getSource(), ret, rv_packet.getMSGID()));    
@@ -120,18 +119,21 @@ public class SystemHandler{
         Request senderRequest = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
         if(rv_packet.getHeader_Instruction().isGet()){
             if(senderRequest.getResourcebyName(Request.MSG_ATTR.WellKnown) != null){
+                try{
                 System.out.println("Response Discover Data");
                 ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
     //                dl.printMessage("Response DISCOVERY");
-                ResponseData resdata = new ResponseData(rv_packet,senderRequest.getInformation().getResource());
-                System.out.println("resdata: "+resdata.getResourceString());
+                ResponseData resdata = new ResponseData(rv_packet,senderRequest.getResourceData().getResource());
                 UpdateDiscoverData(resdata);
                 if(reshandle != null)
                     reshandle.Response(resdata);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }else{
                 ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
                 if(reshandle != null)
-                    reshandle.Response(new ResponseData(rv_packet, senderRequest.getInformation().getResource()));
+                    reshandle.Response(new ResponseData(rv_packet, senderRequest.getResourceData().getResource()));
             }
         }else if(rv_packet.getHeader_Instruction().isSet()){
             

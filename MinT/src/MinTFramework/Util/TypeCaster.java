@@ -104,7 +104,8 @@ public class TypeCaster {
         }
         else if(value instanceof String){
             String strv = (String)value;
-            buff = ByteBuffer.wrap(MinTCharset.encode(strv).array());
+//            buff = ByteBuffer.wrap(MinTCharset.encode(strv).array());
+            buff = ByteBuffer.wrap(strv.getBytes());
             buff.order(order);
         }else
             return null;
@@ -143,7 +144,8 @@ public class TypeCaster {
 //            s.append((char) input[i]);
 //        }
         String ret = null;
-        ret = MinTCharset.decode(ByteBuffer.wrap(input)).toString();
+        ret = new String(input);
+//        ret = MinTCharset.decode(ByteBuffer.wrap(input)).toString();
 //        return s.toString();
         return ret;
     }

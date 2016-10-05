@@ -32,7 +32,7 @@ public class SendMSG implements Runnable{
     private ResponseHandler resHandle;
     private int resKey;
     private int SendHit = 0;
-    private boolean isMulticast = false;
+    private boolean isUDPMulticast = false;
     private NetworkProfile FinalDestination;
     private NetworkProfile nextNode;
     
@@ -85,7 +85,7 @@ public class SendMSG implements Runnable{
     public SendMSG(PacketDatagram.HEADER_DIRECTION hd, PacketDatagram.HEADER_INSTRUCTION hi
             , NetworkProfile dst, Request msg, boolean _isMulticast){
         this(hd,hi,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
-        this.isMulticast = _isMulticast;
+        this.isUDPMulticast = _isMulticast;
     }
     
     /**
@@ -190,8 +190,7 @@ public class SendMSG implements Runnable{
         return nextNode;
     }
     
-    public boolean isMulticastMode(){
-        return isMulticast;
+    public boolean isUDPMulticastMode(){
+        return isUDPMulticast;
     }
-    
 }

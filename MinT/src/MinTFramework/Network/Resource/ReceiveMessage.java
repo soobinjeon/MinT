@@ -37,7 +37,7 @@ public class ReceiveMessage extends Request{
             messageString = JSONString;
             if(!JSONString.equals("")){
                 JSONParser jsonParser = new JSONParser();
-                resObject = (JSONObject)jsonParser.parse(JSONString);
+                resObject = (JSONObject)jsonParser.parse(messageString);
                 for(Object obj : resObject.keySet()){
                     String resname = (String)obj;
                     Object res = resObject.get(obj);

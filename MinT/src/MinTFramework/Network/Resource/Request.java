@@ -91,7 +91,7 @@ public class Request {
         return resources.get(attr);
     }
     
-    public Information getInformation(){
+    public Information getResourceData(){
         return resources.get(MSG_ATTR.ResourceData);
     }
     

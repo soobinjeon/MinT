@@ -238,7 +238,6 @@ public class ResourceStorage {
      */
     public JSONObject getDiscoveryResource(String data){
         try{
-            System.out.println("json data: "+data);
             JSONParser jsonParser = new JSONParser();
             JSONObject jsonObject = (JSONObject) jsonParser.parse(data);
             return jsonObject;

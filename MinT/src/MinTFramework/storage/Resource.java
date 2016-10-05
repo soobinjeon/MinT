@@ -86,7 +86,7 @@ public abstract class Resource{
     }
     
     public void put(Request _data){
-        data.setResource(_data.getInformation().getResource());
+        data.setResource(_data.getResourceData().getResource());
     }
     
     abstract public void set(Request req);

@@ -21,6 +21,8 @@ import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
@@ -190,9 +192,10 @@ public class NetworkManager {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
     
-    public void SEND_Multicast(Request requestdata){
+    public void SEND_UDP_Multicast(SendMessage requestdata){
         SEND_Multicast(new SendMSG(PacketDatagram.HEADER_DIRECTION.REQUEST
-                ,PacketDatagram.HEADER_INSTRUCTION.GET, null ,requestdata, true));
+                ,PacketDatagram.HEADER_INSTRUCTION.GET, null 
+                ,requestdata.AddAttribute(Request.MSG_ATTR.WellKnown, null), true));
     }
     
     private void SEND_Multicast(SendMSG smsg){
@@ -249,6 +252,8 @@ public class NetworkManager {
      */
     public synchronized ResponseHandler getResponseDataMatchbyID(int num){
         SendMSG smsg = ResponseList.get(num);
+        if(smsg == null)
+            return null;
         ResponseHandler resd = smsg.getResponseHandler();
         if(resd != null){
             ResponseList.remove(num);

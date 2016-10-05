@@ -90,9 +90,7 @@ public class Transportation implements NetworkLayers{
     @Override
     public PacketDatagram EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
-        NetworkProfile fdst = getFinalDestination(sendmsg.getDestination());
-        
-        sendmsg.setFinalDestination(fdst);
+        sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
         PacketDatagram npacket = null;
         if(sendmsg.isResponse()){
@@ -125,6 +123,8 @@ public class Transportation implements NetworkLayers{
      */
     private NetworkProfile getNextNode(NetworkProfile fdst) {
         //Serch Routing Protocol
+//        if(fdst == null)
+//            System.out.println("next Node null");
         return fdst;
     }
     
@@ -152,7 +152,7 @@ public class Transportation implements NetworkLayers{
     public void Send(PacketDatagram packet) {
         try {
             //For Group Message
-            if (packet.getSendMSG().isMulticastMode()) {
+            if (packet.getSendMSG().isUDPMulticastMode()) {
                 for(Network sendNetwork : networkManager.getNetworks().values()){
                     MakeSourceProfile(packet, sendNetwork);
                     sendNetwork.sendAllNodes(packet);
