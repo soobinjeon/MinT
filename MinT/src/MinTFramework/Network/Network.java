@@ -80,7 +80,7 @@ public abstract class Network {
      *
      * @param ap RoutingProtocol
      */
-    public void setApplicationProtocol(RoutingProtocol routing) {
+    public void setRoutingProtocol(RoutingProtocol routing) {
         this.routing = routing;
     }
     

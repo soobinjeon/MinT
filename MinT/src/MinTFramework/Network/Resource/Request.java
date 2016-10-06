@@ -29,7 +29,8 @@ public class Request {
     public static enum MSG_ATTR {
         WellKnown(".well-known"), 
         ResourceName("rn"),
-        ResourceData("rd");
+        ResourceData("rd"),
+        Routing("ro");
         private String resName;
         
         MSG_ATTR(String name){

@@ -369,6 +369,28 @@ public abstract class MinT {
     }
     
     /**
+     * 
+     * @param dst
+     * @param requestdata (new Request(Resource Name, Resource Method)
+     * @param resHandle 
+     */
+    public void REQUEST_POST(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.POST, dst,requestdata, resHandle));
+    }
+    
+    /**
+     * 
+     * @param dst
+     * @param requestdata (new Request(Resource Name, Resource Method)
+     * @param resHandle 
+     */
+    public void REQUEST_DELETE(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.DELETE, dst,requestdata, resHandle));
+    }
+    
+    /**
      * Request directly Resource Data to other Node
      * @param dst destination Node Information
      * @param resName Resource Name

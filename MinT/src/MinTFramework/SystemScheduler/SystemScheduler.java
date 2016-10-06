@@ -41,6 +41,8 @@ public class SystemScheduler extends ThreadPoolScheduler{
         registerMinTSystemthreadPool(MinTthreadPools.SYSTEM);
         //register Resource Pool
         registerMinTSystemthreadPool(MinTthreadPools.RESOURCE);
+        //register Routing Pool
+        registerMinTSystemthreadPool(MinTthreadPools.ROUTING_PROTOCOL);
         //register Receive Pool
         registerMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
         //register sender Pool

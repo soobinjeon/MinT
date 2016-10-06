@@ -18,6 +18,7 @@ package MinTFramework.Network.Routing;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.storage.ResourceStorage;
 
 /**
@@ -25,22 +26,23 @@ import MinTFramework.storage.ResourceStorage;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingProtocol {
+public class RoutingProtocol implements Runnable{
     protected MinT frame;
     protected NetworkManager networkManager;
     protected ResourceStorage resStorage;
     
     public RoutingProtocol(){
-        
+        frame = MinT.getInstance();
+        networkManager = frame.getNetworkManager();
+        resStorage = frame.getResStorage();
     }
     
     public String getCurrentRoutingGroup(){
         return "group";
     }
 
-    public void setParents(NetworkManager nm, MinT frame, ResourceStorage resourceStorage) {
-        this.frame = frame;
-        this.networkManager = nm;
-        this.resStorage = resourceStorage;
+    @Override
+    public void run() {
+        System.out.println("Running Router!");
     }
 }

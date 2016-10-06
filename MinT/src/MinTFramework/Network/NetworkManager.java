@@ -18,7 +18,6 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
-import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
@@ -79,10 +78,11 @@ public class NetworkManager {
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
+        
+        if(routing == null)
+            routing = new RoutingProtocol();
+        
         makeBytebuffer();
-        
-        routing = new MinTRoutingProtocol();
-        
         idmaker = new PacketIDManager(ResponseList);
     }
     
@@ -91,9 +91,9 @@ public class NetworkManager {
      */
     private void initRoutingSetup(){
         System.out.println("routing init");
-        if(resourceStorage == null)
-            System.out.println("resource null");
-        routing.setParents(this, frame, resourceStorage);
+        
+        //start routing algorithm
+        sysSched.executeProcess(MinTthreadPools.ROUTING_PROTOCOL, routing);
     }
 
     /**
@@ -109,8 +109,8 @@ public class NetworkManager {
      * Start when MinT Start
      */
     public void onStart() {
-        initRoutingSetup();
         TurnOnNetwork();
+        initRoutingSetup();
     }
 
     /**
@@ -159,6 +159,7 @@ public class NetworkManager {
         Iterator it = networks.values().iterator();
         while(it.hasNext()){
             Network nn = (Network)it.next();
+            nn.setRoutingProtocol(routing);
             nn.TurnOnNetwork();
         }
     }
@@ -171,7 +172,7 @@ public class NetworkManager {
         this.routing = ap;
 
         for (Network n : networks.values()) {
-            n.setApplicationProtocol(ap);
+            n.setRoutingProtocol(ap);
         }
     }
     
@@ -241,7 +242,7 @@ public class NetworkManager {
      * @return 
      */
     public String getCurrentRoutingGroup(){
-        return this.routing.getCurrentRoutingGroup();
+        return routing.getCurrentRoutingGroup();
     }
     
     /**
@@ -289,7 +290,7 @@ public class NetworkManager {
      * get Adapted Networks
      * @return 
      */
-    protected ConcurrentHashMap<NetworkType,Network> getNetworks(){
+    public ConcurrentHashMap<NetworkType,Network> getNetworks(){
         return this.networks;
     }
     
