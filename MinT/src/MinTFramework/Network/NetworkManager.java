@@ -19,7 +19,6 @@ package MinTFramework.Network;
 import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
-import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -91,7 +90,7 @@ public class NetworkManager {
      */
     private void initRoutingSetup(){
         System.out.println("routing init");
-        
+        routing.init(this);
         //start routing algorithm
         sysSched.executeProcess(MinTthreadPools.ROUTING_PROTOCOL, routing);
     }
@@ -195,7 +194,7 @@ public class NetworkManager {
     public void SEND_UDP_Multicast(SendMessage requestdata){
         SEND_Multicast(new SendMSG(PacketDatagram.HEADER_TYPE.NON
                 ,0 ,PacketDatagram.HEADER_CODE.POST, null
-                ,requestdata.AddAttribute(Request.MSG_ATTR.WellKnown, null), true));
+                ,requestdata, true));
     }
     
     private void SEND_Multicast(SendMSG smsg){

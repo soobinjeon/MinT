@@ -444,27 +444,27 @@ public class PacketDatagram {
             return null;
         }
                 
-        boolean isRequest() {return classCode == 0;}
-        boolean isResponse() {return classCode != 0;}
+        public boolean isRequest() {return classCode == 0;}
+        public boolean isResponse() {return classCode != 0;}
         
-        boolean isGet() {return this == GET;}
-        boolean isPost() {return this == POST;}
-        boolean isPut() {return this == PUT;}
-        boolean isDelete() {return this == DELETE;}
+        public boolean isGet() {return this == GET;}
+        public boolean isPost() {return this == POST;}
+        public boolean isPut() {return this == PUT;}
+        public boolean isDelete() {return this == DELETE;}
 
-        boolean isCreated() {return this == CREATED;}
-        boolean isDeleted() {return this == DELETED;}
-        boolean isValid() {return this == VALID;}
-        boolean isChanged() {return this == CHANGED;}
-        boolean isContent() {return this == CONTENT;}
-        boolean isContinue() {return this == CONTINUE;}
+        public boolean isCreated() {return this == CREATED;}
+        public boolean isDeleted() {return this == DELETED;}
+        public boolean isValid() {return this == VALID;}
+        public boolean isChanged() {return this == CHANGED;}
+        public boolean isContent() {return this == CONTENT;}
+        public boolean isContinue() {return this == CONTINUE;}
         
-        boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
+        public boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
         
-        boolean isSuccessResponse() {return classCode == 2;}
-        boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
-        boolean isClientError() {return classCode == 4;}
-        boolean isServerError() {return classCode == 5;}
+        public boolean isSuccessResponse() {return classCode == 2;}
+        public boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
+        public boolean isClientError() {return classCode == 4;}
+        public boolean isServerError() {return classCode == 5;}
     }
     
 }

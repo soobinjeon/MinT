@@ -247,6 +247,19 @@ public class ResourceStorage {
         }
     }
     
+    public void updateDiscoverData(ResponseData resdata) {
+        JSONObject discovery = getDiscoveryResource(resdata.getResourceString());
+        JSONArray jpr = (JSONArray) discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+        for (int i = 0; i < jpr.size(); i++) {
+            addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject) jpr.get(i), resdata);
+        }
+
+        JSONArray jis = (JSONArray) discovery.get(ResourceStorage.RESOURCE_TYPE.instruction.toString());
+        for (int i = 0; i < jis.size(); i++) {
+            addNetworkResource(ResourceStorage.RESOURCE_TYPE.instruction, (JSONObject) jis.get(i), resdata);
+        }
+    }
+    
     public List<String> getInstructionList(){
         return instruction.getAllResourceName();
     }

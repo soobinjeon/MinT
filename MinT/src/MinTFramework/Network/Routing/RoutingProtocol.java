@@ -18,7 +18,7 @@ package MinTFramework.Network.Routing;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.PacketDatagram;
 import MinTFramework.storage.ResourceStorage;
 
 /**
@@ -30,11 +30,19 @@ public class RoutingProtocol implements Runnable{
     protected MinT frame;
     protected NetworkManager networkManager;
     protected ResourceStorage resStorage;
+    protected RoutHandler rhandle;
     
     public RoutingProtocol(){
         frame = MinT.getInstance();
-        networkManager = frame.getNetworkManager();
         resStorage = frame.getResStorage();
+//        init(frame.getNetworkManager());
+        if(resStorage == null)
+            System.out.println("res Storage null");
+    }
+    
+    public void init(NetworkManager aThis) {
+        networkManager = aThis;
+        rhandle = new RoutHandler(this);
     }
     
     public String getCurrentRoutingGroup(){
@@ -44,5 +52,9 @@ public class RoutingProtocol implements Runnable{
     @Override
     public void run() {
         System.out.println("Running Router!");
+    }
+
+    public void routingHandle(PacketDatagram rv_packet) {
+        rhandle.receiveHandle(rv_packet);
     }
 }
