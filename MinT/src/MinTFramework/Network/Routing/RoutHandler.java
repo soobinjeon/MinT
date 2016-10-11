@@ -26,6 +26,7 @@ import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.datamap.Information;
 
 /**
  *
@@ -57,6 +58,10 @@ public class RoutHandler {
 
     private void requestHandle(PacketDatagram rv_packet, Request req) {
         Request ret = null;
+        Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
+        if(R_MSG.NODE_BROADCAST.isEqual(data.getResourceInt())){
+            System.out.println("receive node broadcast");
+        }
         if(isDiscovery(req)){
             System.out.println("Request out in routing handler");
             Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
@@ -67,17 +72,15 @@ public class RoutHandler {
         }
         
         if(ret != null){
-            if(networkManager == null)
-                System.out.println("nmanager null ");
             networkManager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
                     , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }
     }
 
     private void responsehandle(PacketDatagram rv_packet, Request req) {
+        ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
         if(isDiscovery(req)){
             System.out.println("update discovery data in Routing Handler");
-            ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
             resStorage.updateDiscoverData(resdata);
         }
     }

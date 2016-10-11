@@ -96,7 +96,7 @@ public class ResourceStorage {
      * @param rdata
      * @param resdata 
      */
-    public void addNetworkResource(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
+    public Resource getResourcefromJSON(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
         Resource nr;
         if(rtype == RESOURCE_TYPE.property){
             nr = new ThingProperty(rdata, Resource.StoreCategory.Network) {
@@ -113,6 +113,17 @@ public class ResourceStorage {
                 public Object get(Request req) {return null;}
             };
         }
+        return nr;
+    }
+    
+    /**
+     * add NetworkResource
+     * @param rtype
+     * @param rdata
+     * @param resdata 
+     */
+    public void addNetworkResource(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
+        Resource nr = getResourcefromJSON(rtype, rdata, resdata);
         if(!nr.isSameLocation(resdata.getDestination()))
             addResource(nr);
     }

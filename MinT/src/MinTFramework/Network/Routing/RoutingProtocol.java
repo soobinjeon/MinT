@@ -19,6 +19,8 @@ package MinTFramework.Network.Routing;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.storage.ResourceStorage;
 
 /**
@@ -31,10 +33,14 @@ public class RoutingProtocol implements Runnable{
     protected NetworkManager networkManager;
     protected ResourceStorage resStorage;
     protected RoutHandler rhandle;
+    protected RoutingTable routingtable;
+    
+    protected String groupName = "group";
     
     public RoutingProtocol(){
         frame = MinT.getInstance();
         resStorage = frame.getResStorage();
+        routingtable = new RoutingTable();
 //        init(frame.getNetworkManager());
         if(resStorage == null)
             System.out.println("res Storage null");
@@ -45,13 +51,25 @@ public class RoutingProtocol implements Runnable{
         rhandle = new RoutHandler(this);
     }
     
+    public void setCurrentRoutingGroup(String _name){
+        groupName = _name;
+    }
+    
     public String getCurrentRoutingGroup(){
-        return "group";
+        return groupName;
     }
 
     @Override
     public void run() {
         System.out.println("Running Router!");
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
+                networkManager.SEND_UDP_Multicast(new SendMessage()
+                        .AddAttribute(Request.MSG_ATTR.Routing, R_MSG.NODE_BROADCAST.getValue()));
+                Thread.sleep(1000);
+            }
+        } catch (Exception e) {
+        }
     }
 
     public void routingHandle(PacketDatagram rv_packet) {
