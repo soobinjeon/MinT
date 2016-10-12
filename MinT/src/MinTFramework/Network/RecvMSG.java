@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinTConfig;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.net.SocketAddress;
 
@@ -65,7 +66,12 @@ public class RecvMSG implements Runnable {
      * @return 
      */
     private String getIPAddress(SocketAddress recvadd){
-        return recvadd.toString().substring(1);
+        String addr = recvadd.toString().substring(1);
+        String[] ipaddr = addr.split(":");
+        if(ipaddr.length > 1)
+            return ipaddr[0]+":"+MinTConfig.INTERNET_COAP_PORT;
+        else
+            return recvadd.toString().substring(1);
     }
     
     /**

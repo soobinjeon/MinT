@@ -16,40 +16,45 @@
  */
 package MinTFramework.Network.Routing;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * Routing Table Manager
- * 
+ *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingTable {
-    //routing table for nodes
-    private ConcurrentHashMap<String, Node> routingTable;
-    //table history, all node information are stored here
-    private ConcurrentHashMap<String, Node> nodeHistory;
-    private Node HeaderNode = null;
+public enum RT_MSG {
+    DIS_BROADCAST(0,0),
+    HE_HEADERBROADCAST(1,0),
+    RT_RTOPTION(2,0);
     
-    public RoutingTable(){
-        routingTable = new ConcurrentHashMap<>();
-        nodeHistory = new ConcurrentHashMap<>();
+    private int phase;
+    private int num;
+    private final int identifier = 10;
+    RT_MSG(int _phase, int _num){
+        phase = _phase;
+        num = _num;
     }
     
-    public void addRoutingTable(Node n){
-        routingTable.put(n.gettoAddr().getAddress(), n);
-        nodeHistory.put(n.gettoAddr().getAddress(), n);
+    public boolean isEqual(int _num){
+        int rphase = _num / identifier;
+        int rnum = _num - rphase;
+        
+        return rphase == phase && num == rnum;
+    }
+
+    public int getValue() {
+        return phase * identifier + num;
     }
     
-    public void clearRoutingTable(){
-        routingTable.clear();
+    private int PhaseIdentifier(int _n){
+        return (_n / identifier);
     }
     
     /**
-     * Routing Table Size
+     * is Same Phase of this
+     * @param msg
      * @return 
      */
-    public int Size(){
-        return routingTable.size();
+    boolean isSamePhase(int msg) {
+        return phase == PhaseIdentifier(msg);
     }
 }

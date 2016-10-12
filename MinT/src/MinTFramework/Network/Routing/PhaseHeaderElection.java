@@ -16,24 +16,39 @@
  */
 package MinTFramework.Network.Routing;
 
+import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Resource.Request;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public enum R_MSG {
-    NODE_BROADCAST(0);
-    private int num;
+public class PhaseHeaderElection extends Phase implements Runnable{
+    RoutingProtocol current_protocol;
     
-    R_MSG(int _num){
-        num = _num;
+    public PhaseHeaderElection(RoutingProtocol rp, Phase pp){
+        super(rp,pp);
     }
     
-    public boolean isEqual(int _num){
-        return this.num == _num;
+    @Override
+    public boolean hasMessage(int msg) {
+        return RT_MSG.HE_HEADERBROADCAST.isSamePhase(msg);
     }
 
-    public int getValue() {
-        return num;
+    @Override
+    public void run() {
+    }
+    
+    @Override
+    public void requestHandle(PacketDatagram rv_packet, Request req) {
+        if(!isWorkingPhase())
+            return;
+    }
+
+    @Override
+    public void responseHandle(PacketDatagram rv_packet, Request req) {
+        if(!isWorkingPhase())
+            return;
     }
 }

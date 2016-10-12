@@ -17,6 +17,7 @@
 package MinTFramework.Network.Routing;
 
 import MinTFramework.Network.Network;
+import MinTFramework.Network.NetworkProfile;
 
 /**
  *
@@ -24,23 +25,22 @@ import MinTFramework.Network.Network;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Node {
-    private String toAddr = null;
-    private String nextAddr = null;
+    private NetworkProfile toAddr = null;
+    private NetworkProfile nextAddr = null;
     private Network network = null;
     private boolean Header = false;
     
-    public Node(String _toAddr, String _nextAddr, Network _network, boolean Hd){
+    public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr, boolean Hd){
         toAddr = _toAddr;
         Header = Hd;
         nextAddr = _nextAddr;
-        network = _network;
     }
     
-    public String gettoAddr(){
+    public NetworkProfile gettoAddr(){
         return toAddr;
     }
     
-    public String getNextAddr(){
+    public NetworkProfile getNextAddr(){
         return nextAddr;
     }
     
@@ -50,5 +50,10 @@ public class Node {
     
     public boolean isHeader(){
         return Header;
+    }
+    
+    @Override
+    public String toString(){
+        return "toAddr: "+toAddr.getAddress()+", nextAddr: "+nextAddr.getAddress();
     }
 }

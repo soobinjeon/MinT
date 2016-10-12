@@ -16,40 +16,41 @@
  */
 package MinTFramework.Network.Routing;
 
-import java.util.concurrent.ConcurrentHashMap;
+import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Resource.Request;
 
 /**
- * Routing Table Manager
- * 
+ *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingTable {
-    //routing table for nodes
-    private ConcurrentHashMap<String, Node> routingTable;
-    //table history, all node information are stored here
-    private ConcurrentHashMap<String, Node> nodeHistory;
-    private Node HeaderNode = null;
+public class ExecuteRouting extends Phase implements Runnable{
+    RoutingProtocol current_protocol;
     
-    public RoutingTable(){
-        routingTable = new ConcurrentHashMap<>();
-        nodeHistory = new ConcurrentHashMap<>();
+    public ExecuteRouting(RoutingProtocol rp, Phase pp){
+        super(rp,pp);
     }
     
-    public void addRoutingTable(Node n){
-        routingTable.put(n.gettoAddr().getAddress(), n);
-        nodeHistory.put(n.gettoAddr().getAddress(), n);
+    @Override
+    public boolean hasMessage(int msg) {
+        return RT_MSG.RT_RTOPTION.isSamePhase(msg);
+    }
+
+    @Override
+    public void run() {
     }
     
-    public void clearRoutingTable(){
-        routingTable.clear();
+    @Override
+    public void requestHandle(PacketDatagram rv_packet, Request req) {
+        if(!isWorkingPhase())
+            return;
     }
+
+    @Override
+    public void responseHandle(PacketDatagram rv_packet, Request req) {
+        if(!isWorkingPhase())
+            return;
+    }
+
     
-    /**
-     * Routing Table Size
-     * @return 
-     */
-    public int Size(){
-        return routingTable.size();
-    }
 }

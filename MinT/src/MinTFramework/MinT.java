@@ -329,7 +329,7 @@ public abstract class MinT {
     }
     
     /**
-     * 
+     * @deprecated 
      * @param ntype type of Network
      * @param addr Current Internet Address for UDP, TCP/IP or CoAP
      * @param port Internet Port for UDP, TCP/IP or CoAP

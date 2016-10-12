@@ -132,27 +132,27 @@ public class NetworkManager {
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP && networks.get(ntype) == null){
             System.out.println("Starting UDP...");
-            Network cnet = networks.get(NetworkType.COAP);
-            if(cnet == null)
+//            Network cnet = networks.get(NetworkType.COAP);
+//            if(cnet == null)
                 networks.put(ntype, new UDP(frame.getNodeName(),ntype));
-            else
-                networks.put(ntype, cnet);
+//            else
+//                networks.put(ntype, cnet);
             System.out.println("Turned on UDP: "+ntype.getPort());
-        }
-        else if(ntype == NetworkType.BLE && networks.get(ntype) == null){
+        } else if(ntype == NetworkType.BLE && networks.get(ntype) == null){
             System.out.println("Starting BLE...");
             networks.put(ntype, new BLE(frame.getNodeName()));
             System.out.println("Turned on BLE");
-        } else if (ntype == NetworkType.COAP && networks.get(ntype) == null) { // for CoAP, need to add
-            System.out.println("Starting CoAP...");
-            Network cnet = networks.get(NetworkType.UDP);
-            if(cnet == null)
-                networks.put(ntype, new UDP(frame.getNodeName(),ntype));
-            else
-                networks.put(ntype, cnet);
-            
-            System.out.println("Turned on CoAP");
         }
+//        } else if (ntype == NetworkType.COAP && networks.get(ntype) == null) { // for CoAP, need to add
+//            System.out.println("Starting CoAP...");
+//            Network cnet = networks.get(NetworkType.UDP);
+//            if(cnet == null)
+//                networks.put(ntype, new UDP(frame.getNodeName(),ntype));
+//            else
+//                networks.put(ntype, cnet);
+//            
+//            System.out.println("Turned on CoAP");
+//        }
         
         //Turn On All Network
         Iterator it = networks.values().iterator();

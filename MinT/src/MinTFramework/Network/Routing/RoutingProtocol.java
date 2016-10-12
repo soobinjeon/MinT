@@ -19,9 +19,10 @@ package MinTFramework.Network.Routing;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
-import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -34,21 +35,41 @@ public class RoutingProtocol implements Runnable{
     protected ResourceStorage resStorage;
     protected RoutHandler rhandle;
     protected RoutingTable routingtable;
-    
+    protected ConcurrentHashMap<Integer, Phase> phases;
+    protected SystemScheduler sysSched;
     protected String groupName = "group";
+    
+    public static String ROUTING_PHASE_POOL = "Routing PHase Pool";
     
     public RoutingProtocol(){
         frame = MinT.getInstance();
         resStorage = frame.getResStorage();
+        sysSched = frame.getSysteScheduler();
         routingtable = new RoutingTable();
-//        init(frame.getNetworkManager());
+        phases = new ConcurrentHashMap<>();
+        registPhaseScheduler();
         if(resStorage == null)
             System.out.println("res Storage null");
     }
     
+    
+    /**
+     * init Routing Protocol after starting a MinT
+     * @param aThis 
+     */
     public void init(NetworkManager aThis) {
         networkManager = aThis;
+        initPhase();
         rhandle = new RoutHandler(this);
+    }
+    
+    /**
+     * set Phase
+     */
+    private void initPhase() {
+        phases.put(0, new PhaseDiscover(this, null));
+        phases.put(1, new PhaseHeaderElection(this, phases.get(0)));
+        phases.put(2, new ExecuteRouting(this, phases.get(1)));
     }
     
     public void setCurrentRoutingGroup(String _name){
@@ -62,17 +83,18 @@ public class RoutingProtocol implements Runnable{
     @Override
     public void run() {
         System.out.println("Running Router!");
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                networkManager.SEND_UDP_Multicast(new SendMessage()
-                        .AddAttribute(Request.MSG_ATTR.Routing, R_MSG.NODE_BROADCAST.getValue()));
-                Thread.sleep(1000);
-            }
-        } catch (Exception e) {
-        }
+        int i = 0;
+        sysSched.executeProcess(ROUTING_PHASE_POOL, phases.get(i));
     }
 
     public void routingHandle(PacketDatagram rv_packet) {
         rhandle.receiveHandle(rv_packet);
     }
+
+    private void registPhaseScheduler() {
+        if(sysSched != null)
+        sysSched.registerThreadPool(ROUTING_PHASE_POOL
+                , Executors.newSingleThreadExecutor());
+    }
+
 }

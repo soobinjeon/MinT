@@ -27,6 +27,7 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.datamap.Information;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -35,16 +36,18 @@ import MinTFramework.storage.datamap.Information;
  */
 public class RoutHandler {
 
-    protected MinT frame;
-    protected NetworkManager networkManager;
-    protected ResourceStorage resStorage;
-    protected RoutingProtocol rout;
+    private MinT frame;
+    private NetworkManager networkManager;
+    private ResourceStorage resStorage;
+    private RoutingProtocol rout;
+    private ConcurrentHashMap<Integer, Phase> routingPhase;
     
     public RoutHandler(RoutingProtocol rprotocol) {
         frame = MinT.getInstance();
         networkManager = frame.getNetworkManager();
         resStorage = frame.getResStorage();
         rout = rprotocol;
+        routingPhase = rout.phases;
     }
 
     void receiveHandle(PacketDatagram rv_packet) {
@@ -59,9 +62,16 @@ public class RoutHandler {
     private void requestHandle(PacketDatagram rv_packet, Request req) {
         Request ret = null;
         Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
-        if(R_MSG.NODE_BROADCAST.isEqual(data.getResourceInt())){
-            System.out.println("receive node broadcast");
+        /**
+         * Operate a message according to routing phase
+         */
+        for(Phase cp : routingPhase.values()){
+            if(cp.hasMessage(data.getResourceInt())){
+                cp.requestHandle(rv_packet, req);
+                break;
+            }
         }
+        
         if(isDiscovery(req)){
             System.out.println("Request out in routing handler");
             Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
@@ -79,6 +89,14 @@ public class RoutHandler {
 
     private void responsehandle(PacketDatagram rv_packet, Request req) {
         ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
+        
+        for(Phase cp : routingPhase.values()){
+            if(cp.hasMessage(resdata.getResourceInt())){
+                cp.requestHandle(rv_packet, req);
+                break;
+            }
+        }
+        
         if(isDiscovery(req)){
             System.out.println("update discovery data in Routing Handler");
             resStorage.updateDiscoverData(resdata);
