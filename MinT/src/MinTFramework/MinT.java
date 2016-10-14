@@ -32,6 +32,7 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -340,6 +341,15 @@ public abstract class MinT {
     }
     
     /**
+     * Activate RoutingMode to join the region routing group
+     * @param groupName Routing Group Name
+     * @param platforms <Platforms> Operating Platform
+     */
+    public void activateRoutingProtocol(String groupName, Platforms platforms) {
+        NTWmanager.activeRoutingProtocol(groupName, platforms);
+    }
+    
+    /**
      * GET Resource Data matched to filled Resource
      * @deprecated 
      * @param msg 
@@ -427,12 +437,13 @@ public abstract class MinT {
     }
     
     /**
+     * @deprecated 
      * set Application Protocol
      * @param ap 
      */
-    public void setRoutingProtocol(RoutingProtocol ap){
-        NTWmanager.setRoutingProtocol(ap);
-    }
+//    public void setRoutingProtocol(RoutingProtocol ap){
+//        NTWmanager.setRoutingProtocol(ap);
+//    }
     
     /**
      * get RoutingProtocol for test

@@ -38,6 +38,19 @@ public class PhaseHeaderElection extends Phase implements Runnable{
 
     @Override
     public void run() {
+        setWorkingPhase(true);
+        try {
+            System.out.println("Header Node");
+//            while (!super.isInturrupted() && !Thread.currentThread().isInterrupted()) {
+//            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            setWorkingPhase(false);
+            System.out.println("Discover Phase Interrupt Exception");
+        } finally{
+            setWorkingPhase(false);
+            System.out.println("Header Election Phase Finally");
+        }
     }
     
     @Override
@@ -50,5 +63,9 @@ public class PhaseHeaderElection extends Phase implements Runnable{
     public void responseHandle(PacketDatagram rv_packet, Request req) {
         if(!isWorkingPhase())
             return;
+    }
+    
+    private void doElectHeader(){
+        
     }
 }

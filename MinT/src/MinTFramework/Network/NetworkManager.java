@@ -21,6 +21,7 @@ import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
@@ -47,7 +48,6 @@ public class NetworkManager {
     private String NodeName = null;
     
     private RoutingProtocol routing;
-    
     //Network Send Adaptor Pool for Send Data
     private SystemScheduler sysSched;
     
@@ -181,6 +181,10 @@ public class NetworkManager {
      */
     public RoutingProtocol getRoutingProtocol(){
         return routing;
+    }
+    
+    public void activeRoutingProtocol(String groupName, Platforms platforms) {
+        routing.setRoutingProtocol(groupName, platforms);
     }
     
     /**

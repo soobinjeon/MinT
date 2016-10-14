@@ -30,7 +30,10 @@ public class Request {
         WellKnown(".well-known"), 
         ResourceName("rn"),
         ResourceData("rd"),
-        Routing("ro");
+        Routing("ro"),
+        RoutingGroup("rog"),
+        RoutingWeight("row"),
+        RoutingisHeader("roh");
         private String resName;
         
         MSG_ATTR(String name){

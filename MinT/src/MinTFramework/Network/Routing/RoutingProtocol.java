@@ -19,6 +19,8 @@ package MinTFramework.Network.Routing;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Routing.node.CurrentNode;
+import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,7 +39,15 @@ public class RoutingProtocol implements Runnable{
     protected RoutingTable routingtable;
     protected ConcurrentHashMap<Integer, Phase> phases;
     protected SystemScheduler sysSched;
+    
+    //Group Name
     protected String groupName = "group";
+    
+    //Current Node Specify
+    protected CurrentNode currentNode = null;
+    
+    //is this header node?
+    protected boolean isHeaderNode = false;
     
     public static String ROUTING_PHASE_POOL = "Routing PHase Pool";
     
@@ -47,6 +57,8 @@ public class RoutingProtocol implements Runnable{
         sysSched = frame.getSysteScheduler();
         routingtable = new RoutingTable();
         phases = new ConcurrentHashMap<>();
+        if(currentNode == null)
+            currentNode = new CurrentNode(null, null, false, Platforms.NONE, groupName);
         registPhaseScheduler();
         if(resStorage == null)
             System.out.println("res Storage null");
@@ -72,19 +84,42 @@ public class RoutingProtocol implements Runnable{
         phases.put(2, new ExecuteRouting(this, phases.get(1)));
     }
     
-    public void setCurrentRoutingGroup(String _name){
+    public void setRoutingProtocol(String _name){
         groupName = _name;
     }
     
     public String getCurrentRoutingGroup(){
         return groupName;
     }
+    
+    public CurrentNode getCurrentNode(){
+        return currentNode;
+    }
+    
+    protected void setHeaderNode(boolean setheader){
+        isHeaderNode = setheader;
+    }
+    
+    protected boolean isHeaderNode(){
+        return isHeaderNode;
+    }
+    
+    public void setRoutingProtocol(String _groupName, Platforms platforms){
+        setRoutingProtocol(_groupName);
+        currentNode = new CurrentNode(platforms, groupName);
+    }
 
     @Override
     public void run() {
-        System.out.println("Running Router!");
-        int i = 0;
-        sysSched.executeProcess(ROUTING_PHASE_POOL, phases.get(i));
+        try {
+            System.out.println("Running Router!");
+            System.out.println("--- Current Node("+groupName+")-"+currentNode.toString());
+            ExecutePhase();
+        }catch(InterruptedException e){
+            System.out.println("Routring Protocol- Thread Intrrupt Exception");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void routingHandle(PacketDatagram rv_packet) {
@@ -95,6 +130,21 @@ public class RoutingProtocol implements Runnable{
         if(sysSched != null)
         sysSched.registerThreadPool(ROUTING_PHASE_POOL
                 , Executors.newSingleThreadExecutor());
+    }
+
+    private void TurnOnPhase(int i) throws InterruptedException {
+        if(i>0)
+            phases.get(i-1).inturrupt();
+        sysSched.executeProcess(ROUTING_PHASE_POOL, phases.get(i));
+    }
+
+    private void ExecutePhase() throws InterruptedException {
+        int i = 0;
+        TurnOnPhase(i++);
+        Thread.sleep(10000);
+        TurnOnPhase(i++);
+        Thread.sleep(10000);
+        TurnOnPhase(i++);
     }
 
 }

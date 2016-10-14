@@ -14,46 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
-
-import MinTFramework.Network.Network;
-import MinTFramework.Network.NetworkProfile;
+package MinTFramework.Network.Routing.node;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Node {
-    private NetworkProfile toAddr = null;
-    private NetworkProfile nextAddr = null;
-    private Network network = null;
-    private boolean Header = false;
+public enum SpecCPU {
+    ARM_CORTEX_A53(0, 1200, 4),
+    ARM_CORETEX_A8(1, 1000, 1),
+    INTEL_ATOM_2_CORE(2, 500, 2),
+    INTEL_I7_G7(3, 3200, 4),
+    NONE(100,0,0);
     
-    public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr, boolean Hd){
-        toAddr = _toAddr;
-        Header = Hd;
-        nextAddr = _nextAddr;
+    private int hz = 0;
+    private int core = 0;
+    private int src = 0;
+    SpecCPU(int _src, int _hz, int _core){
+        hz = _hz;
+        core = _core;
+        src = _src;
     }
     
-    public NetworkProfile gettoAddr(){
-        return toAddr;
-    }
+    public int getHZ(){return hz;}
+    public int getCORE(){return core;}
     
-    public NetworkProfile getNextAddr(){
-        return nextAddr;
-    }
-    
-    public Network getNetwork(){
-        return network;
-    }
-    
-    public boolean isHeader(){
-        return Header;
-    }
-    
-    @Override
-    public String toString(){
-        return "toAddr: "+toAddr.getAddress()+", nextAddr: "+nextAddr.getAddress();
+    public int getSrc() {return src;}
+
+    public static SpecCPU getPowerbyValue(int src) {
+        for (SpecCPU pc : SpecCPU.values()) {
+            if (pc.src == src) {
+                return pc;
+            }
+        }
+        return SpecCPU.NONE;
     }
 }

@@ -14,41 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
-
-import MinTFramework.Network.PacketDatagram;
-import MinTFramework.Network.Resource.Request;
+package MinTFramework.Network.Routing.node;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ExecuteRouting extends Phase implements Runnable{
-    RoutingProtocol current_protocol;
-    
-    public ExecuteRouting(RoutingProtocol rp, Phase pp){
-        super(rp,pp);
-    }
-    
-    @Override
-    public boolean hasMessage(int msg) {
-        return RT_MSG.RT_RTOPTION.isSamePhase(msg);
-    }
+public enum SpecNetwork {
+    WIRELESS(1, 1.0),
+    WIRED(2, 2.0);
+    private double value = 0;
+    private int src = 0;
 
-    @Override
-    public void run() {
+    SpecNetwork(int _src, double v) {
+        value = v;
+        src = _src;
     }
-    
-    @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
-        if(!isWorkingPhase())
-            return;
-    }
+    public double getValue(){return value;}
+    public int getSrc() {return src;}
 
-    @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
-        if(!isWorkingPhase())
-            return;
+    public static SpecNetwork getPowerbyValue(int src) {
+        for (SpecNetwork pc : SpecNetwork.values()) {
+            if (pc.src == src) {
+                return pc;
+            }
+        }
+        return SpecNetwork.WIRED;
     }
 }

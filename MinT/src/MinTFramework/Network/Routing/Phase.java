@@ -17,9 +17,12 @@
 package MinTFramework.Network.Routing;
 
 import MinTFramework.MinT;
+import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Routing.node.Node;
+import MinTFramework.storage.datamap.Information;
 
 /**
  *
@@ -36,6 +39,7 @@ public abstract class Phase implements Runnable{
     protected RoutingTable rtable;
     
     private boolean workingPhase = false;
+    private boolean isInturrupted = false;
     
     public Phase(RoutingProtocol _rp, Phase _prevPhase){
         routing = _rp;
@@ -61,6 +65,28 @@ public abstract class Phase implements Runnable{
     }
     
     /**
+     * set Routing Table from other Node
+     * @param rv_packet 
+     */
+    protected void setRoutingTable(PacketDatagram rv_packet, Request req) {
+        Information rweight = req.getResourcebyName(Request.MSG_ATTR.RoutingWeight);
+        Information rgroup = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
+        Information rheader = req.getResourcebyName(Request.MSG_ATTR.RoutingisHeader);
+        String gn = rgroup != null ? rgroup.getResourceString() : "";
+        double rw = rweight != null ? rweight.getResourceDouble() : 0;
+        boolean rh = rheader != null ? rheader.getResourceBoolean() : false;
+        
+        Node node = new Node(rv_packet.getSource(), rv_packet.getPreviosNode(), rh, rw, gn);
+        //same network exeption
+        Network cnetwork = networkmanager.getNetwork(rv_packet.getPreviosNode().getNetworkType());
+        if(cnetwork != null && cnetwork.getProfile().getAddress().equals(node.gettoAddr().getAddress()))
+            return;
+        
+        //add address to routing table
+        rtable.addRoutingTable(node);
+    }
+    
+    /**
      * set phase to working mode
      * @param wp 
      */
@@ -72,7 +98,16 @@ public abstract class Phase implements Runnable{
         return workingPhase;
     }
     
+    public void inturrupt() {
+        isInturrupted = true;
+    }
+    
+    protected boolean isInturrupted(){
+        return isInturrupted;
+    }
+    
     public abstract boolean hasMessage(int msg);
     public abstract void requestHandle(PacketDatagram rv_packet, Request req);
     public abstract void responseHandle(PacketDatagram rv_packet, Request req);
+
 }

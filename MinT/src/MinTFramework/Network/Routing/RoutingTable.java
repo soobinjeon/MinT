@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.Routing;
 
+import MinTFramework.Network.Routing.node.Node;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,6 +44,14 @@ public class RoutingTable {
     
     public void clearRoutingTable(){
         routingTable.clear();
+    }
+    
+    public void setHeaderNode(Node hn){
+        HeaderNode = hn;
+    }
+    
+    public ConcurrentHashMap<String, Node> getRoutingTable(){
+        return routingTable;
     }
     
     /**
