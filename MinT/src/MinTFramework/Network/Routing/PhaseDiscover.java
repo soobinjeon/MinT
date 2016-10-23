@@ -28,28 +28,34 @@ import MinTFramework.storage.datamap.Information;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class PhaseDiscover extends Phase{
-    
+    DiscoverRole disRole = null;
     public PhaseDiscover(RoutingProtocol rp, Phase pp){
         super(rp,pp);
+        disRole = new DiscoverRole();
     }
     
     @Override
     public boolean hasMessage(int msg) {
-        return RT_MSG.DIS_BROADCAST.isSamePhase(msg);
+        for(RT_MSG rtmsg : RT_MSG.values()){
+            if(rtmsg.isSamePhase(RT_MSG.DIS.getValue()) && rtmsg.isSamePhase(msg))
+                return true;
+        }
+        return false;
     }
 
     @Override
-    public void run() {
+    public Object call() throws Exception {
         setWorkingPhase(true);
         try {
-            
             while (!super.isInturrupted() && !Thread.currentThread().isInterrupted()) {
-                System.out.println("BroadCast Information");
                 networkmanager.SEND_UDP_Multicast(new SendMessage()
                         .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.DIS_BROADCAST.getValue())
                         .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
                         .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight()));
-                Thread.sleep(1000);
+                if(disRole.doDiscoveryTimeRole()){
+                    Thread.sleep(1000);
+                }else
+                    inturrupt();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,6 +65,7 @@ public class PhaseDiscover extends Phase{
             setWorkingPhase(false);
             System.out.println("Discover Phase Finally");
         }
+        return true;
     }
     
     @Override
@@ -68,16 +75,20 @@ public class PhaseDiscover extends Phase{
         String gn = gdata != null ? gdata.getResourceString() : "";
         
         if(RT_MSG.DIS_BROADCAST.isEqual(resdata.getResourceInt())){
-            System.out.println("Discovery Mode -- DIS BROADCAST DATA: "+rv_packet.getSource().getAddress()+", "+req.getMessageString());
+//            System.out.println("Discovery Mode -- DIS BROADCAST DATA: "+rv_packet.getSource().getAddress()+", "+req.getMessageString());
             
             //if Same Group or this is header node
-            if(routing.isHeaderNode() || gn.equals(routing.getCurrentRoutingGroup()))
-                setRoutingTable(rv_packet, req);
-            
-            //debug
-            System.out.println("Node List");
-            for(Node n : rtable.getRoutingTable().values()){
-                System.out.println("-----Node: "+n.gettoAddr().getAddress()+", gr:"+n.getGroupName()+", sw: "+n.getSpecWeight());
+            if (gn.equals(routing.getCurrentRoutingGroup())) {
+                boolean isadded = addRoutingTable(rv_packet, req);
+                
+                if (isadded) {
+                    disRole.addedNewNode();
+                    //debug
+                    System.out.println("Node List");
+                    for (Node n : rtable.getRoutingTable().values()) {
+                        System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName() + ", sw: " + n.getSpecWeight());
+                    }
+                }
             }
             
             //note that new node is added in our group

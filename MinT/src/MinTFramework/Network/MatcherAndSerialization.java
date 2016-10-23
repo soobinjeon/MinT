@@ -87,7 +87,8 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public PacketDatagram EndPointSend(SendMSG sendmsg) {
-        PacketDatagram packet = new PacketDatagram(sendmsg);
+        PacketDatagram packet = null;
+        packet = new PacketDatagram(sendmsg);
 //        PacketDatagram packet = new PacketDatagram(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
 //        ,sendmsg.getHeader_Instruction(), null, null, sendmsg.getNextNode()
 //        ,sendmsg.getFinalDestination(), sendmsg.Message());

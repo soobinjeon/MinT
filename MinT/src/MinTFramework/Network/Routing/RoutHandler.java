@@ -88,17 +88,18 @@ public class RoutHandler {
     }
 
     private void responsehandle(PacketDatagram rv_packet, Request req) {
-        ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
+        Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         for(Phase cp : routingPhase.values()){
-            if(cp.hasMessage(resdata.getResourceInt())){
-                cp.requestHandle(rv_packet, req);
+            if(cp.hasMessage(rdata.getResourceInt())){
+                cp.responseHandle(rv_packet, req);
                 break;
             }
         }
         
         if(isDiscovery(req)){
             System.out.println("update discovery data in Routing Handler");
+            ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
             resStorage.updateDiscoverData(resdata);
         }
     }

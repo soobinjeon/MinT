@@ -24,7 +24,9 @@ import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -135,16 +137,30 @@ public class RoutingProtocol implements Runnable{
     private void TurnOnPhase(int i) throws InterruptedException {
         if(i>0)
             phases.get(i-1).inturrupt();
-        sysSched.executeProcess(ROUTING_PHASE_POOL, phases.get(i));
+        
+//waiting for completing a previous phase
+        Future<Object> getable = sysSched.submitProcess(ROUTING_PHASE_POOL, phases.get(i));
+        
+        try {
+            //return data
+            boolean recvData = (Boolean)getable.get();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        } catch (ExecutionException ex) {
+            ex.printStackTrace();
+        }
     }
 
+    /**
+     * 
+     * @throws InterruptedException 
+     */
     private void ExecutePhase() throws InterruptedException {
-        int i = 0;
-        TurnOnPhase(i++);
-        Thread.sleep(10000);
-        TurnOnPhase(i++);
-        Thread.sleep(10000);
-        TurnOnPhase(i++);
+        for(int i=0;i<phases.size();i++){
+            //새로운 노드가 추가되면 시간 계속 연장 해야함
+            //노드가 추가되지 않을 시 디스커버리 모드 계속 작동
+            //기본 시간 증가해야함
+            TurnOnPhase(i);
+        }
     }
-
 }

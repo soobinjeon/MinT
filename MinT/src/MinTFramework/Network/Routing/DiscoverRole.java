@@ -21,52 +21,49 @@ package MinTFramework.Network.Routing;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public enum RT_MSG {
-    DIS(0,0),
-    DIS_BROADCAST(0,1),
-    HE(1,0),
-    HE_BROADCASTTOCLIENT(1,1),
-    HE_CLIENTRESPONSE(1,2),
-    HE_HEADERNOTIFYING(1,3),
-    RT(2,0),
-    RT_RTOPTION(2,1);
+public class DiscoverRole {
+    private boolean isNewDiscover = false;
+    private int timetable = 0;
+    private final int Default_Time_sec = 10; //sec
     
-    private int phase;
-    private int num;
-    private final int identifier = 10;
-    RT_MSG(int _phase, int _num){
-        phase = _phase;
-        num = _num;
-    }
-    
-    public boolean isEqual(int _num){
-        int rphase = _num / identifier;
-        int rnum = _num - (rphase*identifier);
-        return rphase == phase && num == rnum;
-    }
-
-    public int getValue() {
-        return phase * identifier + num;
-    }
-    
-    private int PhaseIdentifier(int _n){
-        return (_n / identifier);
+    public DiscoverRole(){
+        timetable = 0;
     }
     
     /**
-     * is Same Phase of this
-     * @param msg
-     * @return 
+     * added new Node
      */
-    boolean isSamePhase(int msg) {
-        return phase == PhaseIdentifier(msg);
+    public void addedNewNode(){
+        isNewDiscover = true;
     }
     
     /**
-     * get MSG Phase number
+     * Check New Node Identifying
      * @return 
      */
-    public int getPhase(){
-        return phase;
+    private boolean checkNewNode(){
+        boolean nstatus = isNewDiscover;
+        if(isNewDiscover){
+            isNewDiscover = false;
+            timetable = 0;
+        }
+        return nstatus;
+    }
+    
+    /**
+     * return discovery time role
+     * if new node is added, timetable will be reset
+     * @return 
+     */
+    public boolean doDiscoveryTimeRole(){
+        int ctime = timetable;
+        
+        if(!checkNewNode())
+            timetable ++;
+        System.out.println("--------------------timeTable: "+timetable);
+        if(ctime < Default_Time_sec)
+            return true;
+        else
+            return false;
     }
 }

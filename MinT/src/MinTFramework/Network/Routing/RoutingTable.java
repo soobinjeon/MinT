@@ -61,4 +61,25 @@ public class RoutingTable {
     public int Size(){
         return routingTable.size();
     }
+
+    /**
+     * get Node by Address
+     * @param address
+     * @return 
+     */
+    public Node getNodebyAddress(String address) {
+        for(Node n : routingTable.values()){
+            if(n.gettoAddr().getAddress().equals(address))
+                return n;
+        }
+        return null;
+    }
+
+    public boolean isdoneIdentifyAllClient() {
+       for(Node n : routingTable.values()){
+           if(!n.isHeaderNode() && !n.isClientNode())
+               return false;
+       }
+       return true;
+    }
 }

@@ -111,10 +111,10 @@ public class SystemHandler{
      */
     private void SystemHandleResponse(PacketDatagram rv_packet){
         Request sendedRequest = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
+        ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
         if (isRouting(sendedRequest)){
             rout.routingHandle(rv_packet);
         }else if(rv_packet.getHeader_Code().isContent()){
-            ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
             if(isDiscover(sendedRequest)){
                 try {
                     ResponseData resdata = new ResponseData(rv_packet, sendedRequest.getResourceData().getResource());

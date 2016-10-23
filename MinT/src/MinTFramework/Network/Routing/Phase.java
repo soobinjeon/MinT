@@ -23,13 +23,14 @@ import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Routing.node.Node;
 import MinTFramework.storage.datamap.Information;
+import java.util.concurrent.Callable;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public abstract class Phase implements Runnable{
+public abstract class Phase implements Callable{
     private Phase prevPhase = null;
     private Phase nextphase = null;
     
@@ -68,7 +69,10 @@ public abstract class Phase implements Runnable{
      * set Routing Table from other Node
      * @param rv_packet 
      */
-    protected void setRoutingTable(PacketDatagram rv_packet, Request req) {
+    protected boolean addRoutingTable(PacketDatagram rv_packet, Request req) {
+        Node pnode = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
+        if(pnode != null)
+            return false;
         Information rweight = req.getResourcebyName(Request.MSG_ATTR.RoutingWeight);
         Information rgroup = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         Information rheader = req.getResourcebyName(Request.MSG_ATTR.RoutingisHeader);
@@ -80,10 +84,12 @@ public abstract class Phase implements Runnable{
         //same network exeption
         Network cnetwork = networkmanager.getNetwork(rv_packet.getPreviosNode().getNetworkType());
         if(cnetwork != null && cnetwork.getProfile().getAddress().equals(node.gettoAddr().getAddress()))
-            return;
+            return false;
         
         //add address to routing table
         rtable.addRoutingTable(node);
+        
+        return true;
     }
     
     /**
@@ -104,6 +110,10 @@ public abstract class Phase implements Runnable{
     
     protected boolean isInturrupted(){
         return isInturrupted;
+    }
+    
+    protected boolean handleIdentify(RT_MSG rtmsg, Information recv_msg){
+        return recv_msg != null && rtmsg.isEqual(recv_msg.getResourceInt());
     }
     
     public abstract boolean hasMessage(int msg);

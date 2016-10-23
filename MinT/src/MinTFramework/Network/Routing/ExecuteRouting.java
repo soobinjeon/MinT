@@ -18,13 +18,15 @@ package MinTFramework.Network.Routing;
 
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Routing.node.Node;
+import java.util.concurrent.Callable;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class ExecuteRouting extends Phase implements Runnable{
+public class ExecuteRouting extends Phase implements Callable{
     RoutingProtocol current_protocol;
     
     public ExecuteRouting(RoutingProtocol rp, Phase pp){
@@ -33,13 +35,31 @@ public class ExecuteRouting extends Phase implements Runnable{
     
     @Override
     public boolean hasMessage(int msg) {
-        return RT_MSG.RT_RTOPTION.isSamePhase(msg);
-    }
-
-    @Override
-    public void run() {
+        for(RT_MSG rtmsg : RT_MSG.values()){
+            if(rtmsg.isSamePhase(RT_MSG.RT.getValue()) && rtmsg.isSamePhase(msg))
+                return true;
+        }
+        return false;
     }
     
+    @Override
+    public Object call() throws Exception {
+        try{
+            System.out.println("Execute Routing Protocol");
+            while(!Thread.currentThread().isInterrupted()){
+                System.out.println("--Routing Table");
+                for (Node n : rtable.getRoutingTable().values()) {
+                    System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName()
+                            + ", sw: " + n.getSpecWeight()+", hd: "+n.isHeaderNode() + " client: "+n.isClientNode());
+                }
+                Thread.sleep(5000);
+            }
+        }catch(Exception e){
+            
+        }
+        return true;
+    }
+
     @Override
     public void requestHandle(PacketDatagram rv_packet, Request req) {
         if(!isWorkingPhase())

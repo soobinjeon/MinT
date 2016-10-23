@@ -29,6 +29,7 @@ public class Node {
     private NetworkProfile nextAddr = null;
     private Network network = null;
     private boolean Header = false;
+    private boolean Client = false;
     private double SpecWeight = 0;
     private String GroupName = "";
     public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr
@@ -52,7 +53,7 @@ public class Node {
         return network;
     }
     
-    public boolean isHeader(){
+    public boolean isHeaderNode(){
         return Header;
     }
     
@@ -67,5 +68,17 @@ public class Node {
     @Override
     public String toString(){
         return "toAddr: "+toAddr.getAddress()+", nextAddr: "+nextAddr.getAddress();
+    }
+
+    public void setClientNode(boolean b) {
+        Client = b;
+    }
+    
+    public boolean isClientNode(){
+        return Client;
+    }
+
+    public void setHeaderNode(boolean b) {
+        Header = true;
     }
 }
