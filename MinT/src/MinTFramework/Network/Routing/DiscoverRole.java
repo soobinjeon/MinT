@@ -24,10 +24,11 @@ package MinTFramework.Network.Routing;
 public class DiscoverRole {
     private boolean isNewDiscover = false;
     private int timetable = 0;
-    private final int Default_Time_sec = 10; //sec
+    private int Default_Time_sec = 10; //sec
     
-    public DiscoverRole(){
+    public DiscoverRole(int dtime){
         timetable = 0;
+        Default_Time_sec = dtime;
     }
     
     /**

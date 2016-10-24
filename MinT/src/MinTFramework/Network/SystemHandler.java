@@ -125,9 +125,6 @@ public class SystemHandler{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else{
-                if(reshandle != null)
-                    reshandle.Response(new ResponseData(rv_packet, sendedRequest.getResourceData().getResource()));
             }
         }else if(rv_packet.getHeader_Code().isDeleted()){
         }else if(rv_packet.getHeader_Code().isValid()){
@@ -135,6 +132,9 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Code().isCreated()){
         }else if(rv_packet.getHeader_Code().isContinue()){
         }
+        
+        if(!isDiscover(sendedRequest) && reshandle != null)
+            reshandle.Response(new ResponseData(rv_packet, sendedRequest.getResourceData().getResource()));
     }
     
     /**

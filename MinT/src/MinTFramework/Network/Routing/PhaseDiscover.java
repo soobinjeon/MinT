@@ -29,9 +29,10 @@ import MinTFramework.storage.datamap.Information;
  */
 public class PhaseDiscover extends Phase{
     DiscoverRole disRole = null;
+    private final int Default_Time = 10;
     public PhaseDiscover(RoutingProtocol rp, Phase pp){
         super(rp,pp);
-        disRole = new DiscoverRole();
+        disRole = new DiscoverRole(Default_Time);
     }
     
     @Override

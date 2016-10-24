@@ -19,10 +19,16 @@ package MinTFramework.Network.Routing;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
+import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.node.CurrentNode;
+import MinTFramework.Network.Routing.node.Node;
 import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -52,6 +58,8 @@ public class RoutingProtocol implements Runnable{
     protected boolean isHeaderNode = false;
     
     public static String ROUTING_PHASE_POOL = "Routing PHase Pool";
+    
+    private boolean isActiveRouting = false;
     
     public RoutingProtocol(){
         frame = MinT.getInstance();
@@ -109,14 +117,17 @@ public class RoutingProtocol implements Runnable{
     public void setRoutingProtocol(String _groupName, Platforms platforms){
         setRoutingProtocol(_groupName);
         currentNode = new CurrentNode(platforms, groupName);
+        isActiveRouting = true;
     }
 
     @Override
     public void run() {
         try {
-            System.out.println("Running Router!");
-            System.out.println("--- Current Node("+groupName+")-"+currentNode.toString());
-            ExecutePhase();
+            if(isActiveRouting){
+                System.out.println("Running Router!");
+                System.out.println("--- Current Node("+groupName+")-"+currentNode.toString());
+                ExecutePhase();
+            }
         }catch(InterruptedException e){
             System.out.println("Routring Protocol- Thread Intrrupt Exception");
         }catch (Exception e) {
@@ -161,6 +172,23 @@ public class RoutingProtocol implements Runnable{
             //노드가 추가되지 않을 시 디스커버리 모드 계속 작동
             //기본 시간 증가해야함
             TurnOnPhase(i);
+        }
+    }
+    
+    public void getAllClientsResource(){
+        for(Node n : routingtable.getRoutingTable().values()){
+            //Response
+            ResponseHandler nres = new ResponseHandler() {
+                @Override
+                public void Response(ResponseData resdata) {
+                    System.out.println("property lists");
+                    for(ThingProperty tp : frame.getResStorage().getProperties()){
+                        System.out.println(tp.getID()+", "+tp.getName()+", "+tp.getGroup()+", "+tp.getStorageCategory().toString());
+                    }
+                }
+            };
+            //send Each Nodes
+            frame.REQUEST_GET(n.gettoAddr(), new SendMessage().AddAttribute(Request.MSG_ATTR.WellKnown, null), nres);
         }
     }
 }

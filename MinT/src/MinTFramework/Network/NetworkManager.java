@@ -253,7 +253,7 @@ public class NetworkManager {
      * @param num
      * @return 
      */
-    public synchronized ResponseHandler getResponseDataMatchbyID(int num){
+    public synchronized ResponseHandler getResponseDataMatchbyID(short num){
         SendMSG smsg = ResponseList.get(num);
         if(smsg == null)
             return null;

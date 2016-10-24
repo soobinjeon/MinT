@@ -46,6 +46,8 @@ public class ExecuteRouting extends Phase implements Callable{
     public Object call() throws Exception {
         try{
             System.out.println("Execute Routing Protocol");
+            System.out.println("get All Clients Resources");
+            routing.getAllClientsResource();
             while(!Thread.currentThread().isInterrupted()){
                 System.out.println("--Routing Table");
                 for (Node n : rtable.getRoutingTable().values()) {

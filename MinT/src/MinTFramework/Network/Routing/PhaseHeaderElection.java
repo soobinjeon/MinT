@@ -266,10 +266,10 @@ public class PhaseHeaderElection extends Phase implements Callable{
                                 continue;
                             
                             frame.REQUEST_GET(dst, new SendMessage()
-                                    .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_BROADCASTTOCLIENT.getValue())
-                                    , new ResponseHandler() {
+                                    .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_BROADCASTTOCLIENT.getValue()), new ResponseHandler() {
                                 @Override
                                 public void Response(ResponseData resdata) {
+                                    System.out.println("client response: " + resdata.getResourceString());
                                 }
                             });
                         }

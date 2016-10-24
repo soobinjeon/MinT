@@ -75,6 +75,7 @@ public class ResourceStorage {
         //set Storage Location for Local
         if(res.getStorageCategory() == StoreCategory.Local)
             res.setLocation(setLocalLocation(res));
+        
         //set Storage Location for Network
         //fix me
         else if(res.getStorageCategory() == StoreCategory.Network){
@@ -258,7 +259,7 @@ public class ResourceStorage {
         }
     }
     
-    public void updateDiscoverData(ResponseData resdata) {
+    synchronized public void updateDiscoverData(ResponseData resdata) {
         JSONObject discovery = getDiscoveryResource(resdata.getResourceString());
         JSONArray jpr = (JSONArray) discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
         for (int i = 0; i < jpr.size(); i++) {
