@@ -39,6 +39,7 @@ import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
+import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
@@ -412,31 +413,6 @@ public abstract class MinT {
     }
     
     /**
-     * Get Local Resource by Resource Name
-     * @param resName
-     * @return 
-     */
-    public ResData GETLocalResource(String resName){
-        Request req = new SendMessage(resName, 0);
-        return this.resourceStorage.getProperty(req);
-    }
-    
-    public List<String> GETLocalPropertyList(){
-        return this.getResStorage().getPropertyList();
-    }
-    
-    public List<String> GETLocalInstructionList(){
-        return this.getResStorage().getInstructionList();
-    }
-    
-    public void printPropertyLists(){
-        for(ThingProperty tp : getResStorage().getProperties()){
-            System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
-                    ", "+tp.getDeviceType().toString() +", "+tp.getPropertyRole().toString());
-        }
-    }
-    
-    /**
      * @deprecated 
      * set Application Protocol
      * @param ap 
@@ -463,7 +439,6 @@ public abstract class MinT {
      * @param res 
      */
     public void addResource(Resource res){
-        res.setFrame(this);
         if(res instanceof ThingProperty)
             PM.addProperty((ThingProperty)res);
         else if(res instanceof ThingInstruction)
@@ -485,6 +460,50 @@ public abstract class MinT {
     public String getResourceGroup(){
         return this.NTWmanager.getCurrentRoutingGroup();
     }
+    
+    /**
+     * get Properties by StoreCategory (Local, Network)
+     * @param sc
+     * @return 
+     */
+    public List<ThingProperty> getProperties(StoreCategory sc){
+        return this.getResStorage().getProperties(sc);
+    }
+    
+    /**
+     * get Instructions by StoreCategory (Local, Network)
+     * @param sc
+     * @return 
+     */
+    public List<ThingInstruction> getInstructions(StoreCategory sc){
+        return this.getResStorage().getInstructions(sc);
+    }
+    
+    /**
+     * Get Local Resource by Resource Name
+     * @param resName
+     * @return 
+     */
+    public ResData GETLocalResource(String resName){
+        Request req = new SendMessage(resName, 0);
+        return this.resourceStorage.getProperty(req, StoreCategory.Local);
+    }
+    
+    public List<String> GETLocalPropertyList(){
+        return this.getResStorage().getPropertyList();
+    }
+    
+    public List<String> GETLocalInstructionList(){
+        return this.getResStorage().getInstructionList();
+    }
+    
+    public void printPropertyLists(){
+        for(ThingProperty tp : getResStorage().getProperties()){
+            System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
+                    ", "+tp.getDeviceType().toString() +", "+tp.getPropertyRole().toString());
+        }
+    }
+    
 //    /**
 //     * put cache data to Shared Memory
 //     * @param name

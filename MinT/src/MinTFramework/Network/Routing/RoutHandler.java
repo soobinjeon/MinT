@@ -17,13 +17,11 @@
 package MinTFramework.Network.Routing;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Resource.ResponseData;
-import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.Routing.RoutingProtocol.ROUTING_PHASE;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.datamap.Information;
@@ -40,7 +38,7 @@ public class RoutHandler {
     private NetworkManager networkManager;
     private ResourceStorage resStorage;
     private RoutingProtocol rout;
-    private ConcurrentHashMap<Integer, Phase> routingPhase;
+    private ConcurrentHashMap<ROUTING_PHASE, Phase> routingPhase;
     
     public RoutHandler(RoutingProtocol rprotocol) {
         frame = MinT.getInstance();
@@ -72,14 +70,14 @@ public class RoutHandler {
             }
         }
         
-        if(isDiscovery(req)){
-            System.out.println("Request out in routing handler");
-            Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
-            String redata = resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString();
-            ret = new SendMessage(null, redata)
-                    .AddAttribute(Request.MSG_ATTR.Routing, null)
-                    .AddAttribute(Request.MSG_ATTR.WellKnown, null);
-        }
+//        if(isDiscovery(req)){
+//            System.out.println("Request out in routing handler");
+//            Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
+//            String redata = resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString();
+//            ret = new SendMessage(null, redata)
+//                    .AddAttribute(Request.MSG_ATTR.Routing, null)
+//                    .AddAttribute(Request.MSG_ATTR.WellKnown, null);
+//        }
         
         if(ret != null){
             networkManager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
@@ -97,18 +95,10 @@ public class RoutHandler {
             }
         }
         
-        if(isDiscovery(req)){
-            System.out.println("update discovery data in Routing Handler");
-            ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
-            resStorage.updateDiscoverData(resdata);
-        }
+//        if(isDiscovery(req)){
+//            System.out.println("update discovery data in Routing Handler");
+//            ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
+//            resStorage.updateDiscoverData(resdata);
+//        }
     }
-
-    private boolean isDiscovery(Request req) {
-        if(req.getResourcebyName(Request.MSG_ATTR.WellKnown) != null)
-            return true;
-        else
-            return false;
-    }
-    
 }

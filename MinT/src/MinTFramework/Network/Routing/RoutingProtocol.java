@@ -28,7 +28,6 @@ import MinTFramework.Network.Routing.node.Node;
 import MinTFramework.Network.Routing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
-import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -45,7 +44,7 @@ public class RoutingProtocol implements Runnable{
     protected ResourceStorage resStorage;
     protected RoutHandler rhandle;
     protected RoutingTable routingtable;
-    protected ConcurrentHashMap<Integer, Phase> phases;
+    protected ConcurrentHashMap<ROUTING_PHASE, Phase> phases;
     protected SystemScheduler sysSched;
     
     //Group Name
@@ -89,9 +88,9 @@ public class RoutingProtocol implements Runnable{
      * set Phase
      */
     private void initPhase() {
-        phases.put(0, new PhaseDiscover(this, null));
-        phases.put(1, new PhaseHeaderElection(this, phases.get(0)));
-        phases.put(2, new ExecuteRouting(this, phases.get(1)));
+        phases.put(ROUTING_PHASE.DISCOVER, new PhaseDiscover(this, null));
+        phases.put(ROUTING_PHASE.HEADERELECTION, new PhaseHeaderElection(this, phases.get(0)));
+        phases.put(ROUTING_PHASE.EXECUTEROUTING, new ExecuteRouting(this, phases.get(1)));
     }
     
     public void setRoutingProtocol(String _name){
@@ -145,12 +144,12 @@ public class RoutingProtocol implements Runnable{
                 , Executors.newSingleThreadExecutor());
     }
 
-    private void TurnOnPhase(int i) throws InterruptedException {
-        if(i>0)
-            phases.get(i-1).inturrupt();
+    private void TurnOnPhase(ROUTING_PHASE rp) throws InterruptedException {
+        if(rp.getPhaseNum()>0)
+            phases.get(ROUTING_PHASE.getPHASEbyNum(rp.getPhaseNum()-1)).inturrupt();
         
 //waiting for completing a previous phase
-        Future<Object> getable = sysSched.submitProcess(ROUTING_PHASE_POOL, phases.get(i));
+        Future<Object> getable = sysSched.submitProcess(ROUTING_PHASE_POOL, phases.get(rp));
         
         try {
             //return data
@@ -160,6 +159,10 @@ public class RoutingProtocol implements Runnable{
         } catch (ExecutionException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    protected Phase getPhasebyName(ROUTING_PHASE rp){
+        return phases.get(rp);
     }
 
     /**
@@ -171,24 +174,56 @@ public class RoutingProtocol implements Runnable{
             //새로운 노드가 추가되면 시간 계속 연장 해야함
             //노드가 추가되지 않을 시 디스커버리 모드 계속 작동
             //기본 시간 증가해야함
-            TurnOnPhase(i);
+            TurnOnPhase(ROUTING_PHASE.getPHASEbyNum(i));
         }
     }
     
-    public void getAllClientsResource(){
+    public void getAllClientsResourceInfo(){
         for(Node n : routingtable.getRoutingTable().values()){
-            //Response
-            ResponseHandler nres = new ResponseHandler() {
-                @Override
-                public void Response(ResponseData resdata) {
-                    System.out.println("property lists");
-                    for(ThingProperty tp : frame.getResStorage().getProperties()){
-                        System.out.println(tp.getID()+", "+tp.getName()+", "+tp.getGroup()+", "+tp.getStorageCategory().toString());
-                    }
-                }
-            };
-            //send Each Nodes
-            frame.REQUEST_GET(n.gettoAddr(), new SendMessage().AddAttribute(Request.MSG_ATTR.WellKnown, null), nres);
+            getClientResourceInfo(n);
+        }
+    }
+    
+    public void getClientResourceInfo(String addr){
+        Node n = routingtable.getNodebyAddress(addr);
+        if(n != null)
+            getClientResourceInfo(n);
+    }
+    
+    public void getClientResourceInfo(final Node n){
+        //Response
+        ResponseHandler nres = new ResponseHandler() {
+            @Override
+            public void Response(ResponseData resdata) {
+                n.setResources();
+            }
+        };
+        //send Each Nodes
+        frame.REQUEST_GET(n.gettoAddr(), new SendMessage().AddAttribute(Request.MSG_ATTR.WellKnown, null), nres);
+    }
+    
+    /**
+     * Routing Phase ENUM
+     */
+    public static enum ROUTING_PHASE {
+        DISCOVER (0), HEADERELECTION (1), EXECUTEROUTING (2);
+        
+        private int phasenum = 0;
+        ROUTING_PHASE(int num){
+            phasenum = num;
+        }
+        
+        public static ROUTING_PHASE getPHASEbyNum(int num){
+            for(ROUTING_PHASE rp : ROUTING_PHASE.values()){
+                if(rp.phasenum == num)
+                    return rp;
+            }
+            
+            return null;
+        }
+        
+        public int getPhaseNum(){
+            return phasenum;
         }
     }
 }

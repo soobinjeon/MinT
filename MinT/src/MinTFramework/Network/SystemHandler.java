@@ -24,6 +24,7 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.Routing.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResData;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
 
 /**
@@ -90,7 +91,7 @@ public class SystemHandler{
                         .AddAttribute(Request.MSG_ATTR.WellKnown, null);
             } else {
                 //Directly
-                ResData res = resStorage.getProperty(req);
+                ResData res = resStorage.getProperty(req, Resource.StoreCategory.Local);
                 if (res != null) {
                     ret = new SendMessage(null, res.getResourceString());
                 }

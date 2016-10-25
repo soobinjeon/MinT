@@ -16,6 +16,7 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
@@ -24,6 +25,7 @@ import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -125,7 +127,7 @@ public class ResourceStorage {
      */
     public void addNetworkResource(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
         Resource nr = getResourcefromJSON(rtype, rdata, resdata);
-        if(!nr.isSameLocation(resdata.getDestination()))
+        if(!nr.isSameLocation(resdata.getSourceInfo()))
             addResource(nr);
     }
     
@@ -139,19 +141,28 @@ public class ResourceStorage {
     }
     
     /**
-     * fix me
-     * need to update
+     * Search a property on All locations
+     * @param req
+     * @return 
+     */
+    public ResData getProperty(Request req){
+        return getProperty(req, null);
+    }
+    
+    /**
+     * Search a property on specific location
      * @return 
      * @see 
      * @param req 
      */
-    public ResData getProperty(Request req){
+    public ResData getProperty(Request req, StoreCategory sc){
 //        dl.printMessage("request RES : "+req.getResourceName());
         List<ThingProperty> rs = property.getbyResourceName(req.getResourceName());
         ArrayList<ResData> ol = new ArrayList<>();
         for(ThingProperty tp : rs){
 //            dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
-            ol.add(getProperty(req, tp));
+            if(sc == null || tp.getStorageCategory().equals(sc))
+                ol.add(getPropertyfromResources(req, tp));
         }
         
         /*Fix me!!
@@ -169,7 +180,7 @@ public class ResourceStorage {
      * @param rs
      * @return 
      */
-    private ResData getProperty(Request req, ThingProperty rs){
+    private ResData getPropertyfromResources(Request req, ThingProperty rs){
         ResData ret = null;
         if(rs != null){
             //resource is local and Aperiod Property
@@ -182,7 +193,6 @@ public class ResourceStorage {
         }
         else
             ret = null;
-//        dl.printMessage("Last Pro : "+ret.getResourceString());
         return ret;
     }
     
@@ -204,6 +214,11 @@ public class ResourceStorage {
     }
     
     public static enum RESOURCE_TYPE {property, instruction;}
+    
+    /************************************************************************
+     * Make Resource group for discovery
+     ************************************************************************/
+    
     /**
      * get Discover Resource Data
      * @return 
@@ -218,12 +233,42 @@ public class ResourceStorage {
         }
         obs.put(RESOURCE_TYPE.property, jpr);
         
-        for(Resource res : getInstruction()){
+        for(Resource res : getInstructions()){
             addJSONArray(jis, res, currentNode);
         }
         obs.put(RESOURCE_TYPE.instruction, jis);
         
         return obs;
+    }
+    
+    public JSONObject DiscoverDelegateResource(NetworkProfile currentNode){
+        JSONObject obs = new JSONObject();
+        JSONArray jpr = new JSONArray();
+        JSONArray jis = new JSONArray();
+        
+        HashMap<DeviceType, Integer> PropDtype = new HashMap<>();
+        HashMap<DeviceType, Integer> InstDtype = new HashMap<>();
+        
+        for(Resource res : getProperties()){
+            if(PropDtype.get(res.getDeviceType()) == null){
+                PropDtype.put(res.getDeviceType(), 0);
+                addJSONArray(jpr, res, currentNode);
+            }
+        }
+        obs.put(RESOURCE_TYPE.property, jpr);
+        
+        for(Resource res : getInstructions()){
+            if(InstDtype.get(res.getDeviceType()) == null){
+                InstDtype.put(res.getDeviceType(), 0);
+                addJSONArray(jis, res, currentNode);
+            }
+        }
+        obs.put(RESOURCE_TYPE.instruction, jis);
+        
+        if(PropDtype.size() == 0 && InstDtype.size() == 0)
+            return null;
+        else
+            return obs;
     }
     
     /**
@@ -243,6 +288,9 @@ public class ResourceStorage {
             ja.add(res.getResourcetoJSON());
     }
     
+    /************************************************************************
+     * Received Discover Data Updating
+     ************************************************************************/
     /**
      * String data to Discovery Data
      * @param data
@@ -277,10 +325,24 @@ public class ResourceStorage {
     }
     
     public List<ThingProperty> getProperties(){
-        return property.getAllResources();
+        return getProperties(null);
     }
     
-    public List<ThingInstruction> getInstruction(){
-        return instruction.getAllResources();
+    public List<ThingInstruction> getInstructions(){
+        return getInstructions(null);
+    }
+    
+    public List<ThingProperty> getProperties(StoreCategory sc){
+        if(sc == null)
+            return property.getAllResources();
+        else
+            return property.getbyStoreCategory(sc);
+    }
+    
+    public List<ThingInstruction> getInstructions(StoreCategory sc){
+        if(sc == null)
+            return instruction.getAllResources();
+        else
+            return instruction.getbyStoreCategory(sc);
     }
 }

@@ -16,8 +16,14 @@
  */
 package MinTFramework.Network.Routing.node;
 
+import MinTFramework.MinT;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
+import MinTFramework.storage.Resource.StoreCategory;
+import MinTFramework.storage.ThingInstruction;
+import MinTFramework.storage.ThingProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,6 +38,10 @@ public class Node {
     private boolean Client = false;
     private double SpecWeight = 0;
     private String GroupName = "";
+    
+    private List<ThingProperty> properties;
+    private List<ThingInstruction> instructions;
+    
     public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr
             , boolean Hd, double _specWeight, String _gn){
         toAddr = _toAddr;
@@ -39,6 +49,9 @@ public class Node {
         nextAddr = _nextAddr;
         SpecWeight = _specWeight;
         GroupName = _gn;
+        
+        properties = new ArrayList<>();
+        instructions = new ArrayList<>();
     }
     
     public NetworkProfile gettoAddr(){
@@ -80,5 +93,36 @@ public class Node {
 
     public void setHeaderNode(boolean b) {
         Header = true;
+    }
+
+    /**
+     * set Resources in Current Node
+     */
+    synchronized public void setResources() {
+        MinT frame = MinT.getInstance();
+        
+        //set Property
+        for(ThingProperty tp : frame.getResStorage().getProperties(StoreCategory.Network)){
+            if(tp.getSourceProfile().getAddress().equals(toAddr.getAddress())){
+                properties.add(tp);
+                tp.connectRoutingNode(this);
+            }
+        }
+        
+        //set Property
+        for(ThingInstruction ti : frame.getResStorage().getInstructions(StoreCategory.Network)){
+            if(ti.getSourceProfile().getAddress().equals(toAddr.getAddress())){
+                instructions.add(ti);
+                ti.connectRoutingNode(this);
+            }
+        }
+    }
+
+    public List<ThingProperty> getProperties() {
+        return properties;
+    }
+    
+    public List<ThingInstruction> getInstructions() {
+        return instructions;
     }
 }

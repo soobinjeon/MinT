@@ -16,7 +16,9 @@
  */
 package MinTFramework.Network.Routing;
 
+import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
@@ -29,6 +31,7 @@ import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.datamap.Information;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -59,7 +62,6 @@ public class PhaseHeaderElection extends Phase implements Callable{
     public Object call() throws Exception {
         setWorkingPhase(true);        
         doneElection = false;
-        doneIdentify = false;
         try {
             System.out.println("Header Election Started");
             
@@ -103,13 +105,12 @@ public class PhaseHeaderElection extends Phase implements Callable{
     }
     
     /**
-     * Header Election Request Handle
-     * @param rv_packet
-     * @param req 
-     */
+    * Header Election Request Handle
+    * @param rv_packet
+    * @param req 
+    */
     @Override
     public void requestHandle(PacketDatagram rv_packet, Request req) {
-        System.out.println("request handle");
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         //process for broadcast of header node
@@ -126,7 +127,27 @@ public class PhaseHeaderElection extends Phase implements Callable{
             //Notifying 메세지를 받은 후 반송 메세지로 리소스 정보들으 보내줘야하나? (선택!)
             //아니면 Notifying 시 리소스 정보들을 올려줘야하는가??
             addRoutingTable(rv_packet, req);
+            addHeaderResource(rv_packet, req);
         }
+    }
+    
+    private void addHeaderResource(PacketDatagram rv_packet, Request req) {
+        if (isDiscovery(req)) {
+            System.out.println("update discovery data in Routing Handler");
+            Information discoverdata = req.getResourcebyName(Request.MSG_ATTR.WellKnown);
+            ResponseData resdata = new ResponseData(rv_packet, discoverdata.getResource());
+            frame.getResStorage().updateDiscoverData(resdata);
+            Node hn = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
+            if(hn != null)
+                hn.setResources();
+        }
+    }
+    
+    private boolean isDiscovery(Request req) {
+        if(req.getResourcebyName(Request.MSG_ATTR.WellKnown) != null)
+            return true;
+        else
+            return false;
     }
     
     /**
@@ -162,9 +183,9 @@ public class PhaseHeaderElection extends Phase implements Callable{
      */
     @Override
     public void responseHandle(PacketDatagram rv_packet, Request req) {
-        if(!isWorkingPhase())
+        if(!routing.isHeaderNode() && !isWorkingPhase())
             return;
-        
+        System.out.println("responsed from Client");
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         //Header Node Operation
@@ -237,18 +258,23 @@ public class PhaseHeaderElection extends Phase implements Callable{
 
     /**
      * Broadcast Header info to client Node
+     * 계속해서 응답이 없을 때 처리하는 부분 없음
      * @param hn 
      */
-    private void NotifyHeaderInfotoClient(Node hn) {
+    public void NotifyHeaderInfotoClient(Node hn) {
         final int BroadCastTotalCnt = 10;
+        if(isBroadcasting)
+            return;
+        
         isBroadcasting = true;
-
+        
         Service broadcast = new Service("BroadCast Header Info") {
             @Override
             public void execute() {
                 //do broad cast
                 //fix -> rtable에서 profile list 정보 받는게 좋을 것 같음
                 try {
+                    doneIdentify = false;
                     ArrayList<NetworkProfile> dstlist = new ArrayList<>();
                     int bcCnt = 0;
                     for (Node cn : rtable.getRoutingTable().values()) {
@@ -269,7 +295,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                                     .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_BROADCASTTOCLIENT.getValue()), new ResponseHandler() {
                                 @Override
                                 public void Response(ResponseData resdata) {
-                                    System.out.println("client response: " + resdata.getResourceString());
+                                    routing.getClientResourceInfo(resdata.getSourceInfo().getAddress());
                                 }
                             });
                         }
@@ -280,7 +306,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                     e.printStackTrace();
                     System.out.println("Header Election Interrupt Exception");
                 } finally {
-                    System.out.println("Header Election - Broadcast Finally");
+                    System.out.println("Header Info Notifying - Finally");
                     isBroadcasting = false;
                 }
             }
@@ -304,12 +330,22 @@ public class PhaseHeaderElection extends Phase implements Callable{
                 try{
                     isHeaderNotification = true;
                     while (!Thread.currentThread().isInterrupted()) {
-                        //notifying header info and group name
-                        networkmanager.SEND_UDP_Multicast(new SendMessage()
+                        //notifying header info and group name by UDP multicast
+                        
+                        Network cnet = frame.getNetworkManager().getNetwork(NetworkType.UDP);
+                        JSONObject discoverydata = frame.getResStorage().DiscoverDelegateResource(cnet.getProfile());
+                        
+                        SendMessage smsg = new SendMessage()
                                 .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_HEADERNOTIFYING.getValue())
                                 .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
-                                .AddAttribute(Request.MSG_ATTR.RoutingisHeader, true));
-                        Thread.sleep(5000);
+                                .AddAttribute(Request.MSG_ATTR.RoutingisHeader, true);
+                        
+                        if(cnet != null && discoverydata != null){
+//                            System.out.println("header brd: "+discoverydata.toJSONString());
+                            smsg.AddAttribute(Request.MSG_ATTR.WellKnown, discoverydata.toJSONString());
+                        }
+                        networkmanager.SEND_UDP_Multicast(smsg);
+                        Thread.sleep(10000);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

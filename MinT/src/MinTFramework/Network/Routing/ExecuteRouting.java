@@ -19,6 +19,7 @@ package MinTFramework.Network.Routing;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Routing.node.Node;
+import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.Callable;
 
 /**
@@ -46,14 +47,31 @@ public class ExecuteRouting extends Phase implements Callable{
     public Object call() throws Exception {
         try{
             System.out.println("Execute Routing Protocol");
-            System.out.println("get All Clients Resources");
-            routing.getAllClientsResource();
+            
+//            if(routing.isHeaderNode()){
+//                System.out.println("get All Clients Resources");
+//                routing.getAllClientsResource();
+//            }
+            
             while(!Thread.currentThread().isInterrupted()){
-                System.out.println("--Routing Table");
+                System.out.println("\n--Routing Table");
                 for (Node n : rtable.getRoutingTable().values()) {
                     System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName()
                             + ", sw: " + n.getSpecWeight()+", hd: "+n.isHeaderNode() + " client: "+n.isClientNode());
+                    for(ThingProperty tp : n.getProperties()){
+                        System.out.println("----------"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
+                            +", "+tp.getStorageCategory().toString()
+                            +", data: "+tp.getResourceData().getResourceString());
+                    }
                 }
+                
+                System.out.println("--Thing property lists");
+                for(ThingProperty tp : frame.getProperties(null)){
+                    System.out.println("-----"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
+                            +", "+tp.getStorageCategory().toString()
+                            +", data: "+tp.getResourceData().getResourceString());
+                }
+                
                 Thread.sleep(5000);
             }
         }catch(Exception e){

@@ -51,6 +51,10 @@ public class DiscoverRole {
         return nstatus;
     }
     
+    public void interrupt(){
+        timetable = Default_Time_sec;
+    }
+    
     /**
      * return discovery time role
      * if new node is added, timetable will be reset

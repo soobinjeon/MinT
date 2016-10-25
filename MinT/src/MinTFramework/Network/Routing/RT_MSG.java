@@ -24,6 +24,7 @@ package MinTFramework.Network.Routing;
 public enum RT_MSG {
     DIS(0,0),
     DIS_BROADCAST(0,1),
+    DIS_BROADCAST_STOP(0,2),
     HE(1,0),
     HE_BROADCASTTOCLIENT(1,1),
     HE_CLIENTRESPONSE(1,2),

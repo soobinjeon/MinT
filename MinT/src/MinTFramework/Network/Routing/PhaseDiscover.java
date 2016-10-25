@@ -18,8 +18,11 @@ package MinTFramework.Network.Routing;
 
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.Routing.node.Node;
+import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.datamap.Information;
 
 /**
@@ -75,32 +78,69 @@ public class PhaseDiscover extends Phase{
         Information gdata = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         String gn = gdata != null ? gdata.getResourceString() : "";
         
-        if(RT_MSG.DIS_BROADCAST.isEqual(resdata.getResourceInt())){
+        if(RT_MSG.DIS_BROADCAST.isEqual(resdata.getResourceInt()) || 
+                RT_MSG.DIS_BROADCAST_STOP.isEqual(resdata.getResourceInt())){
 //            System.out.println("Discovery Mode -- DIS BROADCAST DATA: "+rv_packet.getSource().getAddress()+", "+req.getMessageString());
             
             //if Same Group or this is header node
-            if (gn.equals(routing.getCurrentRoutingGroup())) {
-                boolean isadded = addRoutingTable(rv_packet, req);
+            if (isWorkingPhase() && isSameGroup(gn)) {
+                Node isadded = addRoutingTable(rv_packet, req);
                 
-                if (isadded) {
-                    disRole.addedNewNode();
-                    //debug
-                    System.out.println("Node List");
-                    for (Node n : rtable.getRoutingTable().values()) {
-                        System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName() + ", sw: " + n.getSpecWeight());
+                if (isadded != null) {
+                    //헤더 선출이 끝나고 추가적으로 이노드가 그룹에 추가되었을 때 헤더로부터 DIS_BROADCAST_STOP 메시지가 넘어온다.
+                    //넘어온 메세지에 따라 처리 후 헤더에게 정보 반송
+                    //이노드의 페이즈는 HeaderElection 페이즈로 넘어감
+                    if (RT_MSG.DIS_BROADCAST_STOP.isEqual(resdata.getResourceInt())) {
+                        System.out.println("Stop Message");
+                        disRole.interrupt();
+
+                        Request ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
+                        networkmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0, PacketDatagram.HEADER_CODE.CONTENT
+                                , rv_packet.getSource(), ret, rv_packet.getMSGID()));
                     }
+                    
+                    else
+                        disRole.addedNewNode();
+                }
+            }            
+            
+            //note that new node is added in our group, if this is header node
+            else if(routing.isHeaderNode() && isSameGroup(gn)){
+               //to Execute Routing or HeaderElection Phase
+               Node nnode = addRoutingTable(rv_packet, req);
+               //추가되었던 노드가 다시 재추가 될때 프로시저 없음. (addRoutingTable 변경 해야할 것 같음)
+                if (nnode != null) {
+                    System.out.println("new Node Added!!");
+                    frame.REQUEST_GET(nnode.gettoAddr(), new SendMessage()
+                            .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.DIS_BROADCAST_STOP.getValue())
+                            .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
+                            .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight()), new ResponseHandler() {
+                        @Override
+                        public void Response(ResponseData resdata) {
+                            //새로운 노드로부터 응답이 왔을 때 처리
+                            PhaseHeaderElection he = (PhaseHeaderElection)routing.getPhasebyName(RoutingProtocol.ROUTING_PHASE.HEADERELECTION);
+                            if(he != null){
+                                System.out.println("notify HeaderInfoClient");
+                                he.NotifyHeaderInfotoClient(null);
+                            }
+                        }
+                    });
                 }
             }
             
-            //note that new node is added in our group
-            if(!isWorkingPhase()){
-               //to Execute Routing or HeaderElection Phase
-               
+            //debug
+            System.out.println("Node List");
+            for (Node n : rtable.getRoutingTable().values()) {
+                System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName() + ", sw: " + n.getSpecWeight());
             }
         }
     }
 
     @Override
     public void responseHandle(PacketDatagram rv_packet, Request req) {
+    }
+    
+    private boolean isSameGroup(String gname){
+        return gname.equals(routing.getCurrentRoutingGroup());
     }
 }

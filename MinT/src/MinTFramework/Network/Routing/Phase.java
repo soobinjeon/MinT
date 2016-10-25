@@ -69,10 +69,10 @@ public abstract class Phase implements Callable{
      * set Routing Table from other Node
      * @param rv_packet 
      */
-    protected boolean addRoutingTable(PacketDatagram rv_packet, Request req) {
+    protected Node addRoutingTable(PacketDatagram rv_packet, Request req) {
         Node pnode = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
         if(pnode != null)
-            return false;
+            return null;
         Information rweight = req.getResourcebyName(Request.MSG_ATTR.RoutingWeight);
         Information rgroup = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         Information rheader = req.getResourcebyName(Request.MSG_ATTR.RoutingisHeader);
@@ -84,12 +84,12 @@ public abstract class Phase implements Callable{
         //same network exeption
         Network cnetwork = networkmanager.getNetwork(rv_packet.getPreviosNode().getNetworkType());
         if(cnetwork != null && cnetwork.getProfile().getAddress().equals(node.gettoAddr().getAddress()))
-            return false;
+            return null;
         
         //add address to routing table
         rtable.addRoutingTable(node);
         
-        return true;
+        return node;
     }
     
     /**

@@ -17,6 +17,7 @@
 package MinTFramework.storage;
 
 import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.datamap.Cache;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,23 @@ public class Repository<T> extends Cache<T>{
                     rlist.add(res);
                 }
             } catch (Exception ex){
+            }
+        }
+        return rlist;
+    }
+    
+    public List<T> getbyStoreCategory(StoreCategory sc){
+        //getStorageDirectory
+        ArrayList<T> rlist = new ArrayList<>();
+        for(T res : resources.values()){
+            try {
+                StoreCategory estr = (StoreCategory)res.getClass().getMethod("getStorageCategory").invoke(res);
+                if(sc.equals(estr)){
+//                    dl.printMessage("matched : "+resName);
+                    rlist.add(res);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
         return rlist;
