@@ -23,6 +23,7 @@ import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,8 +40,8 @@ public class Node {
     private double SpecWeight = 0;
     private String GroupName = "";
     
-    private List<ThingProperty> properties;
-    private List<ThingInstruction> instructions;
+    private HashMap<String,ThingProperty> properties;
+    private HashMap<String,ThingInstruction> instructions;
     
     public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr
             , boolean Hd, double _specWeight, String _gn){
@@ -50,8 +51,8 @@ public class Node {
         SpecWeight = _specWeight;
         GroupName = _gn;
         
-        properties = new ArrayList<>();
-        instructions = new ArrayList<>();
+        properties = new HashMap<>();
+        instructions = new HashMap<>();
     }
     
     public NetworkProfile gettoAddr(){
@@ -103,26 +104,28 @@ public class Node {
         
         //set Property
         for(ThingProperty tp : frame.getResStorage().getProperties(StoreCategory.Network)){
-            if(tp.getSourceProfile().getAddress().equals(toAddr.getAddress())){
-                properties.add(tp);
+            if(tp.getSourceProfile().getAddress().equals(toAddr.getAddress())
+                    && properties.get(tp.getID()) != null){
+                properties.put(tp.getID(), tp);
                 tp.connectRoutingNode(this);
             }
         }
         
         //set Property
         for(ThingInstruction ti : frame.getResStorage().getInstructions(StoreCategory.Network)){
-            if(ti.getSourceProfile().getAddress().equals(toAddr.getAddress())){
-                instructions.add(ti);
+            if(ti.getSourceProfile().getAddress().equals(toAddr.getAddress())
+                    && instructions.get(ti.getID()) != null){
+                instructions.put(ti.getID(),ti);
                 ti.connectRoutingNode(this);
             }
         }
     }
 
-    public List<ThingProperty> getProperties() {
+    public HashMap<String, ThingProperty> getProperties() {
         return properties;
     }
     
-    public List<ThingInstruction> getInstructions() {
+    public HashMap<String, ThingInstruction> getInstructions() {
         return instructions;
     }
 }

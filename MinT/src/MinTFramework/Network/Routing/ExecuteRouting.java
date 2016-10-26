@@ -58,7 +58,7 @@ public class ExecuteRouting extends Phase implements Callable{
                 for (Node n : rtable.getRoutingTable().values()) {
                     System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName()
                             + ", sw: " + n.getSpecWeight()+", hd: "+n.isHeaderNode() + " client: "+n.isClientNode());
-                    for(ThingProperty tp : n.getProperties()){
+                    for(ThingProperty tp : n.getProperties().values()){
                         System.out.println("----------"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
                             +", "+tp.getStorageCategory().toString()
                             +", data: "+tp.getResourceData().getResourceString());

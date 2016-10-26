@@ -66,7 +66,7 @@ public class DiscoverRole {
         if(!checkNewNode())
             timetable ++;
         System.out.println("--------------------timeTable: "+timetable);
-        if(ctime < Default_Time_sec)
+        if(ctime < Default_Time_sec-1)
             return true;
         else
             return false;

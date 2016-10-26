@@ -341,7 +341,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                                 .AddAttribute(Request.MSG_ATTR.RoutingisHeader, true);
                         
                         if(cnet != null && discoverydata != null){
-//                            System.out.println("header brd: "+discoverydata.toJSONString());
+                            System.out.println("header brd: "+discoverydata.toJSONString());
                             smsg.AddAttribute(Request.MSG_ATTR.WellKnown, discoverydata.toJSONString());
                         }
                         networkmanager.SEND_UDP_Multicast(smsg);
