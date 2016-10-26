@@ -21,7 +21,7 @@ import MinTFramework.MinT;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Sharing.node.Node;
+import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Util.DebugLog;
 import static MinTFramework.storage.Resource.StoreCategory.Network;
 import org.json.simple.JSONObject;

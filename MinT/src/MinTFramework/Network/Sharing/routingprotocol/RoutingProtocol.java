@@ -14,18 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Sharing;
+package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.Sharing.node.CurrentNode;
-import MinTFramework.Network.Sharing.node.Node;
-import MinTFramework.Network.Sharing.node.Platforms;
+import MinTFramework.Network.sharing.node.CurrentNode;
+import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,8 +135,8 @@ public class RoutingProtocol implements Runnable{
         }
     }
 
-    public void routingHandle(PacketDatagram rv_packet) {
-        rhandle.receiveHandle(rv_packet);
+    public void routingHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+        rhandle.receiveHandle(rv_packet, recvmsg);
     }
 
     private void registPhaseScheduler() {

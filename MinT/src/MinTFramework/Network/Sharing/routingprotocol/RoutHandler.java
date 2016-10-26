@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Sharing;
+package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Sharing.RoutingProtocol.ROUTING_PHASE;
-import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol.ROUTING_PHASE;
 import MinTFramework.storage.ResourceStorage;
 import MinTFramework.storage.datamap.Information;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,17 +47,14 @@ public class RoutHandler {
         routingPhase = rout.phases;
     }
 
-    void receiveHandle(PacketDatagram rv_packet) {
-        Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-        
+    void receiveHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
         if(rv_packet.getHeader_Code().isRequest())
-            requestHandle(rv_packet, req);
+            requestHandle(rv_packet, recvmsg);
         else if(rv_packet.getHeader_Code().isResponse())
-            responsehandle(rv_packet, req);
+            responsehandle(rv_packet, recvmsg);
     }
 
     private void requestHandle(PacketDatagram rv_packet, Request req) {
-        Request ret = null;
         Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
         /**
          * Operate a message according to routing phase
@@ -68,20 +64,6 @@ public class RoutHandler {
                 cp.requestHandle(rv_packet, req);
                 break;
             }
-        }
-        
-//        if(isDiscovery(req)){
-//            System.out.println("Request out in routing handler");
-//            Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
-//            String redata = resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString();
-//            ret = new SendMessage(null, redata)
-//                    .AddAttribute(Request.MSG_ATTR.Routing, null)
-//                    .AddAttribute(Request.MSG_ATTR.WellKnown, null);
-//        }
-        
-        if(ret != null){
-            networkManager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                    , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }
     }
 
@@ -94,11 +76,5 @@ public class RoutHandler {
                 break;
             }
         }
-        
-//        if(isDiscovery(req)){
-//            System.out.println("update discovery data in Routing Handler");
-//            ResponseData resdata = new ResponseData(rv_packet, req.getResourceData().getResource());
-//            resStorage.updateDiscoverData(resdata);
-//        }
     }
 }

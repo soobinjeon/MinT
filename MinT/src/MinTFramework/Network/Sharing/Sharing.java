@@ -14,32 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing.node;
+package MinTFramework.Network.Sharing;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public enum SpecNetwork {
-    WIRELESS(1, 1.0),
-    WIRED(2, 2.0);
-    private double value = 0;
-    private int src = 0;
-
-    SpecNetwork(int _src, double v) {
-        value = v;
-        src = _src;
-    }
-    public double getValue(){return value;}
-    public int getSrc() {return src;}
-
-    public static SpecNetwork getPowerbyValue(int src) {
-        for (SpecNetwork pc : SpecNetwork.values()) {
-            if (pc.src == src) {
-                return pc;
-            }
-        }
-        return SpecNetwork.WIRED;
-    }
+public class Sharing {
+    
 }

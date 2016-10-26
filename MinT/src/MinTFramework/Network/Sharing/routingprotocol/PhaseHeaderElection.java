@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Sharing;
+package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
@@ -24,8 +24,8 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.Sharing.node.CurrentNode;
-import MinTFramework.Network.Sharing.node.Node;
+import MinTFramework.Network.sharing.node.CurrentNode;
+import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.datamap.Information;
@@ -327,6 +327,8 @@ public class PhaseHeaderElection extends Phase implements Callable{
         Service headerNotification = new Service("Header Notification") {
             @Override
             public void execute() {
+                long NotPeriod = 5; //sec
+                long DiscoverPeriod = 20;
                 try{
                     isHeaderNotification = true;
                     while (!Thread.currentThread().isInterrupted()) {
@@ -341,11 +343,12 @@ public class PhaseHeaderElection extends Phase implements Callable{
                                 .AddAttribute(Request.MSG_ATTR.RoutingisHeader, true);
                         
                         if(cnet != null && discoverydata != null){
-                            System.out.println("header brd: "+discoverydata.toJSONString());
+//                            System.out.println("header brd: "+discoverydata.toJSONString());
+                            //NotPeriod = DiscoverPeriod;
                             smsg.AddAttribute(Request.MSG_ATTR.WellKnown, discoverydata.toJSONString());
                         }
                         networkmanager.SEND_UDP_Multicast(smsg);
-                        Thread.sleep(10000);
+                        Thread.sleep(NotPeriod * 1000);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

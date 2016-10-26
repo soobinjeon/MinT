@@ -18,7 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
-import MinTFramework.Network.Sharing.RoutingProtocol;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;

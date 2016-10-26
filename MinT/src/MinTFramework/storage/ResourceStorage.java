@@ -255,7 +255,9 @@ public class ResourceStorage {
         HashMap<DeviceType, Integer> InstDtype = new HashMap<>();
         
         for(Resource res : getProperties()){
-            if(PropDtype.get(res.getDeviceType()) == null){
+            if((res.getStorageCategory().isLocal() || (res.getConnectedRoutingNode() != null 
+                    && (!res.getConnectedRoutingNode().isHeaderNode())))
+                    && PropDtype.get(res.getDeviceType()) == null){
                 PropDtype.put(res.getDeviceType(), 0);
                 addJSONArray(jpr, res, currentNode, true);
             }
@@ -263,7 +265,9 @@ public class ResourceStorage {
         obs.put(RESOURCE_TYPE.property, jpr);
         
         for(Resource res : getInstructions()){
-            if(InstDtype.get(res.getDeviceType()) == null){
+            if((res.getStorageCategory().isLocal() || (res.getConnectedRoutingNode() != null 
+                    && (!res.getConnectedRoutingNode().isHeaderNode())))
+                    && InstDtype.get(res.getDeviceType()) == null){
                 InstDtype.put(res.getDeviceType(), 0);
                 addJSONArray(jis, res, currentNode, true);
             }

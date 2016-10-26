@@ -33,7 +33,8 @@ public class Request {
         Routing("ro"),
         RoutingGroup("rog"),
         RoutingWeight("row"),
-        RoutingisHeader("roh");
+        RoutingisHeader("roh"),
+        Sharing("sh");
         private String resName;
         
         MSG_ATTR(String name){

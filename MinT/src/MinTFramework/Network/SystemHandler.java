@@ -21,7 +21,7 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.Sharing.RoutingProtocol;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
@@ -45,8 +45,8 @@ public class SystemHandler{
         rout = nmanager.getRoutingProtocol();
     }
     
-    public void startHandle(PacketDatagram recv_pk){
-        SystemHandler(recv_pk);
+    public void startHandle(PacketDatagram recv_pk, ReceiveMessage recvmsg){
+        SystemHandler(recv_pk, recvmsg);
     }
     
     /**
@@ -57,14 +57,14 @@ public class SystemHandler{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(PacketDatagram recv_packet){
+    private void SystemHandler(PacketDatagram recv_packet, ReceiveMessage recvmsg){
         /**
          * get, post using resource storage
          */
         if(recv_packet.getHeader_Code().isRequest()){
-            SystemHandleRequest(recv_packet);
+            SystemHandleRequest(recv_packet, recvmsg);
         }else if(recv_packet.getHeader_Code().isResponse()){
-            SystemHandleResponse(recv_packet);
+            SystemHandleResponse(recv_packet, recvmsg);
         }
     }
     
@@ -72,11 +72,8 @@ public class SystemHandler{
      * Request handle by requesting from other node
      * @param rv_packet 
      */
-    private void SystemHandleRequest(PacketDatagram rv_packet){
-        Request req = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-        if (isRouting(req)){
-            rout.routingHandle(rv_packet);
-        }else if(rv_packet.getHeader_Code().isGet()){
+    private void SystemHandleRequest(PacketDatagram rv_packet, ReceiveMessage recvmsg){
+        if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
@@ -84,14 +81,14 @@ public class SystemHandler{
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
             Request ret = null;
             //Temporary Routing Discover Mode
-            if (isDiscover(req)) {
+            if (isDiscover(recvmsg)) {
                 Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
                 String redata = resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString();
                 ret = new SendMessage(null, redata)
                         .AddAttribute(Request.MSG_ATTR.WellKnown, null);
             } else {
                 //Directly
-                ResData res = resStorage.getProperty(req, Resource.StoreCategory.Local);
+                ResData res = resStorage.getProperty(recvmsg, Resource.StoreCategory.Local);
                 if (res != null) {
                     ret = new SendMessage(null, res.getResourceString());
                 }
@@ -99,9 +96,9 @@ public class SystemHandler{
             nmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
                     , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
         }else if(rv_packet.getHeader_Code().isPut()){
-            resStorage.setInstruction(req);
+            resStorage.setInstruction(recvmsg);
         }else if(rv_packet.getHeader_Code().isPost()){
-            resStorage.setInstruction(req);
+            resStorage.setInstruction(recvmsg);
         }else if(rv_packet.getHeader_Code().isDelete()){
         }
     }
@@ -110,19 +107,16 @@ public class SystemHandler{
      * Response handler when this node receives a response message from other node what is requested by this node.
      * @param rv_packet 
      */
-    private void SystemHandleResponse(PacketDatagram rv_packet){
-        Request sendedRequest = new ReceiveMessage(rv_packet.getMsgData(), rv_packet.getSource());
-        ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
-        if (isRouting(sendedRequest)){
-            rout.routingHandle(rv_packet);
-        }else if(rv_packet.getHeader_Code().isContent()){
-            if(isDiscover(sendedRequest)){
+    private void SystemHandleResponse(PacketDatagram rv_packet, ReceiveMessage recvmsg){
+//        ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
+        if(rv_packet.getHeader_Code().isContent()){
+            if(isDiscover(recvmsg)){
                 try {
-                    ResponseData resdata = new ResponseData(rv_packet, sendedRequest.getResourceData().getResource());
+                    ResponseData resdata = new ResponseData(rv_packet, recvmsg.getResourceData().getResource());
                     resStorage.updateDiscoverData(resdata);
-                    if (reshandle != null) {
-                        reshandle.Response(resdata);
-                    }
+//                    if (reshandle != null) {
+//                        reshandle.Response(resdata);
+//                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,8 +128,8 @@ public class SystemHandler{
         }else if(rv_packet.getHeader_Code().isContinue()){
         }
         
-        if(!isDiscover(sendedRequest) && reshandle != null)
-            reshandle.Response(new ResponseData(rv_packet, sendedRequest.getResourceData().getResource()));
+//        if(!isDiscover(recvmsg) && reshandle != null)
+//            reshandle.Response(new ResponseData(rv_packet, recvmsg.getResourceData().getResource()));
     }
     
     /**
@@ -166,12 +160,4 @@ public class SystemHandler{
         else
             return false;
     }
-
-    private boolean isRouting(Request req) {
-        if(req.getResourcebyName(Request.MSG_ATTR.Routing) != null)
-            return true;
-        else
-            return false;
-    }
-
 }
