@@ -64,7 +64,7 @@ public class RoutingProtocol implements Runnable{
     public RoutingProtocol(){
         frame = MinT.getInstance();
         resStorage = frame.getResStorage();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         routingtable = new RoutingTable();
         phases = new ConcurrentHashMap<>();
         if(currentNode == null)

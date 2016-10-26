@@ -79,7 +79,7 @@ public abstract class MinT {
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        mintBench = new MinTBenchmark(getSysteScheduler(), 500);
+        mintBench = new MinTBenchmark(getSystemScheduler(), 500);
     }
     
     /**
@@ -225,7 +225,7 @@ public abstract class MinT {
      * get SystemScheduler
      * @return 
      */
-    public SystemScheduler getSysteScheduler(){
+    public SystemScheduler getSystemScheduler(){
         return sched;
     }
     

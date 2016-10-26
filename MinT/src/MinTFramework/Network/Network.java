@@ -58,7 +58,7 @@ public abstract class Network {
     public Network(NetworkProfile npro) {
         this.frame = MinT.getInstance();
         this.networkmanager = frame.getNetworkManager();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         byteBufferPool = networkmanager.getByteBufferPool();
         
         routing = networkmanager.getRoutingProtocol();

@@ -55,7 +55,7 @@ public class ThreadAdjustment_N6 implements Runnable{
 //        pools = bench.getPoolsInfo();
         THarray = new LimitedQueue(TRequestSize);
         arrayRequestNn = new LimitedQueue(3);
-        recvpool = frame.getSysteScheduler().getThreadPool(MinTthreadPools.NET_RECV_HANDLE);
+        recvpool = frame.getSystemScheduler().getThreadPool(MinTthreadPools.NET_RECV_HANDLE);
     }
     
     @Override
@@ -133,7 +133,7 @@ public class ThreadAdjustment_N6 implements Runnable{
             System.out.println("UDP_RECV_LISTNER is not Null() - "+Rdata);//+"("+Rt.ReqperSec.size()+"), Time: "+getTime(Rt)+", Time: "+getRequest(Rt));
             System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);//+"("+Ht.ReqperSec.size()+"), Time: "+getTime(Ht)+", Time: "+getRequest(Ht));
 //            System.out.println("UDP_SEND is not Null() - "+Sdata);
-            frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
+            frame.getSystemScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
 //            Rt.clearBuffer();
 //            Ht.clearBuffer();
 //            St.clearBuffer();

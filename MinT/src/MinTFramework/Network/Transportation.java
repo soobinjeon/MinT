@@ -20,6 +20,7 @@ import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
+import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 
@@ -33,6 +34,7 @@ public class Transportation implements NetworkLayers{
     private NetworkManager networkManager;
     private SystemHandler syshandle = null;
     private RoutingProtocol routing = null;
+    private Sharing sharing = null;
     private MatcherAndSerialization serialization = null;
     
     DebugLog dl = new DebugLog("Transportation");
@@ -64,7 +66,7 @@ public class Transportation implements NetworkLayers{
             if (isRouting(receivemsg)) {
                 routing.routingHandle(packet, receivemsg);
             } else if(isSharing(receivemsg)){
-                
+                sharing.sharingHandle(packet, receivemsg);
             }else {
                 syshandle.startHandle(packet, receivemsg);
             }

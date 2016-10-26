@@ -20,6 +20,7 @@ import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -47,7 +48,8 @@ public class NetworkManager {
     private final ConcurrentHashMap<NetworkType,Network> networks;
     private String NodeName = null;
     
-    private RoutingProtocol routing;
+    private RoutingProtocol routing = null;
+    private Sharing sharing = null;
     //Network Send Adaptor Pool for Send Data
     private SystemScheduler sysSched;
     
@@ -73,13 +75,16 @@ public class NetworkManager {
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
         
         if(routing == null)
             routing = new RoutingProtocol();
+        
+        if(sharing == null)
+            sharing = new Sharing();
         
         makeBytebuffer();
         idmaker = new PacketIDManager(ResponseList);
@@ -88,9 +93,12 @@ public class NetworkManager {
     /**
      * Init Routing Algorithm
      */
-    private void initRoutingSetup(){
-        System.out.println("routing init");
+    private void initSharingSetup(){
+        System.out.println("routing initialization");
+        //init routing protocol algorithm
         routing.init(this);
+        //init sharing approach
+        sharing.init(this);
         //start routing algorithm
         sysSched.executeProcess(MinTthreadPools.ROUTING_PROTOCOL, routing);
     }
@@ -109,7 +117,7 @@ public class NetworkManager {
      */
     public void onStart() {
         TurnOnNetwork();
-        initRoutingSetup();
+        initSharingSetup();
     }
 
     /**
