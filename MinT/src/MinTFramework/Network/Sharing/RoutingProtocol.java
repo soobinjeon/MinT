@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
@@ -23,9 +23,9 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.Routing.node.CurrentNode;
-import MinTFramework.Network.Routing.node.Node;
-import MinTFramework.Network.Routing.node.Platforms;
+import MinTFramework.Network.Sharing.node.CurrentNode;
+import MinTFramework.Network.Sharing.node.Node;
+import MinTFramework.Network.Sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
 import java.util.concurrent.ConcurrentHashMap;

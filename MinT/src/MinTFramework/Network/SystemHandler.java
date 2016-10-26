@@ -21,7 +21,7 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Network.Sharing.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;

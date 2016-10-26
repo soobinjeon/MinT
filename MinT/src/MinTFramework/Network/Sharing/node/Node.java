@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing.node;
+package MinTFramework.Network.Sharing.node;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.Network;
@@ -22,9 +22,7 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -105,7 +103,7 @@ public class Node {
         //set Property
         for(ThingProperty tp : frame.getResStorage().getProperties(StoreCategory.Network)){
             if(tp.getSourceProfile().getAddress().equals(toAddr.getAddress())
-                    && properties.get(tp.getID()) != null){
+                    && properties.get(tp.getID()) == null){
                 properties.put(tp.getID(), tp);
                 tp.connectRoutingNode(this);
             }
@@ -114,7 +112,7 @@ public class Node {
         //set Property
         for(ThingInstruction ti : frame.getResStorage().getInstructions(StoreCategory.Network)){
             if(ti.getSourceProfile().getAddress().equals(toAddr.getAddress())
-                    && instructions.get(ti.getID()) != null){
+                    && instructions.get(ti.getID()) == null){
                 instructions.put(ti.getID(),ti);
                 ti.connectRoutingNode(this);
             }

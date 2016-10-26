@@ -229,18 +229,23 @@ public class ResourceStorage {
         JSONArray jis = new JSONArray();
         
         for(Resource res : getProperties()){
-            addJSONArray(jpr, res, currentNode);
+            addJSONArray(jpr, res, currentNode, false);
         }
         obs.put(RESOURCE_TYPE.property, jpr);
         
         for(Resource res : getInstructions()){
-            addJSONArray(jis, res, currentNode);
+            addJSONArray(jis, res, currentNode, false);
         }
         obs.put(RESOURCE_TYPE.instruction, jis);
         
         return obs;
     }
     
+    /**
+     * Discover delegated Resources
+     * @param currentNode
+     * @return 
+     */
     public JSONObject DiscoverDelegateResource(NetworkProfile currentNode){
         JSONObject obs = new JSONObject();
         JSONArray jpr = new JSONArray();
@@ -252,7 +257,7 @@ public class ResourceStorage {
         for(Resource res : getProperties()){
             if(PropDtype.get(res.getDeviceType()) == null){
                 PropDtype.put(res.getDeviceType(), 0);
-                addJSONArray(jpr, res, currentNode);
+                addJSONArray(jpr, res, currentNode, true);
             }
         }
         obs.put(RESOURCE_TYPE.property, jpr);
@@ -260,7 +265,7 @@ public class ResourceStorage {
         for(Resource res : getInstructions()){
             if(InstDtype.get(res.getDeviceType()) == null){
                 InstDtype.put(res.getDeviceType(), 0);
-                addJSONArray(jis, res, currentNode);
+                addJSONArray(jis, res, currentNode, true);
             }
         }
         obs.put(RESOURCE_TYPE.instruction, jis);
@@ -277,9 +282,9 @@ public class ResourceStorage {
      * @param res
      * @param currentNode 
      */
-    private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode){
+    private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode, boolean delegateMode){
         Resource nr = res.getCloneforDiscovery();
-        if(res.getStorageCategory().isLocal()){
+        if(res.getStorageCategory().isLocal() || delegateMode){
             nr.setLocation(new StorageDirectory(currentNode,
                     res.getStorageDirectory().getGroup(), res.getName()));
 //            dl.printMessage("new class : "+nr.getName()+", "+nr.getStorageDirectory().getSourceLocation());

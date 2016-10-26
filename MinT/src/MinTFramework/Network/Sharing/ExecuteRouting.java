@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Routing.node.Node;
+import MinTFramework.Network.Sharing.node.Node;
 import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.Callable;
 

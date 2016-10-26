@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
+package MinTFramework.Network.Sharing;
 
 /**
  *
@@ -65,7 +65,7 @@ public class DiscoverRole {
         
         if(!checkNewNode())
             timetable ++;
-        System.out.println("--------------------timeTable: "+timetable);
+        System.out.println("--------------------Discover Peripheral Node timeTable: "+timetable+"/"+Default_Time_sec);
         if(ctime < Default_Time_sec-1)
             return true;
         else

@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.Routing.node.Node;
+import MinTFramework.Network.Sharing.node.Node;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.datamap.Information;
 
@@ -129,10 +129,10 @@ public class PhaseDiscover extends Phase{
             }
             
             //debug
-            System.out.println("Node List");
-            for (Node n : rtable.getRoutingTable().values()) {
-                System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName() + ", sw: " + n.getSpecWeight());
-            }
+//            System.out.println("Node List");
+//            for (Node n : rtable.getRoutingTable().values()) {
+//                System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName() + ", sw: " + n.getSpecWeight());
+//            }
         }
     }
 
