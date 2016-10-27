@@ -16,6 +16,7 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.datamap.Cache;
@@ -53,6 +54,29 @@ public class Repository<T> extends Cache<T>{
         return rlist;
     }
     
+    public List<T> getbyResourceType(String resourceName) {
+        ArrayList<T> rlist = new ArrayList<>();
+        for(T res : resources.values()){
+            try {
+//                System.out.println("s name : "+resourceName 
+//                        +", "+(DeviceType)res.getClass().getMethod("getDeviceType").invoke(res));
+                DeviceType estr = (DeviceType)res.getClass().getMethod("getDeviceType").invoke(res);
+                if(estr.isSameDeivce(resourceName)){
+//                    System.out.println("--matched : "+resourceName);
+                    rlist.add(res);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+        return rlist;
+    }
+    
+    /**
+     * get Resources by Store Category
+     * @param sc
+     * @return 
+     */
     public List<T> getbyStoreCategory(StoreCategory sc){
         //getStorageDirectory
         ArrayList<T> rlist = new ArrayList<>();

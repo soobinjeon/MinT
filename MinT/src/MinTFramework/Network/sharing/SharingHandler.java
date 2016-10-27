@@ -20,10 +20,8 @@ import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
-import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.storage.ResourceStorage;
-import MinTFramework.storage.datamap.Information;
 
 /**
  *
@@ -56,11 +54,20 @@ public class SharingHandler {
             responsehandle(rv_packet, recvmsg);
     }
 
-    private void requestHandle(PacketDatagram rv_packet, Request req) {
-//        Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
+    /**
+     * handler for response to child or header node
+     * @param rv_packet
+     * @param req 
+     */
+    private void requestHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+        //request analysis ( child node or other header)
+        if(routing.hasChildNode(rv_packet.getSource()))
+            sharing.executeResponse(new ChildResponce(rv_packet, recvmsg));
+        else
+            sharing.executeResponse(new HeaderReponse(rv_packet, recvmsg));
     }
 
-    private void responsehandle(PacketDatagram rv_packet, Request req) {
+    private void responsehandle(PacketDatagram rv_packet, ReceiveMessage req) {
 //        Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
-    }    
+    }
 }

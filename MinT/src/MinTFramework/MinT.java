@@ -34,6 +34,7 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.Benchmarks.MinTBenchmark;
@@ -410,6 +411,15 @@ public abstract class MinT {
     public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
         NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
                 ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
+    }
+    
+    public void GET_SHARING_RESOURCE(DeviceType dtype, ResponseHandler resHandle){
+        Sharing sharing = NTWmanager.getSharing();
+        try{
+            sharing.getResource(dtype, resHandle);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
     
     /**

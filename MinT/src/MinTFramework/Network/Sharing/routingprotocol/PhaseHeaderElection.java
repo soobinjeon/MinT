@@ -206,7 +206,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
      */
     private void ClientIdentifying() {
         //close all header election process
-        if(rtable.isdoneIdentifyAllClient()){
+        if(rtable.isdoneIdentifyAllChildNode()){
             doneIndentify();
             
             //notifying

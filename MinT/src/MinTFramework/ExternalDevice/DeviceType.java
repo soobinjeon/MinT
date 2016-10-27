@@ -56,4 +56,16 @@ public enum DeviceType {
     public DeviceType getDeviceType(DeviceType type){
         return DeviceType.valueOf(type.getDeviceTypeString());
     }
+    
+    public boolean isSameDeivce(String dname){
+        return deviceType.equals(dname);
+    }
+    
+    public static DeviceType getDeviceType(String dtype){
+        for(DeviceType dt : DeviceType.values()){
+            if(dt.getDeviceTypeString().equals(dtype))
+                return dt;
+        }
+        return NONE;
+    }
 }

@@ -142,7 +142,7 @@ public class ResourceStorage {
     
     /**
      * Search a property on All locations
-     * @param req
+     * @param req Resource Name
      * @return 
      */
     public ResData getProperty(Request req){
@@ -150,10 +150,11 @@ public class ResourceStorage {
     }
     
     /**
+     * fix
+     * 리소스 이름으로 검색하면 1개밖에 안나옮
      * Search a property on specific location
      * @return 
-     * @see 
-     * @param req 
+     * @param req Resource Name
      */
     public ResData getProperty(Request req, StoreCategory sc){
 //        dl.printMessage("request RES : "+req.getResourceName());
@@ -165,13 +166,21 @@ public class ResourceStorage {
                 ol.add(getPropertyfromResources(req, tp));
         }
         
-        /*Fix me!!
-        * 여러개면 배열로 보내야함
-        */
         if(ol.size() > 0)
             return ol.get(0);
         else
             return null;
+    }
+    
+    public List<ResData> getPropertybyResourceType(Request resourceType, StoreCategory sc){
+        List<ThingProperty> rs = property.getbyResourceType(resourceType.getResourceName());
+        ArrayList<ResData> ol = new ArrayList<>();
+        for(ThingProperty tp : rs){
+            if(sc == null || tp.getStorageCategory().equals(sc))
+                ol.add(getPropertyfromResources(resourceType, tp));
+        }
+        
+        return ol;
     }
     
     /**

@@ -47,6 +47,7 @@ public class Transportation implements NetworkLayers{
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE){
             syshandle = new SystemHandler();
             routing = networkManager.getRoutingProtocol();
+            sharing = networkManager.getSharing();
         }
         
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND){

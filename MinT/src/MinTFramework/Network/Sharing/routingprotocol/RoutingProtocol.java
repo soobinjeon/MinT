@@ -18,6 +18,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
@@ -110,7 +111,7 @@ public class RoutingProtocol implements Runnable{
         isHeaderNode = setheader;
     }
     
-    protected boolean isHeaderNode(){
+    public boolean isHeaderNode(){
         return isHeaderNode;
     }
     
@@ -118,6 +119,10 @@ public class RoutingProtocol implements Runnable{
         setRoutingProtocol(_groupName);
         currentNode = new CurrentNode(platforms, groupName);
         isActiveRouting = true;
+    }
+    
+    public Node getHeaderNode(){
+        return routingtable.getHeaderNode();
     }
 
     @Override
@@ -201,6 +206,19 @@ public class RoutingProtocol implements Runnable{
         };
         //send Each Nodes
         frame.REQUEST_GET(n.gettoAddr(), new SendMessage().AddAttribute(Request.MSG_ATTR.WellKnown, null), nres);
+    }
+
+    /**
+     * has Child Node
+     * @param source
+     * @return 
+     */
+    public boolean hasChildNode(NetworkProfile source) {
+        Node n = routingtable.getChildNodebyAddress(source.getAddress());
+        if(n == null)
+            return false;
+        else
+            return true;
     }
     
     /**

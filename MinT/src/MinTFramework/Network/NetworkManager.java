@@ -195,6 +195,10 @@ public class NetworkManager {
         routing.setRoutingProtocol(groupName, platforms);
     }
     
+    public Sharing getSharing(){
+        return sharing;
+    }
+    
     /**
      * Network Send Method
      * @param smsg 

@@ -16,17 +16,26 @@
  */
 package MinTFramework.Network.sharing;
 
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.storage.ResData;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -39,13 +48,14 @@ public class Sharing {
     private NetworkManager networkManager = null;
     private RoutingProtocol routingprotocol = null;
     private SharingHandler shandle = null;
+    private static String SHARING_TP = "sharing_threadpool";
+    private boolean isActivated = false;
     public Sharing(){
         frame = MinT.getInstance();
         resStorage = frame.getResStorage();
         sysSched = frame.getSystemScheduler();
-        
     }
-    
+   
     /**
      * Initialization Sharing approach 
      * @param aThis 
@@ -54,6 +64,39 @@ public class Sharing {
         networkManager = aThis;
         routingprotocol = networkManager.getRoutingProtocol();
         shandle = new SharingHandler(this);
+        initScheduler();
+    }
+    
+    public void initScheduler(){
+        if(sysSched != null){
+            sysSched.registerThreadPool(SHARING_TP, new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS
+                    ,new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)));
+        }
+    }
+    
+    /**
+     * execute Response operation
+     * @param sr 
+     */
+    public void executeResponse(SharingResponse sr){
+        sysSched.executeProcess(SHARING_TP, sr);
+    }
+    
+    /**
+     * activate sharing operation
+     * @param ac 
+     */
+    public void setActivate(boolean ac){
+        System.out.println("Sharing activated");
+        isActivated = ac;
+    }
+    
+    /**
+     * is sharing protocol activated?
+     * @return 
+     */
+    public boolean isActivated(){
+        return isActivated;
     }
     
     /**
@@ -68,9 +111,25 @@ public class Sharing {
     /********************************************************
      * CHILD NODE WORKING
      ********************************************************/
-    
-    public void GET_SHARING_RESOURCE(Request requestdata, ResponseHandler resHandle){
+    public void getResource(DeviceType restype, ResponseHandler resHandle){
+        getResource(new SendMessage(restype.getDeviceTypeString(),null), resHandle);
+    }
+    /**
+     * get Resource from Header Node
+     * @param requestdata
+     * @param resHandle 
+     */
+    private void getResource(SendMessage requestdata, ResponseHandler resHandle){
+        if(!isActivated)
+            return;
         
+        if(routingprotocol.isHeaderNode()){
+            //get child node resource -> use other method in here
+        }else{
+            Node header = routingprotocol.getHeaderNode();
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, null);
+            frame.REQUEST_GET(header.gettoAddr(), requestdata, resHandle);
+        }
     }
     
     
@@ -78,12 +137,16 @@ public class Sharing {
      * HEADER WORKING
      ********************************************************/
     
+    public List<ResData> getLocalResource(Request recvmsg) {
+        return resStorage.getPropertybyResourceType(recvmsg, Resource.StoreCategory.Local);
+    }
+    
     /**
      * search Nodes had request resource
      * @param resource
      * @return 
      */
-    public ArrayList<Node> searchResource(String resource){
+    private ArrayList<Node> searchResource(String resource){
         return null;
     }
     
@@ -93,7 +156,7 @@ public class Sharing {
      * 받은 데이터를 종합 하여 Child Node에게 전달
      * @param resource 
      */
-    public void requestResource(String resource){
+    private void requestResource(String resource){
         
     }
 

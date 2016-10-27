@@ -50,6 +50,10 @@ public class RoutingTable {
         HeaderNode = hn;
     }
     
+    public Node getHeaderNode(){
+        return HeaderNode;
+    }
+    
     public ConcurrentHashMap<String, Node> getRoutingTable(){
         return routingTable;
     }
@@ -74,8 +78,16 @@ public class RoutingTable {
         }
         return null;
     }
+    
+    public Node getChildNodebyAddress(String address) {
+        Node n = getNodebyAddress(address);
+        if(n == null || !n.isClientNode())
+            return null;
+        else
+            return n;
+    }
 
-    public boolean isdoneIdentifyAllClient() {
+    public boolean isdoneIdentifyAllChildNode() {
        for(Node n : routingTable.values()){
            if(!n.isHeaderNode() && !n.isClientNode())
                return false;

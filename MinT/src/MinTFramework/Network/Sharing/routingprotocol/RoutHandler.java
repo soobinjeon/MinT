@@ -54,7 +54,7 @@ public class RoutHandler {
             responsehandle(rv_packet, recvmsg);
     }
 
-    private void requestHandle(PacketDatagram rv_packet, Request req) {
+    private void requestHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
         /**
          * Operate a message according to routing phase
@@ -67,7 +67,7 @@ public class RoutHandler {
         }
     }
 
-    private void responsehandle(PacketDatagram rv_packet, Request req) {
+    private void responsehandle(PacketDatagram rv_packet, ReceiveMessage req) {
         Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         for(Phase cp : routingPhase.values()){

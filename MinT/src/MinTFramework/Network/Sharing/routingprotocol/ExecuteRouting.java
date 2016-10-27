@@ -28,7 +28,6 @@ import java.util.concurrent.Callable;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class ExecuteRouting extends Phase implements Callable{
-    RoutingProtocol current_protocol;
     
     public ExecuteRouting(RoutingProtocol rp, Phase pp){
         super(rp,pp);
@@ -47,7 +46,8 @@ public class ExecuteRouting extends Phase implements Callable{
     public Object call() throws Exception {
         try{
             System.out.println("Execute Routing Protocol");
-            
+            //set Activate Sharing
+            networkmanager.getSharing().setActivate(true);
 //            if(routing.isHeaderNode()){
 //                System.out.println("get All Clients Resources");
 //                routing.getAllClientsResource();
