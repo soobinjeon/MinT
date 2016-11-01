@@ -30,6 +30,7 @@ import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -121,8 +122,8 @@ public class RoutingProtocol implements Runnable{
         isActiveRouting = true;
     }
     
-    public Node getHeaderNode(){
-        return routingtable.getHeaderNode();
+    public Node getHeaderNodeofCurrentNode(){
+        return routingtable.getHeaderNodeofCurrentNode();
     }
 
     @Override
@@ -219,6 +220,21 @@ public class RoutingProtocol implements Runnable{
             return false;
         else
             return true;
+    }
+
+    /**
+     * get Child Node in same group
+     */
+    public List<Node> getChildNodes() {
+        return routingtable.getChildNodes();
+    }
+    
+    /**
+     * get Header Nodes of Header
+     * @return 
+     */
+    public List<Node> getHeaderNodes(){
+        return routingtable.getHeaderNodes();
     }
     
     /**

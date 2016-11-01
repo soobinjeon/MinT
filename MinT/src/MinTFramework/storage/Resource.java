@@ -21,6 +21,7 @@ import MinTFramework.MinT;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Util.DebugLog;
 import static MinTFramework.storage.Resource.StoreCategory.Network;
@@ -89,8 +90,20 @@ public abstract class Resource{
         this.setResourceID();
     }
     
+    /**
+     * Update Data
+     * @param _data 
+     */
     public void put(Request _data){
         data.setResource(_data.getResourceData().getResource());
+    }
+    
+    /**
+     * Update Data
+     * @param _data 
+     */
+    public void put(ResponseData _data){
+        data.setResource(_data.getResource());
     }
     
     abstract public void set(Request req);

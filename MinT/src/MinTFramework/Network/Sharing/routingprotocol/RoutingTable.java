@@ -17,6 +17,8 @@
 package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.Network.sharing.node.Node;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -50,7 +52,7 @@ public class RoutingTable {
         HeaderNode = hn;
     }
     
-    public Node getHeaderNode(){
+    public Node getHeaderNodeofCurrentNode(){
         return HeaderNode;
     }
     
@@ -93,5 +95,30 @@ public class RoutingTable {
                return false;
        }
        return true;
+    }
+
+    /**
+     * get ChildNodes
+     */
+    public List<Node> getChildNodes() {
+        ArrayList<Node> childs = new ArrayList<>();
+        for(Node n : routingTable.values()){
+            if(n.isClientNode())
+                childs.add(n);
+        }
+        return childs;
+    }
+    
+    /**
+     * get Header Nodes
+     * @return 
+     */
+    public List<Node> getHeaderNodes(){
+        ArrayList<Node> headers = new ArrayList<>();
+        for(Node n : routingTable.values()){
+            if(n.isHeaderNode())
+                headers.add(n);
+        }
+        return headers;
     }
 }

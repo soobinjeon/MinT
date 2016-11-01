@@ -34,6 +34,7 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.sharing.ResourceOption;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -413,14 +414,24 @@ public abstract class MinT {
                 ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
-    public void GET_SHARING_RESOURCE(DeviceType dtype, ResponseHandler resHandle){
+    public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle){
         Sharing sharing = NTWmanager.getSharing();
         try{
-            sharing.getResource(dtype, resHandle);
+            sharing.getResource(dtype, resOpt, resHandle);
         }catch(Exception e){
             e.printStackTrace();
         }
     }
+    
+//    public void GET_SHARING_RESOURCE(DeviceType dtype, List<ResourceOption> resOpt, ResponseHandler resHandle){
+//        Sharing sharing = NTWmanager.getSharing();
+//        try{
+//            sharing.getResource(dtype, resHandle);
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+    
     
     /**
      * @deprecated 

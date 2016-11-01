@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Sharings;
+package MinTFramework.Network.sharing;
 
 /**
  *
@@ -22,5 +22,19 @@ package MinTFramework.Network.Sharings;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public enum SharingMessage {
-    REQUEST;
+    CLIENT_REQUEST(0),
+    HEADER_REQUEST(1);
+    
+    private int num;
+    SharingMessage(int _num){
+        num = _num;
+    }
+    
+    public boolean isEqual(int _num){
+        return num == _num;
+    }
+
+    public int getValue() {
+        return num;
+    }
 }

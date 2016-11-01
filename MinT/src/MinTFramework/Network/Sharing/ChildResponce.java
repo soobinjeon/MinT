@@ -18,6 +18,12 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.storage.ResData;
+import MinTFramework.storage.ThingProperty;
+import java.util.List;
+import java.util.Queue;
 
 /**
  *
@@ -33,7 +39,8 @@ public class ChildResponce extends SharingResponse{
     @Override
     public void getResource() {
         System.out.println("child Response Activated!");
-        //get Group Resource
+        
+//get Group Resource
         getGroupResource();
         
         //get other Header Resource
@@ -41,6 +48,25 @@ public class ChildResponce extends SharingResponse{
     }
 
     private void getHeaderResource() {
+        List<Node> cnodes = routing.getHeaderNodes();
+        ResponseWaiter waiter = new ResponseWaiter();
+        for(Node n : cnodes){
+            for(ThingProperty p: n.getProperties().values()){
+//                System.out.println("RecvMsg: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
+                if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName()))
+                    sharing.getHeaderResource(new SendMessage(p.getDeviceType().getDeviceTypeString(),null)
+                            , waiter.putResponseHandler(p), n);
+//                    frame.REQUEST_GET(n.gettoAddr(), new SendMessage(p.getName(), null), waiter.putResponseHandler(p));
+            }
+        }
+        System.out.println("wait for Headers Resources");
+        //waiting and get resources
+        Queue<ResData> gr = waiter.get();
+        System.out.println("success gr: "+gr.size());
+        for(ResData rd : gr){
+            HeaderResources.add(rd);
+            System.out.println("--------gr: "+rd.getResourceString());
+        }
     }
     
 }

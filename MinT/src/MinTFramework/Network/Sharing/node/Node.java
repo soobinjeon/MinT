@@ -126,4 +126,13 @@ public class Node {
     public HashMap<String, ThingInstruction> getInstructions() {
         return instructions;
     }
+
+    /**
+     * is Same Node by Address
+     * @param source Network Profile
+     * @return 
+     */
+    public boolean isSameNode(NetworkProfile source) {
+        return toAddr.getAddress().equals(source.getAddress());
+    }
 }

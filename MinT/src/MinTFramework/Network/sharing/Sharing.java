@@ -111,8 +111,10 @@ public class Sharing {
     /********************************************************
      * CHILD NODE WORKING
      ********************************************************/
-    public void getResource(DeviceType restype, ResponseHandler resHandle){
-        getResource(new SendMessage(restype.getDeviceTypeString(),null), resHandle);
+    public void getResource(DeviceType restype, ResourceOption resOpt, ResponseHandler resHandle){
+        if(resOpt == null)
+                resOpt = ResourceOption.LAST;
+        getResource(new SendMessage(restype.getDeviceTypeString(),resOpt.toOption()), resHandle);
     }
     /**
      * get Resource from Header Node
@@ -126,8 +128,8 @@ public class Sharing {
         if(routingprotocol.isHeaderNode()){
             //get child node resource -> use other method in here
         }else{
-            Node header = routingprotocol.getHeaderNode();
-            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, null);
+            Node header = routingprotocol.getHeaderNodeofCurrentNode();
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
             frame.REQUEST_GET(header.gettoAddr(), requestdata, resHandle);
         }
     }
@@ -139,6 +141,16 @@ public class Sharing {
     
     public List<ResData> getLocalResource(Request recvmsg) {
         return resStorage.getPropertybyResourceType(recvmsg, Resource.StoreCategory.Local);
+    }
+    
+    public void getHeaderResource(SendMessage requestdata, ResponseHandler resHandle, Node header){
+        if(!isActivated)
+            return;
+        
+        if(routingprotocol.isHeaderNode()){
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
+            frame.REQUEST_GET(header.gettoAddr(), requestdata, resHandle);
+        }
     }
     
     /**
@@ -159,6 +171,4 @@ public class Sharing {
     private void requestResource(String resource){
         
     }
-
-    
 }
