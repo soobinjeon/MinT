@@ -50,6 +50,7 @@ public class UDPRecvListener extends Thread{
             bench = new Performance("UDP Recv");
             parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_RECV_LISTENER.toString(), bench);
             isBenchMode = true;
+            System.out.println("make UDP RECVLISTENER Bench");
         }
     }
 
@@ -83,10 +84,16 @@ public class UDPRecvListener extends Thread{
         }
     }
     
+    long stime = 0;
+    long etime = 0;
+    long total = 0;
+    double cnt = 0;
+    double sec = 1000000000.0;
     private void read(SelectionKey key){
-        if(bench != null){
-            bench.startPerform();
-        }
+//        if(bench != null){
+//            bench.startPerform();
+//        }
+        stime = System.nanoTime();
         ByteBufferPool bbp = networkmanager.getByteBufferPool();
         ByteBuffer req = null;
         byte[] fwdbyte = null;
@@ -102,6 +109,16 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
+            etime = System.nanoTime();
+            total += etime - stime;
+            cnt++;
+            if(cnt%10000 == 0){
+                double avg = (double)(total / sec);
+                double rps = cnt / avg;
+                System.out.println("Req/Sec : "+rps+", per byte: "+fwdbyte.length);
+                cnt = 0;
+                total = 0;
+            }
 //            System.out.println("recv: "+new String(fwdbyte));
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
         }catch(ClosedByInterruptException e){

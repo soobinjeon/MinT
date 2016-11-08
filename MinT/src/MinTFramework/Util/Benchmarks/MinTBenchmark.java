@@ -47,6 +47,9 @@ public class MinTBenchmark {
         this.period = pd;
     }
     
+    /**
+     * Make BenchMark for analysis
+     */
     public void makeBenchMark() {
 //        if(!isBenchMode)
 //            return;

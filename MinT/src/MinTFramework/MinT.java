@@ -562,6 +562,10 @@ public abstract class MinT {
         return mintBench;
     }
     
+    /**
+     * Start BenchMark for logging
+     * @param filename 
+     */
     public void startBenchmark(String filename){
 //        mintBench.setBenchMode(isbench, period);
         mintBench.startBench(filename);
