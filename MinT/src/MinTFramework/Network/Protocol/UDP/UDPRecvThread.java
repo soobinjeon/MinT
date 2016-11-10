@@ -53,34 +53,21 @@ public class UDPRecvThread extends UDPThread{
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 size = 0;
-//                checkBench();
-//                startPerform();
+                checkBench();
+                startPerform();
                 
-                datagram.setLength(ReceivedSize);
-                stime = System.nanoTime();
-
                 datagram.setLength(ReceivedSize);
                 socket.receive(datagram);
                 byte[] bytes = Arrays.copyOfRange(datagram.getData(), datagram.getOffset(), datagram.getLength());
                 SocketAddress rd = datagram.getSocketAddress();
 
-                etime = System.nanoTime();
-                total += etime - stime;
-                cnt++;
-                if (cnt % 10000 == 0) {
-                    double avg = (double) (total / sec);
-                    double rps = cnt / avg;
-                    System.out.println(name+"== Req/Sec : " + rps + ", per byte: " + bytes.length);
-                    cnt = 0;
-                    total = 0;
-                }
 //                System.out.println("recv: " + new String(bytes) + ", size: " + bytes.length);
                 size = bytes.length;
                 udp.putReceiveHandler(new RecvMSG(bytes, rd, NetworkType.UDP));
             } catch (Exception t) {
                 System.out.println(t.getMessage());
             } finally{
-//                endPerform(size);
+                endPerform(size);
             }
         }
     }
