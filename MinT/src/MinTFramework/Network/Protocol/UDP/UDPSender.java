@@ -15,59 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.Protocol.UDP;
-import MinTFramework.MinT;
-import MinTFramework.Network.NetworkManager;
-import MinTFramework.Util.Benchmarks.Performance;
-import MinTFramework.Util.ByteBufferPool;
-import MinTFramework.Util.DebugLog;
-import java.io.IOException;
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
+import MinTFramework.Network.PacketDatagram;
 
 public class UDPSender implements Runnable {
-    MinT frame;
-    NetworkManager nmanager;
-    UDP udp;
-//    Selector selector;
-    DebugLog dl = new DebugLog("UDPSender");
-    Performance ppf = null;
+    private PacketDatagram packet;
     
-    byte[] _sendMsg;
-    SocketAddress sendAddr;
-    
-    public UDPSender(UDP udp, byte[] _msg, SocketAddress add) throws IOException{
-        frame = MinT.getInstance();
-        nmanager = frame.getNetworkManager();
-        this.udp = udp;
-        _sendMsg = _msg;
-        sendAddr = add;
+    public UDPSender(PacketDatagram _packet){
+        packet = _packet;
     }
     
     @Override
     public void run() {
-        UDPSendThread ust = (UDPSendThread)Thread.currentThread();
-        ust.checkBench();
-        DatagramChannel channel = ust.getDataChannel();
-        Performance bench = ust.getBench();
-        int bsize = 0;
-        
-        if(bench != null)
-            bench.startPerform();
-        ByteBufferPool bbp = nmanager.getByteBufferPool();
-        ByteBuffer out = null;
-        try{        
-            out = bbp.getMemoryBuffer();
-            out.put(_sendMsg);
-            out.flip();
-            bsize = channel.send(out, sendAddr);
-        } catch (IOException ex) {
+        try {
+            UDPSendThread ust = (UDPSendThread)Thread.currentThread();
+            ust.sendData(packet);
+        } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("Sender Closed by Thread Stop Interrupt");
-        }finally{
-            bbp.putBuffer(out);
-            if(bench != null)
-                bench.endPerform(out.limit());
         }
     }
 }

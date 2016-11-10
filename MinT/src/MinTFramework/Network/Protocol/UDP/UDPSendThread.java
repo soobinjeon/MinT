@@ -16,65 +16,73 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 
-import MinTFramework.MinT;
-import MinTFramework.Util.Benchmarks.Performance;
+import MinTFramework.MinTConfig;
+import MinTFramework.Network.PacketDatagram;
 import java.io.IOException;
-import java.nio.channels.DatagramChannel;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class UDPSendThread extends Thread{
-    private DatagramChannel datachannel;
-    private MinT parent;
-    private Performance bench = null;
-    private boolean isBenchMode = false;
+public class UDPSendThread extends UDPThread{
+    private DatagramSocket socket;
+    private DatagramPacket datagram;
+    private final String MulticastAddress = MinTConfig.CoAP_MULTICAST_ADDRESS;
+    private final int MultiPort = MinTConfig.INTERNET_COAP_PORT;
+    private Runnable r;
     
-    public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
-        super(r,name);
-        this.datachannel = datachannel;
-        this.setPriority(MAX_PRIORITY);
-        parent = MinT.getInstance();
-        checkBench();
-        
-    }
+    private int d_size = 0;
     
-    /**
-     * Sender Bench Check
-     * Not Use some problem
-     * 보내는쪽 버퍼가 낮으면 벤치가 동작하지 않음
-     * start 후 Send 네트워크 문제로 endbench가 실행되지 않아 MinTAnalize에서 Performance check 할때 기다림
-     */
-    public void checkBench(){
-//        if(!isBenchMode && parent.getBenchmark().isBenchMode()){
-//            bench = new Performance("SendAdaptor");
-//            parent.getBenchmark().addPerformance(UDP.UDP_Thread_Pools.UDP_SENDER.toString(), bench);
-//            isBenchMode = true;
-//        }
-    }
-    
-    public DatagramChannel getDataChannel(){
-        return datachannel;
-    }
-    
-    public String getPort(){
-        try {
-            return datachannel.getLocalAddress().toString();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return "";
-    }
-    
-    public Performance getBench(){
-        return bench;
+    public UDPSendThread(Runnable _r, DatagramSocket _socket, UDP udp, int cnt){
+        super("UDP_SEND_"+cnt, udp, UDP.UDP_Thread_Pools.UDP_RECV_LISTENER);
+        socket = _socket;
+        datagram = new DatagramPacket(new byte[0], 0);
+        r = _r;
+//        this.setPriority(MAX_PRIORITY);
     }
     
     @Override
-    public void finalize() throws Throwable{
-        super.finalize();
-        System.out.println("end of thread Sender-");
+    public void run(){
+        /**
+        * Sender Bench Check
+        * Not Use some problem
+        * 보내는쪽 버퍼가 낮으면 벤치가 동작하지 않음
+        * start 후 Send 네트워크 문제로 endbench가 실행되지 않아 MinTAnalize에서 Performance check 할때 기다림
+        */
+        //checkBench();
+        try {
+            d_size = 0;
+            //startPerform();
+            r.run();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            //endPerform(d_size);
+        }
+    }
+    
+    public void setByteSize(int size){
+        d_size = size;
+    }
+    
+    public void sendData(PacketDatagram packet) throws IOException{
+        InetSocketAddress des;
+        
+        if(socket instanceof MulticastSocket){
+            des = new InetSocketAddress(MulticastAddress,MultiPort);
+        }
+        else
+            des = new InetSocketAddress(packet.getNextNode().getIPAddr()
+                , packet.getNextNode().getPort());
+        datagram.setData(packet.getPacket());
+        datagram.setAddress(des.getAddress());
+        datagram.setPort(des.getPort());
+        socket.send(datagram);
+        setByteSize(datagram.getLength());
     }
 }
