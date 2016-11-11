@@ -134,6 +134,7 @@ public class MinTBenchmark {
     public synchronized void addPerformance(String pm, Performance p){
         BenchAnalize pl = addBenchMark(pm);
         pl.addPerformance(p);
+        System.out.println("Add Perform: "+pm+", "+p.Name+", "+pl.getPerformances().size());
     }
     
     public BenchAnalize getBenchmark(String pm){

@@ -82,6 +82,7 @@ public class BenchAnalize {
                     packets += nf.getTotalPackets();
                 }
             }
+            System.out.println("PM: "+pm+", numofThread: "+numofPerform);
             datas.add(new PerformData(datas.size()+1, pm, totalRequest, totalTime, totalbytes, packets, numofPerform));
         }
         
@@ -148,6 +149,12 @@ public class BenchAnalize {
         return this.datas;
     }
     
+    public ConcurrentHashMap<Integer, Performance> getPerformances(){
+        return pflist;
+    }
+    public int getPsize(){
+        return psize;
+    }
     public void print(){
 //        System.out.print(pm+"-Total : ");
 //        if(tp instanceof Performance){

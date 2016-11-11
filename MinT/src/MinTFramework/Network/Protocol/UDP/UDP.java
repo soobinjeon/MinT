@@ -47,7 +47,7 @@ public class UDP extends Network {
     static final int UDP_SENDER_THREAD_CORE = 8;
     static final int UDP_SENDER_THREAD_MAX = 8;
     static final int UDP_SENDER_THREAD_QUEUE = 200000;
-    static public final int UDP_NUM_OF_LISTENER_THREADS = 8;
+    static public final int UDP_NUM_OF_LISTENER_THREADS = 4;
     static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
     static public final int UDP_SEND_BUFF_SIZE = 1024*1024*10;
     static public final int receiverPacketSize = 2048;
@@ -191,7 +191,7 @@ public class UDP extends Network {
      */
     private void MakeUDPReceiveListeners() {
         sysSched.registerThreadPool(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
-                , Executors.newCachedThreadPool());
+                , Executors.newFixedThreadPool(NUMofRecv_Listener_Threads));
         
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
