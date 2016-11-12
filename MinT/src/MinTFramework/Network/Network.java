@@ -37,7 +37,6 @@ public abstract class Network {
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
     protected SystemScheduler sysSched;
-    
     private boolean isworking = true;
     
     private DebugLog ndl = new DebugLog("Network");

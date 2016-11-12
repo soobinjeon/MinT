@@ -34,7 +34,7 @@ public class ReceiveMessage extends Request{
     
     private void setJSONtoData(String JSONString) {
         try{
-            messageString = JSONString;
+//            messageString = JSONString;
             if(!JSONString.equals("")){
                 JSONParser jsonParser = new JSONParser();
                 resObject = (JSONObject)jsonParser.parse(messageString);

@@ -63,7 +63,7 @@ public class Transportation implements NetworkLayers{
     public void Receive(PacketDatagram packet) {
         if(isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())){
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource());
-            System.out.println("PayLoad: "+packet.getMsgData());
+//            System.out.println("PayLoad: "+packet.getMsgData());
             if (isRouting(receivemsg)) {
                 routing.routingHandle(packet, receivemsg);
             } else if(isSharing(receivemsg)){
