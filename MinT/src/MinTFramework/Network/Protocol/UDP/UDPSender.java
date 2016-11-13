@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.PacketDatagram;
@@ -36,10 +37,11 @@ public class UDPSender implements Runnable {
     
     byte[] _sendMsg;
     SocketAddress sendAddr;
-    
-    public UDPSender() throws IOException{
+    String name;
+    public UDPSender(String _name) throws IOException{
         frame = MinT.getInstance();
         nmanager = frame.getNetworkManager();
+        name = _name;
 //        _sendMsg = _msg;
 //        sendAddr = add;
     }
@@ -51,15 +53,20 @@ public class UDPSender implements Runnable {
         Performance bench = ust.getBench();
         int bsize = 0;
         ByteBufferPool bbp = nmanager.getByteBufferPool();
-        
         ust.checkBench();
+        
         while (!Thread.currentThread().isInterrupted()) {
             PacketDatagram packet = ust.getDatafromQueue();
-            if(packet == null)
+            
+            if(packet == null){
                 continue;
+            }
             _sendMsg = packet.getPacket();
-            NetworkProfile dst = packet.getNextNode();
-            sendAddr = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
+            if(!ust.isMulticast()){
+                NetworkProfile dst = packet.getNextNode();
+                sendAddr = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
+            }else
+                sendAddr = new InetSocketAddress(MinTConfig.CoAP_MULTICAST_ADDRESS, ust.getUDP().getPort());
             
             bsize = 0;
             if (bench != null) {

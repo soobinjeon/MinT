@@ -200,7 +200,7 @@ public class UDP extends Network {
         for(int i=0;i<UDP_SENDER_THREAD_MAX;i++){
             try {
                 sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
-                        , new UDPSender());
+                        , new UDPSender("Sender_"+i));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -220,7 +220,7 @@ public class UDP extends Network {
         try {
             //send to CoAP Group Address with CoAP port
             sysSched.submitProcess(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
-                    , new UDPSender());
+                    , new UDPSender("MulticastSender"));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

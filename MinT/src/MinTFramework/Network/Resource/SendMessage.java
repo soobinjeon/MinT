@@ -44,7 +44,7 @@ public class SendMessage extends Request{
         for(MSG_ATTR key : this.resources.keySet()){
             resObject.put(key.getName(), resources.get(key).getResource());
         }
-//        messageString = resObject.toJSONString();
+        messageString = resObject.toJSONString();
     }
     
     public SendMessage AddAttribute(MSG_ATTR attr, Object value){

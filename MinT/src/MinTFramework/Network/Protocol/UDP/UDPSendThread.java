@@ -73,6 +73,9 @@ public class UDPSendThread extends Thread{
         }
         return "";
     }
+    public UDP getUDP(){
+        return udp;
+    }
     
     public Performance getBench(){
         return bench;
@@ -83,14 +86,17 @@ public class UDPSendThread extends Thread{
         super.finalize();
         System.out.println("end of thread Sender-");
     }
+    
+    public boolean isMulticast(){
+        return isMulticast;
+    }
 
     public PacketDatagram getDatafromQueue() {
         try {
-            if (!isMulticast) {
+            if (!isMulticast)
                 return udp.getSendPacketQueue().take();
-            } else {
+            else 
                 return udp.getSendMulticastQueue().take();
-            }
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
