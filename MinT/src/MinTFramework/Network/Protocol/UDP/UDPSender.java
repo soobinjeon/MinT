@@ -71,7 +71,7 @@ public class UDPSender implements Runnable {
                 out.put(_sendMsg);
                 out.flip();
                 bsize = channel.send(out, sendAddr);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 System.out.println("Sender Closed by Thread Stop Interrupt");
             } finally {

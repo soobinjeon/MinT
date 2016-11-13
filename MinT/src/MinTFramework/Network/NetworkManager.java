@@ -61,8 +61,8 @@ public class NetworkManager {
     private PacketIDManager idmaker;
     
     //Temporary properties for check
-    private int tempHandlerCnt = 0;
-    private int sendHandlerCnt = 0;
+    private Integer tempHandlerCnt = 0;
+    private Integer sendHandlerCnt = 0;
     private final DebugLog dl;
     
     /**
@@ -265,7 +265,7 @@ public class NetworkManager {
      * @param num
      * @return 
      */
-    public synchronized ResponseHandler getResponseDataMatchbyID(short num){
+    public ResponseHandler getResponseDataMatchbyID(short num){
         SendMSG smsg = ResponseList.get(num);
         if(smsg == null)
             return null;
@@ -279,15 +279,19 @@ public class NetworkManager {
     /**
      * Temporary Method
      */
-    public synchronized void setHandlerCount(){
-        this.tempHandlerCnt++;
+    public void setHandlerCount(){
+        synchronized(tempHandlerCnt){
+            tempHandlerCnt++;
+        }
     }
     
     public int getHandlerCount(){
         return tempHandlerCnt;
     }
     public synchronized void setSendHandlerCnt(){
-        this.sendHandlerCnt++;
+        synchronized(sendHandlerCnt){
+            sendHandlerCnt++;
+        }
     }
     public int getSendHandlercnt(){
         return sendHandlerCnt;
@@ -297,8 +301,10 @@ public class NetworkManager {
      * get Response Msg List
      * @return 
      */
-    public synchronized ConcurrentHashMap<Short, SendMSG> getResponseList(){
-        return ResponseList;
+    public ConcurrentHashMap<Short, SendMSG> getResponseList(){
+        synchronized(ResponseList){
+            return ResponseList;
+        }
     }
     
     /**

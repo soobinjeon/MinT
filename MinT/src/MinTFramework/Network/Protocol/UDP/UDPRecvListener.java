@@ -63,7 +63,7 @@ public class UDPRecvListener extends Thread{
                 checkBench();
                 RequestPendingConnection();
             }
-        }catch(IOException e){
+        }catch(Exception e){
             e.printStackTrace();
         }
     }

@@ -24,8 +24,6 @@ import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.Util.LimitedQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Thread Pool Adjustment
@@ -147,7 +145,7 @@ public class ThreadAdjustment_N6 implements Runnable{
         int size = (int)benchcount;
         if(size < 0)
             return 0;
-        return input.ReqperSec.get(size);
+        return input.getRequestperSeconds().get(size);
     }
     
     private double getTime(BenchAnalize input){
@@ -156,7 +154,7 @@ public class ThreadAdjustment_N6 implements Runnable{
         int size = (int)benchcount;
         if(size < 0)
             return 0;
-        return input.totaltime.get(size);
+        return input.getTotalTime().get(size);
     }
     
     private double getRequest(BenchAnalize input){
@@ -166,7 +164,7 @@ public class ThreadAdjustment_N6 implements Runnable{
         
         if(size < 0)
             return 0;
-        return input.TRequest.get(size);
+        return input.getTotalRequest().get(size);
     }
     
     private void delayforInformation(BenchAnalize input){
@@ -180,6 +178,7 @@ public class ThreadAdjustment_N6 implements Runnable{
             try {
                 Thread.sleep(1);
             } catch (InterruptedException ex) {
+                ex.printStackTrace();
             }
             size = (int)benchcount;
         }

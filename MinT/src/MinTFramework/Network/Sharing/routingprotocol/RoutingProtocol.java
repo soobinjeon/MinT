@@ -136,6 +136,7 @@ public class RoutingProtocol implements Runnable{
             }
         }catch(InterruptedException e){
             System.out.println("Routring Protocol- Thread Intrrupt Exception");
+            e.printStackTrace();
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,6 +166,8 @@ public class RoutingProtocol implements Runnable{
             ex.printStackTrace();
         } catch (ExecutionException ex) {
             ex.printStackTrace();
+        } catch(Exception e){
+            e.printStackTrace();
         }
     }
     

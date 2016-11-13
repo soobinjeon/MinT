@@ -247,7 +247,7 @@ public abstract class Resource{
             sourcelocation = new StorageDirectory(new NetworkProfile((String)jtor.get(JSONKEY.SOURCELOC.toString())), 
                     (String)jtor.get(JSONKEY.GROUP.toString()), name);
         }catch(Exception e){
-            
+            e.printStackTrace();
         }
     }
     

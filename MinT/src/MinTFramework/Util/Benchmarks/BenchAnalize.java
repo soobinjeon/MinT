@@ -39,14 +39,14 @@ public class BenchAnalize {
 //    protected ArrayList<Performance> pflist;
     protected ArrayList<PerformData> datas;
     
-    public ArrayList<Long> totaltime = new ArrayList<>();
-    public ArrayList<Double> avgtime = new ArrayList<>();
-    public ArrayList<Long> TRequest = new ArrayList<>();
-    public ArrayList<Long> Tpackets = new ArrayList<>();
-    public ArrayList<Long> Tbytes = new ArrayList<>();
-    public ArrayList<Double> ReqperSec = new ArrayList<>();
-    public ArrayList<Double> PckperSec = new ArrayList<>();
-    public ArrayList<Integer> NofPerform = new ArrayList<>();
+    private ArrayList<Long> totaltime = new ArrayList<>();
+    private ArrayList<Double> avgtime = new ArrayList<>();
+    private ArrayList<Long> TRequest = new ArrayList<>();
+    private ArrayList<Long> Tpackets = new ArrayList<>();
+    private ArrayList<Long> Tbytes = new ArrayList<>();
+    private ArrayList<Double> ReqperSec = new ArrayList<>();
+    private ArrayList<Double> PckperSec = new ArrayList<>();
+    private ArrayList<Integer> NofPerform = new ArrayList<>();
     
     private boolean isInserting = false;
     public BenchAnalize(String pm){
@@ -89,7 +89,6 @@ public class BenchAnalize {
         if(others != null)
             others.insertAnalysisData(true, datas);
     }
-    
     public synchronized void insertAnalysisData(boolean isother, ArrayList<PerformData> datas){
         isInserting = true;
         int idx = datas.size()-1;
@@ -110,7 +109,7 @@ public class BenchAnalize {
                 NofPerform.add(datas.get(idx).getNumofPerform());
                 ReqperSec.add(datas.get(idx).getRequestperSec());
                 PckperSec.add(datas.get(idx).getPacketperSec());
-            }else{
+            } else {
                 System.err.printf("IDX is Zero");
             }
         isInserting = false;
@@ -183,5 +182,30 @@ public class BenchAnalize {
         ReqperSec.clear();
         PckperSec.clear();
         NofPerform.clear();
+    }
+    
+    public synchronized ArrayList<Long> getTotalTime(){
+        return totaltime;
+    }
+    public synchronized  ArrayList<Double> getAverageTime(){
+        return avgtime;
+    }
+    public synchronized  ArrayList<Long> getTotalRequest(){
+        return TRequest;
+    }
+    public synchronized  ArrayList<Long> getTotalPackets(){
+        return Tpackets;
+    }
+    public synchronized  ArrayList<Long> getTotalbytes(){
+        return Tbytes;
+    }
+    public synchronized  ArrayList<Double> getRequestperSeconds(){
+        return ReqperSec;
+    }
+    public synchronized  ArrayList<Double> getPacketperSeconds(){
+        return PckperSec;
+    }
+    public synchronized  ArrayList<Integer> getNumberofPerform(){
+        return NofPerform;
     }
 }

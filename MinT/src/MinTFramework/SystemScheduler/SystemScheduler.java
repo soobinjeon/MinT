@@ -36,7 +36,7 @@ public class SystemScheduler extends ThreadPoolScheduler{
     public SystemScheduler(){
         serviceList = new ArrayList<>();
         //System Scheduler
-        registerMinTSystemthreadPool(MinTthreadPools.THREAD_ADJUST);
+//        registerMinTSystemthreadPool(MinTthreadPools.THREAD_ADJUST);
         //register System Pool
         registerMinTSystemthreadPool(MinTthreadPools.SYSTEM);
         //register Resource Pool

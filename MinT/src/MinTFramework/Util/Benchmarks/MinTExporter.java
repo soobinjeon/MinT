@@ -58,14 +58,14 @@ public class MinTExporter extends ExcelExporter{
         int cnt = 4;
         addTime(excelSheet, 0, cnt, datas);
         
-        addIntegerDatas(excelSheet, 1, cnt, ben.NofPerform);
-        addLongDatas(excelSheet, 2, cnt, ben.totaltime);
-        addDoubleDatas(excelSheet, 3, cnt, ben.avgtime);
-        addLongDatas(excelSheet, 4, cnt, ben.TRequest);
-        addDoubleDatas(excelSheet, 5, cnt, ben.ReqperSec);
-        addLongDatas(excelSheet, 6, cnt, ben.Tpackets);
-        addDoubleDatas(excelSheet, 7, cnt, ben.PckperSec);
-        addLongDatas(excelSheet, 8, cnt, ben.Tbytes);
+        addIntegerDatas(excelSheet, 1, cnt, ben.getNumberofPerform());
+        addLongDatas(excelSheet, 2, cnt, ben.getTotalTime());
+        addDoubleDatas(excelSheet, 3, cnt, ben.getAverageTime());
+        addLongDatas(excelSheet, 4, cnt, ben.getTotalRequest());
+        addDoubleDatas(excelSheet, 5, cnt, ben.getRequestperSeconds());
+        addLongDatas(excelSheet, 6, cnt, ben.getTotalPackets());
+        addDoubleDatas(excelSheet, 7, cnt, ben.getPacketperSeconds());
+        addLongDatas(excelSheet, 8, cnt, ben.getTotalbytes());
     }
     
     private void addIntegerDatas(WritableSheet excelSheet, int col, int cnt, ArrayList<Integer> datas) throws WriteException {

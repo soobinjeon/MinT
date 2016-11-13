@@ -91,7 +91,7 @@ public class UDPSendThread extends Thread{
             } else {
                 return udp.getSendMulticastQueue().take();
             }
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }

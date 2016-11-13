@@ -75,7 +75,7 @@ public class ExecuteRouting extends Phase implements Callable{
                 Thread.sleep(5000);
             }
         }catch(Exception e){
-            
+            e.printStackTrace();
         }
         return true;
     }

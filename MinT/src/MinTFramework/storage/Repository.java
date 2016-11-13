@@ -49,6 +49,7 @@ public class Repository<T> extends Cache<T>{
                     rlist.add(res);
                 }
             } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
         return rlist;

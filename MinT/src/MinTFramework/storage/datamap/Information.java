@@ -51,6 +51,7 @@ public class Information {
                 isStringvalue = false;
         }
         }catch(Exception e){
+            e.printStackTrace();
             /**/
         }
     }

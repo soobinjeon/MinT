@@ -75,7 +75,7 @@ public class Cache<T> implements CacheMap<T>{
                     res.add(cd);    
                 }
             }catch(Exception e){
-                
+                e.printStackTrace();
             }
             
         }
@@ -106,6 +106,7 @@ public class Cache<T> implements CacheMap<T>{
                 }
             }
         }catch(Exception e){
+            e.printStackTrace();
             /**/
         }
         return res;
