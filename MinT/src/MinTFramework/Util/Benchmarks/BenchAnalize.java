@@ -101,14 +101,30 @@ public class BenchAnalize {
 //                }else{
 //                    System.err.println("Other-size: "+idx+", inidx: "+inidx);
 //                }
-                totaltime.add(datas.get(idx).getTotalTime());
-                avgtime.add(datas.get(idx).getAvgTime());
-                TRequest.add(datas.get(idx).getRequest());
-                Tpackets.add(datas.get(idx).getTotalPackets());
-                Tbytes.add(datas.get(idx).getTotalBytes());
-                NofPerform.add(datas.get(idx).getNumofPerform());
-                ReqperSec.add(datas.get(idx).getRequestperSec());
-                PckperSec.add(datas.get(idx).getPacketperSec());
+                synchronized (totaltime) {
+                    totaltime.add(datas.get(idx).getTotalTime());
+                }
+                synchronized (avgtime) {
+                    avgtime.add(datas.get(idx).getAvgTime());
+                }
+                synchronized (TRequest) {
+                    TRequest.add(datas.get(idx).getRequest());
+                }
+                synchronized (Tpackets) {
+                    Tpackets.add(datas.get(idx).getTotalPackets());
+                }
+                synchronized (Tbytes) {
+                    Tbytes.add(datas.get(idx).getTotalBytes());
+                }
+                synchronized (NofPerform) {
+                    NofPerform.add(datas.get(idx).getNumofPerform());
+                }
+                synchronized (ReqperSec) {
+                    ReqperSec.add(datas.get(idx).getRequestperSec());
+                }
+                synchronized (PckperSec) {
+                    PckperSec.add(datas.get(idx).getPacketperSec());
+                }
             } else {
                 System.err.printf("IDX is Zero");
             }
@@ -173,39 +189,89 @@ public class BenchAnalize {
         }
 //        System.out.println("------------------------------------exit waiting!!!");
         this.resetParam();
-        datas.clear();
-        totaltime.clear();
-        avgtime.clear();
-        TRequest.clear();
-        Tpackets.clear();
-        Tbytes.clear();
-        ReqperSec.clear();
-        PckperSec.clear();
-        NofPerform.clear();
+//        datas.clear();
+//        totaltime.clear();
+//        avgtime.clear();
+//        TRequest.clear();
+//        Tpackets.clear();
+//        Tbytes.clear();
+//        ReqperSec.clear();
+//        PckperSec.clear();
+//        NofPerform.clear();
+        synchronized (datas){
+            datas.clear();
+        }
+        synchronized (totaltime) {
+            totaltime.clear();
+        }
+        synchronized (avgtime) {
+            avgtime.clear();
+        }
+        synchronized (TRequest) {
+            TRequest.clear();
+        }
+        synchronized (Tpackets) {
+            Tpackets.clear();
+        }
+        synchronized (Tbytes) {
+            Tbytes.clear();
+        }
+        synchronized (NofPerform) {
+            NofPerform.clear();
+        }
+        synchronized (ReqperSec) {
+            ReqperSec.clear();
+        }
+        synchronized (PckperSec) {
+            PckperSec.clear();
+        }
     }
     
-    public synchronized ArrayList<Long> getTotalTime(){
-        return totaltime;
+    public ArrayList<Long> getTotalTime() {
+        synchronized (totaltime) {
+            return totaltime;
+        }
     }
-    public synchronized  ArrayList<Double> getAverageTime(){
-        return avgtime;
+
+    public ArrayList<Double> getAverageTime() {
+        synchronized (totaltime) {
+            return avgtime;
+        }
     }
-    public synchronized  ArrayList<Long> getTotalRequest(){
-        return TRequest;
+
+    public ArrayList<Long> getTotalRequest() {
+        synchronized (totaltime) {
+            return TRequest;
+        }
     }
-    public synchronized  ArrayList<Long> getTotalPackets(){
-        return Tpackets;
+
+    public ArrayList<Long> getTotalPackets() {
+        synchronized (Tpackets) {
+            return Tpackets;
+        }
     }
-    public synchronized  ArrayList<Long> getTotalbytes(){
-        return Tbytes;
+
+    public ArrayList<Long> getTotalbytes() {
+        synchronized (Tbytes) {
+            return Tbytes;
+        }
     }
-    public synchronized  ArrayList<Double> getRequestperSeconds(){
-        return ReqperSec;
+
+    public ArrayList<Double> getRequestperSeconds() {
+        synchronized (ReqperSec) {
+            return ReqperSec;
+        }
     }
-    public synchronized  ArrayList<Double> getPacketperSeconds(){
-        return PckperSec;
+
+    public ArrayList<Double> getPacketperSeconds() {
+        synchronized (PckperSec) {
+            return PckperSec;
+        }
     }
-    public synchronized  ArrayList<Integer> getNumberofPerform(){
-        return NofPerform;
+
+    public ArrayList<Integer> getNumberofPerform() {
+        synchronized (NofPerform) {
+            return NofPerform;
+        }
     }
 }
