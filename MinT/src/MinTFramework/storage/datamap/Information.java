@@ -76,7 +76,19 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public int getResourceInt() {
-        return (int)getResourceDouble();
+        try {
+            if (isStringvalue)
+                return Integer.parseInt(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).intValue();
+                else
+                    return (int) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (int)0;
+        }
     }
     
     /**
@@ -85,7 +97,19 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public float getResourceFloat(){
-        return (float)getResourceDouble();
+        try {
+            if (isStringvalue)
+                return Float.parseFloat(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).floatValue();
+                else
+                    return (float) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (float)0;
+        }
     }
     
     /**
@@ -97,8 +121,12 @@ public class Information {
         try {
             if (isStringvalue)
                 return Double.parseDouble(getResourceString());
-            else
-                return (double) res;
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).doubleValue();
+                else
+                    return (double) res;
+            }
         } catch (NumberFormatException e) {
             e.printStackTrace();
             return (double)0;
@@ -129,7 +157,19 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public short getResourceShort(){
-        return (short)getResourceDouble();
+        try {
+            if (isStringvalue)
+                return Short.parseShort(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).shortValue();
+                else
+                    return (short) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (short)0;
+        }
     }
     
     /**
@@ -142,7 +182,7 @@ public class Information {
             if (isStringvalue) {
                 return 0;
             } else {
-                return (char) res;
+                return (char) getResourceDouble();
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();

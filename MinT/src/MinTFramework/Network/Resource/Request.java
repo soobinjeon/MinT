@@ -139,10 +139,15 @@ public class Request {
     }
     
     public Information getResourceData(){
+        if(ResourceData == null)
+            setResourceData(null);
         return ResourceData;
     }
     
     public String getResourceName(){
-        return ResourceName.getResourceString();
+        if(ResourceName == null)
+            return "";
+        else
+            return ResourceName.getResourceString();
     }
 }
