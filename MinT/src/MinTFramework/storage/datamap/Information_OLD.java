@@ -16,46 +16,71 @@
  */
 package MinTFramework.storage.datamap;
 
+import MinTFramework.Util.TypeCaster;
+import java.nio.ByteOrder;
+
 /**
- *
- * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
- * youngtak Han <gksdudxkr@gmail.com>
+ * Cache Data Class for Local Cache
+ * Insert DataType
+ *   - All DataType
+ * return
+ *   - incorrect type : null
+ * @author soobin
  */
-public class Information {
-    protected Object res;
+public class Information_OLD {
+    protected byte[] res;
     protected boolean isStringvalue = true;
     
-    public Information(Object _getResource){
+    public Information_OLD(Object _getResource){
         setResource(_getResource);
     }
     
     public void setResource(Object setres){
         try{
-            if(setres == null){
-                isStringvalue = true;
+            if(setres == null)
                 setres = new String("");
-            }
             
             if(setres instanceof Boolean){
+                res = TypeCaster.ObjectTobyte(Boolean.toString((Boolean)setres), ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else if(setres instanceof String){
+                res = TypeCaster.ObjectTobyte((String) setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else{
+                res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = false;
-            }
-            res = setres;
+        }
         }catch(Exception e){
             e.printStackTrace();
             /**/
         }
     }
     
+    private double getNumberResource(){
+        return TypeCaster.byteToDouble(res, ByteOrder.BIG_ENDIAN);
+    }
+    
+    private String getStringResource(){
+        String str = null;
+//        try {
+//            str =  TypeCaster.unzipStringFromBytes(res);
+            str =  TypeCaster.bytesToString(res);
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+        
+        return str;
+    }
+
     /**
      * get Information by Object
      * @return object Type Information
      */
     public Object getResource(){
-        return res;
+        if(isStringvalue)
+            return getStringResource();
+        else
+            return getNumberResource();
     }
     
     /**
@@ -65,18 +90,21 @@ public class Information {
      */
     public String getResourceString(){
         if(isStringvalue)
-            return (String)res;
+            return getStringResource();
         else
             return String.valueOf(getResource());
     }
     
     /**
      * get Integer type Information
-     if it is not matched to input data type(numeric <-> String, return null 
+ if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public int getResourceInt() {
-        return (int)getResourceDouble();
+    public Integer getResourceInt(){
+        if(isStringvalue)
+            return (int)Double.parseDouble(getStringResource());
+        else
+            return (int)getNumberResource();
     }
     
     /**
@@ -84,8 +112,11 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public float getResourceFloat(){
-        return (float)getResourceDouble();
+    public Float getResourceFloat(){
+        if(isStringvalue)
+            return (float)Double.parseDouble(getStringResource());
+        else
+            return (float)getNumberResource();
     }
     
     /**
@@ -93,16 +124,11 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public double getResourceDouble(){
-        try {
-            if (isStringvalue)
-                return Double.parseDouble(getResourceString());
-            else
-                return (double) res;
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            return (double)0;
-        }
+    public Double getResourceDouble(){
+        if(isStringvalue)
+            return Double.parseDouble(getStringResource());
+        else
+            return (double)getNumberResource();
     }
     
     /**
@@ -111,25 +137,23 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public long getResourceLong(){
-        try {
-            if (isStringvalue)
-                return Long.parseLong(getResourceString());
-            else
-                return (long) res;
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
+//    public Long getResourceLong(){
+//        if(isStringvalue)
+//            return Long.parseLong(getStringResource());
+//        else
+//            return (long)getNumberResource();
+//    }
     
     /**
      * get Short type Information
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public short getResourceShort(){
-        return (short)getResourceDouble();
+    public Short getResourceShort(){
+        if(isStringvalue)
+            return (short)Double.parseDouble(getStringResource());
+        else
+            return (short)getNumberResource();
     }
     
     /**
@@ -137,17 +161,11 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public char getResourceChar() {
-        try {
-            if (isStringvalue) {
-                return 0;
-            } else {
-                return (char) res;
-            }
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            return 0;
-        }
+    public Character getResourceChar(){
+        if(isStringvalue)
+            return null;
+        else
+            return (char)getNumberResource();
     }
     
     /**
@@ -155,20 +173,23 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public boolean getResourceBoolean(){
+    public Boolean getResourceBoolean(){
         if(isStringvalue){
-            try{
-                return Boolean.parseBoolean(getResourceString());
-            }catch(Exception e){
-                e.printStackTrace();
-                return false;
-            }
+            return Boolean.parseBoolean(getStringResource());
         }else{
-            int tf = (int)getResourceDouble();
+            int tf = (int)getNumberResource();
             if(tf == 0)
                 return false;
             else
                 return true;
         }
+    }
+    
+    /**
+     * get Length
+     * @return 
+     */
+    public int getLength(){
+        return res != null ? res.length : 0;
     }
 }

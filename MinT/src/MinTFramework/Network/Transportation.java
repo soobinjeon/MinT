@@ -60,9 +60,10 @@ public class Transportation implements NetworkLayers{
     }
 
     @Override
-    public void Receive(PacketDatagram packet) {
+    public void Receive(RecvMSG recvMsg) {
+        PacketDatagram packet = recvMsg.getPacketDatagram();
         if(isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())){
-            ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource());
+            ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
             if (isRouting(receivemsg)) {
                 routing.routingHandle(packet, receivemsg);

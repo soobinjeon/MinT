@@ -19,6 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.Callable;
 
@@ -66,7 +67,7 @@ public class ExecuteRouting extends Phase implements Callable{
                 }
                 
                 System.out.println("--Thing property lists");
-                for(ThingProperty tp : frame.getProperties(null)){
+                for(Resource tp : frame.getProperties(null)){
                     System.out.println("-----"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
                             +", "+tp.getStorageCategory().toString()
                             +", data: "+tp.getResourceData().getResourceString());

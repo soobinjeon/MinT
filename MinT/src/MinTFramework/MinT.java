@@ -487,7 +487,7 @@ public abstract class MinT {
      * @param sc
      * @return 
      */
-    public List<ThingProperty> getProperties(StoreCategory sc){
+    public List<Resource> getProperties(StoreCategory sc){
         return this.getResStorage().getProperties(sc);
     }
     
@@ -496,7 +496,7 @@ public abstract class MinT {
      * @param sc
      * @return 
      */
-    public List<ThingInstruction> getInstructions(StoreCategory sc){
+    public List<Resource> getInstructions(StoreCategory sc){
         return this.getResStorage().getInstructions(sc);
     }
     
@@ -519,9 +519,10 @@ public abstract class MinT {
     }
     
     public void printPropertyLists(){
-        for(ThingProperty tp : getResStorage().getProperties()){
+        for(Resource tp : getResStorage().getProperties()){
+            ThingProperty tpp = (ThingProperty)tp;
             System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
-                    ", "+tp.getDeviceType().toString() +", "+tp.getPropertyRole().toString());
+                    ", "+tp.getDeviceType().toString() +", "+tpp.getPropertyRole().toString());
         }
     }
     

@@ -36,7 +36,7 @@ public class SendMessage extends Request{
     }
     
     public SendMessage(){
-        super();
+        super(null);
     }
     
     private void setMessagetoJSON(){

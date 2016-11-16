@@ -19,6 +19,7 @@ package MinTFramework.Network.sharing.node;
 import MinTFramework.MinT;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
@@ -101,19 +102,19 @@ public class Node {
         MinT frame = MinT.getInstance();
         
         //set Property
-        for(ThingProperty tp : frame.getResStorage().getProperties(StoreCategory.Network)){
+        for(Resource tp : frame.getResStorage().getProperties(StoreCategory.Network)){
             if(tp.getSourceProfile().getAddress().equals(toAddr.getAddress())
                     && properties.get(tp.getID()) == null){
-                properties.put(tp.getID(), tp);
+                properties.put(tp.getID(), (ThingProperty) tp);
                 tp.connectRoutingNode(this);
             }
         }
         
         //set Property
-        for(ThingInstruction ti : frame.getResStorage().getInstructions(StoreCategory.Network)){
+        for(Resource ti : frame.getResStorage().getInstructions(StoreCategory.Network)){
             if(ti.getSourceProfile().getAddress().equals(toAddr.getAddress())
                     && instructions.get(ti.getID()) == null){
-                instructions.put(ti.getID(),ti);
+                instructions.put(ti.getID(), (ThingInstruction) ti);
                 ti.connectRoutingNode(this);
             }
         }
