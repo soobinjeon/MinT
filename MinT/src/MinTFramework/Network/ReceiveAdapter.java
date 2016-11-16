@@ -19,6 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.MinT;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
+import org.json.simple.parser.JSONParser;
 
 /**
  * Receive Adapter Thread Pool
@@ -34,11 +35,13 @@ public class ReceiveAdapter extends Thread{
     private Performance bench = null;
     private MinT parent;
     private boolean isBenchMode = false;
+    private JSONParser jparser;
     
     public ReceiveAdapter(Runnable r, String name) {
         super(r,name);
         matcher = new MatcherAndSerialization(NetworkLayers.LAYER_DIRECTION.RECEIVE);
         parent = MinT.getInstance();
+        jparser = new JSONParser();
 //        System.out.println("Handler Max Priority"+MAX_PRIORITY);
 //        setPriority(MAX_PRIORITY);
         checkBench();
@@ -60,6 +63,10 @@ public class ReceiveAdapter extends Thread{
     
     public Performance getBench(){
         return bench;
+    }
+    
+    public JSONParser getJSONParser(){
+        return jparser;
     }
     
     @Override

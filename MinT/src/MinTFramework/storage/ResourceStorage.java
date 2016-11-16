@@ -50,14 +50,14 @@ public class ResourceStorage {
     private ResourceManagerHandle PMhandle = null;
     private ResourceManagerHandle IMhandle = null;
     
-    private final Repository<ThingProperty> property;
-    private final Repository<ThingInstruction> instruction;
+    private final Repository property;
+    private final Repository instruction;
     
     private MinT frame = null;
     private DebugLog dl = new DebugLog("ResourceStorage");
     public ResourceStorage(){
-        this.instruction = new Repository<>();
-        this.property = new Repository<>();
+        this.instruction = new Repository();
+        this.property = new Repository();
         this.frame = MinT.getInstance();
     }
     
@@ -86,7 +86,6 @@ public class ResourceStorage {
         
         //set Resource ID
 //        res.setResourceID();
-        
         if(res instanceof ThingProperty)
             property.put(res.getID(), (ThingProperty)res);
         else if(res instanceof ThingInstruction)
@@ -158,14 +157,13 @@ public class ResourceStorage {
      */
     public ResData getProperty(Request req, StoreCategory sc){
 //        dl.printMessage("request RES : "+req.getResourceName());
-        List<ThingProperty> rs = property.getbyResourceName(req.getResourceName());
+        List<Resource> rs = property.getbyResourceName(req.getResourceName());
         ArrayList<ResData> ol = new ArrayList<>();
-        for(ThingProperty tp : rs){
+        for(Resource tp : rs){
 //            dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
             if(sc == null || tp.getStorageCategory().equals(sc))
-                ol.add(getPropertyfromResources(req, tp));
+                ol.add(getPropertyfromResources(req, (ThingProperty) tp));
         }
-        
         if(ol.size() > 0)
             return ol.get(0);
         else
@@ -173,11 +171,11 @@ public class ResourceStorage {
     }
     
     public List<ResData> getPropertybyResourceType(Request resourceType, StoreCategory sc){
-        List<ThingProperty> rs = property.getbyResourceType(resourceType.getResourceName());
+        List<Resource> rs = property.getbyResourceType(resourceType.getResourceName());
         ArrayList<ResData> ol = new ArrayList<>();
-        for(ThingProperty tp : rs){
+        for(Resource tp : rs){
             if(sc == null || tp.getStorageCategory().equals(sc))
-                ol.add(getPropertyfromResources(resourceType, tp));
+                ol.add(getPropertyfromResources(resourceType, (ThingProperty)tp));
         }
         
         return ol;
@@ -190,19 +188,15 @@ public class ResourceStorage {
      * @return 
      */
     private ResData getPropertyfromResources(Request req, ThingProperty rs){
-        ResData ret = null;
         if(rs != null){
             //resource is local and Aperiod Property
-            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC){
-                ret = PMhandle.get(req, rs);
-            }
-            else{ //network or period property
-                ret = rs.getResourceData();
-            }
+            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC)
+                return PMhandle.get(req, rs);
+            else //network or period property
+                return rs.getResourceData();
         }
         else
-            ret = null;
-        return ret;
+            return null;
     }
     
     /**
@@ -212,9 +206,9 @@ public class ResourceStorage {
      * @param req 
      */
     public void setInstruction(Request req){
-        List<ThingInstruction> rs = instruction.getbyResourceName(req.getResourceName());
-        for(ThingInstruction tp : rs){
-            IMhandle.set(req, tp);
+        List<Resource> rs = instruction.getbyResourceName(req.getResourceName());
+        for(Resource tp : rs){
+            IMhandle.set(req, (ThingInstruction)tp);
         }
     }
     
@@ -294,7 +288,7 @@ public class ResourceStorage {
      * @param ja
      * @param res
      * @param currentNode 
-     */
+     */ 
     private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode, boolean delegateMode){
         Resource nr = res.getCloneforDiscovery();
         if(res.getStorageCategory().isLocal() || delegateMode){
@@ -342,22 +336,22 @@ public class ResourceStorage {
         return instruction.getAllResourceName();
     }
     
-    public List<ThingProperty> getProperties(){
+    public List<Resource> getProperties(){
         return getProperties(null);
     }
     
-    public List<ThingInstruction> getInstructions(){
+    public List<Resource> getInstructions(){
         return getInstructions(null);
     }
     
-    public List<ThingProperty> getProperties(StoreCategory sc){
+    public List<Resource> getProperties(StoreCategory sc){
         if(sc == null)
             return property.getAllResources();
         else
             return property.getbyStoreCategory(sc);
     }
     
-    public List<ThingInstruction> getInstructions(StoreCategory sc){
+    public List<Resource> getInstructions(StoreCategory sc){
         if(sc == null)
             return instruction.getAllResources();
         else

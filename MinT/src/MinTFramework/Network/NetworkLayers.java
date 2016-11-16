@@ -47,7 +47,7 @@ public interface NetworkLayers {
      * Layer Implements
      * @param packet 
      */
-    public void Receive(PacketDatagram packet);
+    public void Receive(RecvMSG recvmsg);
     
     /**
      * Layer Implements

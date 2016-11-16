@@ -56,10 +56,11 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void EndPointReceive(RecvMSG packet) {
+    public void EndPointReceive(RecvMSG recvmsg) {
         try{
-        PacketDatagram matchedPacket = new PacketDatagram(packet);
-        transportation.Receive(matchedPacket);
+        PacketDatagram matchedPacket = new PacketDatagram(recvmsg);
+        recvmsg.setReceivedPacketDatagram(matchedPacket);
+        transportation.Receive(recvmsg);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -79,7 +80,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Receive(PacketDatagram packet) {
+    public void Receive(RecvMSG packet) {
     }
 
     /**
