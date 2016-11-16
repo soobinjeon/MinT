@@ -39,14 +39,14 @@ public class BenchAnalize {
 //    protected ArrayList<Performance> pflist;
     protected ArrayList<PerformData> datas;
     
-    public ArrayList<Long> totaltime = new ArrayList<>();
-    public ArrayList<Double> avgtime = new ArrayList<>();
-    public ArrayList<Long> TRequest = new ArrayList<>();
-    public ArrayList<Long> Tpackets = new ArrayList<>();
-    public ArrayList<Long> Tbytes = new ArrayList<>();
-    public ArrayList<Double> ReqperSec = new ArrayList<>();
-    public ArrayList<Double> PckperSec = new ArrayList<>();
-    public ArrayList<Integer> NofPerform = new ArrayList<>();
+    private ArrayList<Long> totaltime = new ArrayList<>();
+    private ArrayList<Double> avgtime = new ArrayList<>();
+    private ArrayList<Long> TRequest = new ArrayList<>();
+    private ArrayList<Long> Tpackets = new ArrayList<>();
+    private ArrayList<Long> Tbytes = new ArrayList<>();
+    private ArrayList<Double> ReqperSec = new ArrayList<>();
+    private ArrayList<Double> PckperSec = new ArrayList<>();
+    private ArrayList<Integer> NofPerform = new ArrayList<>();
     
     private boolean isInserting = false;
     public BenchAnalize(String pm){
@@ -89,7 +89,6 @@ public class BenchAnalize {
         if(others != null)
             others.insertAnalysisData(true, datas);
     }
-    
     public synchronized void insertAnalysisData(boolean isother, ArrayList<PerformData> datas){
         isInserting = true;
         int idx = datas.size()-1;
@@ -102,15 +101,31 @@ public class BenchAnalize {
 //                }else{
 //                    System.err.println("Other-size: "+idx+", inidx: "+inidx);
 //                }
-                totaltime.add(datas.get(idx).getTotalTime());
-                avgtime.add(datas.get(idx).getAvgTime());
-                TRequest.add(datas.get(idx).getRequest());
-                Tpackets.add(datas.get(idx).getTotalPackets());
-                Tbytes.add(datas.get(idx).getTotalBytes());
-                NofPerform.add(datas.get(idx).getNumofPerform());
-                ReqperSec.add(datas.get(idx).getRequestperSec());
-                PckperSec.add(datas.get(idx).getPacketperSec());
-            }else{
+                synchronized (totaltime) {
+                    totaltime.add(datas.get(idx).getTotalTime());
+                }
+                synchronized (avgtime) {
+                    avgtime.add(datas.get(idx).getAvgTime());
+                }
+                synchronized (TRequest) {
+                    TRequest.add(datas.get(idx).getRequest());
+                }
+                synchronized (Tpackets) {
+                    Tpackets.add(datas.get(idx).getTotalPackets());
+                }
+                synchronized (Tbytes) {
+                    Tbytes.add(datas.get(idx).getTotalBytes());
+                }
+                synchronized (NofPerform) {
+                    NofPerform.add(datas.get(idx).getNumofPerform());
+                }
+                synchronized (ReqperSec) {
+                    ReqperSec.add(datas.get(idx).getRequestperSec());
+                }
+                synchronized (PckperSec) {
+                    PckperSec.add(datas.get(idx).getPacketperSec());
+                }
+            } else {
                 System.err.printf("IDX is Zero");
             }
         isInserting = false;
@@ -174,14 +189,89 @@ public class BenchAnalize {
         }
 //        System.out.println("------------------------------------exit waiting!!!");
         this.resetParam();
-        datas.clear();
-        totaltime.clear();
-        avgtime.clear();
-        TRequest.clear();
-        Tpackets.clear();
-        Tbytes.clear();
-        ReqperSec.clear();
-        PckperSec.clear();
-        NofPerform.clear();
+//        datas.clear();
+//        totaltime.clear();
+//        avgtime.clear();
+//        TRequest.clear();
+//        Tpackets.clear();
+//        Tbytes.clear();
+//        ReqperSec.clear();
+//        PckperSec.clear();
+//        NofPerform.clear();
+        synchronized (datas){
+            datas.clear();
+        }
+        synchronized (totaltime) {
+            totaltime.clear();
+        }
+        synchronized (avgtime) {
+            avgtime.clear();
+        }
+        synchronized (TRequest) {
+            TRequest.clear();
+        }
+        synchronized (Tpackets) {
+            Tpackets.clear();
+        }
+        synchronized (Tbytes) {
+            Tbytes.clear();
+        }
+        synchronized (NofPerform) {
+            NofPerform.clear();
+        }
+        synchronized (ReqperSec) {
+            ReqperSec.clear();
+        }
+        synchronized (PckperSec) {
+            PckperSec.clear();
+        }
+    }
+    
+    public ArrayList<Long> getTotalTime() {
+        synchronized (totaltime) {
+            return totaltime;
+        }
+    }
+
+    public ArrayList<Double> getAverageTime() {
+        synchronized (totaltime) {
+            return avgtime;
+        }
+    }
+
+    public ArrayList<Long> getTotalRequest() {
+        synchronized (totaltime) {
+            return TRequest;
+        }
+    }
+
+    public ArrayList<Long> getTotalPackets() {
+        synchronized (Tpackets) {
+            return Tpackets;
+        }
+    }
+
+    public ArrayList<Long> getTotalbytes() {
+        synchronized (Tbytes) {
+            return Tbytes;
+        }
+    }
+
+    public ArrayList<Double> getRequestperSeconds() {
+        synchronized (ReqperSec) {
+            return ReqperSec;
+        }
+    }
+
+    public ArrayList<Double> getPacketperSeconds() {
+        synchronized (PckperSec) {
+            return PckperSec;
+        }
+    }
+
+    public ArrayList<Integer> getNumberofPerform() {
+        synchronized (NofPerform) {
+            return NofPerform;
+        }
     }
 }

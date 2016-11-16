@@ -52,7 +52,7 @@ public class ThreadAdjustment implements Runnable{
         pools = bench.getPoolsInfo();
         THarray = new LimitedQueue(TRequestSize);
         arrayRequestNn = new LimitedQueue(3);
-        recvpool = frame.getSysteScheduler().getThreadPool(MinTthreadPools.NET_RECV_HANDLE);
+        recvpool = frame.getSystemScheduler().getThreadPool(MinTthreadPools.NET_RECV_HANDLE);
     }
     
     /**
@@ -156,7 +156,7 @@ public class ThreadAdjustment implements Runnable{
 //            System.out.println("NET_RECV_HANDLE is not Null() - "+Hdata);//+"("+Ht.ReqperSec.size()+"), Time: "+getTime(Ht)+", Time: "+getRequest(Ht));
 //            System.out.println("UDP_SEND is not Null() - "+Sdata);
             
-            frame.getSysteScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
+            frame.getSystemScheduler().setPoolsize(MinTthreadPools.NET_RECV_HANDLE, Nt);
             Rt.clearBuffer();
             Ht.clearBuffer();
 //            St.clearBuffer();
@@ -167,7 +167,7 @@ public class ThreadAdjustment implements Runnable{
     private double getData(BenchAnalize input){
         if(input == null)
             return -1;
-        int size = input.ReqperSec.size() - 1;
+        int size = input.getRequestperSeconds().size() - 1;
         /**
          * 서로 다른 스레드에서 동시에 Pool 정보를 저장 및 불러옴
          * Pool 정보를 저장하는 시간보다 불러오는 시간이 더 빠를 때가 있음
@@ -178,20 +178,20 @@ public class ThreadAdjustment implements Runnable{
                 Thread.sleep(1);
             } catch (InterruptedException ex) {
             }
-            size = input.ReqperSec.size() - 1;
+            size = input.getRequestperSeconds().size() - 1;
         }
 //        if(size < 0)
 //            return -1;
-        return input.ReqperSec.get(size);
+        return input.getRequestperSeconds().get(size);
     }
     
     private double getTime(BenchAnalize input){
         if(input == null)
             return -1;        
-        int size = input.totaltime.size() - 1;
+        int size = input.getTotalTime().size() - 1;
         if(size < 0)
             return 0;
-        return input.totaltime.get(size);
+        return input.getTotalTime().get(size);
     }
     
     private double getTotalRequest(BenchAnalize input){
@@ -199,10 +199,10 @@ public class ThreadAdjustment implements Runnable{
             return -1;
         double reqsum = 0;
         
-        if(input.TRequest == null)
+        if(input.getTotalRequest() == null)
             return 0;
         
-        for(double d : input.TRequest)
+        for(double d : input.getTotalRequest())
             reqsum += d;
         return reqsum;
     }

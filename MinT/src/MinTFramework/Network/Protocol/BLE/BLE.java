@@ -22,8 +22,6 @@ import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -98,7 +96,7 @@ public class BLE extends Network {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            Logger.getLogger(BLE.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         //
         if(deviceBLE.connect(dst))

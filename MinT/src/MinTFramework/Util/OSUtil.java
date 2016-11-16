@@ -23,13 +23,9 @@ import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-import java.util.Formatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -56,7 +52,7 @@ public class OSUtil {
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(OSUtil.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
     private static String getAndroidIPAddress() {

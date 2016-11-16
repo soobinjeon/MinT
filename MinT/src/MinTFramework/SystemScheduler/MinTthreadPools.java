@@ -48,7 +48,8 @@ public enum MinTthreadPools {
             , TimeUnit.SECONDS
             , new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)
             , new ReceiveAdaptorFactory()
-            , new RejectedExecutionHandlerImpl()));
+            , new RejectedExecutionHandlerImpl())),
+    ROUTING_PROTOCOL(Executors.newSingleThreadExecutor());
 
     ExecutorService es;
 

@@ -17,6 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
+import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
@@ -29,14 +30,19 @@ import java.nio.channels.DatagramChannel;
 public class UDPSendThread extends Thread{
     private DatagramChannel datachannel;
     private MinT parent;
+    private UDP udp;
     private Performance bench = null;
     private boolean isBenchMode = false;
+    private boolean isMulticast = false;
     
-    public UDPSendThread(Runnable r, DatagramChannel datachannel, String name){
+    public UDPSendThread(Runnable r, DatagramChannel datachannel, String name, UDP _udp
+            ,boolean _isMulticast){
         super(r,name);
         this.datachannel = datachannel;
         this.setPriority(MAX_PRIORITY);
         parent = MinT.getInstance();
+        udp = _udp;
+        isMulticast = _isMulticast;
         checkBench();
         
     }
@@ -67,6 +73,9 @@ public class UDPSendThread extends Thread{
         }
         return "";
     }
+    public UDP getUDP(){
+        return udp;
+    }
     
     public Performance getBench(){
         return bench;
@@ -76,5 +85,21 @@ public class UDPSendThread extends Thread{
     public void finalize() throws Throwable{
         super.finalize();
         System.out.println("end of thread Sender-");
+    }
+    
+    public boolean isMulticast(){
+        return isMulticast;
+    }
+
+    public PacketDatagram getDatafromQueue() {
+        try {
+            if (!isMulticast)
+                return udp.getSendPacketQueue().take();
+            else 
+                return udp.getSendMulticastQueue().take();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 }

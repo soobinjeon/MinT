@@ -39,7 +39,7 @@ public class ResourceManager {
      */
     public ResourceManager(){
         frame = MinT.getInstance();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         RS = frame.getResStorage();
     }
 

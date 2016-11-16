@@ -24,8 +24,19 @@ import MinTFramework.storage.datamap.Information;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class ResData extends Information{
-
-    public ResData(Object _getResource) {
+    ThingProperty property = null;
+    
+    public ResData(Object _getResource, ThingProperty _prop) {
         super(_getResource);
+        property = _prop;
     }
+    
+    public ResData(Object _getResource) {
+        this(_getResource, null);
+    }
+
+    public ThingProperty getProperty() {
+        return property;
+    }
+    
 }

@@ -16,7 +16,9 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.Util.DebugLog;
+import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.datamap.Cache;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class Repository<T> extends Cache<T>{
+public class Repository extends Cache<Resource>{
     DebugLog dl = new DebugLog("Repository");
     public Repository(){}
     
@@ -35,18 +37,59 @@ public class Repository<T> extends Cache<T>{
      * @param resName
      * @return 
      */
-    public List<T> getbyResourceName(String resName){
-        ArrayList<T> rlist = new ArrayList<>();
-        for(T res : resources.values()){
+    public List<Resource> getbyResourceName(String resName){
+        ArrayList<Resource> rlist = new ArrayList<>();
+        for(Resource res : resources.values()){
             try {
-//                dl.printMessage("s name : "+resName 
+//                System.out.println("s name : "+resName 
 //                        +", "+(String)res.getClass().getMethod("getName").invoke(res));
-                String estr = (String)res.getClass().getMethod("getName").invoke(res);
-                if(resName.equals(estr)){
+                if(resName.equals(res.getName())){
 //                    dl.printMessage("matched : "+resName);
                     rlist.add(res);
                 }
             } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+        return rlist;
+    }
+    
+    public List<Resource> getbyResourceType(String resourceName) {
+        ArrayList<Resource> rlist = new ArrayList<>();
+        for(Resource res : resources.values()){
+            try {
+//                System.out.println("s name : "+resourceName 
+//                        +", "+(DeviceType)res.getClass().getMethod("getDeviceType").invoke(res));
+                //DeviceType estr = (DeviceType)res.getClass().getMethod("getDeviceType").invoke(res);
+                DeviceType estr = res.getDeviceType();
+                if(estr.isSameDeivce(resourceName)){
+//                    System.out.println("--matched : "+resourceName);
+                    rlist.add(res);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+        return rlist;
+    }
+    
+    /**
+     * get Resources by Store Category
+     * @param sc
+     * @return 
+     */
+    public List<Resource> getbyStoreCategory(StoreCategory sc){
+        //getStorageDirectory
+        ArrayList<Resource> rlist = new ArrayList<>();
+        for(Resource res : resources.values()){
+            try {
+//                StoreCategory estr = (StoreCategory)res.getClass().getMethod("getStorageCategory").invoke(res);
+                if(sc.equals(res.getStorageCategory())){
+//                    dl.printMessage("matched : "+resName);
+                    rlist.add(res);
+                }
+            } catch (Exception ex){
+                ex.printStackTrace();
             }
         }
         return rlist;

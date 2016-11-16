@@ -16,7 +16,10 @@
  */
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
@@ -28,46 +31,62 @@ import java.nio.channels.DatagramChannel;
 public class UDPSender implements Runnable {
     MinT frame;
     NetworkManager nmanager;
-    UDP udp;
 //    Selector selector;
     DebugLog dl = new DebugLog("UDPSender");
     Performance ppf = null;
     
     byte[] _sendMsg;
     SocketAddress sendAddr;
-    
-    public UDPSender(UDP udp, byte[] _msg, SocketAddress add) throws IOException{
+    String name;
+    public UDPSender(String _name) throws IOException{
         frame = MinT.getInstance();
         nmanager = frame.getNetworkManager();
-        this.udp = udp;
-        _sendMsg = _msg;
-        sendAddr = add;
+        name = _name;
+//        _sendMsg = _msg;
+//        sendAddr = add;
     }
     
     @Override
     public void run() {
         UDPSendThread ust = (UDPSendThread)Thread.currentThread();
-        ust.checkBench();
         DatagramChannel channel = ust.getDataChannel();
         Performance bench = ust.getBench();
         int bsize = 0;
-        
-        if(bench != null)
-            bench.startPerform();
         ByteBufferPool bbp = nmanager.getByteBufferPool();
-        ByteBuffer out = null;
-        try{        
-            out = bbp.getMemoryBuffer();
-            out.put(_sendMsg);
-            out.flip();
-            bsize = channel.send(out, sendAddr);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            System.out.println("Sender Closed by Thread Stop Interrupt");
-        }finally{
-            bbp.putBuffer(out);
-            if(bench != null)
-                bench.endPerform(out.limit());
+        ust.checkBench();
+        
+        while (!Thread.currentThread().isInterrupted()) {
+            PacketDatagram packet = ust.getDatafromQueue();
+            
+            if(packet == null){
+                continue;
+            }
+            _sendMsg = packet.getPacket();
+            if(!ust.isMulticast()){
+                NetworkProfile dst = packet.getNextNode();
+                sendAddr = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
+            }else
+                sendAddr = new InetSocketAddress(MinTConfig.CoAP_MULTICAST_ADDRESS, ust.getUDP().getPort());
+            
+            bsize = 0;
+            if (bench != null) {
+                bench.startPerform();
+            }
+            ByteBuffer out = null;
+            try {
+                out = bbp.getMemoryBuffer();
+                out.put(_sendMsg);
+                out.flip();
+                bsize = channel.send(out, sendAddr);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                System.out.println("Sender Closed by Thread Stop Interrupt");
+            } finally {
+                bbp.putBuffer(out);
+                if (bench != null) {
+                    bench.endPerform(out.limit());
+                }
+            }
         }
     }
 }

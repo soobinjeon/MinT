@@ -18,11 +18,11 @@ package MinTFramework.Network;
 
 import MinTFramework.*;
 import MinTFramework.Network.Protocol.BLE.BLE;
-import MinTFramework.Network.Routing.MinTSharing.MinTRoutingProtocol;
 import MinTFramework.Network.Protocol.UDP.UDP;
-import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Network.sharing.Sharing;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
@@ -48,8 +48,8 @@ public class NetworkManager {
     private final ConcurrentHashMap<NetworkType,Network> networks;
     private String NodeName = null;
     
-    private RoutingProtocol routing;
-    
+    private RoutingProtocol routing = null;
+    private Sharing sharing = null;
     //Network Send Adaptor Pool for Send Data
     private SystemScheduler sysSched;
     
@@ -61,8 +61,8 @@ public class NetworkManager {
     private PacketIDManager idmaker;
     
     //Temporary properties for check
-    private int tempHandlerCnt = 0;
-    private int sendHandlerCnt = 0;
+    private Integer tempHandlerCnt = 0;
+    private Integer sendHandlerCnt = 0;
     private final DebugLog dl;
     
     /**
@@ -75,25 +75,32 @@ public class NetworkManager {
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
+        
+        if(routing == null)
+            routing = new RoutingProtocol();
+        
+        if(sharing == null)
+            sharing = new Sharing();
+        
         makeBytebuffer();
-        
-        routing = new MinTRoutingProtocol();
-        
         idmaker = new PacketIDManager(ResponseList);
     }
     
     /**
      * Init Routing Algorithm
      */
-    private void initRoutingSetup(){
-        System.out.println("routing init");
-        if(resourceStorage == null)
-            System.out.println("resource null");
-        routing.setParents(this, frame, resourceStorage);
+    private void initSharingSetup(){
+        System.out.println("routing initialization");
+        //init routing protocol algorithm
+        routing.init(this);
+        //init sharing approach
+        sharing.init(this);
+        //start routing algorithm
+        sysSched.executeProcess(MinTthreadPools.ROUTING_PROTOCOL, routing);
     }
 
     /**
@@ -109,8 +116,8 @@ public class NetworkManager {
      * Start when MinT Start
      */
     public void onStart() {
-        initRoutingSetup();
         TurnOnNetwork();
+        initSharingSetup();
     }
 
     /**
@@ -133,32 +140,33 @@ public class NetworkManager {
     public void setOnNetwork(NetworkType ntype) {
         if(ntype == NetworkType.UDP && networks.get(ntype) == null){
             System.out.println("Starting UDP...");
-            Network cnet = networks.get(NetworkType.COAP);
-            if(cnet == null)
+//            Network cnet = networks.get(NetworkType.COAP);
+//            if(cnet == null)
                 networks.put(ntype, new UDP(frame.getNodeName(),ntype));
-            else
-                networks.put(ntype, cnet);
+//            else
+//                networks.put(ntype, cnet);
             System.out.println("Turned on UDP: "+ntype.getPort());
-        }
-        else if(ntype == NetworkType.BLE && networks.get(ntype) == null){
+        } else if(ntype == NetworkType.BLE && networks.get(ntype) == null){
             System.out.println("Starting BLE...");
             networks.put(ntype, new BLE(frame.getNodeName()));
             System.out.println("Turned on BLE");
-        } else if (ntype == NetworkType.COAP && networks.get(ntype) == null) { // for CoAP, need to add
-            System.out.println("Starting CoAP...");
-            Network cnet = networks.get(NetworkType.UDP);
-            if(cnet == null)
-                networks.put(ntype, new UDP(frame.getNodeName(),ntype));
-            else
-                networks.put(ntype, cnet);
-            
-            System.out.println("Turned on CoAP");
         }
+//        } else if (ntype == NetworkType.COAP && networks.get(ntype) == null) { // for CoAP, need to add
+//            System.out.println("Starting CoAP...");
+//            Network cnet = networks.get(NetworkType.UDP);
+//            if(cnet == null)
+//                networks.put(ntype, new UDP(frame.getNodeName(),ntype));
+//            else
+//                networks.put(ntype, cnet);
+//            
+//            System.out.println("Turned on CoAP");
+//        }
         
         //Turn On All Network
         Iterator it = networks.values().iterator();
         while(it.hasNext()){
             Network nn = (Network)it.next();
+            nn.setRoutingProtocol(routing);
             nn.TurnOnNetwork();
         }
     }
@@ -171,7 +179,7 @@ public class NetworkManager {
         this.routing = ap;
 
         for (Network n : networks.values()) {
-            n.setApplicationProtocol(ap);
+            n.setRoutingProtocol(ap);
         }
     }
     
@@ -181,6 +189,14 @@ public class NetworkManager {
      */
     public RoutingProtocol getRoutingProtocol(){
         return routing;
+    }
+    
+    public void activeRoutingProtocol(String groupName, Platforms platforms) {
+        routing.setRoutingProtocol(groupName, platforms);
+    }
+    
+    public Sharing getSharing(){
+        return sharing;
     }
     
     /**
@@ -194,7 +210,7 @@ public class NetworkManager {
     public void SEND_UDP_Multicast(SendMessage requestdata){
         SEND_Multicast(new SendMSG(PacketDatagram.HEADER_TYPE.NON
                 ,0 ,PacketDatagram.HEADER_CODE.POST, null
-                ,requestdata.AddAttribute(Request.MSG_ATTR.WellKnown, null), true));
+                ,requestdata, true));
     }
     
     private void SEND_Multicast(SendMSG smsg){
@@ -241,7 +257,7 @@ public class NetworkManager {
      * @return 
      */
     public String getCurrentRoutingGroup(){
-        return this.routing.getCurrentRoutingGroup();
+        return routing.getCurrentRoutingGroup();
     }
     
     /**
@@ -249,7 +265,7 @@ public class NetworkManager {
      * @param num
      * @return 
      */
-    public synchronized ResponseHandler getResponseDataMatchbyID(short num){
+    public ResponseHandler getResponseDataMatchbyID(short num){
         SendMSG smsg = ResponseList.get(num);
         if(smsg == null)
             return null;
@@ -263,15 +279,19 @@ public class NetworkManager {
     /**
      * Temporary Method
      */
-    public synchronized void setHandlerCount(){
-        this.tempHandlerCnt++;
+    public void setHandlerCount(){
+        synchronized(tempHandlerCnt){
+            tempHandlerCnt++;
+        }
     }
     
     public int getHandlerCount(){
         return tempHandlerCnt;
     }
     public synchronized void setSendHandlerCnt(){
-        this.sendHandlerCnt++;
+        synchronized(sendHandlerCnt){
+            sendHandlerCnt++;
+        }
     }
     public int getSendHandlercnt(){
         return sendHandlerCnt;
@@ -281,15 +301,17 @@ public class NetworkManager {
      * get Response Msg List
      * @return 
      */
-    public synchronized ConcurrentHashMap<Short, SendMSG> getResponseList(){
-        return ResponseList;
+    public ConcurrentHashMap<Short, SendMSG> getResponseList(){
+        synchronized(ResponseList){
+            return ResponseList;
+        }
     }
     
     /**
      * get Adapted Networks
      * @return 
      */
-    protected ConcurrentHashMap<NetworkType,Network> getNetworks(){
+    public ConcurrentHashMap<NetworkType,Network> getNetworks(){
         return this.networks;
     }
     

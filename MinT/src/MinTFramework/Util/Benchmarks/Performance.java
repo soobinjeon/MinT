@@ -150,6 +150,7 @@ public class Performance {
 //                System.out.println("------------------------------------insert waiting!!!");
                 wait();
             } catch (InterruptedException ex) {
+//                ex.printStackTrace();
 //                System.out.println("------------------------------------exit waiting!!!");
             }
         }

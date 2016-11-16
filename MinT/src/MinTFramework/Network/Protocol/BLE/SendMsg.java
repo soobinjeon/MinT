@@ -19,11 +19,6 @@ package MinTFramework.Network.Protocol.BLE;
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.PacketDatagram;
 import static java.lang.Thread.sleep;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import static java.lang.Thread.sleep;
-import static java.lang.Thread.sleep;
-import static java.lang.Thread.sleep;
 
 /**
  *
@@ -55,7 +50,7 @@ public class SendMsg implements Runnable {
         try {
             sleep(200);
         } catch (InterruptedException ex) {
-            Logger.getLogger(SendMsg.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         //System.out.println("Disconnect");
         deviceBLE.disconnect();

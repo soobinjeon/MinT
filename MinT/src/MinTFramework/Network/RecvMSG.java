@@ -16,8 +16,10 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinTConfig;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.net.SocketAddress;
+import org.json.simple.parser.JSONParser;
 
 /**
  * Receive Message
@@ -30,7 +32,8 @@ public class RecvMSG implements Runnable {
     private byte[] recvbytes;
     private SocketAddress addr;
     private String address;
-    
+    private JSONParser jparser;
+    private PacketDatagram receivedPacket = null;
     public RecvMSG(byte[] recvb, String address, NetworkType type){
         recvbytes = recvb;
         address = address;
@@ -39,8 +42,6 @@ public class RecvMSG implements Runnable {
     
     public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type){
         this(recvb, "", type);
-//        System.out.println("recv len : "+recvb.length);
-//        System.out.println(type.toString());
         addr = prevsocket;
         address = getIPAddress(addr);
     }
@@ -51,6 +52,7 @@ public class RecvMSG implements Runnable {
         recvA.checkBench();
         MatcherAndSerialization matcher = recvA.getMatcher();
         Performance bench = recvA.getBench();
+        jparser = recvA.getJSONParser();
         //put the recvmsg to matcher
         if(bench != null)
             bench.startPerform();
@@ -65,7 +67,12 @@ public class RecvMSG implements Runnable {
      * @return 
      */
     private String getIPAddress(SocketAddress recvadd){
-        return recvadd.toString().substring(1);
+        String addr = recvadd.toString().substring(1);
+        String[] ipaddr = addr.split(":");
+        if(ipaddr.length > 1)
+            return ipaddr[0]+":"+MinTConfig.INTERNET_COAP_PORT;
+        else
+            return recvadd.toString().substring(1);
     }
     
     /**
@@ -99,5 +106,16 @@ public class RecvMSG implements Runnable {
     public String getAddress() {
         return this.address;
     }
-
+    
+    public void setReceivedPacketDatagram(PacketDatagram _packet){
+        receivedPacket = _packet;
+    }
+    
+    public PacketDatagram getPacketDatagram(){
+        return receivedPacket;
+    }
+    
+    public JSONParser getJSONParser(){
+        return jparser;
+    }
 }

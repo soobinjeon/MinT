@@ -16,19 +16,13 @@
  */
 package MinTFramework.storage.datamap;
 
-import MinTFramework.Util.TypeCaster;
-import java.nio.ByteOrder;
-
 /**
- * Cache Data Class for Local Cache
- * Insert DataType
- *   - All DataType
- * return
- *   - incorrect type : null
- * @author soobin
+ *
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
 public class Information {
-    protected byte[] res;
+    protected Object res;
     protected boolean isStringvalue = true;
     
     public Information(Object _getResource){
@@ -37,49 +31,31 @@ public class Information {
     
     public void setResource(Object setres){
         try{
-            if(setres == null)
+            if(setres == null){
+                isStringvalue = true;
                 setres = new String("");
+            }
             
             if(setres instanceof Boolean){
-                res = TypeCaster.ObjectTobyte(Boolean.toString((Boolean)setres), ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else if(setres instanceof String){
-                res = TypeCaster.ObjectTobyte((String) setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = true;
             }else{
-                res = TypeCaster.ObjectTobyte(setres, ByteOrder.BIG_ENDIAN);
                 isStringvalue = false;
-        }
+            }
+            res = setres;
         }catch(Exception e){
+            e.printStackTrace();
             /**/
         }
     }
     
-    private double getNumberResource(){
-        return TypeCaster.byteToDouble(res, ByteOrder.BIG_ENDIAN);
-    }
-    
-    private String getStringResource(){
-        String str = null;
-//        try {
-//            str =  TypeCaster.unzipStringFromBytes(res);
-            str =  TypeCaster.bytesToString(res);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-        
-        return str;
-    }
-
     /**
      * get Information by Object
      * @return object Type Information
      */
     public Object getResource(){
-        if(isStringvalue)
-            return getStringResource();
-        else
-            return getNumberResource();
+        return res;
     }
     
     /**
@@ -89,21 +65,30 @@ public class Information {
      */
     public String getResourceString(){
         if(isStringvalue)
-            return getStringResource();
+            return (String)res;
         else
             return String.valueOf(getResource());
     }
     
     /**
      * get Integer type Information
- if it is not matched to input data type(numeric <-> String, return null 
+     if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Integer getResourceInt(){
-        if(isStringvalue)
-            return (int)Double.parseDouble(getStringResource());
-        else
-            return (int)getNumberResource();
+    public int getResourceInt() {
+        try {
+            if (isStringvalue)
+                return Integer.parseInt(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).intValue();
+                else
+                    return (int) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (int)0;
+        }
     }
     
     /**
@@ -111,11 +96,20 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Float getResourceFloat(){
-        if(isStringvalue)
-            return (float)Double.parseDouble(getStringResource());
-        else
-            return (float)getNumberResource();
+    public float getResourceFloat(){
+        try {
+            if (isStringvalue)
+                return Float.parseFloat(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).floatValue();
+                else
+                    return (float) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (float)0;
+        }
     }
     
     /**
@@ -123,11 +117,20 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Double getResourceDouble(){
-        if(isStringvalue)
-            return Double.parseDouble(getStringResource());
-        else
-            return (double)getNumberResource();
+    public double getResourceDouble(){
+        try {
+            if (isStringvalue)
+                return Double.parseDouble(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).doubleValue();
+                else
+                    return (double) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (double)0;
+        }
     }
     
     /**
@@ -136,23 +139,37 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-//    public Long getResourceLong(){
-//        if(isStringvalue)
-//            return Long.parseLong(getStringResource());
-//        else
-//            return (long)getNumberResource();
-//    }
+    public long getResourceLong(){
+        try {
+            if (isStringvalue)
+                return Long.parseLong(getResourceString());
+            else
+                return (long) res;
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
     
     /**
      * get Short type Information
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Short getResourceShort(){
-        if(isStringvalue)
-            return (short)Double.parseDouble(getStringResource());
-        else
-            return (short)getNumberResource();
+    public short getResourceShort(){
+        try {
+            if (isStringvalue)
+                return Short.parseShort(getResourceString());
+            else{
+                if(res instanceof Long)
+                    return ((Long)res).shortValue();
+                else
+                    return (short) res;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return (short)0;
+        }
     }
     
     /**
@@ -160,11 +177,17 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Character getResourceChar(){
-        if(isStringvalue)
-            return null;
-        else
-            return (char)getNumberResource();
+    public char getResourceChar() {
+        try {
+            if (isStringvalue) {
+                return 0;
+            } else {
+                return (char) getResourceDouble();
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
     
     /**
@@ -172,23 +195,20 @@ public class Information {
  if it is not matched to input data type(numeric <-> String, return null 
      * @return null, if it is not matched to input data type
      */
-    public Boolean getResourceBoolean(){
+    public boolean getResourceBoolean(){
         if(isStringvalue){
-            return Boolean.parseBoolean(getStringResource());
+            try{
+                return Boolean.parseBoolean(getResourceString());
+            }catch(Exception e){
+                e.printStackTrace();
+                return false;
+            }
         }else{
-            int tf = (int)getNumberResource();
+            int tf = (int)getResourceDouble();
             if(tf == 0)
                 return false;
             else
                 return true;
         }
-    }
-    
-    /**
-     * get Length
-     * @return 
-     */
-    public int getLength(){
-        return res != null ? res.length : 0;
     }
 }

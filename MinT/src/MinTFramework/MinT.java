@@ -24,7 +24,7 @@ import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
@@ -32,12 +32,16 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.sharing.ResourceOption;
+import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.Benchmarks.MinTBenchmark;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
+import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingInstruction;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
@@ -77,7 +81,7 @@ public abstract class MinT {
         PM = new PropertyManager();
         IM = new InstructionManager();
         NTWmanager = new NetworkManager();
-        mintBench = new MinTBenchmark(getSysteScheduler(), 500);
+        mintBench = new MinTBenchmark(getSystemScheduler(), 500);
     }
     
     /**
@@ -223,7 +227,7 @@ public abstract class MinT {
      * get SystemScheduler
      * @return 
      */
-    public SystemScheduler getSysteScheduler(){
+    public SystemScheduler getSystemScheduler(){
         return sched;
     }
     
@@ -329,7 +333,7 @@ public abstract class MinT {
     }
     
     /**
-     * 
+     * @deprecated 
      * @param ntype type of Network
      * @param addr Current Internet Address for UDP, TCP/IP or CoAP
      * @param port Internet Port for UDP, TCP/IP or CoAP
@@ -337,6 +341,15 @@ public abstract class MinT {
     public void addNetwork(NetworkType ntype, String addr, Integer port){
         ntype.setPort(port);
         addNetwork(ntype, addr);
+    }
+    
+    /**
+     * Activate RoutingMode to join the region routing group
+     * @param groupName Routing Group Name
+     * @param platforms <Platforms> Operating Platform
+     */
+    public void activateRoutingProtocol(String groupName, Platforms platforms) {
+        NTWmanager.activeRoutingProtocol(groupName, platforms);
     }
     
     /**
@@ -369,6 +382,28 @@ public abstract class MinT {
     }
     
     /**
+     * 
+     * @param dst
+     * @param requestdata (new Request(Resource Name, Resource Method)
+     * @param resHandle 
+     */
+    public void REQUEST_POST(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.POST, dst,requestdata, resHandle));
+    }
+    
+    /**
+     * 
+     * @param dst
+     * @param requestdata (new Request(Resource Name, Resource Method)
+     * @param resHandle 
+     */
+    public void REQUEST_DELETE(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
+                ,PacketDatagram.HEADER_CODE.DELETE, dst,requestdata, resHandle));
+    }
+    
+    /**
      * Request directly Resource Data to other Node
      * @param dst destination Node Information
      * @param resName Resource Name
@@ -379,38 +414,33 @@ public abstract class MinT {
                 ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
-    /**
-     * Get Local Resource by Resource Name
-     * @param resName
-     * @return 
-     */
-    public ResData GETLocalResource(String resName){
-        Request req = new SendMessage(resName, 0);
-        return this.resourceStorage.getProperty(req);
-    }
-    
-    public List<String> GETLocalPropertyList(){
-        return this.getResStorage().getPropertyList();
-    }
-    
-    public List<String> GETLocalInstructionList(){
-        return this.getResStorage().getInstructionList();
-    }
-    
-    public void printPropertyLists(){
-        for(ThingProperty tp : getResStorage().getProperties()){
-            System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
-                    ", "+tp.getDeviceType().toString() +", "+tp.getPropertyRole().toString());
+    public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle){
+        Sharing sharing = NTWmanager.getSharing();
+        try{
+            sharing.getResource(dtype, resOpt, resHandle);
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
     
+//    public void GET_SHARING_RESOURCE(DeviceType dtype, List<ResourceOption> resOpt, ResponseHandler resHandle){
+//        Sharing sharing = NTWmanager.getSharing();
+//        try{
+//            sharing.getResource(dtype, resHandle);
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+    
+    
     /**
+     * @deprecated 
      * set Application Protocol
      * @param ap 
      */
-    public void setRoutingProtocol(RoutingProtocol ap){
-        NTWmanager.setRoutingProtocol(ap);
-    }
+//    public void setRoutingProtocol(RoutingProtocol ap){
+//        NTWmanager.setRoutingProtocol(ap);
+//    }
     
     /**
      * get RoutingProtocol for test
@@ -430,7 +460,6 @@ public abstract class MinT {
      * @param res 
      */
     public void addResource(Resource res){
-        res.setFrame(this);
         if(res instanceof ThingProperty)
             PM.addProperty((ThingProperty)res);
         else if(res instanceof ThingInstruction)
@@ -452,6 +481,51 @@ public abstract class MinT {
     public String getResourceGroup(){
         return this.NTWmanager.getCurrentRoutingGroup();
     }
+    
+    /**
+     * get Properties by StoreCategory (Local, Network)
+     * @param sc
+     * @return 
+     */
+    public List<Resource> getProperties(StoreCategory sc){
+        return this.getResStorage().getProperties(sc);
+    }
+    
+    /**
+     * get Instructions by StoreCategory (Local, Network)
+     * @param sc
+     * @return 
+     */
+    public List<Resource> getInstructions(StoreCategory sc){
+        return this.getResStorage().getInstructions(sc);
+    }
+    
+    /**
+     * Get Local Resource by Resource Name
+     * @param resName
+     * @return 
+     */
+    public ResData GETLocalResource(String resName){
+        Request req = new SendMessage(resName, 0);
+        return this.resourceStorage.getProperty(req, StoreCategory.Local);
+    }
+    
+    public List<String> GETLocalPropertyList(){
+        return this.getResStorage().getPropertyList();
+    }
+    
+    public List<String> GETLocalInstructionList(){
+        return this.getResStorage().getInstructionList();
+    }
+    
+    public void printPropertyLists(){
+        for(Resource tp : getResStorage().getProperties()){
+            ThingProperty tpp = (ThingProperty)tp;
+            System.out.println(tp.getName()+ " : " + tp.getStorageDirectory().getSourceLocation()+
+                    ", "+tp.getDeviceType().toString() +", "+tpp.getPropertyRole().toString());
+        }
+    }
+    
 //    /**
 //     * put cache data to Shared Memory
 //     * @param name

@@ -48,6 +48,7 @@ public class SendMsg implements Runnable {
             socket.send(outPacket);
 //            dl.printMessage("Send Success");
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }

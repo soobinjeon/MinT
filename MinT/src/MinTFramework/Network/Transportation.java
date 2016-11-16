@@ -17,6 +17,11 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
+import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
+import MinTFramework.Network.sharing.Sharing;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -28,6 +33,8 @@ public class Transportation implements NetworkLayers{
     private MinT frame;
     private NetworkManager networkManager;
     private SystemHandler syshandle = null;
+    private RoutingProtocol routing = null;
+    private Sharing sharing = null;
     private MatcherAndSerialization serialization = null;
     
     DebugLog dl = new DebugLog("Transportation");
@@ -37,8 +44,11 @@ public class Transportation implements NetworkLayers{
         frame = MinT.getInstance();
         this.networkManager = frame.getNetworkManager();        
         
-        if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE)
+        if(layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE){
             syshandle = new SystemHandler();
+            routing = networkManager.getRoutingProtocol();
+            sharing = networkManager.getSharing();
+        }
         
         if(layerDirection == NetworkLayers.LAYER_DIRECTION.SEND){
             serialization = new MatcherAndSerialization(layerDirection);
@@ -50,13 +60,46 @@ public class Transportation implements NetworkLayers{
     }
 
     @Override
-    public void Receive(PacketDatagram packet) {
+    public void Receive(RecvMSG recvMsg) {
+        PacketDatagram packet = recvMsg.getPacketDatagram();
         if(isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())){
-            syshandle.startHandle(packet);
+            ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
+//            System.out.println("PayLoad: "+packet.getMsgData());
+            if (isRouting(receivemsg)) {
+                routing.routingHandle(packet, receivemsg);
+            } else if(isSharing(receivemsg)){
+                sharing.sharingHandle(packet, receivemsg);
+            }else {
+                syshandle.startHandle(packet, receivemsg);
+            }
+            
+            //Run Response Handler for Response Mode
+            if (packet.getHeader_Code().isResponse()) {
+                ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
+                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
+
+                if (reshandle != null) {
+                    reshandle.Response(resdata);
+                }
+            }
         }
         else{
             stopOver(packet);
         }
+    }
+    
+    private boolean isRouting(ReceiveMessage req) {
+        if(req.getResourcebyName(Request.MSG_ATTR.Routing) != null)
+            return true;
+        else
+            return false;
+    }
+    
+    private boolean isSharing(ReceiveMessage req) {
+        if(req.getResourcebyName(Request.MSG_ATTR.Sharing) != null)
+            return true;
+        else
+            return false;
     }
 
     private boolean isFinalDestination(NetworkProfile destinationNode) {

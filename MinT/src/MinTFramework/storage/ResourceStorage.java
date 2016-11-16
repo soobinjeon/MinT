@@ -16,6 +16,7 @@
  */
 package MinTFramework.storage;
 
+import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
@@ -24,6 +25,7 @@ import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.Resource.StoreCategory;
 import MinTFramework.storage.ThingProperty.PropertyRole;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -48,14 +50,14 @@ public class ResourceStorage {
     private ResourceManagerHandle PMhandle = null;
     private ResourceManagerHandle IMhandle = null;
     
-    private final Repository<ThingProperty> property;
-    private final Repository<ThingInstruction> instruction;
+    private final Repository property;
+    private final Repository instruction;
     
     private MinT frame = null;
     private DebugLog dl = new DebugLog("ResourceStorage");
     public ResourceStorage(){
-        this.instruction = new Repository<>();
-        this.property = new Repository<>();
+        this.instruction = new Repository();
+        this.property = new Repository();
         this.frame = MinT.getInstance();
     }
     
@@ -75,6 +77,7 @@ public class ResourceStorage {
         //set Storage Location for Local
         if(res.getStorageCategory() == StoreCategory.Local)
             res.setLocation(setLocalLocation(res));
+        
         //set Storage Location for Network
         //fix me
         else if(res.getStorageCategory() == StoreCategory.Network){
@@ -83,7 +86,6 @@ public class ResourceStorage {
         
         //set Resource ID
 //        res.setResourceID();
-        
         if(res instanceof ThingProperty)
             property.put(res.getID(), (ThingProperty)res);
         else if(res instanceof ThingInstruction)
@@ -96,7 +98,7 @@ public class ResourceStorage {
      * @param rdata
      * @param resdata 
      */
-    public void addNetworkResource(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
+    public Resource getResourcefromJSON(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
         Resource nr;
         if(rtype == RESOURCE_TYPE.property){
             nr = new ThingProperty(rdata, Resource.StoreCategory.Network) {
@@ -113,7 +115,18 @@ public class ResourceStorage {
                 public Object get(Request req) {return null;}
             };
         }
-        if(!nr.isSameLocation(resdata.getDestination()))
+        return nr;
+    }
+    
+    /**
+     * add NetworkResource
+     * @param rtype
+     * @param rdata
+     * @param resdata 
+     */
+    public void addNetworkResource(RESOURCE_TYPE rtype, JSONObject rdata, ResponseData resdata){
+        Resource nr = getResourcefromJSON(rtype, rdata, resdata);
+        if(!nr.isSameLocation(resdata.getSourceInfo()))
             addResource(nr);
     }
     
@@ -127,28 +140,45 @@ public class ResourceStorage {
     }
     
     /**
-     * fix me
-     * need to update
+     * Search a property on All locations
+     * @param req Resource Name
      * @return 
-     * @see 
-     * @param req 
      */
     public ResData getProperty(Request req){
+        return getProperty(req, null);
+    }
+    
+    /**
+     * fix
+     * 리소스 이름으로 검색하면 1개밖에 안나옮
+     * Search a property on specific location
+     * @return 
+     * @param req Resource Name
+     */
+    public ResData getProperty(Request req, StoreCategory sc){
 //        dl.printMessage("request RES : "+req.getResourceName());
-        List<ThingProperty> rs = property.getbyResourceName(req.getResourceName());
+        List<Resource> rs = property.getbyResourceName(req.getResourceName());
         ArrayList<ResData> ol = new ArrayList<>();
-        for(ThingProperty tp : rs){
+        for(Resource tp : rs){
 //            dl.printMessage("finded : "+tp.getName()+", "+tp.getID()+", "+tp.getPropertyRole());
-            ol.add(getProperty(req, tp));
+            if(sc == null || tp.getStorageCategory().equals(sc))
+                ol.add(getPropertyfromResources(req, (ThingProperty) tp));
         }
-        
-        /*Fix me!!
-        * 여러개면 배열로 보내야함
-        */
         if(ol.size() > 0)
             return ol.get(0);
         else
             return null;
+    }
+    
+    public List<ResData> getPropertybyResourceType(Request resourceType, StoreCategory sc){
+        List<Resource> rs = property.getbyResourceType(resourceType.getResourceName());
+        ArrayList<ResData> ol = new ArrayList<>();
+        for(Resource tp : rs){
+            if(sc == null || tp.getStorageCategory().equals(sc))
+                ol.add(getPropertyfromResources(resourceType, (ThingProperty)tp));
+        }
+        
+        return ol;
     }
     
     /**
@@ -157,21 +187,16 @@ public class ResourceStorage {
      * @param rs
      * @return 
      */
-    private ResData getProperty(Request req, ThingProperty rs){
-        ResData ret = null;
+    private ResData getPropertyfromResources(Request req, ThingProperty rs){
         if(rs != null){
             //resource is local and Aperiod Property
-            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC){
-                ret = PMhandle.get(req, rs);
-            }
-            else{ //network or period property
-                ret = rs.getResourceData();
-            }
+            if(rs.getStorageCategory().isLocal() && rs.getPropertyRole() == PropertyRole.APERIODIC)
+                return PMhandle.get(req, rs);
+            else //network or period property
+                return rs.getResourceData();
         }
         else
-            ret = null;
-//        dl.printMessage("Last Pro : "+ret.getResourceString());
-        return ret;
+            return null;
     }
     
     /**
@@ -181,9 +206,9 @@ public class ResourceStorage {
      * @param req 
      */
     public void setInstruction(Request req){
-        List<ThingInstruction> rs = instruction.getbyResourceName(req.getResourceName());
-        for(ThingInstruction tp : rs){
-            IMhandle.set(req, tp);
+        List<Resource> rs = instruction.getbyResourceName(req.getResourceName());
+        for(Resource tp : rs){
+            IMhandle.set(req, (ThingInstruction)tp);
         }
     }
     
@@ -192,6 +217,11 @@ public class ResourceStorage {
     }
     
     public static enum RESOURCE_TYPE {property, instruction;}
+    
+    /************************************************************************
+     * Make Resource group for discovery
+     ************************************************************************/
+    
     /**
      * get Discover Resource Data
      * @return 
@@ -202,12 +232,12 @@ public class ResourceStorage {
         JSONArray jis = new JSONArray();
         
         for(Resource res : getProperties()){
-            addJSONArray(jpr, res, currentNode);
+            addJSONArray(jpr, res, currentNode, false);
         }
         obs.put(RESOURCE_TYPE.property, jpr);
         
-        for(Resource res : getInstruction()){
-            addJSONArray(jis, res, currentNode);
+        for(Resource res : getInstructions()){
+            addJSONArray(jis, res, currentNode, false);
         }
         obs.put(RESOURCE_TYPE.instruction, jis);
         
@@ -215,14 +245,53 @@ public class ResourceStorage {
     }
     
     /**
+     * Discover delegated Resources
+     * @param currentNode
+     * @return 
+     */
+    public JSONObject DiscoverDelegateResource(NetworkProfile currentNode){
+        JSONObject obs = new JSONObject();
+        JSONArray jpr = new JSONArray();
+        JSONArray jis = new JSONArray();
+        
+        HashMap<DeviceType, Integer> PropDtype = new HashMap<>();
+        HashMap<DeviceType, Integer> InstDtype = new HashMap<>();
+        
+        for(Resource res : getProperties()){
+            if((res.getStorageCategory().isLocal() || (res.getConnectedRoutingNode() != null 
+                    && (!res.getConnectedRoutingNode().isHeaderNode())))
+                    && PropDtype.get(res.getDeviceType()) == null){
+                PropDtype.put(res.getDeviceType(), 0);
+                addJSONArray(jpr, res, currentNode, true);
+            }
+        }
+        obs.put(RESOURCE_TYPE.property, jpr);
+        
+        for(Resource res : getInstructions()){
+            if((res.getStorageCategory().isLocal() || (res.getConnectedRoutingNode() != null 
+                    && (!res.getConnectedRoutingNode().isHeaderNode())))
+                    && InstDtype.get(res.getDeviceType()) == null){
+                InstDtype.put(res.getDeviceType(), 0);
+                addJSONArray(jis, res, currentNode, true);
+            }
+        }
+        obs.put(RESOURCE_TYPE.instruction, jis);
+        
+        if(PropDtype.size() == 0 && InstDtype.size() == 0)
+            return null;
+        else
+            return obs;
+    }
+    
+    /**
      * add resource to JSONArray
      * @param ja
      * @param res
      * @param currentNode 
-     */
-    private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode){
+     */ 
+    private void addJSONArray(JSONArray ja, Resource res, NetworkProfile currentNode, boolean delegateMode){
         Resource nr = res.getCloneforDiscovery();
-        if(res.getStorageCategory().isLocal()){
+        if(res.getStorageCategory().isLocal() || delegateMode){
             nr.setLocation(new StorageDirectory(currentNode,
                     res.getStorageDirectory().getGroup(), res.getName()));
 //            dl.printMessage("new class : "+nr.getName()+", "+nr.getStorageDirectory().getSourceLocation());
@@ -231,6 +300,9 @@ public class ResourceStorage {
             ja.add(res.getResourcetoJSON());
     }
     
+    /************************************************************************
+     * Received Discover Data Updating
+     ************************************************************************/
     /**
      * String data to Discovery Data
      * @param data
@@ -247,15 +319,42 @@ public class ResourceStorage {
         }
     }
     
+    synchronized public void updateDiscoverData(ResponseData resdata) {
+        JSONObject discovery = getDiscoveryResource(resdata.getResourceString());
+        JSONArray jpr = (JSONArray) discovery.get(ResourceStorage.RESOURCE_TYPE.property.toString());
+        for (int i = 0; i < jpr.size(); i++) {
+            addNetworkResource(ResourceStorage.RESOURCE_TYPE.property, (JSONObject) jpr.get(i), resdata);
+        }
+
+        JSONArray jis = (JSONArray) discovery.get(ResourceStorage.RESOURCE_TYPE.instruction.toString());
+        for (int i = 0; i < jis.size(); i++) {
+            addNetworkResource(ResourceStorage.RESOURCE_TYPE.instruction, (JSONObject) jis.get(i), resdata);
+        }
+    }
+    
     public List<String> getInstructionList(){
         return instruction.getAllResourceName();
     }
     
-    public List<ThingProperty> getProperties(){
-        return property.getAllResources();
+    public List<Resource> getProperties(){
+        return getProperties(null);
     }
     
-    public List<ThingInstruction> getInstruction(){
-        return instruction.getAllResources();
+    public List<Resource> getInstructions(){
+        return getInstructions(null);
+    }
+    
+    public List<Resource> getProperties(StoreCategory sc){
+        if(sc == null)
+            return property.getAllResources();
+        else
+            return property.getbyStoreCategory(sc);
+    }
+    
+    public List<Resource> getInstructions(StoreCategory sc){
+        if(sc == null)
+            return instruction.getAllResources();
+        else
+            return instruction.getbyStoreCategory(sc);
     }
 }

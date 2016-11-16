@@ -18,7 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
-import MinTFramework.Network.Routing.RoutingProtocol;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
@@ -37,7 +37,6 @@ public abstract class Network {
     protected ByteBufferPool byteBufferPool;
     private RoutingProtocol routing;
     protected SystemScheduler sysSched;
-    
     private boolean isworking = true;
     
     private DebugLog ndl = new DebugLog("Network");
@@ -58,7 +57,7 @@ public abstract class Network {
     public Network(NetworkProfile npro) {
         this.frame = MinT.getInstance();
         this.networkmanager = frame.getNetworkManager();
-        sysSched = frame.getSysteScheduler();
+        sysSched = frame.getSystemScheduler();
         byteBufferPool = networkmanager.getByteBufferPool();
         
         routing = networkmanager.getRoutingProtocol();
@@ -80,7 +79,7 @@ public abstract class Network {
      *
      * @param ap RoutingProtocol
      */
-    public void setApplicationProtocol(RoutingProtocol routing) {
+    public void setRoutingProtocol(RoutingProtocol routing) {
         this.routing = routing;
     }
     

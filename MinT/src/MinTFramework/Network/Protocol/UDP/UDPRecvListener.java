@@ -63,7 +63,7 @@ public class UDPRecvListener extends Thread{
                 checkBench();
                 RequestPendingConnection();
             }
-        }catch(IOException e){
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -102,6 +102,7 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
+//            System.out.println("recv: "+new String(fwdbyte) + ", "+fwdbyte.length);
             udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
         }catch(ClosedByInterruptException e){
             System.out.println("Thread Stop Interrupt - ClosedByInterruptException");

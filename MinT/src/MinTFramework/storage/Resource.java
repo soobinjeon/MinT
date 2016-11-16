@@ -18,9 +18,13 @@ package MinTFramework.storage;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
+import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ResponseData;
+import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Util.DebugLog;
+import static MinTFramework.storage.Resource.StoreCategory.Network;
 import org.json.simple.JSONObject;
 
 /**
@@ -44,8 +48,9 @@ public abstract class Resource{
     
     protected String name;
     protected DeviceType dtype;
-    protected MinT frame = null;
     protected ResData data;
+    
+    protected Node connectedNode = null; // for Routing Protocol
     
     public Resource(String name, DeviceType dtype, Authority auth, StoreCategory sc) {
         this.auth = auth;
@@ -85,13 +90,33 @@ public abstract class Resource{
         this.setResourceID();
     }
     
+    /**
+     * Update Data
+     * @param _data 
+     */
     public void put(Request _data){
         data.setResource(_data.getResourceData().getResource());
+    }
+    
+    /**
+     * Update Data
+     * @param _data 
+     */
+    public void put(ResponseData _data){
+        data.setResource(_data.getResource());
     }
     
     abstract public void set(Request req);
     abstract public Object get(Request req);
 
+    public void connectRoutingNode(Node n){
+        connectedNode = n;
+    }
+    
+    public Node getConnectedRoutingNode(){
+        return connectedNode;
+    }
+    
     /**
      * get Resource Name
      * @return 
@@ -135,15 +160,6 @@ public abstract class Resource{
     }
     
     /**
-     * set Frame
-     * !!Caution!! just use in frame
-     * @param frame 
-     */
-    public void setFrame(MinT frame){
-        this.frame = frame;
-    }
-    
-    /**
      * get Storage Category
      * @return Local or Network
      */
@@ -184,8 +200,13 @@ public abstract class Resource{
     }
     
     boolean isSameLocation(NetworkProfile destination) {
-//        dl.printMessage("src :"+sourcelocation.getSource()+", des : "+destination.getAddress());
-        return this.sourcelocation.getSource().equals(destination.getAddress());
+        MinT frame = MinT.getInstance();
+        Network cnet = frame.getNetworkManager().getNetwork(destination.getNetworkType());
+        if(cnet != null){
+//            System.out.println("src :"+sourcelocation.getSource()+", des : "+cnet.getProfile().getAddress());
+            return this.sourcelocation.getSource().equals(cnet.getProfile().getAddress());
+        }else
+            return true;
     }
     
     public Resource getCloneforDiscovery() {
@@ -226,7 +247,7 @@ public abstract class Resource{
             sourcelocation = new StorageDirectory(new NetworkProfile((String)jtor.get(JSONKEY.SOURCELOC.toString())), 
                     (String)jtor.get(JSONKEY.GROUP.toString()), name);
         }catch(Exception e){
-            
+            e.printStackTrace();
         }
     }
     

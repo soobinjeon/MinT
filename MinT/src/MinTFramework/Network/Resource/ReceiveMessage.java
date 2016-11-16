@@ -17,7 +17,7 @@
 package MinTFramework.Network.Resource;
 
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.storage.datamap.Information;
+import MinTFramework.Network.RecvMSG;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -26,9 +26,10 @@ import org.json.simple.parser.JSONParser;
  * @author soobin
  */
 public class ReceiveMessage extends Request{
-    
-    public ReceiveMessage(String JSONString, NetworkProfile tn) {
-        super(null, null, tn);
+    RecvMSG receivemsg;
+     public ReceiveMessage(String JSONString, NetworkProfile tn, RecvMSG recvMSG) {
+        super(tn);
+        receivemsg = recvMSG;
         setJSONtoData(JSONString);
     }
     
@@ -36,17 +37,16 @@ public class ReceiveMessage extends Request{
         try{
             messageString = JSONString;
             if(!JSONString.equals("")){
-                JSONParser jsonParser = new JSONParser();
+                JSONParser jsonParser = receivemsg.getJSONParser();
                 resObject = (JSONObject)jsonParser.parse(messageString);
                 for(Object obj : resObject.keySet()){
                     String resname = (String)obj;
                     Object res = resObject.get(obj);
                     if(res == null)
                         continue;
-                    Information nr = new Information(res);
-                    resources.put(MSG_ATTR.getbyName(resname), nr);
+                    addResource(MSG_ATTR.get(resname), res);
                 }
-//                targetRes = (String)jsonObject.get(RESOURCENAME);
+////                targetRes = (String)jsonObject.get(RESOURCENAME);
 //                super.setResource((String)jsonObject.get(REQUESTMETHOD));
             }
         }catch(Exception e){

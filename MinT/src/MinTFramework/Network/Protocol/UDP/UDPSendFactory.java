@@ -37,40 +37,45 @@ public class UDPSendFactory implements ThreadFactory{
     private int port;
     private boolean isMulticast = false;
     private NetworkProfile profile;
-    
-    public UDPSendFactory(int PORT, boolean _isMulticast, NetworkProfile _profile){
+    private DatagramChannel sendchannel = null;
+    private UDP udp;
+    public UDPSendFactory(UDP _udp, int PORT, boolean _isMulticast, NetworkProfile _profile){
         port = PORT;
         isMulticast = _isMulticast;
         profile = _profile;
+        udp = _udp;
+        InetSocketAddress sendisa = null;
+        try {
+            sendisa = new InetSocketAddress(port);
+            sendchannel = DatagramChannel.open();
+            sendchannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+            sendchannel.socket().bind(sendisa);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
     
-    public UDPSendFactory(int PORT){
-        this(PORT, false, null);
+    public UDPSendFactory(UDP _udp, int PORT){
+        this(_udp, PORT, false, null);
     }
 
     @Override
     public synchronized Thread newThread(Runnable r) {
         threadNo++;
-        InetSocketAddress sendisa = null;
-        DatagramChannel sendchannel = null;
+        
         try {
-            int nport = port+threadNo;
-            sendisa = new InetSocketAddress(nport);
-            sendchannel = DatagramChannel.open();
-            sendchannel.socket().bind(sendisa);
             if(isMulticast){
-                System.out.println("SET Multicast Option to Port: "+nport);
+                System.out.println("SET Multicast Option to Port: "+port);
                 InetAddress inetaddress = InetAddress.getByName(profile.getIPAddr());
                 NetworkInterface interf= NetworkInterface.getByInetAddress(inetaddress);
                 InetAddress mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
-                
                 sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_IF, interf);
                 sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_TTL, MinTConfig.CoAP_MULTICAST_TTL);
                 sendchannel.join(mulAddress, interf);
             }
                 
-            System.out.println("Sender Factory("+threadNo+"): create sender-"+(port+threadNo));
-            return new UDPSendThread(r, sendchannel, "UDP_Sender-"+threadNo);
+            System.out.println("Sender Factory("+threadNo+"): create sender-"+(port));
+            return new UDPSendThread(r, sendchannel, "UDP_Sender-"+threadNo, udp, isMulticast);
         } catch (SocketException ex) {
             System.out.println("use addr: "+(port+threadNo));
             ex.printStackTrace();

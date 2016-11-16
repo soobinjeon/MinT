@@ -28,12 +28,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
-import java.net.SocketAddress;
 import java.net.StandardProtocolFamily;
 import java.net.StandardSocketOptions;
 import java.nio.channels.DatagramChannel;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -48,8 +49,8 @@ public class UDP extends Network {
     
     public static enum UDP_Thread_Pools {UDP_RECV_LISTENER, UDP_SENDER, UDP_MULTICAST_SENDER;};
     //UDP
-    static final int UDP_SENDER_THREAD_CORE = 3;
-    static final int UDP_SENDER_THREAD_MAX = 3;
+    static final int UDP_SENDER_THREAD_CORE = 4;
+    static final int UDP_SENDER_THREAD_MAX = 4;
     static final int UDP_SENDER_THREAD_QUEUE = 200000;
     static public final int UDP_NUM_OF_LISTENER_THREADS = 1;
     static public final int UDP_RECV_BUFF_SIZE = 1024*1024*10;
@@ -65,6 +66,9 @@ public class UDP extends Network {
     private InetAddress mulAddress;
     
     private final DebugLog log = new DebugLog("UDP.java");
+    
+    private BlockingQueue<PacketDatagram> sendPacketQueue;
+    private BlockingQueue<PacketDatagram> sendMultiCastQueue;
 
     /**
      * UDP communication structure
@@ -90,6 +94,10 @@ public class UDP extends Network {
             log.printMessage(profile.getProfile());
         }
         PORT = ntype.getPort();
+        
+        sendPacketQueue = new LinkedBlockingQueue<>();
+        sendMultiCastQueue = new LinkedBlockingQueue<>();
+        
         this.portOpen();
         try {
             this.setUDPSocket();
@@ -154,11 +162,13 @@ public class UDP extends Network {
      */
     @Override
     protected void sendProtocol(PacketDatagram packet) throws IOException {
+        sendPacketQueue.add(packet);
+
         //if Data Packet
-        NetworkProfile dst = packet.getNextNode();
-        SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
-        sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
-                , new UDPSender(this, packet.getPacket(), add));
+//        NetworkProfile dst = packet.getNextNode();
+//        SocketAddress add = new InetSocketAddress(dst.getIPAddr(), dst.getPort());
+//        sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
+//                , new UDPSender(this, packet.getPacket(), add));
     }
     
     /**
@@ -167,14 +177,15 @@ public class UDP extends Network {
      */
     @Override
     protected void sendMulticast(PacketDatagram packet) {
-        try {
-            //send to CoAP Group Address with CoAP port
-            SocketAddress add = new InetSocketAddress(MinTConfig.CoAP_MULTICAST_ADDRESS, PORT);
-            sysSched.submitProcess(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
-                    , new UDPSender(this, packet.getPacket(), add));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        sendMultiCastQueue.add(packet);
+//        try {
+//            //send to CoAP Group Address with CoAP port
+//            SocketAddress add = new InetSocketAddress(MinTConfig.CoAP_MULTICAST_ADDRESS, PORT);
+//            sysSched.submitProcess(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
+//                    , new UDPSender(this, packet.getPacket(), add));
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
     }
     
     private void MakeUDPSender(){
@@ -183,8 +194,17 @@ public class UDP extends Network {
                 , UDP_SENDER_THREAD_MAX, 10
                 , TimeUnit.SECONDS
                 , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
-                , new UDPSendFactory(PORT)
+                , new UDPSendFactory(this,PORT)
                 , new RejectedExecutionHandlerImpl()));
+        
+        for(int i=0;i<UDP_SENDER_THREAD_MAX;i++){
+            try {
+                sysSched.submitProcess(UDP_Thread_Pools.UDP_SENDER.toString()
+                        , new UDPSender("Sender_"+i));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
     
     private void MakeUDPMulticastSender(){
@@ -194,8 +214,16 @@ public class UDP extends Network {
                 , 1, 10
                 , TimeUnit.SECONDS
                 , new ArrayBlockingQueue<Runnable>(UDP_SENDER_THREAD_QUEUE)
-                , new UDPSendFactory(PORT, true, profile)
+                , new UDPSendFactory(this,PORT, true, profile)
                 , new RejectedExecutionHandlerImpl()));
+        
+        try {
+            //send to CoAP Group Address with CoAP port
+            sysSched.submitProcess(UDP_Thread_Pools.UDP_MULTICAST_SENDER.toString()
+                    , new UDPSender("MulticastSender"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -226,5 +254,13 @@ public class UDP extends Network {
 
     @Override
     protected void interrupt() {
+    }
+    
+    public BlockingQueue<PacketDatagram> getSendPacketQueue(){
+        return sendPacketQueue;
+    }
+    
+    public BlockingQueue<PacketDatagram> getSendMulticastQueue(){
+        return sendMultiCastQueue;
     }
 }

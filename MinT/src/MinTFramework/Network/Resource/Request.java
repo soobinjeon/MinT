@@ -18,6 +18,8 @@ package MinTFramework.Network.Resource;
 
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.storage.datamap.Information;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.json.simple.JSONObject;
 
@@ -29,9 +31,23 @@ public class Request {
     public static enum MSG_ATTR {
         WellKnown(".well-known"), 
         ResourceName("rn"),
-        ResourceData("rd");
+        ResourceData("rd"),
+        Routing("ro"),
+        RoutingGroup("rog"),
+        RoutingWeight("row"),
+        RoutingisHeader("roh"),
+        Sharing("sh");
         private String resName;
         
+        // Reverse-lookup map for getting a MSG_ATTR from an resName
+        private static final Map<String, MSG_ATTR> lookup = new HashMap<String, MSG_ATTR>();
+
+        static {
+            for (MSG_ATTR d : MSG_ATTR.values()) {
+                lookup.put(d.getName(), d);
+            }
+        }
+
         MSG_ATTR(String name){
             resName = name;
         }
@@ -40,6 +56,11 @@ public class Request {
             return resName;
         }
         
+        /**
+         * @deprecated 
+         * @param name
+         * @return 
+         */
         public static MSG_ATTR getbyName(String name){
             for(MSG_ATTR k : MSG_ATTR.values()){
                 if(k.getName().equals(name))
@@ -47,6 +68,13 @@ public class Request {
             }
             return null;
         }
+        
+        public static MSG_ATTR get(String name){
+            return lookup.get(name);
+        }
+
+        private boolean isResourceName() { return this == ResourceName; }
+        private boolean isResourceData() { return this == ResourceData; }
     }
     
     protected NetworkProfile RequestNode = null;
@@ -55,12 +83,12 @@ public class Request {
     protected String messageString = "";
     
     protected final ConcurrentHashMap<MSG_ATTR, Information> resources;
+    protected Information ResourceName = null;
+    protected Information ResourceData = null;
     
     public Request(NetworkProfile tn){
-        this(null, null, tn);
-    }
-    public Request(){
         resources = new ConcurrentHashMap<>();
+        RequestNode = tn;
     }
     /**
      * Constructor
@@ -69,12 +97,31 @@ public class Request {
      * @param tn 
      */
     public Request(String res_name, Object _getResource, NetworkProfile tn) {
-        this();
-        RequestNode = tn;
-        resources.put(MSG_ATTR.ResourceName, new Information(res_name));
-        resources.put(MSG_ATTR.ResourceData, new Information(_getResource));
+        this(tn);
+        setResourceName(res_name);
+        setResourceData(_getResource);
     }
-
+    
+    private void setResourceName(Object res){
+        Information nres = new Information(res);
+        ResourceName = nres;
+        resources.put(MSG_ATTR.ResourceName, nres);
+    }
+    
+    private void setResourceData(Object _data){
+        Information nres = new Information(_data);
+        ResourceData = nres;
+        resources.put(MSG_ATTR.ResourceData, nres);
+    }
+    
+    protected void addResource(MSG_ATTR attr, Object info){
+        if(attr.isResourceName()){
+            setResourceName(info);
+        }else if(attr.isResourceData()){
+            setResourceData(info);
+        }else
+            resources.put(attr, new Information(info));
+    }
     /**
      * get Target Node
      * @return 
@@ -92,10 +139,15 @@ public class Request {
     }
     
     public Information getResourceData(){
-        return resources.get(MSG_ATTR.ResourceData);
+        if(ResourceData == null)
+            setResourceData(null);
+        return ResourceData;
     }
     
     public String getResourceName(){
-        return resources.get(MSG_ATTR.ResourceName).getResourceString();
+        if(ResourceName == null)
+            return "";
+        else
+            return ResourceName.getResourceString();
     }
 }

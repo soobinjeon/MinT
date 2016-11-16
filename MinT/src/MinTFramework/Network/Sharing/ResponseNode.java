@@ -14,33 +14,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.Routing;
+package MinTFramework.Network.sharing;
 
-import MinTFramework.MinT;
-import MinTFramework.Network.NetworkManager;
-import MinTFramework.storage.ResourceStorage;
+import MinTFramework.Network.Resource.ResponseData;
+import MinTFramework.Network.ResponseHandler;
+import MinTFramework.storage.ResData;
+import MinTFramework.storage.ThingProperty;
 
 /**
- *
+ * Response Handler Class for waiting a Resource Response
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class RoutingProtocol {
-    protected MinT frame;
-    protected NetworkManager networkManager;
-    protected ResourceStorage resStorage;
-    
-    public RoutingProtocol(){
-        
-    }
-    
-    public String getCurrentRoutingGroup(){
-        return "group";
+public class ResponseNode implements ResponseHandler{
+    private ResponseWaiter resWaiter;
+    private ThingProperty SendedResource;
+    public ResponseNode(ResponseWaiter cw, ThingProperty _sendedResource){
+        resWaiter = cw;
+        SendedResource = _sendedResource;
     }
 
-    public void setParents(NetworkManager nm, MinT frame, ResourceStorage resourceStorage) {
-        this.frame = frame;
-        this.networkManager = nm;
-        this.resStorage = resourceStorage;
+    @Override
+    public void Response(ResponseData resdata) {
+        ResData resd = new ResData(resdata.getResource(), SendedResource);
+        //update current resource
+        SendedResource.put(resdata);
+        //activating response event
+        resWaiter.responsed(resd);
     }
+    
 }
