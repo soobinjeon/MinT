@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package MinTFramework.Network.Protocol.BLE;
+
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.PacketDatagram;
 import java.net.*;
@@ -32,8 +33,6 @@ public class BLESender {
 
     public void SendMsg(PacketDatagram msg, String dst) {
         this.msg = msg;
-                
         new Thread(new SendMsg(deviceBLE, msg)).start();
-        
     }
 }

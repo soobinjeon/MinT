@@ -22,6 +22,8 @@ import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,7 +31,6 @@ import MinTFramework.Util.DebugLog;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class BLE extends Network {
-    
 
     BLEReceiver receiver;
     BLESender sender;
@@ -38,17 +39,17 @@ public class BLE extends Network {
     String cmd;
     DeviceBLE deviceBLE = null;
     DebugLog dl = new DebugLog("BLE Network");
-    
+
     /**
-     * BLE Communication Structure
-     * Do not support under v2.03
+     * BLE Communication Structure Do not support under v2.03
+     *
      * @param _ap
-     * @param frame 
-     * @param nm 
+     * @param frame
+     * @param nm
      */
-    public BLE(String NodeName){
-        super(new NetworkProfile(NodeName,null,NetworkType.BLE));
-        if(!setBLEDevice()){
+    public BLE(String NodeName) {
+        super(new NetworkProfile(NodeName, null, NetworkType.BLE));
+        if (!setBLEDevice()) {
             String str = "BLE devices are not detected in the MinT: Please check it out";
             System.err.println(str);
 //            dl.printMessage(str);
@@ -57,25 +58,28 @@ public class BLE extends Network {
         }
         //set Address
         profile.setAddress(deviceBLE.getAddress());
-        System.out.println("BLE addr : "+profile.getAddress());
+        System.out.println("BLE addr : " + profile.getAddress());
         receiver = new BLEReceiver(deviceBLE, this);
         sender = new BLESender(deviceBLE);
-//        this.startReceiveThread();
+        //this.startReceiveThread();
     }
-    
+
     /**
      * set BLE Device, if there are no BLE devices, return false
+     *
      * @return BLE existence
      */
     private boolean setBLEDevice() {
         deviceBLE = frame.getBLEDevice();
-        if(deviceBLE == null)
+        if (deviceBLE == null) {
             return false;
-        else
+        } else {
             return true;
+        }
     }
 
-    /***
+    /**
+     * *
      * Make and start Receiver thread
      */
     private void startReceiveThread() {
@@ -91,42 +95,43 @@ public class BLE extends Network {
      */
     public String setDestination(NetworkProfile _dst) {
         String dst = _dst.getAddress();
-        deviceBLE.setRole(1);
+
+        //deviceBLE.setRole(1);
         //지연 필수******************짧을 시 통신불가, 1초보다 짧을 시 되었다 안되었다함
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Logger.getLogger(BLE.class.getName()).log(Level.SEVERE, null, ex);
         }
         //
-        if(deviceBLE.connect(dst))
-        {
-//            System.out.println("Success : Connect");
+        if (deviceBLE.connect(dst)) {
+            System.out.println("Success : Connect");
             //deviceBLE.writeUART("AT");
             //return true;
-        }
-        else
-        {
-//            System.out.println("Fail : Connect");
+        } else {
+            System.out.println("Fail : Connect");
             //deviceBLE.writeUART("AT");
             //return false;
         }
+
         return dst;
     }
-    
-    /***
+
+    /**
+     * *
      * Sending Message
-     * @param packet 
+     *
+     * @param packet
      */
     @Override
     protected void sendProtocol(PacketDatagram packet) {
-        //System.out.println(packet);
+        System.out.println(packet.getMsgData());
         String dst = setDestination(packet.getNextNode());
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
     }
 
     /**
-     * @see 
+     * @see
      */
     @Override
     protected void interrupt() {

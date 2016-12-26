@@ -18,6 +18,8 @@ package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.PacketDatagram;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static java.lang.Thread.sleep;
 
 /**
@@ -44,18 +46,22 @@ public class SendMsg implements Runnable {
     public void run() {
         //Convert Byte to String
         //System.out.println("Write Packet");
-        deviceBLE.writeUART(outPacket.getPacketString() + "#");
+        //deviceBLE.writeUART(outPacket.getPacketString() + "#");
+        deviceBLE.writeUART(outPacket.getPacketString());
         
+        String msg = outPacket.getPacketString();
+        
+        System.out.println(new String(outPacket.getPacket()));
+        
+        //System.out.println("Packet : " + outPacket.getPacketString()+",  "+outPacket.getMsgData() + ", "+outPacket.getPacket());
         //disconnect 지연 필수 200 정도 여기가 문제가 되면 BLE 연결이 끊어지지 않음
         try {
             sleep(200);
         } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            Logger.getLogger(SendMsg.class.getName()).log(Level.SEVERE, null, ex);
         }
         //System.out.println("Disconnect");
-        deviceBLE.disconnect();
-        deviceBLE.setRole(0);
+        //deviceBLE.disconnect();
+        //deviceBLE.setRole(0);
     }
-
 }
-
