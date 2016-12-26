@@ -115,7 +115,12 @@ public class NetworkProfile {
     }
     
     public void setAddress(String add){
-        address = add+":"+Port;
+        if(ntype.isIPbased()) {
+            address = add+":"+Port;
+        }
+        else{
+            address = add;
+        }
         initialize();
     }
     
@@ -174,7 +179,23 @@ public class NetworkProfile {
             }
         }
     }
-
+    /*
+ * CoAP Header (4 bytes)
+ * 0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |Ver| T |  TKL  |      Code     |          Message ID           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Token (if any, TKL bytes) ..,
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   Options (if any) ...,
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1 1 1 1 1 1 1 1|    Payload (if any)...
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+*/
+    
+    
+    
     private void makebyte() {
         if(ntype == NetworkType.BLE){
             //fill this method

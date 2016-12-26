@@ -136,23 +136,23 @@ public class PacketDatagram {
             byte[] strarray = DataAnalizer(msgdata).getBytes();
             byte[] pack = new byte[PACKET_HEADER_SIZE + strarray.length];
             byte[] header = makeHeadertoBytes(h_ver, h_type, h_tkl, h_code, MSG_ID);
-//            System.out.println("packet size : "+pack.length);
-//            System.out.println("");
+            System.out.println("packet size : "+pack.length);
+            System.out.println("");
 //            System.out.println("MSGDIR : "+h_dir.toString()+", MSGINT : "+h_ins.toString()+", MID : "+MSG_ID);
-//            System.out.println("next node : "+routelist.get(ROUTE.NEXT).getProfile());
-//            System.out.println("dest node : "+routelist.get(ROUTE.DESTINATION).getProfile());
+            System.out.println("next node : "+routelist.get(ROUTE.NEXT).getProfile());
+            System.out.println("dest node : "+routelist.get(ROUTE.DESTINATION).getProfile());
             int pos = MergePacket(pack, header, 0);
             pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.SOURCE), pos);
             pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.DESTINATION), pos);
             pos = MergePacket(pack, strarray, pos);
             
             packetdata = pack;
-//            for(int i=0;i<packetdata.length;i++){
-//                String s1 = String.format("%8s", Integer.toBinaryString(packetdata[i] & 0xFF)).replace(' ','0');
-//                System.out.print(s1+" ");
-//            }
-//            System.out.println("");
-//            System.out.println(packetdata.length);
+            for(int i=0;i<packetdata.length;i++){
+                String s1 = String.format("%8s", Integer.toBinaryString(packetdata[i] & 0xFF)).replace(' ','0');
+                System.out.print(s1+" ");
+            }
+            System.out.println("");
+            System.out.println(packetdata.length);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -444,27 +444,26 @@ public class PacketDatagram {
             return null;
         }
                 
-        public boolean isRequest() {return classCode == 0;}
-        public boolean isResponse() {return classCode != 0;}
+        boolean isRequest() {return classCode == 0;}
+        boolean isResponse() {return classCode != 0;}
         
-        public boolean isGet() {return this == GET;}
-        public boolean isPost() {return this == POST;}
-        public boolean isPut() {return this == PUT;}
-        public boolean isDelete() {return this == DELETE;}
+        boolean isGet() {return this == GET;}
+        boolean isPost() {return this == POST;}
+        boolean isPut() {return this == PUT;}
+        boolean isDelete() {return this == DELETE;}
 
-        public boolean isCreated() {return this == CREATED;}
-        public boolean isDeleted() {return this == DELETED;}
-        public boolean isValid() {return this == VALID;}
-        public boolean isChanged() {return this == CHANGED;}
-        public boolean isContent() {return this == CONTENT;}
-        public boolean isContinue() {return this == CONTINUE;}
+        boolean isCreated() {return this == CREATED;}
+        boolean isDeleted() {return this == DELETED;}
+        boolean isValid() {return this == VALID;}
+        boolean isChanged() {return this == CHANGED;}
+        boolean isContent() {return this == CONTENT;}
+        boolean isContinue() {return this == CONTINUE;}
         
-        public boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
+        boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
         
-        public boolean isSuccessResponse() {return classCode == 2;}
-        public boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
-        public boolean isClientError() {return classCode == 4;}
-        public boolean isServerError() {return classCode == 5;}
+        boolean isSuccessResponse() {return classCode == 2;}
+        boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
+        boolean isClientError() {return classCode == 4;}
+        boolean isServerError() {return classCode == 5;}
     }
-    
 }
