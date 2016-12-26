@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (C) 2015 Software&System Lab. Kangwon National University.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,33 +28,35 @@ public abstract class Device {
     protected ArrayList<PortPinSet> ppSet = new ArrayList<>();
     protected DeviceType dtype = null;
     private String Library_Name = null;
-    
+
     /**
      * Initialize pin number, etc;
      */
     abstract protected void initDevice();
+
     abstract protected void freeDevice();
-    
+
     /**
      * initialize device
+     *
      * @param _LibName
-     * @param dtype 
+     * @param dtype
      */
-    public Device(String _LibName, DeviceType dtype){
+    public Device(String _LibName, DeviceType dtype) {
         Library_Name = _LibName;
         this.dtype = dtype;
     }
-    
+
     /**
      * Do not support in v2.02 and later
-     * @deprecated 
-     * @param _LibName 
+     *
+     * @deprecated
+     * @param _LibName
      */
     public Device(String _LibName) {
         this(_LibName, DeviceType.NONE);
     }
-    
-    
+
     /**
      * Initiallize Sensor
      */
@@ -62,7 +64,7 @@ public abstract class Device {
         LoadLibrary();
         initDevice();
     }
-    
+
     /**
      * Load Library
      *
@@ -81,22 +83,24 @@ public abstract class Device {
     protected String getLibraryName() {
         return this.Library_Name;
     }
-    
+
     /**
-     * Regist using Port, Pin number
-     * - add port, pin set
-    */
-    public void registPortPin(int port, int pin)
-    {
+     * Regist using Port, Pin number - add port, pin set
+     */
+    public void registPortPin(int port, int pin) {
         ppSet.add(new PortPinSet(port, pin));
     }
-    
-    public void registUARTPortPin(int uartNumber)
+
+    // for BeagleBone Black
+    /*public void registUARTPortPin(int uartNumber)
     {
         PortPinSet uartTx = null;
         PortPinSet uartRx = null;
         switch(uartNumber)
         {
+            case 0:
+                uartTx = new PortPinSet(9, 8);
+                uartRx = new PortPinSet(9, 10);
             case 1:
                 uartTx = new PortPinSet(9, 24);
                 uartRx = new PortPinSet(9, 26);
@@ -116,15 +120,27 @@ public abstract class Device {
         }
         ppSet.add(uartTx);
         ppSet.add(uartRx);
+    }*/
+    
+    // for Intel Edison
+    public void registUARTPortPin() {
+        PortPinSet uartTx = null;
+        PortPinSet uartRx = null;
+
+        uartTx = new PortPinSet(9, 35);
+        uartRx = new PortPinSet(9, 26);
+
+        ppSet.add(uartTx);
+        ppSet.add(uartRx);
     }
-    public void registI2CPortPin(int i2cNumber)
-    {
+    
+    // for BeagleBone Black
+    /*public void registI2CPortPin(int i2cNumber) {
         PortPinSet i2c_sclA = null;
         PortPinSet i2c_sdaA = null;
         PortPinSet i2c_sclB = null;
         PortPinSet i2c_sdaB = null;
-        switch(i2cNumber)
-        {
+        switch (i2cNumber) {
             case 1:
                 i2c_sclA = new PortPinSet(9, 17);
                 i2c_sdaA = new PortPinSet(9, 18);
@@ -142,13 +158,31 @@ public abstract class Device {
         ppSet.add(i2c_sdaA);
         ppSet.add(i2c_sclB);
         ppSet.add(i2c_sdaB);
+    }*/
+    
+    //for Intel Edison
+    public void registI2CPortPin(int i2cNumber) {
+        PortPinSet i2c_scl = null;
+        PortPinSet i2c_sda = null;
+        
+        switch (i2cNumber) {
+            case 1:
+                i2c_scl = new PortPinSet(9, 19);
+                i2c_sda = new PortPinSet(9, 7);
+                break;
+            case 6:
+                i2c_scl = new PortPinSet(9, 6);
+                i2c_sda = new PortPinSet(9, 8);
+                break;
+        }
+        ppSet.add(i2c_scl);
+        ppSet.add(i2c_sda);
     }
     
-    public void registADCPortPin(int adcNumber)
-    {
+    // for BeagleBone Black
+    public void registADCPortPin(int adcNumber) {
         PortPinSet adcPPS = null;
-        switch(adcNumber)
-        {
+        switch (adcNumber) {
             case 0:
                 adcPPS = new PortPinSet(9, 39);
                 break;
@@ -171,28 +205,44 @@ public abstract class Device {
                 adcPPS = new PortPinSet(9, 35);
                 break;
         }
-    
+
         ppSet.add(adcPPS);
     }
-
-    public ArrayList<PortPinSet> getPortPinList()
-    {
+    
+    // for Intel Edison
+    public void registSPIPortPin() {
+        PortPinSet spi_mosi = null;
+        PortPinSet spi_miso = null;
+        PortPinSet spi_sck = null;
+        
+        spi_mosi = new PortPinSet(9, 11);
+        spi_miso = new PortPinSet(9, 24);
+        spi_sck = new PortPinSet(9, 10);
+        
+        ppSet.add(spi_mosi);
+        ppSet.add(spi_miso);
+        ppSet.add(spi_sck);
+    }
+    
+    public ArrayList<PortPinSet> getPortPinList() {
         return ppSet;
     }
-    
+
     /**
      * set Device Type
-     * @param dt 
+     *
+     * @param dt
      */
-    public void setDeviceType(DeviceType dt){
+    public void setDeviceType(DeviceType dt) {
         dtype = dt;
     }
-    
+
     /**
      * get Device Type
-     * @return 
+     *
+     * @return
      */
-    public DeviceType getDeviceType(){
+    public DeviceType getDeviceType() {
         return dtype;
     }
 }
