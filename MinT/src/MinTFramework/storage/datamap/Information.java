@@ -37,7 +37,7 @@ public class Information {
             }
             
             if(setres instanceof Boolean){
-                isStringvalue = true;
+                isStringvalue = false;
             }else if(setres instanceof String){
                 isStringvalue = true;
             }else{
@@ -64,8 +64,10 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public String getResourceString(){
-        if(isStringvalue)
+        if(isStringvalue){
+            System.out.println("String value : "+res);
             return (String)res;
+        }
         else
             return String.valueOf(getResource());
     }
@@ -196,19 +198,24 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public boolean getResourceBoolean(){
-        if(isStringvalue){
-            try{
+        try {
+            if (isStringvalue) {
+
                 return Boolean.parseBoolean(getResourceString());
-            }catch(Exception e){
-                e.printStackTrace();
-                return false;
+
+            } else {
+                return Boolean.parseBoolean(getResourceString());
             }
-        }else{
-            int tf = (int)getResourceDouble();
-            if(tf == 0)
-                return false;
-            else
-                return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
+//        else{
+//            int tf = (int)getResourceDouble();
+//            if(tf == 0)
+//                return false;
+//            else
+//                return true;
+//        }
     }
 }
