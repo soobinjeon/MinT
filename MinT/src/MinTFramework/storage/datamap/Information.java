@@ -64,10 +64,8 @@ public class Information {
      * @return null, if it is not matched to input data type
      */
     public String getResourceString(){
-        if(isStringvalue){
-            System.out.println("String value : "+res);
+        if(isStringvalue)
             return (String)res;
-        }
         else
             return String.valueOf(getResource());
     }
@@ -200,7 +198,6 @@ public class Information {
     public boolean getResourceBoolean(){
         try {
             if (isStringvalue) {
-
                 return Boolean.parseBoolean(getResourceString());
 
             } else {
