@@ -62,8 +62,10 @@ public abstract class MinT {
     private ResourceStorage resourceStorage;
     private PropertyManager PM;
     private InstructionManager IM;
-    DeviceClassification deviceClassification;
-    DeviceType deviceType;
+    private DeviceClassification deviceClassification;
+    private DeviceType deviceType;
+    
+    private MinTConfig mintConfig;
     
     /**
      * 
@@ -74,7 +76,7 @@ public abstract class MinT {
         MinTFrame = this;
         if(AndroidFilePath != null)
             MinTConfig.ANDROID_FILE_PATH = AndroidFilePath;
-        
+        mintConfig = new MinTConfig();
         sched = new SystemScheduler();
         devicemanager = new DeviceManager();
         resourceStorage = new ResourceStorage();
@@ -128,6 +130,14 @@ public abstract class MinT {
         this.deviceClassification = deviceClassification;
         this.deviceType = deviceType;
         }
+    
+    /**
+     * get MinT Config
+     * @return 
+     */
+    public MinTConfig getConfig(){
+        return mintConfig;
+    }
     
     /**
      * Add device to device manager
