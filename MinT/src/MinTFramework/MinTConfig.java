@@ -16,6 +16,11 @@
  */
 package MinTFramework;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
@@ -28,8 +33,8 @@ public class MinTConfig {
     //Network Adaptor
     static public final int NETWORK_RECEIVE_WAITING_QUEUE = 100000;
     static public final int NETWORK_SEND_WAITING_QUEUE = 100000;
-    static public  int NETWORK_RECEIVE_POOLSIZE = 1;
-    static public  int NETWORK_SEND_POOLSIZE = 1;
+    static public final int NETWORK_RECEIVE_POOLSIZE = 1;
+    static public final int NETWORK_SEND_POOLSIZE = 1;
     
     static public boolean DebugMode = false;
     static public final int NOT_WORKING_THREAD_SERVICE_ID = -1;
@@ -40,10 +45,130 @@ public class MinTConfig {
     
     //for CoAP
     static public String IP_ADDRESS = "";
+    static public int USER_PORT = 0;
     static public final String CoAP_MULTICAST_ADDRESS = "224.0.1.187";
     static public final int CoAP_MULTICAST_TTL = 5;
     static public final int COAP_VERSION = 0x01;
     
+    //for Sharing
+    private String GROUP_NAME = "";
+    private int TOTAL_BATTERY = 1000;
+    
     //for Android
     static public String ANDROID_FILE_PATH = "";
+
+    static public final String MinTConfigFilePath = "MinTConfig.cfg";
+    private File configName = null;
+
+    public MinTConfig () {
+        loadConfigFile();
+    }
+
+    private void loadConfigFile() {
+        try {
+            File configName = new File(MinTConfigFilePath);
+
+            if(configName != null)
+                System.out.println("Load MinT Config File..."+configName.getName());
+            
+            BufferedReader in = new BufferedReader(new FileReader(configName));
+            String s;
+            
+            while ((s = in.readLine()) != null) {
+                String[] sp = s.split("=");
+                
+                //for String debug
+//                System.out.print("String=["+sp.length+"] -> ( ");
+//                System.out.print(s+" ),:");
+//                for(String spc : sp){
+//                    System.out.print(spc.trim());
+//                    System.out.print(",");
+//                }
+//                System.out.println("");
+                
+                if(sp.length > 1)
+                    setConfig(sp);
+            }
+            in.close();
+        } catch (IOException e) {
+            System.out.println("Config File not found");
+            System.err.println(e); // 에러가 있다면 메시지 출력
+        }
+        
+        //for Data debug
+        System.out.println("Config values are set up...");
+        System.out.println("IP_ADDR : "+IP_ADDRESS);
+        System.out.println("USER_PORT : "+USER_PORT);
+        System.out.println("GROUP_NAME : "+GROUP_NAME);
+        System.out.println("TOTAL_BATTERY : "+TOTAL_BATTERY);
+    }
+
+    private void setConfig(String[] value) {
+        ConfigFile cCfg;
+        try {
+            cCfg = ConfigFile.valueOf(value[0].trim());
+        } catch (Exception e) {
+            System.out.println("unable connect config name to '"+value[0].trim()+"'");
+            cCfg = null;
+        }
+        
+        int cnum = -1;
+        if(cCfg != null)
+            cnum = cCfg.num;
+        try {
+            switch (cnum) {
+                case 0:
+                    IP_ADDRESS = value[1].trim();
+                    break;
+                case 1:
+                    USER_PORT = Integer.parseInt(value[1].trim());
+                    break;
+                case 2:
+                    GROUP_NAME = value[1].trim();
+                    break;
+                case 3:
+                    TOTAL_BATTERY = Integer.parseInt(value[1].trim());
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public String getIP_ADDRESS(){
+        return IP_ADDRESS;
+    }
+    
+    public String getGroupName(){
+        return GROUP_NAME;
+    }
+    
+    public int getUserPort(){
+        return USER_PORT;
+    }
+    
+    public int getTotalBattery(){
+        return TOTAL_BATTERY;
+    }
+    
+    public enum ConfigFile {
+        IP_ADDR(0, "IP_ADDR"),
+        PORT(1, "PORT"),
+        GROUP_NAME(2, "GROUP_NAME"),
+        TOTAL_BATTERY(3, "TOTAL_BATTERY");
+        
+        private String name;
+        private int num;
+        ConfigFile(int _num,String _name){
+            name = _name;
+            num = _num;
+        }
+        
+        public String toString(){
+            return name;
+        }
+        
+    }
 }
