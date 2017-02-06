@@ -61,6 +61,7 @@ public class SharingHandler {
      */
     private void requestHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
         //request analysis ( child node or other header)
+        System.out.println("request for Header");
         if(routing.hasChildNode(rv_packet.getSource()))
             sharing.executeResponse(new ChildResponce(rv_packet, recvmsg));
         else

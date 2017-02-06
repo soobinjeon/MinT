@@ -133,7 +133,10 @@ public class MinTConfig {
                     break;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println("Not read Attribute in Config File -> "+ cnum);
+            if(cnum == 1)
+                USER_PORT = MinTConfig.INTERNET_COAP_PORT;
         }
     }
     

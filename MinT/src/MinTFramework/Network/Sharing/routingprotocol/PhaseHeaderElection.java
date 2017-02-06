@@ -235,7 +235,6 @@ public class PhaseHeaderElection extends Phase implements Callable{
                 highvalue = hn.getSpecWeight();
             }else if(cn.getSpecWeight() == highvalue){
                 //if weight is same with high, do something
-                
             }
         }
         
@@ -250,7 +249,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
             //broadcast
             NotifyHeaderInfotoClient(hn);
         } else { //else client node
-
+            ;
         }
         
         ConfirmDoneElection();
