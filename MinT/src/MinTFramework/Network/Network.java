@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
@@ -45,8 +46,8 @@ public abstract class Network {
      * send packet
      * @param packet 
      */
-    abstract protected void sendProtocol(PacketDatagram packet)  throws IOException;
-    abstract protected void sendMulticast(PacketDatagram packet);
+    abstract protected void sendProtocol(CoAPPacket packet)  throws IOException;
+    abstract protected void sendMulticast(CoAPPacket packet);
     abstract protected void interrupt();
     /**
      * *
@@ -98,7 +99,7 @@ public abstract class Network {
      * @param packet
      * @throws MinTFramework.Exception.NetworkException
      */
-    public void send(PacketDatagram packet) throws NetworkException, IOException{
+    public void send(CoAPPacket packet) throws NetworkException, IOException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{
@@ -107,7 +108,7 @@ public abstract class Network {
         }
     }
     
-    public void sendAllNodes(PacketDatagram packet) throws NetworkException{
+    public void sendAllNodes(CoAPPacket packet) throws NetworkException{
         if(!isWorking())
             throw new NetworkException(NetworkException.NE.NetworkNotWorking);
         else{

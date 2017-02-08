@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.sharing.routingprotocol;
 
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -73,7 +73,7 @@ public class PhaseDiscover extends Phase{
     }
     
     @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
+    public void requestHandle(CoAPPacket rv_packet, Request req) {
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         Information gdata = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         String gn = gdata != null ? gdata.getResourceString() : "";
@@ -95,7 +95,7 @@ public class PhaseDiscover extends Phase{
                         disRole.interrupt();
 
                         Request ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
-                        networkmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0, PacketDatagram.HEADER_CODE.CONTENT
+                        networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
                                 , rv_packet.getSource(), ret, rv_packet.getMSGID()));
                     }
                     
@@ -137,7 +137,7 @@ public class PhaseDiscover extends Phase{
     }
 
     @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
+    public void responseHandle(CoAPPacket rv_packet, Request req) {
     }
     
     private boolean isSameGroup(String gname){

@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinTConfig;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.net.SocketAddress;
@@ -33,7 +34,7 @@ public class RecvMSG implements Runnable {
     private SocketAddress addr;
     private String address;
     private JSONParser jparser;
-    private PacketDatagram receivedPacket = null;
+    private CoAPPacket receivedPacket = null;
     public RecvMSG(byte[] recvb, String address, NetworkType type){
         recvbytes = recvb;
         address = address;
@@ -107,11 +108,11 @@ public class RecvMSG implements Runnable {
         return this.address;
     }
     
-    public void setReceivedPacketDatagram(PacketDatagram _packet){
+    public void setReceivedPacketDatagram(CoAPPacket _packet){
         receivedPacket = _packet;
     }
     
-    public PacketDatagram getPacketDatagram(){
+    public CoAPPacket getPacketDatagram(){
         return receivedPacket;
     }
     

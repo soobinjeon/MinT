@@ -26,19 +26,39 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PacketIDManager {
     private final short DEFAULT_ID = 1;
     private short id = DEFAULT_ID;
-    private boolean cycled = false;
+    private short tkn = 22;
+    private boolean idcycled = false;
+    private boolean tkncycled = false;
     private ConcurrentHashMap<Short,SendMSG> idlist;
-    public PacketIDManager(ConcurrentHashMap<Short,SendMSG> IDList){
-        idlist = IDList;
+    private ConcurrentHashMap<Short,SendMSG> tknlist;
+    public PacketIDManager(ConcurrentHashMap<Short,SendMSG> idlist, ConcurrentHashMap<Short,SendMSG> tknlist){
+        this.idlist = idlist;
+        this.tknlist = tknlist;
     }
-    
-    public synchronized short makePacketID(){
-        if(id == Short.MAX_VALUE){
-            id = DEFAULT_ID;
-            cycled = true;
+    public synchronized short makeToken(){
+        if(tkn == Short.MAX_VALUE){
+            tkn = DEFAULT_ID;
+            tkncycled = true;
         }
         
-        if(!cycled)
+        if(!idcycled)
+            return tkn++;
+        else{
+            while(true){
+                if(tknlist.get(tkn) == null)
+                    break;
+                tkn++;
+            }
+            return tkn++;
+        }
+    }
+    public synchronized short makeMessageID(){
+        if(id == Short.MAX_VALUE){
+            id = DEFAULT_ID;
+            idcycled = true;
+        }
+        
+        if(!tkncycled)
             return id++;
         else{
             while(true){

@@ -14,9 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.MessageProtocol;
 
+import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.SendMSG;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.TreeMap;
 
 /**
@@ -43,7 +47,7 @@ import java.util.TreeMap;
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class PacketDatagram {
+public class CoAPPacket extends PacketDatagram {
     public static final short HEADER_MSGID_INITIALIZATION = 0;
     private TreeMap<ROUTE, NetworkProfile> routelist= new TreeMap<>();
     
@@ -59,10 +63,10 @@ public class PacketDatagram {
     private int h_tkl;                                          //TKL
     private HEADER_CODE h_code;                                 //Code
     private short HEADER_MSGID = HEADER_MSGID_INITIALIZATION;     //Message ID
-    
+    private short tkn;
     private final int MAIN_HEADER_SIZE = 4;
     private final int PACKET_HEADER_SIZE = MAIN_HEADER_SIZE 
-            + (NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE * 2);
+            + (NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE * 2) + 2;// + h_tkl;
     private enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
     }
@@ -76,8 +80,9 @@ public class PacketDatagram {
      * @param msg msg = service(0:null, other:service)|response() <- need to thinking
      * @return 
      */
-    public PacketDatagram(short msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
+    public CoAPPacket(short msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
+        super(PacketDatagram.MessageProtocol.COAP);
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
         routelist.put(ROUTE.NEXT,next);
@@ -86,6 +91,7 @@ public class PacketDatagram {
         this.h_type = h_type;
         this.h_tkl = h_tkl;
         this.h_code = h_code;
+        this.tkn = 0;
         data = msg;
         HEADER_MSGID = msgid;
     }
@@ -94,13 +100,19 @@ public class PacketDatagram {
      * Data -> MinT Protocol for Sender
      * @param _smsg  
      */
-    public PacketDatagram(SendMSG _smsg){
-        this(_smsg.getResponseKey(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
+    public CoAPPacket(SendMSG _smsg){
+//        this(_smsg.getResponseKey(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
+//                ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
+        this(_smsg.getMessageID(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
                 ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
         sendMsg = _smsg;
+        if(this.h_tkl != 0){
+            tkn = _smsg.getResponseKey();
+        }
+        
     }
     
-    public PacketDatagram(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
+    public CoAPPacket(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
             NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
         this(HEADER_MSGID_INITIALIZATION, h_ver, h_type, h_tkl, h_code, src, prev, next, dest, msg);
     }
@@ -109,7 +121,8 @@ public class PacketDatagram {
      * MinT Protocol -> Data
      * @param packet 
      */
-    public PacketDatagram(RecvMSG packet){
+    public CoAPPacket(RecvMSG packet){
+        super(PacketDatagram.MessageProtocol.COAP);
         packetdata = packet.getRecvBytes();
         try {
         } catch (Exception ex) {
@@ -123,7 +136,7 @@ public class PacketDatagram {
      * this method is only used in Network Send Method
      */
     public void makeBytes() {
-        makePacketData(this.HEADER_MSGID,this.h_ver, this.h_type, this.h_tkl, this.h_code, data);
+        makePacketData(this.HEADER_MSGID,this.h_ver, this.h_type, this.h_tkl, this.h_code, this.tkn, data);
     }
     
     /**
@@ -131,7 +144,7 @@ public class PacketDatagram {
      * @param rlist
      * @param msgdata 
      */
-    private void makePacketData(short MSG_ID, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, String msgdata){
+    private void makePacketData(short MSG_ID, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code, short tkn, String msgdata){
         try {
             byte[] strarray = DataAnalizer(msgdata).getBytes();
             byte[] pack = new byte[PACKET_HEADER_SIZE + strarray.length];
@@ -142,6 +155,7 @@ public class PacketDatagram {
 //            System.out.println("next node : "+routelist.get(ROUTE.NEXT).getProfile());
 //            System.out.println("dest node : "+routelist.get(ROUTE.DESTINATION).getProfile());
             int pos = MergePacket(pack, header, 0);
+            pos = MergePacket(pack, makeTokenToBytes(tkn), pos);
             pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.SOURCE), pos);
             pos = MergePacket(pack, getProtocolbyROUTE(ROUTE.DESTINATION), pos);
             pos = MergePacket(pack, strarray, pos);
@@ -197,8 +211,29 @@ public class PacketDatagram {
         this.h_tkl = headerFirstByte & 0x0F;         //0x0F = 0000 1111
         this.h_code = HEADER_CODE.getHeaderCode(headerSecondByte);
         this.HEADER_MSGID = ByteBuffer.wrap(msg_id).getShort();
+//        System.out.println("VER:"+h_ver);
+//        System.out.println("TYPE:"+h_type);
+//        System.out.println("TKL:"+h_tkl);
+//        System.out.println("CODE:"+h_code);
+//        System.out.println("MSGID:"+HEADER_MSGID);
+                
     }
     
+    private byte[] makeTokenToBytes(short tkn){
+        byte[] btkn = new byte[2];
+        btkn[0] = (byte)(tkn & 0xff);
+        btkn[1] = (byte)((tkn >> 8) & 0xff);
+        return btkn;
+    }
+    
+    private short makeBytesToToken(byte[] btkn){
+        ByteBuffer bb = ByteBuffer.allocate(2);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+        bb.put(btkn[0]);
+        bb.put(btkn[1]);
+        short ret = bb.getShort(0);
+        return ret;
+    }
     /**
      * return byte Packet Data
      * @return 
@@ -248,6 +283,13 @@ public class PacketDatagram {
         byte[] spacket = rcvmsg.getRecvBytes();
         byte[] msg;
         makeBytestoHeader(spacket);
+        
+        byte[] btkn = new byte[2]; //h_tkn
+        
+        System.arraycopy(spacket, pos, btkn, 0, 2);
+        pos+=2;
+        this.tkn = this.makeBytesToToken(btkn);
+//        System.out.println("TOKEN:"+tkn);
         System.arraycopy(spacket, pos, nprofile, 0, NetworkProfile.NETWORK_ADDRESS_BYTE_SIZE);
 //        for(int i=0;i<nprofile.length;i++){
 //            String s1 = String.format("%8s", Integer.toBinaryString(nprofile[i] & 0xFF)).replace(' ','0');
@@ -326,10 +368,14 @@ public class PacketDatagram {
         return sendMsg;
     }
     
-//    public PacketDatagram getclone(){
+    public short getToken(){
+        return tkn;
+    }
+    
+//    public CoAPPacket getclone(){
 //        byte[] nbyte = new byte[packetdata.length];
 //        System.arraycopy(packetdata, 0, nbyte, 0, packetdata.length);
-//        return new PacketDatagram(routelist.get(ROUTE.NEXT), nbyte);
+//        return new CoAPPacket(routelist.get(ROUTE.NEXT), nbyte);
 //    }
     /*
     CON : Confirmable

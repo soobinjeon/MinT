@@ -19,7 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.MinT;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.datamap.Information;
@@ -69,7 +69,7 @@ public abstract class Phase implements Callable{
      * set Routing Table from other Node
      * @param rv_packet 
      */
-    protected Node addRoutingTable(PacketDatagram rv_packet, Request req) {
+    protected Node addRoutingTable(CoAPPacket rv_packet, Request req) {
         Node pnode = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
         if(pnode != null)
             return null;
@@ -117,7 +117,7 @@ public abstract class Phase implements Callable{
     }
     
     public abstract boolean hasMessage(int msg);
-    public abstract void requestHandle(PacketDatagram rv_packet, Request req);
-    public abstract void responseHandle(PacketDatagram rv_packet, Request req);
+    public abstract void requestHandle(CoAPPacket rv_packet, Request req);
+    public abstract void responseHandle(CoAPPacket rv_packet, Request req);
 
 }

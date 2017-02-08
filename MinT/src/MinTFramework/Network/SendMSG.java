@@ -16,6 +16,8 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
@@ -27,9 +29,10 @@ import MinTFramework.Util.Benchmarks.Performance;
  */
 public class SendMSG implements Runnable{
     private int head_version;
-    private PacketDatagram.HEADER_TYPE head_type;
+    private CoAPPacket.HEADER_TYPE head_type;
     private int head_tokenLength;
-    private PacketDatagram.HEADER_CODE head_code;
+    private CoAPPacket.HEADER_CODE head_code;
+    private short messageId;
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
@@ -39,13 +42,14 @@ public class SendMSG implements Runnable{
     private NetworkProfile FinalDestination;
     private NetworkProfile nextNode;
     
-    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl, 
-            PacketDatagram.HEADER_CODE hc, NetworkProfile dst, Request msg,
+    public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl, 
+            CoAPPacket.HEADER_CODE hc, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, short resKey){
         head_version = MinTConfig.COAP_VERSION;
         head_type = ht;
         head_tokenLength = tkl;
         head_code = hc;
+        messageId = 0;
         destination = dst;
         if(msg == null)
             this.msg = "";
@@ -57,16 +61,35 @@ public class SendMSG implements Runnable{
     
     /**
      * Response
+     * @param ht
+     * @param tkl Token length
      * @param hd Direction (Request, Response)
      * @param hi for Instruction (GET, SET, POST, PUT, DELETE, DISCOVERY)
      * @param dst Destination profile
      * @param msg Resource and request
      * @param resKey 
      */
-    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
-            , PacketDatagram.HEADER_CODE hc, NetworkProfile dst
-            , Request msg, short resKey){
-        this(ht, tkl, hc, dst,msg,null,resKey);
+    public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl
+            , CoAPPacket.HEADER_CODE hc, NetworkProfile dst
+            , Request msg, short token){
+        this(ht, tkl, hc, dst,msg,null,token);
+    }
+    
+    /**
+     * Response
+     * @param msgid
+     * @param ht
+     * @param tkl
+     * @param hc
+     * @param token
+     * @param dst
+     * @param msg 
+     */
+    public SendMSG(short msgid, CoAPPacket.HEADER_TYPE ht, int tkl, 
+            CoAPPacket.HEADER_CODE hc, NetworkProfile dst, 
+            Request msg, short token){
+        this(ht, tkl, hc, dst, msg, null, token);
+        this.messageId = msgid;
     }
     
     /**
@@ -76,10 +99,10 @@ public class SendMSG implements Runnable{
      * @param dst Destination profile
      * @param msg Resource and request
      */
-    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
-            , PacketDatagram.HEADER_CODE hc
+    public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl
+            , CoAPPacket.HEADER_CODE hc
             , NetworkProfile dst, Request msg, boolean _isMulticast){
-        this(ht, tkl, hc,dst,msg,null,PacketDatagram.HEADER_MSGID_INITIALIZATION);
+        this(ht, tkl, hc,dst,msg,null,CoAPPacket.HEADER_MSGID_INITIALIZATION);
         this.isUDPMulticast = _isMulticast;
     }
     
@@ -91,10 +114,11 @@ public class SendMSG implements Runnable{
      * @param msg Resource and request
      * @param resHandle response handler (need to GET, DISCOVERY)
      */
-    public SendMSG(PacketDatagram.HEADER_TYPE ht, int tkl
-            , PacketDatagram.HEADER_CODE hc
-            , NetworkProfile dst, Request msg, ResponseHandler resHandle){   
-        this(ht, tkl, hc,dst,msg,resHandle,PacketDatagram.HEADER_MSGID_INITIALIZATION);
+    public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl
+            , CoAPPacket.HEADER_CODE hc
+            , NetworkProfile dst, Request msg, ResponseHandler resHandle){
+        this(ht, tkl, hc,dst,msg,resHandle,CoAPPacket.HEADER_MSGID_INITIALIZATION);
+        messageId = MinT.getInstance().getNetworkManager().getIDMaker().makeMessageID();
     }
     
     @Override
@@ -118,7 +142,14 @@ public class SendMSG implements Runnable{
         return head_version;
     }
     
-    public PacketDatagram.HEADER_TYPE getHeader_Type(){
+    public short getMessageID(){
+        return messageId;
+    }
+    public void setMessageID(short msgid){
+        this.messageId = msgid;
+    }
+    
+    public CoAPPacket.HEADER_TYPE getHeader_Type(){
         return head_type;
     }
     
@@ -126,7 +157,7 @@ public class SendMSG implements Runnable{
         return head_tokenLength;
     }
     
-    public PacketDatagram.HEADER_CODE getHeader_Code(){
+    public CoAPPacket.HEADER_CODE getHeader_Code(){
         return head_code;
     }
         

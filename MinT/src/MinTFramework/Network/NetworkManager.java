@@ -16,7 +16,9 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.*;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
@@ -35,43 +37,44 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Network Manager
- *  - Managing hold process of networks
- *  - 
+ * Network Manager - Managing hold process of networks -
+ *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NetworkManager {
+
     private MinT frame = null;
     private ResourceStorage resourceStorage = null;
     private final ArrayList<NetworkType> networkList;
-    private final ConcurrentHashMap<NetworkType,Network> networks;
+    private final ConcurrentHashMap<NetworkType, Network> networks;
     private String NodeName = null;
-    
+
     private RoutingProtocol routing = null;
     private Sharing sharing = null;
     //Network Send Adaptor Pool for Send Data
     private SystemScheduler sysSched;
-    
+
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
-    
+
     //Message Response List
-    private final ConcurrentHashMap<Short,SendMSG> ResponseList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Short, SendMSG> ResponseList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
     private PacketIDManager idmaker;
-    
+
     //Temporary properties for check
     private Integer tempHandlerCnt = 0;
     private Integer sendHandlerCnt = 0;
     private final DebugLog dl;
-    
+
     /**
      * Auto Set Network Manager as possible
      *
      * @param frame
      */
     public NetworkManager() {
-        this.dl = new DebugLog("NetworkManager",true);
+        this.dl = new DebugLog("NetworkManager", true);
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
@@ -79,21 +82,23 @@ public class NetworkManager {
         resourceStorage = frame.getResStorage();
         setNodeName();
 //        dl.printMessage("set ByteBuffer");
-        
-        if(routing == null)
+
+        if (routing == null) {
             routing = new RoutingProtocol();
-        
-        if(sharing == null)
+        }
+
+        if (sharing == null) {
             sharing = new Sharing();
-        
+        }
+
         makeBytebuffer();
-        idmaker = new PacketIDManager(ResponseList);
+        idmaker = new PacketIDManager(IDList, ResponseList);
     }
-    
+
     /**
      * Init Routing Algorithm
      */
-    private void initSharingSetup(){
+    private void initSharingSetup() {
         System.out.println("routing initialization");
         //init routing protocol algorithm
         routing.init(this);
@@ -111,7 +116,7 @@ public class NetworkManager {
     public void AddNetwork(NetworkType ntype) {
         networkList.add(ntype);
     }
-    
+
     /**
      * Start when MinT Start
      */
@@ -138,15 +143,15 @@ public class NetworkManager {
      * @param port Internet port for (UDP,TCP/IP,COAP), null for others
      */
     public void setOnNetwork(NetworkType ntype) {
-        if(ntype == NetworkType.UDP && networks.get(ntype) == null){
+        if (ntype == NetworkType.UDP && networks.get(ntype) == null) {
             System.out.println("Starting UDP...");
 //            Network cnet = networks.get(NetworkType.COAP);
 //            if(cnet == null)
-                networks.put(ntype, new UDP(frame.getNodeName(),ntype));
+            networks.put(ntype, new UDP(frame.getNodeName(), ntype));
 //            else
 //                networks.put(ntype, cnet);
-            System.out.println("Turned on UDP: "+ntype.getPort());
-        } else if(ntype == NetworkType.BLE && networks.get(ntype) == null){
+            System.out.println("Turned on UDP: " + ntype.getPort());
+        } else if (ntype == NetworkType.BLE && networks.get(ntype) == null) {
             System.out.println("Starting BLE...");
             networks.put(ntype, new BLE(frame.getNodeName()));
             System.out.println("Turned on BLE");
@@ -161,11 +166,11 @@ public class NetworkManager {
 //            
 //            System.out.println("Turned on CoAP");
 //        }
-        
+
         //Turn On All Network
         Iterator it = networks.values().iterator();
-        while(it.hasNext()){
-            Network nn = (Network)it.next();
+        while (it.hasNext()) {
+            Network nn = (Network) it.next();
             nn.setRoutingProtocol(routing);
             nn.TurnOnNetwork();
         }
@@ -173,7 +178,8 @@ public class NetworkManager {
 
     /**
      * set Routing Protocol
-     * @param ap 
+     *
+     * @param ap
      */
     public void setRoutingProtocol(RoutingProtocol ap) {
         this.routing = ap;
@@ -182,49 +188,89 @@ public class NetworkManager {
             n.setRoutingProtocol(ap);
         }
     }
-    
+
     /**
      * get Routing Protocol
-     * @return 
+     *
+     * @return
      */
-    public RoutingProtocol getRoutingProtocol(){
+    public RoutingProtocol getRoutingProtocol() {
         return routing;
     }
-    
+
     public void activeRoutingProtocol(String groupName, Platforms platforms) {
         routing.setRoutingProtocol(groupName, platforms);
     }
-    
-    public Sharing getSharing(){
+
+    public Sharing getSharing() {
         return sharing;
     }
-    
+
     /**
      * Network Send Method
-     * @param smsg 
+     *
+     * @param smsg
      */
-    public void SEND(SendMSG smsg){
+    public void SEND(SendMSG smsg) {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
-    
-    public void SEND_UDP_Multicast(SendMessage requestdata){
-        SEND_Multicast(new SendMSG(PacketDatagram.HEADER_TYPE.NON
-                ,0 ,PacketDatagram.HEADER_CODE.POST, null
-                ,requestdata, true));
-    }
-    
-    private void SEND_Multicast(SendMSG smsg){
-        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
-    }
-    
+
     /**
-     * get PacketID 
-     * @return 
+     * *
+     * For piggyback acknowledge
+     *
+     * @param rv_packet Receved packet
+     * @param ret
      */
-    public PacketIDManager getIDMaker(){
+    public void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
+        // CoAP Piggyback procedure
+        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
+            CoAPPacket cp = (CoAPPacket)rv_packet;
+//            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
+//                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
+            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
+                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+        } else {
+            //non-CoAP Piggyback procedure
+        }
+    }
+
+    /**
+     * @TODO implemantation
+     * For separate ack for when piggyback is not possible
+     * @param rv_packet received packet
+     */
+    public void SEND_ACK(CoAPPacket rv_packet) {
+
+    }
+    
+    public void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
+            CoAPPacket cp = (CoAPPacket)rv_packet;
+            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
+                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+        } else {
+            
+        }
+    }
+
+    public void SEND_UDP_Multicast(SendMessage requestdata) {
+        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+    }
+
+    private void SEND_Multicast(SendMSG smsg) {
+        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
+    }
+
+    /**
+     * get PacketID
+     *
+     * @return
+     */
+    public PacketIDManager getIDMaker() {
         return idmaker;
     }
-    
+
     /**
      * set Node Name
      *
@@ -251,26 +297,29 @@ public class NetworkManager {
     private void setNodeName() {
         NodeName = "temporary Node";
     }
-    
+
     /**
      * get Routing group of this node
-     * @return 
+     *
+     * @return
      */
-    public String getCurrentRoutingGroup(){
+    public String getCurrentRoutingGroup() {
         return routing.getCurrentRoutingGroup();
     }
-    
+
     /**
      * get Response Data matched by Response ID
+     *
      * @param num
-     * @return 
+     * @return
      */
-    public ResponseHandler getResponseDataMatchbyID(short num){
+    public ResponseHandler getResponseDataMatchbyID(short num) {
         SendMSG smsg = ResponseList.get(num);
-        if(smsg == null)
+        if (smsg == null) {
             return null;
+        }
         ResponseHandler resd = smsg.getResponseHandler();
-        if(resd != null){
+        if (resd != null) {
             ResponseList.remove(num);
         }
         return resd;
@@ -279,54 +328,59 @@ public class NetworkManager {
     /**
      * Temporary Method
      */
-    public void setHandlerCount(){
-        synchronized(tempHandlerCnt){
+    public void setHandlerCount() {
+        synchronized (tempHandlerCnt) {
             tempHandlerCnt++;
         }
     }
-    
-    public int getHandlerCount(){
+
+    public int getHandlerCount() {
         return tempHandlerCnt;
     }
-    public synchronized void setSendHandlerCnt(){
-        synchronized(sendHandlerCnt){
+
+    public synchronized void setSendHandlerCnt() {
+        synchronized (sendHandlerCnt) {
             sendHandlerCnt++;
         }
     }
-    public int getSendHandlercnt(){
+
+    public int getSendHandlercnt() {
         return sendHandlerCnt;
     }
-    
+
     /**
      * get Response Msg List
-     * @return 
+     *
+     * @return
      */
-    public ConcurrentHashMap<Short, SendMSG> getResponseList(){
-        synchronized(ResponseList){
+    public ConcurrentHashMap<Short, SendMSG> getResponseList() {
+        synchronized (ResponseList) {
             return ResponseList;
         }
     }
-    
+
     /**
      * get Adapted Networks
-     * @return 
+     *
+     * @return
      */
-    public ConcurrentHashMap<NetworkType,Network> getNetworks(){
+    public ConcurrentHashMap<NetworkType, Network> getNetworks() {
         return this.networks;
     }
-    
-    public Network getNetwork(NetworkType ntype){
+
+    public Network getNetwork(NetworkType ntype) {
         return networks.get(ntype);
     }
-    
+
     /**
      * get ByteBufferPool
-     * @return 
+     *
+     * @return
      */
-    public ByteBufferPool getByteBufferPool(){
+    public ByteBufferPool getByteBufferPool() {
         return bytepool;
     }
-    
+
     /**
      * Make ByteBuffer for Recv Byte Data
      */
@@ -341,9 +395,9 @@ public class NetworkManager {
             bfile.deleteOnExit();
         } catch (IOException ex) {
             //if Android
-            System.out.println("Android File Set up: "+MinTConfig.ANDROID_FILE_PATH+"/bufferpool.dat");
+            System.out.println("Android File Set up: " + MinTConfig.ANDROID_FILE_PATH + "/bufferpool.dat");
             try {
-                fileName = MinTConfig.ANDROID_FILE_PATH+"/bufferpool.dat";
+                fileName = MinTConfig.ANDROID_FILE_PATH + "/bufferpool.dat";
                 bfile = new File(fileName);
                 if (!existFile(fileName)) {
                     bfile.createNewFile();
@@ -376,8 +430,8 @@ public class NetworkManager {
         ResponseList.put(responseKey, sendmsg);
 //        System.out.println("size : "+ResponseList.size());
     }
-    
-    public int getResponseSize(){
+
+    public int getResponseSize() {
         return ResponseList.size();
     }
 }

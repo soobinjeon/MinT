@@ -19,7 +19,7 @@ package MinTFramework.Network.sharing;
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
@@ -45,7 +45,7 @@ public abstract class SharingResponse implements Runnable{
     protected RoutingProtocol routing = null;
     
     protected ReceiveMessage recvmsg = null;
-    protected PacketDatagram rv_packet = null;
+    protected CoAPPacket rv_packet = null;
     
     protected List<ResData> LocalResources = null;
     protected List<ResData> ChildResources = null;
@@ -54,7 +54,7 @@ public abstract class SharingResponse implements Runnable{
     protected List<DeviceType> resourceTypes = null;
     protected List<ResourceOption> resourceOptions = null;
     
-    public SharingResponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg){
+    public SharingResponse(CoAPPacket _rv_packet, ReceiveMessage _recvmsg){
         frame = MinT.getInstance();
         networkmanager = frame.getNetworkManager();
         sharing = networkmanager.getSharing();
@@ -203,8 +203,8 @@ public abstract class SharingResponse implements Runnable{
         
         //Response MSG
         if(sendmsg != null)
-            networkmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                        , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
+            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
+                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
     }
 
     

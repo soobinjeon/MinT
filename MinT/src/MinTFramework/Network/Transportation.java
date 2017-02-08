@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
@@ -23,6 +24,8 @@ import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  *
@@ -37,6 +40,7 @@ public class Transportation implements NetworkLayers {
     private RoutingProtocol routing = null;
     private Sharing sharing = null;
     private MatcherAndSerialization serialization = null;
+    private ScheduledExecutorService executor; //executor for packet timeout checking
 
     DebugLog dl = new DebugLog("Transportation");
 //    private Performance bench_send = null;
@@ -44,6 +48,7 @@ public class Transportation implements NetworkLayers {
     public Transportation(NetworkLayers.LAYER_DIRECTION layerDirection) {
         frame = MinT.getInstance();
         this.networkManager = frame.getNetworkManager();
+        executor = Executors.newSingleThreadScheduledExecutor();
 
         if (layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE) {
             syshandle = new SystemHandler();
@@ -62,7 +67,7 @@ public class Transportation implements NetworkLayers {
 
     @Override
     public void Receive(RecvMSG recvMsg) {
-        PacketDatagram packet = recvMsg.getPacketDatagram();
+        CoAPPacket packet = recvMsg.getPacketDatagram();
         if (isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
@@ -132,16 +137,16 @@ public class Transportation implements NetworkLayers {
      *
      * @param packet
      */
-    private void stopOver(PacketDatagram packet) {
+    private void stopOver(CoAPPacket packet) {
 
     }
 
     @Override
-    public PacketDatagram EndPointSend(SendMSG sendmsg) {
+    public CoAPPacket EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
-        PacketDatagram npacket = null;
+        CoAPPacket npacket = null;
         if (sendmsg.isResponse()) {
             npacket = serialization.EndPointSend(sendmsg);
         } else if (sendmsg.isRequest()) {
@@ -149,18 +154,30 @@ public class Transportation implements NetworkLayers {
         } else if (sendmsg.isRequestGET()) {
             //check resend information
             if (sendmsg.getSendHit() == 0) {
-                sendmsg.setResKey(networkManager.getIDMaker().makePacketID());
+                sendmsg.setResKey(networkManager.getIDMaker().makeToken());
                 networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
             }
             npacket = serialization.EndPointSend(sendmsg);
         }
-
-        //msg sending count
-        sendmsg.Sended();
+        
+        if(sendmsg.getHeader_Type().isCON()){
+            //Start retransmit procedure
+            
+            //First try to send
+            sendmsg.Sended();
+            if(sendmsg.getSendHit() <= 1){
+                
+            }
+            else {
+                
+            }
+        }
+        
         if (npacket != null) {
             //send packet
-            System.out.println("TRANSPOTATION.JAVA: Send error, npacket is null");
             Send(npacket);
+        } else{
+            System.out.println("TRANSPOTATION.JAVA: Send error, npacket is null");
         }
 
         return npacket;
@@ -202,7 +219,7 @@ public class Transportation implements NetworkLayers {
      * @param packet
      */
     @Override
-    public void Send(PacketDatagram packet) {
+    public void Send(CoAPPacket packet) {
         try {
             //For Group Message
             if (packet.getSendMSG().isUDPMulticastMode()) {
@@ -222,7 +239,7 @@ public class Transportation implements NetworkLayers {
         }
     }
 
-    private void MakeSourceProfile(PacketDatagram packet, Network sendNetwork) {
+    private void MakeSourceProfile(CoAPPacket packet, Network sendNetwork) {
         //Send Message
         if (sendNetwork != null) {
             //set Source Node
