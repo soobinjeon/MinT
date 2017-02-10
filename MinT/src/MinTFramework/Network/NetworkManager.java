@@ -214,7 +214,20 @@ public class NetworkManager {
     public void SEND(SendMSG smsg) {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
-
+    
+    /**
+     * Send Response Messages
+     * @param rv_packet
+     * @param ret 
+     */
+    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
+        if (rv_packet.getHeader_Type().isCON()) {
+            SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret);
+        } else {
+            SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret);
+        }
+    }
+    
     /**
      * *
      * For piggyback acknowledge
@@ -253,11 +266,15 @@ public class NetworkManager {
             
         }
     }
-
+    
+    /** @deprecated 
+     * 
+     * @param requestdata 
+     */
     public void SEND_UDP_Multicast(SendMessage requestdata) {
-        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
     }
-
+    
     private void SEND_Multicast(SendMSG smsg) {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }

@@ -76,9 +76,9 @@ public class SystemHandler{
     private void SystemHandleRequest(CoAPPacket rv_packet, ReceiveMessage recvmsg){
         if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
-//            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+            System.out.print("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
-            
+            System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
             Request ret = null;
             //Temporary Routing Discover Mode
@@ -97,11 +97,7 @@ public class SystemHandler{
             }
 //            nmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
 //                    , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
-            if(rv_packet.getHeader_Type().isCON()){
-                nmanager.SEND_PIGGYBACK_ACK(rv_packet, (SendMessage)ret);
-            } else {
-                nmanager.SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage)ret);
-            }
+            nmanager.SEND_RESPONSE(rv_packet, (SendMessage)ret);
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible
              */

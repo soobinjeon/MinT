@@ -93,7 +93,7 @@ public class SendMSG implements Runnable{
     }
     
     /**
-     * Request only
+     * Request only on Multi-cast
      * @param hd Direction (Request, Response)
      * @param hi for Instruction (SET, POST, PUT, DELETE)
      * @param dst Destination profile

@@ -433,6 +433,8 @@ public abstract class MinT {
         }
     }
     
+//    public void REQUEST_GET_MULTICAST(SendMessage requestdata, )
+    
 //    public void GET_SHARING_RESOURCE(DeviceType dtype, List<ResourceOption> resOpt, ResponseHandler resHandle){
 //        Sharing sharing = NTWmanager.getSharing();
 //        try{
