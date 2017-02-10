@@ -93,10 +93,8 @@ public class SystemHandler{
                 if (res != null) {
                     ret = new SendMessage(null, res.getResourceString());
                 }
-//                ret = new SendMessage(null, "test");
             }
-//            nmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
-//                    , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
+            
             if(rv_packet.getHeader_Type().isCON()){
                 nmanager.SEND_PIGGYBACK_ACK(rv_packet, (SendMessage)ret);
             } else {

@@ -513,4 +513,13 @@ public class CoAPPacket extends PacketDatagram {
         public boolean isServerError() {return classCode == 5;}
     }
     
+    public static class CoAPConfig {
+        static public final int CoAP_MULTICAST_TTL = 5;
+        static public final int COAP_VERSION = 0x01;
+        static public final int RANDOM_SEED = 10;
+        static public final int ACK_TIMEOUT = 2000;
+        static public final float ACK_RANDOM_FACTOR = 1.5f;
+        static public final float ACK_TIMEOUT_SCALE = 2.0f;
+        static public final int MAX_RETRANSMIT = 4;
+    }
 }

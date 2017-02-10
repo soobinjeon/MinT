@@ -250,7 +250,7 @@ public class NetworkManager {
             SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
                                 CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
         } else {
-            
+            //For Non-CoAP Procedure
         }
     }
 
@@ -325,6 +325,15 @@ public class NetworkManager {
         return resd;
     }
 
+    public void checkAck(short id) {
+        SendMSG smsg = IDList.get(id);
+        if (smsg == null) {
+            System.out.println("There is No message ID: "+id);
+            return;
+        }
+        smsg.setRetransmissionHandle(null);
+        IDList.remove(id);
+    }
     /**
      * Temporary Method
      */
@@ -429,6 +438,9 @@ public class NetworkManager {
     public void putResponse(short responseKey, SendMSG sendmsg) {
         ResponseList.put(responseKey, sendmsg);
 //        System.out.println("size : "+ResponseList.size());
+    }
+    public void putCONMessage(short msgID, SendMSG sendmsg){
+        IDList.put(msgID, sendmsg);
     }
 
     public int getResponseSize() {

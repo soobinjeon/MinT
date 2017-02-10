@@ -21,6 +21,7 @@ import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  *
@@ -36,6 +37,8 @@ public class SendMSG implements Runnable{
     private NetworkProfile destination;
     private String msg;
     private ResponseHandler resHandle;
+    private ScheduledFuture<?> retransmissionHandle;
+    private long currentTimeout = 0;
     private short resKey;
     private int SendHit = 0;
     private boolean isUDPMulticast = false;
@@ -45,7 +48,7 @@ public class SendMSG implements Runnable{
     public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl, 
             CoAPPacket.HEADER_CODE hc, NetworkProfile dst, Request msg,
             ResponseHandler resHandle, short resKey){
-        head_version = MinTConfig.COAP_VERSION;
+        head_version = CoAPPacket.CoAPConfig.COAP_VERSION;
         head_type = ht;
         head_tokenLength = tkl;
         head_code = hc;
@@ -57,6 +60,7 @@ public class SendMSG implements Runnable{
             this.msg = msg.getMessageString();
         this.resHandle = resHandle;
         this.resKey = resKey;
+        this.retransmissionHandle = null;
     }
     
     /**
@@ -229,4 +233,23 @@ public class SendMSG implements Runnable{
     public boolean isUDPMulticastMode(){
         return isUDPMulticast;
     }
+    
+    public void setCurrentTimeout(long timeout){
+        this.currentTimeout = timeout;
+    }
+    public long getCurrentTimeout(){
+        return currentTimeout;
+    }
+    
+    public void setRetransmissionHandle(ScheduledFuture<?> retransmissionHandle){
+        if(this.retransmissionHandle != null){
+            this.retransmissionHandle.cancel(false);
+            System.out.println("SendMSG.java "+this.getMessageID()+" message : Retransmission Handle is canceled!");
+        }
+        this.retransmissionHandle = retransmissionHandle;
+    }
+    public ScheduledFuture<?> getRetransmissionHandle(){
+        return this.retransmissionHandle;
+    }
+    
 }

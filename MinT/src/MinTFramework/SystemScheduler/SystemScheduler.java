@@ -47,6 +47,8 @@ public class SystemScheduler extends ThreadPoolScheduler{
         registerMinTSystemthreadPool(MinTthreadPools.NET_RECV_HANDLE);
         //register sender Pool
         registerMinTSystemthreadPool(MinTthreadPools.NET_SEND);
+        //register retransmission pool
+        registerMinTSystemthreadPool(MinTthreadPools.RETRANSMISSION_HANDLE);
     }
     
     /**
