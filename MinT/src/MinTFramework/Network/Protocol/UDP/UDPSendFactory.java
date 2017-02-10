@@ -17,6 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -70,7 +71,7 @@ public class UDPSendFactory implements ThreadFactory{
                 NetworkInterface interf= NetworkInterface.getByInetAddress(inetaddress);
                 InetAddress mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
                 sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_IF, interf);
-                sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_TTL, MinTConfig.CoAP_MULTICAST_TTL);
+                sendchannel.setOption(StandardSocketOptions.IP_MULTICAST_TTL, CoAPPacket.CoAPConfig.CoAP_MULTICAST_TTL);
                 sendchannel.join(mulAddress, interf);
             }
                 

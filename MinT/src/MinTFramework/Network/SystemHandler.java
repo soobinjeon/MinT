@@ -93,10 +93,8 @@ public class SystemHandler{
                 if (res != null) {
                     ret = new SendMessage(null, res.getResourceString());
                 }
-//                ret = new SendMessage(null, "test");
             }
-//            nmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
-//                    , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
+            
             nmanager.SEND_RESPONSE(rv_packet, (SendMessage)ret);
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible

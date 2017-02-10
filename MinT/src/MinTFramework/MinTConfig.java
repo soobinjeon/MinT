@@ -47,8 +47,6 @@ public class MinTConfig {
     static public String IP_ADDRESS = "";
     static public int USER_PORT = 0;
     static public final String CoAP_MULTICAST_ADDRESS = "224.0.1.187";
-    static public final int CoAP_MULTICAST_TTL = 5;
-    static public final int COAP_VERSION = 0x01;
     
     //for Sharing
     private String GROUP_NAME = "";

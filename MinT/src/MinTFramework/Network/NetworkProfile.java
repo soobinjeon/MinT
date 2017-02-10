@@ -46,10 +46,7 @@ public class NetworkProfile {
      * @param ntype type of Network
      */
     public NetworkProfile(String name, String address, NetworkType ntype){
-//        this.name = name;
-        this.address = address;
-        this.ntype = ntype;
-        initialize();
+        this(name,address,ntype, CoAPPacket.HEADER_TYPE.NON);
     }
     
     public NetworkProfile(String name, String address, NetworkType ntype, CoAPPacket.HEADER_TYPE htype){
