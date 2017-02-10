@@ -27,7 +27,7 @@ import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
@@ -387,8 +387,8 @@ public abstract class MinT {
      * @param resHandle 
      */
     public void REQUEST_PUT(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                ,PacketDatagram.HEADER_CODE.PUT, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(dst.getHeaderType(), 2
+                ,CoAPPacket.HEADER_CODE.PUT, dst,requestdata, resHandle));
     }
     
     /**
@@ -398,8 +398,8 @@ public abstract class MinT {
      * @param resHandle 
      */
     public void REQUEST_POST(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                ,PacketDatagram.HEADER_CODE.POST, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(dst.getHeaderType(), 2
+                ,CoAPPacket.HEADER_CODE.POST, dst,requestdata, resHandle));
     }
     
     /**
@@ -409,8 +409,8 @@ public abstract class MinT {
      * @param resHandle 
      */
     public void REQUEST_DELETE(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                ,PacketDatagram.HEADER_CODE.DELETE, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(dst.getHeaderType(), 2
+                ,CoAPPacket.HEADER_CODE.DELETE, dst,requestdata, resHandle));
     }
     
     /**
@@ -420,8 +420,8 @@ public abstract class MinT {
      * @param resHandle Response Handler
      */
     public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                ,PacketDatagram.HEADER_CODE.GET, dst,requestdata, resHandle));
+        NTWmanager.SEND(new SendMSG(dst.getHeaderType(), 2
+                ,CoAPPacket.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
     public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle){

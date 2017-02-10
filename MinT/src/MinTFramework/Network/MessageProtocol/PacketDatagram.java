@@ -14,22 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
-
-import java.util.concurrent.ThreadFactory;
+package MinTFramework.Network.MessageProtocol;
 
 /**
  *
- * @author soobin
+ * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
+ * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendAdapterFactory implements ThreadFactory{
-    private String name = "SendAdaptor";
-    static int threadNo = 0;
+public class PacketDatagram {
+    private MessageProtocol ptype;
 
-    @Override
-    public Thread newThread(Runnable r) {
-        ++threadNo;
-        return new SendAdapter(r, name+": "+threadNo);
+    public static enum MessageProtocol{
+        COAP, MQTT;
+    }
+
+    public PacketDatagram(PacketDatagram.MessageProtocol ptype){
+        this.ptype = ptype;
+    }
+    /***
+     * Get Message Protocol Types
+     * e.g.) COAP, MQTT, and so on
+     * @return Message protocol type
+     */
+    public MessageProtocol getMessageProtocolType(){
+        return ptype;
     }
 }
-       

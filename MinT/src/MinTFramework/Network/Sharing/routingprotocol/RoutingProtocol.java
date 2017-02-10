@@ -19,7 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
@@ -142,7 +142,7 @@ public class RoutingProtocol implements Runnable{
         }
     }
 
-    public void routingHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+    public void routingHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
         rhandle.receiveHandle(rv_packet, recvmsg);
     }
 

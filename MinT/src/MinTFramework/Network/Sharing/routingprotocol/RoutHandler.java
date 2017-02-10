@@ -18,7 +18,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol.ROUTING_PHASE;
@@ -47,14 +47,14 @@ public class RoutHandler {
         routingPhase = rout.phases;
     }
 
-    void receiveHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+    void receiveHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
         if(rv_packet.getHeader_Code().isRequest())
             requestHandle(rv_packet, recvmsg);
         else if(rv_packet.getHeader_Code().isResponse())
             responsehandle(rv_packet, recvmsg);
     }
 
-    private void requestHandle(PacketDatagram rv_packet, ReceiveMessage req) {
+    private void requestHandle(CoAPPacket rv_packet, ReceiveMessage req) {
         Information data = req.getResourcebyName(Request.MSG_ATTR.Routing);
         /**
          * Operate a message according to routing phase
@@ -67,7 +67,7 @@ public class RoutHandler {
         }
     }
 
-    private void responsehandle(PacketDatagram rv_packet, ReceiveMessage req) {
+    private void responsehandle(CoAPPacket rv_packet, ReceiveMessage req) {
         Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         for(Phase cp : routingPhase.values()){

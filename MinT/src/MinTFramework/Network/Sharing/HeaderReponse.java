@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.sharing;
 
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 
 /**
@@ -26,7 +26,7 @@ import MinTFramework.Network.Resource.ReceiveMessage;
  */
 public class HeaderReponse extends SharingResponse{
 
-    public HeaderReponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
+    public HeaderReponse(CoAPPacket _rv_packet, ReceiveMessage _recvmsg) {
         super(_rv_packet, _recvmsg);
     }
 

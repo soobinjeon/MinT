@@ -18,7 +18,7 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.storage.ResourceStorage;
@@ -47,7 +47,7 @@ public class SharingHandler {
      * @param rv_packet
      * @param recvmsg 
      */
-    public void receiveHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+    public void receiveHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
         if(rv_packet.getHeader_Code().isRequest())
             requestHandle(rv_packet, recvmsg);
         else if(rv_packet.getHeader_Code().isResponse())
@@ -59,7 +59,7 @@ public class SharingHandler {
      * @param rv_packet
      * @param req 
      */
-    private void requestHandle(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
+    private void requestHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
         //request analysis ( child node or other header)
         System.out.println("request for Header");
         if(routing.hasChildNode(rv_packet.getSource()))
@@ -68,7 +68,7 @@ public class SharingHandler {
             sharing.executeResponse(new HeaderReponse(rv_packet, recvmsg));
     }
 
-    private void responsehandle(PacketDatagram rv_packet, ReceiveMessage req) {
+    private void responsehandle(CoAPPacket rv_packet, ReceiveMessage req) {
 //        Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
     }
 }

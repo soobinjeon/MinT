@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.sharing;
 
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.node.Node;
@@ -32,7 +32,7 @@ import java.util.Queue;
  */
 public class ChildResponce extends SharingResponse{
 
-    public ChildResponce(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
+    public ChildResponce(CoAPPacket _rv_packet, ReceiveMessage _recvmsg) {
         super(_rv_packet, _recvmsg);
     }
 

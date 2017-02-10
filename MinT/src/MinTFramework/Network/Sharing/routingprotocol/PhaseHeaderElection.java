@@ -19,7 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -110,7 +110,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
     * @param req 
     */
     @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
+    public void requestHandle(CoAPPacket rv_packet, Request req) {
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         //process for broadcast of header node
@@ -131,7 +131,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
         }
     }
     
-    private void addHeaderResource(PacketDatagram rv_packet, Request req) {
+    private void addHeaderResource(CoAPPacket rv_packet, Request req) {
         if (isDiscovery(req)) {
             System.out.println("update discovery data in Routing Handler");
             Information discoverdata = req.getResourcebyName(Request.MSG_ATTR.WellKnown);
@@ -154,7 +154,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
      * Process for broadcast of header node
      * @param rv_packet 
      */
-    private void responseToHeader(PacketDatagram rv_packet){
+    private void responseToHeader(CoAPPacket rv_packet){
         if(!routing.isHeaderNode()) { // Client Node Operation
             Node hNode = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
             //set Header Node in routing table
@@ -167,7 +167,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                     .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_CLIENTRESPONSE.getValue());
 
             //response client info to header
-            networkmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0, PacketDatagram.HEADER_CODE.CONTENT
+            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
                     , rv_packet.getSource(), ret, rv_packet.getMSGID()));
             doneIndentify();
         } else { //When is this header node, to do
@@ -182,7 +182,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
      * @param req 
      */
     @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
+    public void responseHandle(CoAPPacket rv_packet, Request req) {
         if(!routing.isHeaderNode() && !isWorkingPhase())
             return;
         System.out.println("responsed from Client");

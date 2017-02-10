@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinTConfig;
 import MinTFramework.Util.DebugLog;
 import java.nio.ByteBuffer;
@@ -34,6 +35,7 @@ public class NetworkProfile {
     private String ipaddr="";
     private int Port = 0;
     private NetworkType ntype;
+    private CoAPPacket.HEADER_TYPE htype = CoAPPacket.HEADER_TYPE.NON;
     private String Split = "|";
     private byte[] addrbyte = new byte[NETWORK_ADDRESS_BYTE_SIZE];
     private DebugLog dl = new DebugLog("NETWORK Profile");
@@ -49,6 +51,15 @@ public class NetworkProfile {
         this.ntype = ntype;
         initialize();
     }
+    
+    public NetworkProfile(String name, String address, NetworkType ntype, CoAPPacket.HEADER_TYPE htype){
+//        this.name = name;
+        this.address = address;
+        this.ntype = ntype;
+        this.htype = htype;
+        initialize();
+    }
+    
     public NetworkProfile(byte[] pdata){
         makeBytetoProfile(pdata);
     }
@@ -112,6 +123,10 @@ public class NetworkProfile {
     
     public NetworkType getNetworkType(){
         return ntype;
+    }
+    
+    public CoAPPacket.HEADER_TYPE getHeaderType(){
+        return htype;
     }
     
     public void setAddress(String add){

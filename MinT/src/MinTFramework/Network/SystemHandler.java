@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network;
 
+import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
@@ -45,7 +46,7 @@ public class SystemHandler{
         rout = nmanager.getRoutingProtocol();
     }
     
-    public void startHandle(PacketDatagram recv_pk, ReceiveMessage recvmsg){
+    public void startHandle(CoAPPacket recv_pk, ReceiveMessage recvmsg){
         SystemHandler(recv_pk, recvmsg);
     }
     
@@ -57,7 +58,7 @@ public class SystemHandler{
      * @param src
      * @param msg 
      */
-    private void SystemHandler(PacketDatagram recv_packet, ReceiveMessage recvmsg){
+    private void SystemHandler(CoAPPacket recv_packet, ReceiveMessage recvmsg){
         /**
          * get, post using resource storage
          */
@@ -65,14 +66,14 @@ public class SystemHandler{
             SystemHandleRequest(recv_packet, recvmsg);
         }else if(recv_packet.getHeader_Code().isResponse()){
             SystemHandleResponse(recv_packet, recvmsg);
-        }
+        } 
     }
     
     /**
      * Request handle by requesting from other node
      * @param rv_packet 
      */
-    private void SystemHandleRequest(PacketDatagram rv_packet, ReceiveMessage recvmsg){
+    private void SystemHandleRequest(CoAPPacket rv_packet, ReceiveMessage recvmsg){
         if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
@@ -94,8 +95,18 @@ public class SystemHandler{
                 }
 //                ret = new SendMessage(null, "test");
             }
-            nmanager.SEND(new SendMSG(PacketDatagram.HEADER_TYPE.NON, 0
-                    , PacketDatagram.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
+//            nmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
+//                    , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), ret, rv_packet.getMSGID()));
+            if(rv_packet.getHeader_Type().isCON()){
+                nmanager.SEND_PIGGYBACK_ACK(rv_packet, (SendMessage)ret);
+            } else {
+                nmanager.SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage)ret);
+            }
+            /**
+             * @TODO seperate ack and response procedure for when piggyback is not possible
+             */
+            
+            
         }else if(rv_packet.getHeader_Code().isPut()){
             resStorage.setInstruction(recvmsg);
         }else if(rv_packet.getHeader_Code().isPost()){
@@ -108,7 +119,7 @@ public class SystemHandler{
      * Response handler when this node receives a response message from other node what is requested by this node.
      * @param rv_packet 
      */
-    private void SystemHandleResponse(PacketDatagram rv_packet, ReceiveMessage recvmsg){
+    private void SystemHandleResponse(CoAPPacket rv_packet, ReceiveMessage recvmsg){
 //        ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
         if(rv_packet.getHeader_Code().isContent()){
             if(isDiscover(recvmsg)){
