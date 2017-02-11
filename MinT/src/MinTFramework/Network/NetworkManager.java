@@ -275,7 +275,7 @@ public class NetworkManager {
         SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
     }
     
-    private void SEND_Multicast(SendMSG smsg) {
+    public void SEND_Multicast(SendMSG smsg) {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
 

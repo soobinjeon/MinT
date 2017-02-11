@@ -52,10 +52,12 @@ public class PhaseDiscover extends Phase{
         setWorkingPhase(true);
         try {
             while (!super.isInturrupted() && !Thread.currentThread().isInterrupted()) {
-                networkmanager.SEND_UDP_Multicast(new SendMessage()
+//                networkmanager.SEND_UDP_Multicast(new SendMessage()
+                frame.REQUEST_POST_MULTICAST(CoAPPacket.HEADER_TYPE.NON, new SendMessage()
                         .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.DIS_BROADCAST.getValue())
                         .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
-                        .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight()));
+                        .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight())
+                        , null);
                 if(disRole.doDiscoveryTimeRole()){
                     Thread.sleep(1000);
                 }else

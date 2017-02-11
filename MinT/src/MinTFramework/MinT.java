@@ -424,6 +424,52 @@ public abstract class MinT {
                 ,CoAPPacket.HEADER_CODE.GET, dst,requestdata, resHandle));
     }
     
+    /**
+     * Request get type Resource to other Node by Multicast
+     * @param htype
+     * @param requestdata
+     * @param resHandle 
+     */
+    public void REQUEST_GET_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.GET, null, requestdata, true));
+    }
+    
+    /**
+     * PUT Resource to other Node by Multicast
+     * @param htype
+     * @param requestdata
+     * @param resHandle 
+     */
+    public void REQUEST_PUT_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.PUT, null, requestdata, true));
+    }
+    
+    /**
+     * Post Resource to other Node by Multicast
+     * @param htype
+     * @param requestdata
+     * @param resHandle 
+     */
+    public void REQUEST_POST_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+    }
+    
+    /**
+     * Request delete  to other Node by Multicast
+     * @param htype
+     * @param requestdata
+     * @param resHandle 
+     */
+    public void REQUEST_DELETE_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.DELETE, null, requestdata, true));
+    }
+    
+    /**
+     * 
+     * @param dtype
+     * @param resOpt
+     * @param resHandle 
+     */
     public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle){
         Sharing sharing = NTWmanager.getSharing();
         try{
@@ -432,8 +478,6 @@ public abstract class MinT {
             e.printStackTrace();
         }
     }
-    
-//    public void REQUEST_GET_MULTICAST(SendMessage requestdata, )
     
 //    public void GET_SHARING_RESOURCE(DeviceType dtype, List<ResourceOption> resOpt, ResponseHandler resHandle){
 //        Sharing sharing = NTWmanager.getSharing();

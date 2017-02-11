@@ -346,7 +346,8 @@ public class PhaseHeaderElection extends Phase implements Callable{
                             //NotPeriod = DiscoverPeriod;
                             smsg.AddAttribute(Request.MSG_ATTR.WellKnown, discoverydata.toJSONString());
                         }
-                        networkmanager.SEND_UDP_Multicast(smsg);
+//                        networkmanager.SEND_UDP_Multicast(smsg);
+                        frame.REQUEST_POST_MULTICAST(CoAPPacket.HEADER_TYPE.NON, smsg, null);
                         Thread.sleep(NotPeriod * 1000);
                     }
                 } catch (Exception e) {
