@@ -23,7 +23,6 @@ import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.SendMSG;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.node.Node;
@@ -140,7 +139,7 @@ public abstract class SharingResponse implements Runnable{
             for(ThingProperty p: n.getProperties().values()){
                 System.out.println("RecvMsg: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
                 if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName()))
-                    frame.REQUEST_GET(n.gettoAddr(), new SendMessage(p.getName(), null), waiter.putResponseHandler(p));
+                    frame.REQUEST_GET(n.gettoAddr().setCON(true), new SendMessage(p.getName(), null), waiter.putResponseHandler(p));
             }
         }
         
@@ -202,9 +201,11 @@ public abstract class SharingResponse implements Runnable{
         SendMessage sendmsg = new SendMessage(null,summary.getResponseData(reso));
         
         //Response MSG
-        if(sendmsg != null)
-            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
-                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
+        if(sendmsg != null){
+            networkmanager.SEND_RESPONSE(rv_packet, sendmsg);
+//            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
+//                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
+        }
     }
 
     

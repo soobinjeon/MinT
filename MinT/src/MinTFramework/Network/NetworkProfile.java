@@ -145,6 +145,14 @@ public class NetworkProfile {
         return str;
     }
     
+    public NetworkProfile setCON(boolean iscon) {
+        if(iscon)
+            htype = CoAPPacket.HEADER_TYPE.CON;
+        else
+            htype = CoAPPacket.HEADER_TYPE.NON;
+        return this;
+    }
+    
 //    public boolean isNameProfile(){
 //        return !name.equals("")&&(address == null || address.equals(""));
 //    }

@@ -22,7 +22,6 @@ import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.Network.SendMSG;
 import MinTFramework.storage.datamap.Information;
 
 /**
@@ -96,9 +95,10 @@ public class PhaseDiscover extends Phase{
                         System.out.println("Stop Message");
                         disRole.interrupt();
 
-                        Request ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
-                        networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
-                                , rv_packet.getSource(), ret, rv_packet.getMSGID()));
+                        SendMessage ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
+                        networkmanager.SEND_RESPONSE(rv_packet, ret);
+//                        networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
+//                                , rv_packet.getSource(), ret, rv_packet.getMSGID()));
                     }
                     
                     else
@@ -113,7 +113,7 @@ public class PhaseDiscover extends Phase{
                //추가되었던 노드가 다시 재추가 될때 프로시저 없음. (addRoutingTable 변경 해야할 것 같음)
                 if (nnode != null) {
                     System.out.println("new Node Added!!");
-                    frame.REQUEST_GET(nnode.gettoAddr(), new SendMessage()
+                    frame.REQUEST_GET(nnode.gettoAddr().setCON(true), new SendMessage()
                             .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.DIS_BROADCAST_STOP.getValue())
                             .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
                             .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight()), new ResponseHandler() {

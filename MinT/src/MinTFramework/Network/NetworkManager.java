@@ -235,7 +235,7 @@ public class NetworkManager {
      * @param rv_packet Receved packet
      * @param ret
      */
-    public void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
+    private void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
         // CoAP Piggyback procedure
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
@@ -257,7 +257,7 @@ public class NetworkManager {
 
     }
     
-    public void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+    private void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
             SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),

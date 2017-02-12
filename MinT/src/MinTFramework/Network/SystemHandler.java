@@ -80,7 +80,7 @@ public class SystemHandler{
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
             System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
-            Request ret = null;
+            SendMessage ret = null;
             //Temporary Routing Discover Mode
             if (isDiscover(recvmsg)) {
                 Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
@@ -95,7 +95,7 @@ public class SystemHandler{
                 }
             }
             
-            nmanager.SEND_RESPONSE(rv_packet, (SendMessage)ret);
+            nmanager.SEND_RESPONSE(rv_packet, ret);
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible
              */

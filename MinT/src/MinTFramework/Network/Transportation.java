@@ -207,7 +207,7 @@ public class Transportation implements NetworkLayers {
     private void prepareRetransmission(SendMSG msg, RetransmissionTask task){
         //scheduler.submitProcess(MinTthreadPools.RETRANSMISSION_HANDLE, task);
         if(executor.isShutdown()){
-            System.out.println("Transpotation.java : Retransmission executor is shutdown!");
+//            System.out.println("Transpotation.java : Retransmission executor is shutdown!");
             return;
         }
         

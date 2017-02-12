@@ -130,7 +130,7 @@ public class Sharing {
         }else{
             Node header = routingprotocol.getHeaderNodeofCurrentNode();
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
-            frame.REQUEST_GET(header.gettoAddr(), requestdata, resHandle);
+            frame.REQUEST_GET(header.gettoAddr().setCON(true), requestdata, resHandle);
         }
     }
     
@@ -149,7 +149,7 @@ public class Sharing {
         
         if(routingprotocol.isHeaderNode()){
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
-            frame.REQUEST_GET(header.gettoAddr(), requestdata, resHandle);
+            frame.REQUEST_GET(header.gettoAddr().setCON(true), requestdata, resHandle);
         }
     }
     

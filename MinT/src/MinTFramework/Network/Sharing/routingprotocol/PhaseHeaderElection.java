@@ -26,7 +26,6 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.CurrentNode;
 import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.datamap.Information;
 import java.util.ArrayList;
@@ -163,12 +162,13 @@ public class PhaseHeaderElection extends Phase implements Callable{
                 hNode.setHeaderNode(true);
             }
             
-            Request ret = new SendMessage()
+            SendMessage ret = new SendMessage()
                     .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_CLIENTRESPONSE.getValue());
 
             //response client info to header
-            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
-                    , rv_packet.getSource(), ret, rv_packet.getMSGID()));
+            networkmanager.SEND_RESPONSE(rv_packet, ret);
+//            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
+//                    , rv_packet.getSource(), ret, rv_packet.getMSGID()));
             doneIndentify();
         } else { //When is this header node, to do
             //re calculate header election
@@ -290,7 +290,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                             if(snode != null && snode.isClientNode())
                                 continue;
                             
-                            frame.REQUEST_GET(dst, new SendMessage()
+                            frame.REQUEST_GET(dst.setCON(true), new SendMessage()
                                     .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_BROADCASTTOCLIENT.getValue()), new ResponseHandler() {
                                 @Override
                                 public void Response(ResponseData resdata) {
