@@ -220,12 +220,16 @@ public class NetworkManager {
      * @param rv_packet
      * @param ret 
      */
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
+    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode) {
         if (rv_packet.getHeader_Type().isCON()) {
-            SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret);
+            SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret, headerCode);
         } else {
-            SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret);
+            SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret, headerCode);
         }
+    }
+    
+    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
+        SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
     }
     
     /**
@@ -235,14 +239,14 @@ public class NetworkManager {
      * @param rv_packet Receved packet
      * @param ret
      */
-    private void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
+    private void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode) {
         // CoAP Piggyback procedure
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
 //            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
             SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
-                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+                    headerCode, cp.getSource(), ret, cp.getToken()));
         } else {
             //non-CoAP Piggyback procedure
         }
@@ -257,11 +261,11 @@ public class NetworkManager {
 
     }
     
-    private void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+    private void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode){
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
             SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
-                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+                                headerCode, cp.getSource(), ret, cp.getToken()));
         } else {
             //For Non-CoAP Procedure
         }

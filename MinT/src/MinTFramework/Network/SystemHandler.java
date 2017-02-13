@@ -95,7 +95,7 @@ public class SystemHandler{
                 }
             }
             
-            nmanager.SEND_RESPONSE(rv_packet, ret);
+            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible
              */
@@ -103,9 +103,20 @@ public class SystemHandler{
             
         }else if(rv_packet.getHeader_Code().isPut()){
             resStorage.setInstruction(recvmsg);
+            SendMessage ret = new SendMessage(null, null);
+            //if create -> header create
+            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CREATED);
+            
+            //if changed
+            //nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CHANGED);
+            
         }else if(rv_packet.getHeader_Code().isPost()){
             resStorage.setInstruction(recvmsg);
+            SendMessage ret = new SendMessage(null, null);
+            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CREATED);
         }else if(rv_packet.getHeader_Code().isDelete()){
+            SendMessage ret = new SendMessage(null, null);
+            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.DELETED);
         }
     }
     
