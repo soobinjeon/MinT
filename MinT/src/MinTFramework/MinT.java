@@ -430,8 +430,8 @@ public abstract class MinT {
      * @param requestdata
      * @param resHandle 
      */
-    public void REQUEST_GET_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.GET, null, requestdata, true));
+    public void REQUEST_GET_MULTICAST(SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.GET, null, requestdata, true));
     }
     
     /**
@@ -440,8 +440,8 @@ public abstract class MinT {
      * @param requestdata
      * @param resHandle 
      */
-    public void REQUEST_PUT_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.PUT, null, requestdata, true));
+    public void REQUEST_PUT_MULTICAST(SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.PUT, null, requestdata, true));
     }
     
     /**
@@ -450,8 +450,8 @@ public abstract class MinT {
      * @param requestdata
      * @param resHandle 
      */
-    public void REQUEST_POST_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+    public void REQUEST_POST_MULTICAST(SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
     }
     
     /**
@@ -460,8 +460,8 @@ public abstract class MinT {
      * @param requestdata
      * @param resHandle 
      */
-    public void REQUEST_DELETE_MULTICAST(CoAPPacket.HEADER_TYPE htype, SendMessage requestdata, ResponseHandler resHandle){
-        NTWmanager.SEND_Multicast(new SendMSG(htype, 2, CoAPPacket.HEADER_CODE.DELETE, null, requestdata, true));
+    public void REQUEST_DELETE_MULTICAST(SendMessage requestdata, ResponseHandler resHandle){
+        NTWmanager.SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.DELETE, null, requestdata, true));
     }
     
     /**

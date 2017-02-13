@@ -57,7 +57,7 @@ public class UDP extends Network {
     
     private UDPSender sender;
     private InetSocketAddress isa;
-    private DatagramChannel channel;
+    private DatagramChannel multichannel, unichannel;
     private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
     
     //Group Communication (Multicast)
@@ -129,13 +129,20 @@ public class UDP extends Network {
         interf= NetworkInterface.getByInetAddress(inetaddress);
         mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
         isa = new InetSocketAddress(PORT);
-        channel = DatagramChannel.open(StandardProtocolFamily.INET)
+        //make multicast channel
+        multichannel = DatagramChannel.open(StandardProtocolFamily.INET)
                 .setOption(StandardSocketOptions.SO_REUSEADDR, true)
                 .bind(isa)
                 .setOption(StandardSocketOptions.IP_MULTICAST_IF, interf)
                 .setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
-        channel.configureBlocking(false);
-        channel.join(mulAddress, interf);
+        multichannel.configureBlocking(false);
+        multichannel.join(mulAddress, interf);
+        
+        //make unicast channel
+        unichannel = DatagramChannel.open(StandardProtocolFamily.INET)
+                .setOption(StandardSocketOptions.SO_REUSEADDR, true)
+                .bind(isa);
+        unichannel.configureBlocking(false);
         
 //        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
@@ -240,7 +247,7 @@ public class UDP extends Network {
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
                 sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
-                        , new UDPRecvListener(channel, this));
+                        , new UDPRecvListener(multichannel,unichannel, this));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

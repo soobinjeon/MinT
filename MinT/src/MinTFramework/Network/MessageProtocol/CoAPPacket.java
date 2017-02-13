@@ -57,6 +57,9 @@ public class CoAPPacket extends PacketDatagram {
     private final String EMPTY_MSG = "-";
     
     private SendMSG sendMsg = null;
+    
+    private boolean isReceivedPacket = false;
+    private boolean isUDPMulticast = false;
     //CoAP Header
     private int h_ver = 0x01;                                   //Ver
     private HEADER_TYPE h_type;                                 //T
@@ -81,7 +84,8 @@ public class CoAPPacket extends PacketDatagram {
      * @return 
      */
     public CoAPPacket(short msgid, int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
-            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
+            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg
+            , boolean isMulti) {
         super(PacketDatagram.MessageProtocol.COAP);
         routelist.put(ROUTE.SOURCE,src);
         routelist.put(ROUTE.PREV,prev);
@@ -94,6 +98,7 @@ public class CoAPPacket extends PacketDatagram {
         this.tkn = 0;
         data = msg;
         HEADER_MSGID = msgid;
+        isUDPMulticast = isMulti;
     }
     
     /**
@@ -104,7 +109,8 @@ public class CoAPPacket extends PacketDatagram {
 //        this(_smsg.getResponseKey(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
 //                ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
         this(_smsg.getMessageID(), _smsg.getVersion(), _smsg.getHeader_Type(), _smsg.getTokenLength()
-                ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message());
+                ,_smsg.getHeader_Code(), null, null, _smsg.getNextNode(), _smsg.getFinalDestination(), _smsg.Message()
+                ,_smsg.isUDPMulticastMode());
         sendMsg = _smsg;
         if(this.h_tkl != 0){
             tkn = _smsg.getResponseKey();
@@ -112,10 +118,22 @@ public class CoAPPacket extends PacketDatagram {
         
     }
     
-    public CoAPPacket(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
-            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
-        this(HEADER_MSGID_INITIALIZATION, h_ver, h_type, h_tkl, h_code, src, prev, next, dest, msg);
-    }
+//    /**
+//     * @deprecated 
+//     * @param h_ver
+//     * @param h_type
+//     * @param h_tkl
+//     * @param h_code
+//     * @param src
+//     * @param prev
+//     * @param next
+//     * @param dest
+//     * @param msg 
+//     */
+//    public CoAPPacket(int h_ver, HEADER_TYPE h_type, int h_tkl, HEADER_CODE h_code,
+//            NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest, String msg) {
+//        this(HEADER_MSGID_INITIALIZATION, h_ver, h_type, h_tkl, h_code, src, prev, next, dest, msg);
+//    }
     
     /**
      * MinT Protocol -> Data
@@ -124,10 +142,8 @@ public class CoAPPacket extends PacketDatagram {
     public CoAPPacket(RecvMSG packet){
         super(PacketDatagram.MessageProtocol.COAP);
         packetdata = packet.getRecvBytes();
-        try {
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        isReceivedPacket = true;
+        isUDPMulticast = packet.isUDPMulticast();
         makeData(packet);
     }
     
@@ -370,6 +386,30 @@ public class CoAPPacket extends PacketDatagram {
     
     public short getToken(){
         return tkn;
+    }
+    
+    /**
+     * is this packet is received from other node.
+     * @return true if, false else
+     */
+    public boolean isReceivedPacket(){
+        return isReceivedPacket;
+    }
+    
+    /**
+     * Will this packet send to other node ?
+     * @return true if, false else
+     */
+    public boolean isSendPacket(){
+        return !isReceivedPacket;
+    }
+    
+    public boolean hasMulticast(){
+        return isUDPMulticast;
+    }
+    
+    public boolean hasUnicast(){
+        return !isUDPMulticast;
     }
     
 //    public CoAPPacket getclone(){

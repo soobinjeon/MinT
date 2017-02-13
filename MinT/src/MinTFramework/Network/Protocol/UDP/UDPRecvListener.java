@@ -27,24 +27,27 @@ import java.util.Iterator;
  */
 public class UDPRecvListener extends Thread{
     Selector selector;
-    DatagramChannel channel;
+    DatagramChannel multichannel, unichannel;
+    SelectionKey multikey, unikey;
     UDP udp = null;
     NetworkManager networkmanager = null;
     DebugLog dl = new DebugLog("UDPRecvAdaptor");
     private Performance bench = null;
     private MinT parent;
     private boolean isBenchMode = false;
-    public UDPRecvListener(DatagramChannel _channel, UDP udp) throws IOException{
+    public UDPRecvListener(DatagramChannel _multi, DatagramChannel _uni, UDP udp) throws IOException{
         this.udp = udp;
         networkmanager = udp.getNetworkManager();
         selector = Selector.open();
-        channel = _channel;
-        channel.register(selector, SelectionKey.OP_READ);
+        multichannel = _multi;
+        unichannel = _uni;
+        multikey = multichannel.register(selector, SelectionKey.OP_READ);
+        unikey = unichannel.register(selector, SelectionKey.OP_READ);
         parent = MinT.getInstance();
         checkBench();
         
     }
-    
+
     public void checkBench(){
         if(!isBenchMode && parent.getBenchmark() != null && parent.getBenchmark().isMakeBench()){
             bench = new Performance("UDP Recv");
@@ -59,7 +62,7 @@ public class UDPRecvListener extends Thread{
             while(!Thread.currentThread().isInterrupted()){
 //                dl.printMessage(this.getID()+"-wait selector..");
                 int KeysReady = selector.select();
-//                dl.printMessage("Selector Accepted");
+                System.out.println("Key Ready: "+KeysReady);
                 checkBench();
                 RequestPendingConnection();
             }
@@ -102,8 +105,8 @@ public class UDPRecvListener extends Thread{
             //make received byte
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
-//            System.out.println("recv: "+new String(fwdbyte) + ", "+fwdbyte.length);
-            udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP));
+            //System.out.println("recv: "+new String(fwdbyte) + ", "+fwdbyte.length+", key: "+key.toString());
+            udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP, isUDPMulticast(key)));
         }catch(ClosedByInterruptException e){
             System.out.println("Thread Stop Interrupt - ClosedByInterruptException");
             e.printStackTrace();
@@ -116,5 +119,13 @@ public class UDPRecvListener extends Thread{
                 bench.endPerform(req.limit());
             }
         }
+    }
+    
+    private boolean isUDPMulticast(SelectionKey skey){
+        return skey.hashCode() == multikey.hashCode();
+    }
+    
+    private boolean isUDPUnicast(SelectionKey skey){
+        return skey.hashCode() == unikey.hashCode();
     }
 }

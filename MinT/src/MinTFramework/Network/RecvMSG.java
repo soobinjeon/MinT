@@ -35,16 +35,18 @@ public class RecvMSG implements Runnable {
     private String address;
     private JSONParser jparser;
     private CoAPPacket receivedPacket = null;
+    private boolean isMulticast = false;
     public RecvMSG(byte[] recvb, String address, NetworkType type){
         recvbytes = recvb;
         address = address;
         ntype = type;
     }
     
-    public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type){
+    public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type, boolean _isMulticast){
         this(recvb, "", type);
         addr = prevsocket;
         address = getIPAddress(addr);
+        isMulticast = _isMulticast;
     }
     
     @Override
@@ -118,5 +120,13 @@ public class RecvMSG implements Runnable {
     
     public JSONParser getJSONParser(){
         return jparser;
+    }
+    
+    /**
+     * Check for receiving data to multi-cast or uni-cast
+     * @return , true if, false else
+     */
+    public boolean isUDPMulticast(){
+        return isMulticast;
     }
 }
