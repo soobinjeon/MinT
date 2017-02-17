@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;

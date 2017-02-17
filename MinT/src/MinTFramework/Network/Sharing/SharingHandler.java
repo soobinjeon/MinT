@@ -18,7 +18,7 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.storage.ResourceStorage;

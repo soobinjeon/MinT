@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
 import MinTFramework.Util.DebugLog;
 

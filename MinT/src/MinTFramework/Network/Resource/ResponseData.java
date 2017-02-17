@@ -17,7 +17,7 @@
 package MinTFramework.Network.Resource;
 
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.storage.datamap.Information;
 
 /**

@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
@@ -76,9 +76,9 @@ public class SystemHandler{
     private void SystemHandleRequest(CoAPPacket rv_packet, ReceiveMessage recvmsg){
         if(rv_packet.getHeader_Code().isGet()){
 //            dl.printMessage("set get");
-            System.out.print("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+//            System.out.print("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+//            System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
-            System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
             SendMessage ret = null;
             //Temporary Routing Discover Mode

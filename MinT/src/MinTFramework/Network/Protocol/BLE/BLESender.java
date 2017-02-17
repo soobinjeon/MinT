@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.Protocol.BLE;
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import java.net.*;
 
 public class BLESender {

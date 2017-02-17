@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import static java.lang.Thread.sleep;
 
 /**

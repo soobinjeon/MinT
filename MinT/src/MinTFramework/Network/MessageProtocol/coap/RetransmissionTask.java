@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.MessageProtocol.coap;
 
-import MinTFramework.MinTConfig;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
-import java.sql.Time;
-import java.time.LocalTime;
-import java.util.Date;
+import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
+import MinTFramework.Network.SendMSG;
 
 /**
  *
@@ -29,12 +27,12 @@ import java.util.Date;
  */
 public class RetransmissionTask implements Runnable{
     private SendMSG msg;
-    private Transportation translayer;
     int transmissionCount;
+    private MinT mint = MinT.getInstance();
+    
     public RetransmissionTask(){}
-    public RetransmissionTask(SendMSG msg, Transportation translayer){
+    public RetransmissionTask(SendMSG msg){
         this.msg = msg;
-        this.translayer = translayer;
         this.transmissionCount = 0;
     }
     
@@ -48,10 +46,11 @@ public class RetransmissionTask implements Runnable{
 //            System.out.println("#   Reransmission Count : "+msg.getSendHit());
 //            System.out.println("#   Current Timeout : "+msg.getCurrentTimeout()/1000.0f);
             
-            translayer.EndPointSend(msg);
+            
+            mint.getNetworkManager().SEND(msg);
             
         } else{
-//            System.out.println("# "+msg.getMessageID()+" message is abandonced");
+            System.out.println("# "+msg.getMessageID()+" message is abandonced");
         }
 //        System.out.println("#############################################################");        
 //        System.out.println(".");

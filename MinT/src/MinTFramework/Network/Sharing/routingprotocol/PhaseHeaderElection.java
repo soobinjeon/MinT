@@ -19,7 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;

@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.MessageProtocol;
+package MinTFramework.Network.MessageProtocol.coap;
 
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Network.SendMSG;
@@ -561,5 +562,6 @@ public class CoAPPacket extends PacketDatagram {
         static public final float ACK_RANDOM_FACTOR = 1.5f;
         static public final float ACK_TIMEOUT_SCALE = 2.0f;
         static public final int MAX_RETRANSMIT = 4;
+        static public final float DEFAULT_LEISURE = 5;
     }
 }

@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinTConfig;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import java.io.IOException;
 import java.net.InetAddress;

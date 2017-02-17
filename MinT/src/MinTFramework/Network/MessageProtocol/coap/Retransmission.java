@@ -14,26 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.MessageProtocol.coap;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
-import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.MinT;
+import MinTFramework.Network.NetworkManager;
+import java.util.Random;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class HeaderReponse extends SharingResponse{
-
-    public HeaderReponse(CoAPPacket _rv_packet, ReceiveMessage _recvmsg) {
-        super(_rv_packet, _recvmsg);
+public class Retransmission {
+    private int ack_timeout; //for timeout
+    private float ack_random_factor; //for timeout
+    private float ack_timeout_scale;
+    private Random rand; //for random timeout
+    
+    private MinT mint = MinT.getInstance();
+    private NetworkManager nmanager = null;
+    
+    public Retransmission(){
+        nmanager = mint.getNetworkManager();
     }
-
-    @Override
-    public void getResource() {
-        //get Group Resource
-        getGroupResource();
-    }
+    
     
 }

@@ -19,7 +19,7 @@ package MinTFramework.Network.Protocol.BLE;
 import MinTFramework.ExternalDevice.DeviceBLE;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
 

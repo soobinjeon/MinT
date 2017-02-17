@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.sharing;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.node.Node;

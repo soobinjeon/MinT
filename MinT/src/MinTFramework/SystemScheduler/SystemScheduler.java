@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * MinT Thread ThreadPoolScheduler
@@ -49,6 +50,8 @@ public class SystemScheduler extends ThreadPoolScheduler{
         registerMinTSystemthreadPool(MinTthreadPools.NET_SEND);
         //register retransmission pool
         registerMinTSystemthreadPool(MinTthreadPools.RETRANSMISSION_HANDLE);
+        //register multicast leisure
+        registerMinTSystemthreadPool(MinTthreadPools.MULTICAST_LEISURE_HANDLE);
     }
     
     /**
@@ -143,5 +146,16 @@ public class SystemScheduler extends ThreadPoolScheduler{
      */
     public Future<Object> submitProcess(MinTthreadPools target, Runnable run){
         return submitProcess(target.toString(), run);
+    }
+    
+    /**
+     * submit Schedule by TimeUnit is MILLISECONDS
+     * @param target
+     * @param task
+     * @param timeout
+     * @return 
+     */
+    public Future<Object> submitSchedule(MinTthreadPools target,Runnable task, long timeout){
+        return submitSchedule(target.toString(), task, timeout, TimeUnit.MILLISECONDS);
     }
 }

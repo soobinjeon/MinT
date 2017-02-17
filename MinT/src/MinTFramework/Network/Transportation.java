@@ -16,7 +16,8 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.RetransmissionTask;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
@@ -83,7 +84,9 @@ public class Transportation implements NetworkLayers {
     @Override
     public void Receive(RecvMSG recvMsg) {
         CoAPPacket packet = recvMsg.getPacketDatagram();
-        if (isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())) {
+//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getMSGID());
+//            System.out.println(", sender IP : "+packet.getSource().getAddress());
+        if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
             if (isRouting(receivemsg)) {
@@ -103,7 +106,6 @@ public class Transportation implements NetworkLayers {
                 //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
                 ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getToken());
                 ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
-
                 if (reshandle != null) {
                     reshandle.Response(resdata);
                 }
@@ -138,19 +140,19 @@ public class Transportation implements NetworkLayers {
         return false;//currnetProfile.equals(destinationNode);
     }
 
-    /**
-     * is Multicast Packet with CoAP or UDP
-     *
-     * @param destinationNode
-     * @return
-     */
-    private boolean isMulticast(NetworkProfile destinationNode) {
-        if (destinationNode.getAddress().equals("")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    /**
+//     * is Multicast Packet with CoAP or UDP
+//     *
+//     * @param destinationNode
+//     * @return
+//     */
+//    private boolean isMulticast(NetworkProfile destinationNode) {
+//        if (destinationNode.getAddress().equals("")) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     /**
      * Stop Over Method
@@ -179,15 +181,17 @@ public class Transportation implements NetworkLayers {
 
         npacket = serialization.EndPointSend(sendmsg);
         
+        /**
+         * Message Retransmit control
+         */
         if (sendmsg.getHeader_Type().isCON()){
             if(sendmsg.getSendHit() == 0){
                 networkManager.putCONMessage(sendmsg.getMessageID(), sendmsg);
             }
             //Start retransmit procedure
-            RetransmissionTask task = new RetransmissionTask(sendmsg, this);
+            RetransmissionTask task = new RetransmissionTask(sendmsg);
             prepareRetransmission(sendmsg, task);
             sendmsg.Sended();
-            //prepareRetransmission(sendmsg, )
         }
         
         if (npacket != null) {
@@ -199,6 +203,7 @@ public class Transportation implements NetworkLayers {
 
         return npacket;
     }
+    
     /***
      * Register retransmission task to the MinT scheduler and SendMSG
      * @param msg CON msg
@@ -223,7 +228,7 @@ public class Transportation implements NetworkLayers {
         ScheduledFuture<?> f = executor.schedule(task, timeout, TimeUnit.MILLISECONDS);
         msg.setRetransmissionHandle(f);
     }
-
+    
     /***
      * Get Random value between min and max
      *
@@ -317,4 +322,5 @@ public class Transportation implements NetworkLayers {
     @Override
     public void EndPointReceive(RecvMSG packet) {
     }
+
 }

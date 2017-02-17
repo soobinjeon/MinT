@@ -17,8 +17,7 @@
 package MinTFramework.Network;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
-import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.util.concurrent.ScheduledFuture;
@@ -44,6 +43,9 @@ public class SendMSG implements Runnable{
     private boolean isUDPMulticast = false;
     private NetworkProfile FinalDestination;
     private NetworkProfile nextNode;
+    
+    //for Response
+    private boolean res_for_multicast = false;
     
     public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl, 
             CoAPPacket.HEADER_CODE hc, NetworkProfile dst, Request msg,
@@ -96,6 +98,20 @@ public class SendMSG implements Runnable{
         this.messageId = msgid;
     }
     
+    /***
+     * Send Message for Response on CoAP
+     * @param rv_packet
+     * @param ht
+     * @param hc
+     * @param msg 
+     */
+    public SendMSG(CoAPPacket rv_packet, CoAPPacket.HEADER_TYPE ht, CoAPPacket.HEADER_CODE hc, Request msg){
+        this(ht, rv_packet.getHeader_TokenLength(), hc, rv_packet.getSource(), msg, null, rv_packet.getToken());
+        this.messageId = rv_packet.getMSGID();
+        this.res_for_multicast = rv_packet.hasMulticast();
+        
+    }
+    
     /**
      * Request only on Multi-cast
      * @param hd Direction (Request, Response)
@@ -105,8 +121,8 @@ public class SendMSG implements Runnable{
      */
     public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl
             , CoAPPacket.HEADER_CODE hc
-            , NetworkProfile dst, Request msg, boolean _isMulticast){
-        this(ht, tkl, hc,dst,msg,null,CoAPPacket.HEADER_MSGID_INITIALIZATION);
+            , NetworkProfile dst, Request msg, ResponseHandler resHandle, boolean _isMulticast){
+        this(ht, tkl, hc,dst,msg,resHandle,CoAPPacket.HEADER_MSGID_INITIALIZATION);
         this.isUDPMulticast = _isMulticast;
     }
     
@@ -234,6 +250,15 @@ public class SendMSG implements Runnable{
         return isUDPMulticast;
     }
     
+    /**
+     * this send message is response message for Multicast.
+     * send message type is unicast.
+     * @return 
+     */
+    public boolean isResponseforMulticast(){
+        return res_for_multicast;
+    }
+    
     public void setCurrentTimeout(long timeout){
         this.currentTimeout = timeout;
     }
@@ -241,7 +266,7 @@ public class SendMSG implements Runnable{
         return currentTimeout;
     }
     
-    public void setRetransmissionHandle(ScheduledFuture<?> retransmissionHandle){
+    public synchronized void setRetransmissionHandle(ScheduledFuture<?> retransmissionHandle){
         if(this.retransmissionHandle != null){
             this.retransmissionHandle.cancel(false);
             System.out.println("SendMSG.java "+this.getMessageID()+" message : Retransmission Handle is canceled!");

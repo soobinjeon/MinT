@@ -16,8 +16,9 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.*;
+import MinTFramework.Network.MessageProtocol.coap.CoAPLeisure;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
@@ -63,6 +64,9 @@ public class NetworkManager {
     private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
     private PacketIDManager idmaker;
 
+    //CoAP Protocol
+    private CoAPLeisure coapleisure = null;
+    
     //Temporary properties for check
     private Integer tempHandlerCnt = 0;
     private Integer sendHandlerCnt = 0;
@@ -93,6 +97,8 @@ public class NetworkManager {
 
         makeBytebuffer();
         idmaker = new PacketIDManager(IDList, ResponseList);
+        
+        coapleisure = new CoAPLeisure();
     }
 
     /**
@@ -221,10 +227,19 @@ public class NetworkManager {
      * @param ret 
      */
     public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
+        SendMSG res_msg = null;
+        
         if (rv_packet.getHeader_Type().isCON()) {
-            SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret);
+            res_msg = SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret);
         } else {
-            SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret);
+            res_msg = SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret);
+        }
+        
+        if(res_msg != null){
+            if(res_msg.isResponseforMulticast())
+                coapleisure.putLeisureScheduler(res_msg);
+            else
+                SEND(res_msg);
         }
     }
     
@@ -235,16 +250,18 @@ public class NetworkManager {
      * @param rv_packet Receved packet
      * @param ret
      */
-    private void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
+    private SendMSG SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
         // CoAP Piggyback procedure
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
 //            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
-            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
-                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+//            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
+//                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, CoAPPacket.HEADER_CODE.CONTENT, ret);
         } else {
             //non-CoAP Piggyback procedure
+            return null;
         }
     }
 
@@ -257,13 +274,15 @@ public class NetworkManager {
 
     }
     
-    private void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+    private SendMSG SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
-            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
-                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+//            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
+//                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
+            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.NON, CoAPPacket.HEADER_CODE.CONTENT, ret);
         } else {
             //For Non-CoAP Procedure
+            return null;
         }
     }
     
@@ -272,7 +291,8 @@ public class NetworkManager {
      * @param requestdata 
      */
     public void SEND_UDP_Multicast(SendMessage requestdata) {
-        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2
+                , CoAPPacket.HEADER_CODE.POST, null, requestdata, null, true));
     }
     
     public void SEND_Multicast(SendMSG smsg) {
