@@ -269,7 +269,7 @@ public class SendMSG implements Runnable{
     public synchronized void setRetransmissionHandle(ScheduledFuture<?> retransmissionHandle){
         if(this.retransmissionHandle != null){
             this.retransmissionHandle.cancel(false);
-            System.out.println("SendMSG.java "+this.getMessageID()+" message : Retransmission Handle is canceled!");
+//            System.out.println("SendMSG.java "+this.getMessageID()+" message : Retransmission Handle is canceled!");
         }
         this.retransmissionHandle = retransmissionHandle;
     }

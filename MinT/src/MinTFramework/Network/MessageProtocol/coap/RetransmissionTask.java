@@ -19,6 +19,8 @@ package MinTFramework.Network.MessageProtocol.coap;
 import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.SendMSG;
+import java.sql.Time;
+import java.time.LocalTime;
 
 /**
  *
@@ -39,7 +41,7 @@ public class RetransmissionTask implements Runnable{
     @Override
     public void run() {
 //        System.out.println("####################  Retransmission  #######################");
-//        System.out.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed!");
+        System.err.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed!");
         transmissionCount = msg.getSendHit();
         if(transmissionCount <= CoAPPacket.CoAPConfig.MAX_RETRANSMIT){
 //            System.out.println("#   Message ID : "+ msg.getMessageID());
