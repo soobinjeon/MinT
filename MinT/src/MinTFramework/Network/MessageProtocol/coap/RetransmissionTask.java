@@ -40,13 +40,13 @@ public class RetransmissionTask implements Runnable{
     
     @Override
     public void run() {
-        System.out.println("####################  Retransmission  #######################");
+//        System.out.println("####################  Retransmission  #######################");
         System.err.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed!");
         transmissionCount = msg.getSendHit();
         if(transmissionCount <= CoAPPacket.CoAPConfig.MAX_RETRANSMIT){
-            System.out.println("#   Message ID : "+ msg.getMessageID());
-            System.out.println("#   Reransmission Count : "+msg.getSendHit());
-            System.out.println("#   Current Timeout : "+msg.getCurrentTimeout()/1000.0f);
+//            System.out.println("#   Message ID : "+ msg.getMessageID());
+//            System.out.println("#   Reransmission Count : "+msg.getSendHit());
+//            System.out.println("#   Current Timeout : "+msg.getCurrentTimeout()/1000.0f);
             
             
             mint.getNetworkManager().SEND(msg);
@@ -54,8 +54,8 @@ public class RetransmissionTask implements Runnable{
         } else{
             System.out.println("# "+msg.getMessageID()+" message is abandonced");
         }
-        System.out.println("#############################################################");        
-        System.out.println(".");
+//        System.out.println("#############################################################");        
+//        System.out.println(".");
     }
     
 }
