@@ -16,7 +16,6 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.coap.RetransmissionTask;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
 import MinTFramework.Network.Resource.ReceiveMessage;
@@ -24,13 +23,8 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
-import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.DebugLog;
-import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -46,11 +40,6 @@ public class Transportation implements NetworkLayers {
     private Sharing sharing = null;
     private SystemScheduler scheduler;
     private MatcherAndSerialization serialization = null;
-    private Random rand; //for random timeout
-    private int ack_timeout; //for timeout
-    private float ack_random_factor; //for timeout
-    private float ack_timeout_scale;
-    private ScheduledExecutorService executor;
     
     DebugLog dl = new DebugLog("Transportation");
 //    private Performance bench_send = null;
@@ -60,11 +49,6 @@ public class Transportation implements NetworkLayers {
         this.networkManager = frame.getNetworkManager();
         this.scheduler = frame.getSystemScheduler();
         
-        rand = new Random(CoAPPacket.CoAPConfig.RANDOM_SEED);
-        ack_timeout = CoAPPacket.CoAPConfig.ACK_TIMEOUT;
-        ack_random_factor = CoAPPacket.CoAPConfig.ACK_RANDOM_FACTOR;
-        ack_timeout_scale = CoAPPacket.CoAPConfig.ACK_TIMEOUT_SCALE;
-        
         if (layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE) {
             syshandle = new SystemHandler();
             routing = networkManager.getRoutingProtocol();
@@ -73,7 +57,6 @@ public class Transportation implements NetworkLayers {
 
         if (layerDirection == NetworkLayers.LAYER_DIRECTION.SEND) {
             serialization = new MatcherAndSerialization(layerDirection);
-            executor = (ScheduledExecutorService) frame.getSystemScheduler().getRegisteredThread(MinTthreadPools.RETRANSMISSION_HANDLE.toString());
 //            if(frame.isBenchMode()){
 //                bench_send = new PacketPerform("Trans-sender");
 //                frame.addPerformance(MinT.PERFORM_METHOD.Trans_Sender, bench_send);
@@ -189,9 +172,7 @@ public class Transportation implements NetworkLayers {
                 networkManager.putCONMessage(sendmsg.getMessageID(), sendmsg);
             }
             //Start retransmit procedure
-            RetransmissionTask task = new RetransmissionTask(sendmsg);
-            prepareRetransmission(sendmsg, task);
-            sendmsg.Sended();
+            networkManager.getCoAPRetransmit().activeRetransmission(sendmsg);
         }
         
         if (npacket != null) {
@@ -202,45 +183,6 @@ public class Transportation implements NetworkLayers {
         }
 
         return npacket;
-    }
-    
-    /***
-     * Register retransmission task to the MinT scheduler and SendMSG
-     * @param msg CON msg
-     * @param task Retransmission task
-     */
-    private void prepareRetransmission(SendMSG msg, RetransmissionTask task){
-        //scheduler.submitProcess(MinTthreadPools.RETRANSMISSION_HANDLE, task);
-        if(executor.isShutdown()){
-//            System.out.println("Transpotation.java : Retransmission executor is shutdown!");
-            return;
-        }
-        
-        long timeout;
-
-        if (msg.getSendHit() == 0) {
-            timeout = getRandomTimeout(ack_timeout, (int) (ack_timeout * ack_random_factor));
-        } else {
-            timeout = (int) ack_timeout_scale * msg.getCurrentTimeout();
-        }
-        
-        msg.setCurrentTimeout(timeout);
-        ScheduledFuture<?> f = executor.schedule(task, timeout, TimeUnit.MILLISECONDS);
-        msg.setRetransmissionHandle(f);
-    }
-    
-    /***
-     * Get Random value between min and max
-     *
-     * @param min
-     * @param max
-     * @return Random value between min and max
-     */
-    private long getRandomTimeout(final int min, final int max) {
-        if (min == max) {
-            return min;
-        }
-        return min + rand.nextInt(max - min);                
     }
     
     /**

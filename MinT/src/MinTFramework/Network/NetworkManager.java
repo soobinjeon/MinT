@@ -20,6 +20,7 @@ import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.*;
 import MinTFramework.Network.MessageProtocol.coap.CoAPLeisure;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.coap.Retransmission;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
@@ -66,6 +67,7 @@ public class NetworkManager {
 
     //CoAP Protocol
     private CoAPLeisure coapleisure = null;
+    private Retransmission coapretransmit = null;
     
     //Temporary properties for check
     private Integer tempHandlerCnt = 0;
@@ -99,6 +101,7 @@ public class NetworkManager {
         idmaker = new PacketIDManager(IDList, ResponseList);
         
         coapleisure = new CoAPLeisure();
+        coapretransmit = new Retransmission();
     }
 
     /**
@@ -482,5 +485,9 @@ public class NetworkManager {
 
     public int getResponseSize() {
         return ResponseList.size();
+    }
+    
+    public Retransmission getCoAPRetransmit(){
+        return coapretransmit;
     }
 }

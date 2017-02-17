@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -84,11 +85,11 @@ public class ThreadPoolScheduler {
      * @param timeunit
      * @return 
      */
-    public Future<Object> submitSchedule(String target,Runnable task, long timeout,TimeUnit timeunit){
+    public ScheduledFuture<Object> submitSchedule(String target,Runnable task, long timeout,TimeUnit timeunit){
         ScheduledExecutorService exe = (ScheduledExecutorService) threadPools.get(target);
-        Future<Object> retvalue = null;
+        ScheduledFuture<Object> retvalue = null;
         if(exe != null)
-            retvalue = (Future<Object>) exe.schedule(task, timeout, timeunit);
+            retvalue = (ScheduledFuture<Object>) exe.schedule(task, timeout, timeunit);
         return retvalue;
     }
     

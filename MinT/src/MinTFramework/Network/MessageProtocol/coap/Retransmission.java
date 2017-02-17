@@ -18,7 +18,11 @@ package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.SendMSG;
+import MinTFramework.SystemScheduler.MinTthreadPools;
+import MinTFramework.SystemScheduler.SystemScheduler;
 import java.util.Random;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  *
@@ -33,10 +37,49 @@ public class Retransmission {
     
     private MinT mint = MinT.getInstance();
     private NetworkManager nmanager = null;
+    private SystemScheduler sysSched = null;
     
     public Retransmission(){
         nmanager = mint.getNetworkManager();
+        sysSched = mint.getSystemScheduler();
+        
+        rand = new Random(CoAPPacket.CoAPConfig.RANDOM_SEED);
+        ack_timeout = CoAPPacket.CoAPConfig.ACK_TIMEOUT;
+        ack_random_factor = CoAPPacket.CoAPConfig.ACK_RANDOM_FACTOR;
+        ack_timeout_scale = CoAPPacket.CoAPConfig.ACK_TIMEOUT_SCALE;
     }
     
+    /***
+     * Register retransmission task to the MinT scheduler and SendMSG
+     * @param msg CON msg
+     */
+    public void activeRetransmission(SendMSG msg){
+        long timeout = 0;
+
+        if (msg.getSendHit() == 0) {
+            timeout = getRandomTimeout(ack_timeout, (int) (ack_timeout * ack_random_factor));
+        } else {
+            timeout = (int) ack_timeout_scale * msg.getCurrentTimeout();
+        }
+        
+        msg.setCurrentTimeout(timeout);
+        ScheduledFuture<?> f = sysSched.submitSchedule(MinTthreadPools.RETRANSMISSION_HANDLE, new RetransmissionTask(msg), timeout);
+        msg.setRetransmissionHandle(f);
+        
+        msg.Sended();
+    }
     
+    /***
+     * Get Random value between min and max
+     *
+     * @param min
+     * @param max
+     * @return Random value between min and max
+     */
+    private long getRandomTimeout(final int min, final int max) {
+        if (min == max) {
+            return min;
+        }
+        return min + rand.nextInt(max - min);                
+    }
 }

@@ -20,6 +20,7 @@ import MinTFramework.ThreadsPool.ThreadPoolScheduler;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -155,7 +156,7 @@ public class SystemScheduler extends ThreadPoolScheduler{
      * @param timeout
      * @return 
      */
-    public Future<Object> submitSchedule(MinTthreadPools target,Runnable task, long timeout){
+    public ScheduledFuture<Object> submitSchedule(MinTthreadPools target,Runnable task, long timeout){
         return submitSchedule(target.toString(), task, timeout, TimeUnit.MILLISECONDS);
     }
 }
