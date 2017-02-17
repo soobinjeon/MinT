@@ -95,17 +95,24 @@ public class SystemHandler{
                 }
             }
             
-            nmanager.SEND_RESPONSE(rv_packet, ret);
+            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible
              */
             
-            
+        //FIX it! : 아래 명령어에 대한 명령들이 Set Instruction에 제대로 구현되어 있지 않음!!!!    
         }else if(rv_packet.getHeader_Code().isPut()){
             resStorage.setInstruction(recvmsg);
+            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CREATED);
+//            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CHANGED);
         }else if(rv_packet.getHeader_Code().isPost()){
             resStorage.setInstruction(recvmsg);
+            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CREATED);
+//            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CHANGED);
+//            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.DELETED);
         }else if(rv_packet.getHeader_Code().isDelete()){
+            resStorage.setInstruction(recvmsg);
+            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.DELETED);
         }
     }
     

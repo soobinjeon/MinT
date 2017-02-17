@@ -202,7 +202,7 @@ public abstract class SharingResponse implements Runnable{
         
         //Response MSG
         if(sendmsg != null){
-            networkmanager.SEND_RESPONSE(rv_packet, sendmsg);
+            networkmanager.SEND_RESPONSE(rv_packet, sendmsg, CoAPPacket.HEADER_CODE.CONTENT);
 //            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
 //                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
         }

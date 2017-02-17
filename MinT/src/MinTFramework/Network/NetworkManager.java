@@ -226,13 +226,13 @@ public class NetworkManager {
      * @param rv_packet
      * @param ret 
      */
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
+    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
         SendMSG res_msg = null;
         
         if (rv_packet.getHeader_Type().isCON()) {
-            res_msg = SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret);
+            res_msg = SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret, hcode);
         } else {
-            res_msg = SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret);
+            res_msg = SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret, hcode);
         }
         
         if(res_msg != null){
@@ -250,7 +250,7 @@ public class NetworkManager {
      * @param rv_packet Receved packet
      * @param ret
      */
-    private SendMSG SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret) {
+    private SendMSG SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
         // CoAP Piggyback procedure
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
@@ -258,7 +258,7 @@ public class NetworkManager {
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
 //            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
-            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, CoAPPacket.HEADER_CODE.CONTENT, ret);
+            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, hcode, ret);
         } else {
             //non-CoAP Piggyback procedure
             return null;
@@ -274,12 +274,12 @@ public class NetworkManager {
 
     }
     
-    private SendMSG SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+    private SendMSG SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode){
         if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
             CoAPPacket cp = (CoAPPacket)rv_packet;
 //            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
 //                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
-            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.NON, CoAPPacket.HEADER_CODE.CONTENT, ret);
+            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.NON, hcode, ret);
         } else {
             //For Non-CoAP Procedure
             return null;
