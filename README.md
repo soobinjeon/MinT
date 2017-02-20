@@ -87,7 +87,7 @@ The MinT provides powerful development tools for service developers and clients.
 
 ## 4 Latest Update - MinT version 2.8
 
-### 4.1 주요 업데이트 내용
+### 4.1 Information
 * Re-define CoAP details #35, #38, #39, #40 
 	* Added CON, NON message token for CoAP packets @aa14ac0
 	* re-transmission for CON message in CoAP @a1e40c8
@@ -123,7 +123,7 @@ The MinT provides powerful development tools for service developers and clients.
 
 * v2.8 Link - [Click Here](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
 
-### 4.2 버전 정보 및 소스
+### 4.2 Version Information
 - [MinT v2.8-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/21), [MinT v2.8-releases](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
 - [MinT v2.7-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/19), [MinT v2.7](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.7)
 - [MinT v2.4](http://sn.kangwon.ac.kr/LabThings/MinT/post/18)
