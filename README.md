@@ -1,23 +1,39 @@
-﻿# Middleware for Cooperative Interactions of Things
+﻿# Middleware for Cooperative Interactions of Things (MinT)
 
 ## Introduction
-Integrated middleware platform for cooperative interactions on variable system environments.
+We propose an IoT middleware platform to support the cooperative interaction of things called MINT (Middleware for Cooperative INteraction of Things). The characteristics of cooperative interaction can be used to effectively configure the IoT working environment. These are the goals of MINT:
+- To support various sensors and network devices platforms
+- Enable connections between heterogeneous networks   
+- Provide for fast connections and effective interaction between objects
+- Enable easy installation and provide a simple development platform
+- Support Efficiency performance management for limited objects 
 
-다양한 시스템 환경에서 사물들이 서로 상호작용 할 수 있는 통합 미들웨어 플랫폼.
-본 프레임워크는 다양한 종류의 센서 및 네트워크 디바이스를 적용할 수 있는 개발 환경을 제공 한다. 
-개발된 드라이버와 Application API를 통해 쉽게 IoT 어플리케이션을 제작 할 수 있다. 
-다양한 플랫폼에 적용 가능하기 때문에 IoT 환경에 적합한 디바이스 모듈 제작이 가능하다.
+![IoT Context diagram on MinT](http://i.imgur.com/KBCGKjk.png "Yobi")
 
-* Available on
-	1. Beagle Bone Black
-	2. Raspberry PI(I, II)
-	3. Android Platform
-	4. Linux Based Platform
+The figure shows the context diagram of IoT working environment as implemented on the MinT platform. The function of the main platform is to manage and operate the devices connected in the IoT. The sensors and network devices are co-worked for collecting information from the surroundings and then delivering the information to other objects or environments. 
+
+The MinT provides the SAL (Sensor Abstraction Layer) for various sensors. The capabilities of the SAL aid in effectively connecting sensors and network devices with each other, and managing them as a system. The MinT supports both Linux and Windows platforms. In addition, the MinT provides interfaces like GPIO, ADC, SPI, and UART to connect various types of hardware including the Beagle Bone Series, Raspberry Pi Series, and the Edison with multiple types of sensors. These interfaces aid in rapid and convenient development of IoT networks. 
+
+The objects in MinT can interact with the other objects with which they are connected. The IoT environment supports various communication protocols such as Bluetooth, BLE, ZigBee, and Wi-Fi. When a united network environment is installed, connectivity can be established between the objects via any of the protocols based on the quality of the physical network connection and flexible usage of system resources. The MinT platform supports functionality related to the unified network environment needed to connect objects via various network protocols. 
+Basically, the MinT platform uses CoAP because this protocol is well suited for IoT environments employing limited resources. 
+
+The MinT provides powerful development tools for service developers and clients. By using these tools, users can develop new service applications, those that are standalone in nature and those that cooperate with other services to implement a new service. Given the fact that the MinT platform is easy to learn and has a user-friendly interface, besides expert developers, even general users can rapidly take high-level business ideas from concept to implementation in an IoT environment. The reduced development time has a favorable effect on the ability of organizations to implement IoT systems with the latest sensor devices and service applications.
+
+## Technical Notes 
+* [System Architecture](http://sn.kangwon.ac.kr/LabThings/MinT/post/22)
+* [MinT Performance Evaluation](http://sn.kangwon.ac.kr/LabThings/MinT/post/23)
+* [Flexible performance improvement](http://sn.kangwon.ac.kr/LabThings/MinT/post/24)
+* [Integration of Heterogeneous network](http://sn.kangwon.ac.kr/LabThings/MinT/post/25)
 
 ## Development Environment
-* IDE
+* Available on
+	1. Beagle Bone Black
+	2. Raspberry PI(I, II, III)
+	3. Intel Edison
+	3. Android Platform
+	4. Linux Based Platform
+* Build IDE
 	1. Netbeans
-	2. VIM
 * Build OS
 	1. Windows
 	2. Linux based
@@ -26,86 +42,59 @@ Integrated middleware platform for cooperative interactions on variable system e
 	1. JAVA
 	2. C
 
-## Git을 이용하여 Framework 저장소 가져오기
-* Linux
-	> git clone http://YobiID@sn.kangwon.ac.kr/LabThings/MinT
+## Get Clone with Git
+* Yobi
+	> git clone http://sn.kangwon.ac.kr/LabThings/MinT
+* Github
+	> git clone https://github.com/soobinjeon/MinT.git
 
-* Window
-	> git을 설치한 후 원하는 폴더에 마우스 오른쪽 버튼을 눌러 Clone
-
-## netbeans에서 프로젝트 가져오기
+## Open Project with netbeans
 > 1. File -> Open Project
-> 2. git으로 내려받은 프로젝트 위치를 찾는다.
-> 3. Open Project 클릭
+> 2. Find clone folder for git clone
+> 3. Click Open Project
 
-## 프로젝트 폴더 설명
+## Project Directory
 * ***conf***
-	- Beagle Bone Black Debian 환경에서 Framework를 사용하기 위한 환경변수 설정
+	- Configuration for using MinT on platforms (Beagle Bone Black, Raspberry Pi, and so on)
 * ***doc***
-	- 프로젝트 문서
+	- Project Documents
 * ***driverTemplete***
-	- 드라이버 개발자를 위한 Templete 파일
-* ***framework***
-	- 프레임워크 소스
+	- Templete for driver developer
+* ***MinT***
+	- MinT source
 * ***usr***
-	- 프레임워크 개발 및 사용에 필요한 라이브러리
+	- Library for MinT
 
 # Getting Start
-## 1. Install the MinT to Beagle Bone Black
+## 1. Install the MinT to Platform
 ### [MinT Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/LabThings/MinT/post/11)
+### [MinT Installation Guide for Raspberry Pi 3 - not ready but similar with beagle bone black]
+### [MinT Installation Guide for Intel Edison - not ready but similar with beagle bone black]
 ## 2. Development Information
 ### Link for [Framework Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/8)
 ### Link for [Driver Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/9)
 ### Link for [Application Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/10)
-## 3. Project
+## 3. Tutorial Projects
 ### 3.1 Driver Project
-1. HT01SV Sensor Driver Example Project -> [MinT_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/MinT_Example_Driver-HT01SV)
+1. DHT11 Sensor Driver Example Project -> [MinT_Example_driver-DHT11](http://sn.kangwon.ac.kr/LabThings/MinT_DHT11_Control)
+2. HT01SV Sensor Driver Example Project -> [MinT_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/MinT_Example_Driver-HT01SV)
+3. SRF04 Sensor Driver Example Project -> [MinT_Example_driver-SRF04](http://sn.kangwon.ac.kr/LabThings/MinT_SRF04_Demo/settingform)
+4. HM10-BLE Sensor Driver Example Project -> [MinT_Example_driver-HM10-BLE](http://sn.kangwon.ac.kr/LabThings/HM10-BLE_MinT_DeviceDriver)
+5. You can see more example in -> [LabThings Projects](http://sn.kangwon.ac.kr/organizations/LabThings)
 
 ### 3.2 Application Project
-1. Application Example Project -> [MinT_Exam_Application](http://marsberry@sn.kangwon.ac.kr/LabThings/MinT_Exam_Application)
+1. Application Example Project -> [MinT_Exam_Application](http://sn.kangwon.ac.kr/LabThings/MinT_Sharing)
 
 ## 4 Latest Update - MinT version 2.7
 
 ### 4.1 주요 업데이트 내용
-* Performance Improvement
-	* Basic resource store methods have changed to generate performance delay. (Information.java)
-		* all resource data which is used in heap stack had been stored by byte type
-		* All converting task in resource method are occurs the delay.
-		* Many other method use the resource method.
-	* solutions
-		* The converting task has removed.
-		* All resource are just stored by each type.
-
-* Added Resource Sharing Algorithm for CoAP ( Alpha testing..)
-	* Regional based group sharing
-	* Nodes are group by regional information which is set by initialization proceeding on MinT
-	* Nodes are able to be added to the group through simple code as below.
-	```java
-	public class Client extends MinT{
-	    public Client(){
-	        init();
-	    }
-	
-	    private void init() {
-		//set Network with Network Type and ip address if it is UDP
-	        this.addNetwork(NetworkType.UDP, "xxx.xxx.xxx.xxx");
-
-		//active Sharing, group name : "oom513", platform info
-	        this.activateRoutingProtocol("room513", Platforms.COMPUTER);
-
-		//add Resource
-	        this.addResource(new ThingProperty("LED1", DeviceType.LED, PropertyRole.PERIODIC, 1000) {
-	            @Override
-	            public void set(Request rqst) {
-	            }
-	            
-	            @Override
-	            public Object get(Request rqst) {
-	                return 111;
-	            }
-	        });
-	}
-	```
+* Re-define CoAP details #35, #38, #39, #40 
+	* Added CON, NON message token for CoAP packets @aa14ac0
+	* re-transmission for CON message in CoAP @a1e40c8
+		* update re-transmission construction @1432006
+	* Updated multicast method for above updating @4d8bb33, @15cb5c1
+	* update packet algorithm to distinguish the multicast or unicast during receiving the packet. @804d533
+	* Added CoAP leisure for multicast @7a4447f
 
 * CoAP Protocol
 	* Some Support CoAP Protocol
@@ -132,12 +121,50 @@ Integrated middleware platform for cooperative interactions on variable system e
 	 * 
 	```
 
-### 4.2 버전 정보 및 소스
+* v2.8 Link - [Click Here](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
 
-- [MinT v2.7](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.7)
+### 4.2 버전 정보 및 소스
+- [MinT v2.8-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/21), [MinT v2.8-releases](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
+- [MinT v2.7-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/19), [MinT v2.7](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.7)
+- [MinT v2.4](http://sn.kangwon.ac.kr/LabThings/MinT/post/18)
+- [MinT v2.3](http://sn.kangwon.ac.kr/LabThings/MinT/post/17)
+
+## Publications
+
+* International Journals
+	- Soobin Jeon, Inbum Jung, "Middleware_for_Cooperative_Interaction_of_things," proceeding in journals (SCI(E)).
+	- Soobin Jeon, Inbum Jung, "Experimental Evaluation and flexible performance improvement for CoAP-Enabled IoT Platform," Proceeding in journals (SCI(E)).
+
+* Domestic Journals
+	- 전수빈, 한영탁, 이충산, 정인범, "이기종 시물간의 상호작용을 위한 통합 미들웨어 플렛폼," acceptance in 정보과학회논문지
+	- 전수빈, 한영탁, 이충산, 정인범, "CoAP 기반의 사물인터넷 플랫폼 실험 평가 및 효율적 성능 향상 방법," proceeding in journal
+	- 이충산, 한영탁, 전수빈, 서동만, 정인범, "사물인터넷에서 초음파 센서와 블로투스 통신을 이용한 스마트 주차 시스템," 정보과학회 컴퓨팅의 실제, 22권, 6호, pp. 268-277, 2016년 06월
+
+* International Conference
+	- Soobin Jeon, Chungsan Lee, Youngtak Han, Dongmahn Seo and Inbum Jung, "The Smart Shoes Providing the Gait Information on IoT," 2017 IEEE International Conference on Consumer Electronics (ICCE), pp. 96-97, Jan, 2017
+	- Youngtak Han, Chungsan Lee, Youjin Kim, Soobin Jeon, Dongmahn Seo, Inbum Jung, "Smart Umbrella for Safety Directions on Internet of Things," 2017 IEEE International Conference on Consumer Electronics (ICCE), pp. 84-85, Jan, 2017
+	- Soobin Jeon, Chungsan Lee, Youngtak Han, Dongmahn Seo and Inbum Jung, "MinT: Middleware for Cooperative Interactions of Things," 2016 IEEE International Conference on Consumer Electronics (ICCE), pp. 139-140, Jan, 2016
+	- Chungsan Lee, Youngtak Han, Soobin Jeon, Dongmahn Seo, Inbum Jung, "Smart Parking System for Internet of Things," 2016 IEEE International Conference on Consumer Electronics (ICCE), pp. 289-290, Jan, 2016
+
+* Domestic Conference
+	- 김유진, 이충산, 전수빈, 정인범, "실내 사물인터넷 환경을 위한 객체 크기 기반의 사람 검출 방법," 한국 정보과학회 2016년 동계학술발표회, pp. 1507-1509, 2016년 12월
+	- 신세정, 이충산, 한영탁, 전수빈, 정인범, "실시간 현황갱신 및 사물 간 상호작용을 위한 인아웃보드 시스템," 한국 정보과학회 2016년 동계학술발표회, pp. 1570-1572, 2016년 12월
+	- 한영탁, 이충산, 전수빈, 정인범, "IoT 개발 환경을 위한 통합 디바이스 제어 도구," 한국정보과학회 2015 동계학술발표회, pp. 348-350, 2015년 12월
+	- 이기웅, 전수빈, 이충산, 한영탁, 심순용, 이은수, 정인범, "사물인터넷을 이용한 스마트 우산," 한국정보과학회 2015 동계학술발표회, pp. 428-430, 2015년 12월
+	- 이은수, 전수빈, 이충산, 한영탁, 심순용, 이기웅, 신세정, 정인범, "사물인터넷 기반의 스마트 조명시스템," 한국정보과학회 2015 동계학술발표회, pp. 446-448, 2015년 12월
+	- 이충산, 한영탁, 전수빈, 정인범, "사물 인터넷을 위한 이기종 네트워크 통합 프레임워크," 한국정보과학회 2015 동계학술발표회, pp. 443-445, 2015년 12월
+	- 심순용, 전수빈, 이충산, 한영탁, 이기웅, 이은수, 정인범, "사물인터넷 기반 스마트 신발," 한국정보과학회 2015 동계학술발표회, pp. 449-451, 2015년 12월
+	- 한영탁, 전수빈, 이충산, 정인범, "IoT 환경에서 화분을 관리하기 위한 인터넷 가든 시스템," 2015년 한국컴퓨터종합학술대회, pp. 463-465, 2015년 06월
+	- 이충산, 전수빈, 한영탁, 정인범, "사물 인터넷에서의 디바이스 개발을 위한 통합 플랫폼," 2015년 한국컴퓨터종합학술대회, pp. 471-473, 2015년 06월
+	- 이충산, 한영탁, 조영태, 전수빈, 최진섭, 정인범, "사물 인터넷을 위한 지능형 주차 시스템," 2014년 한국컴퓨터종합학술대회, pp. 1842-1844, 2014년 06월
+
+* patent
+	- 스마트폰과 블루투스를 이용한 주차 관리 및 안내 방법, 출원일 2013. 12. 31
 
 ## Latest Edit
 > 09/17/2015
 > 08/24/2016
 > 10/10/2016
 > 11/16/2016
+> 12/12/2016
+> 02/20/2017
