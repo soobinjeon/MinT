@@ -197,17 +197,8 @@ public class SendMSG implements Runnable{
         return resKey;
     }
     
-    public boolean isRequest(){
-        //return head_code.isRequest() && !head_code.NeedResponse();
-        return head_code.isPost();
-    }
-    
-    public boolean isResponse(){
-        return head_code.isResponse();
-    }
-    
     public boolean isRequestGET(){
-        return (head_code.isGet() || head_code.isPut() || head_code.isDelete()) && this.resHandle != null;
+        return resHandle != null;
     }
     
     public int getSendHit(){
@@ -262,6 +253,7 @@ public class SendMSG implements Runnable{
     public void setCurrentTimeout(long timeout){
         this.currentTimeout = timeout;
     }
+    
     public long getCurrentTimeout(){
         return currentTimeout;
     }
@@ -273,6 +265,7 @@ public class SendMSG implements Runnable{
         }
         this.retransmissionHandle = retransmissionHandle;
     }
+    
     public ScheduledFuture<?> getRetransmissionHandle(){
         return this.retransmissionHandle;
     }

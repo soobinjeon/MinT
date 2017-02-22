@@ -251,17 +251,6 @@ public class CoAPPacket extends PacketDatagram {
         short ret = bb.getShort(0);
         return ret;
     }
-    /**
-     * return byte Packet Data
-     * @return 
-     */
-    public byte[] getPacket(){
-        return packetdata;
-    }
-    
-    public String getPacketString(){
-        return String.valueOf(packetdata);
-    }
     
     /**
      * get Protocol by Route
@@ -329,6 +318,18 @@ public class CoAPPacket extends PacketDatagram {
 //        System.out.println("PREV : "+routelist.get(ROUTE.PREV).getProfile());
 //        System.out.println("DEST : "+routelist.get(ROUTE.DESTINATION).getProfile());
 //        System.out.println("msg : "+data);
+    }
+    
+    /**
+     * return byte Packet Data
+     * @return 
+     */
+    public byte[] getPacket(){
+        return packetdata;
+    }
+    
+    public String getPacketString(){
+        return String.valueOf(packetdata);
     }
     
     public NetworkProfile getSource(){

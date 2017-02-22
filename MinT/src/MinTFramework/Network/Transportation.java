@@ -72,6 +72,13 @@ public class Transportation implements NetworkLayers {
         if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
+            
+            if(packet.getHeader_Code().isRequest()){
+                
+            }else if(packet.getHeader_Code().isResponse()){
+                
+            }
+             
             if (isRouting(receivemsg)) {
                 routing.routingHandle(packet, receivemsg);
             } else if (isSharing(receivemsg)) {
@@ -123,20 +130,6 @@ public class Transportation implements NetworkLayers {
         return false;//currnetProfile.equals(destinationNode);
     }
 
-//    /**
-//     * is Multicast Packet with CoAP or UDP
-//     *
-//     * @param destinationNode
-//     * @return
-//     */
-//    private boolean isMulticast(NetworkProfile destinationNode) {
-//        if (destinationNode.getAddress().equals("")) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-
     /**
      * Stop Over Method
      *
@@ -152,18 +145,13 @@ public class Transportation implements NetworkLayers {
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
         CoAPPacket npacket = null;
-        if (sendmsg.isResponse()) {
-        } else if (sendmsg.isRequest()) {
-        } else if (sendmsg.isRequestGET()) {
+        
+        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
             //check resend information
-            if (sendmsg.getSendHit() == 0) {
-                sendmsg.setResKey(networkManager.getIDMaker().makeToken());
-                networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
-            }            
+            sendmsg.setResKey(networkManager.getIDMaker().makeToken());
+            networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
         }
 
-        npacket = serialization.EndPointSend(sendmsg);
-        
         /**
          * Message Retransmit control
          */
@@ -174,6 +162,8 @@ public class Transportation implements NetworkLayers {
             //Start retransmit procedure
             networkManager.getCoAPRetransmit().activeRetransmission(sendmsg);
         }
+        
+        npacket = serialization.EndPointSend(sendmsg);
         
         if (npacket != null) {
             //send packet

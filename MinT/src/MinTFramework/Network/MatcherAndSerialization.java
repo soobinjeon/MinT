@@ -89,8 +89,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      */
     @Override
     public CoAPPacket EndPointSend(SendMSG sendmsg) {
-        CoAPPacket packet = null;
-        packet = new CoAPPacket(sendmsg);
+        CoAPPacket packet = new CoAPPacket(sendmsg);
 //        CoAPPacket packet = new CoAPPacket(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
 //        ,sendmsg.getHeader_Instruction(), null, null, sendmsg.getNextNode()
 //        ,sendmsg.getFinalDestination(), sendmsg.Message());
