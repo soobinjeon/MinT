@@ -18,7 +18,9 @@ package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.PacketIDManager;
+import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
@@ -47,13 +49,15 @@ public class CoAPManager implements MessageTransfer{
     }
     
     @Override
-    public SendMSG sendREsponse(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
+    public SendMSG sendREsponse(PacketDatagram rv_pkt, SendMessage ret) {
         SendMSG res_msg = null;
+        CoAPPacket rvpacket = (CoAPPacket)rv_pkt;
+        CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(ret.getMessageCode().getCode());
         
-        if (rv_packet.getHeader_Type().isCON()) {
-            res_msg = SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret, hcode);
+        if (rvpacket.getHeader_Type().isCON()) {
+            res_msg = SEND_PIGGYBACK_ACK(rvpacket, (SendMessage) ret, hcode);
         } else {
-            res_msg = SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret, hcode);
+            res_msg = SEND_SEPERATED_RESPONSE(rvpacket, (SendMessage) ret, hcode);
         }
         
         if(res_msg != null){
@@ -75,19 +79,14 @@ public class CoAPManager implements MessageTransfer{
      * @param rv_packet Receved packet
      * @param ret
      */
-    private SendMSG SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
+    private SendMSG SEND_PIGGYBACK_ACK(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
         // CoAP Piggyback procedure
-        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
-            CoAPPacket cp = (CoAPPacket)rv_packet;
+        CoAPPacket cp = (CoAPPacket)rv_packet;
 //            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
 //            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
-            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, hcode, ret);
-        } else {
-            //non-CoAP Piggyback procedure
-            return null;
-        }
+        return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, hcode, ret);
     }
 
     /**
@@ -99,16 +98,10 @@ public class CoAPManager implements MessageTransfer{
 
     }
     
-    private SendMSG SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode){
-        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
-            CoAPPacket cp = (CoAPPacket)rv_packet;
+    private SendMSG SEND_SEPERATED_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode){
 //            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
 //                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
-            return new SendMSG(cp, CoAPPacket.HEADER_TYPE.NON, hcode, ret);
-        } else {
-            //For Non-CoAP Procedure
-            return null;
-        }
+        return new SendMSG(rv_packet, CoAPPacket.HEADER_TYPE.NON, hcode, ret);
     }
     
     /**
@@ -173,5 +166,48 @@ public class CoAPManager implements MessageTransfer{
     
     public Retransmission getCoAPRetransmit(){
         return coapretransmit;
+    }
+
+    @Override
+    public void send(SendMSG sendmsg) {
+        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
+            //check resend information
+            sendmsg.setResKey(getIDMaker().makeToken());
+            
+            //message id
+            sendmsg.setMessageID(getIDMaker().makeMessageID());
+
+            putResponse(sendmsg.getResponseKey(), sendmsg);
+        }
+
+        /**
+         * Message Retransmit control
+         */
+        if (sendmsg.getHeader_Type().isCON()){
+            if(sendmsg.getSendHit() == 0){
+                putCONMessage(sendmsg.getMessageID(), sendmsg);
+            }
+            //Start retransmit procedure
+            getCoAPRetransmit().activeRetransmission(sendmsg);
+        }
+    }
+
+    @Override
+    public void receive(RecvMSG recvmsg) {
+        CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
+        ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvmsg);
+        if(packet.getHeader_Type().isACK()){
+            checkAck(packet.getMSGID());
+        }
+        
+        //Run Response Handler for Response Mode
+            if (packet.getHeader_Code().isResponse()) {
+                //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
+                ResponseHandler reshandle = getResponseDataMatchbyID(packet.getToken());
+                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
+                if (reshandle != null) {
+                    reshandle.Response(resdata);
+                }
+            }
     }
 }

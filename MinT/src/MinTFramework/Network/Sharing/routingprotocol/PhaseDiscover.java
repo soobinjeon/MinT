@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.sharing.routingprotocol;
 
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
@@ -96,7 +97,7 @@ public class PhaseDiscover extends Phase{
                         disRole.interrupt();
 
                         SendMessage ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
-                        networkmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
+                        networkmanager.SEND_RESPONSE(rv_packet, ret.addResponseCode(MinTMessageCode.CONTENT));
 //                        networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
 //                                , rv_packet.getSource(), ret, rv_packet.getMSGID()));
                     }

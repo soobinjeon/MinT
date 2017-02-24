@@ -16,17 +16,28 @@
  */
 package MinTFramework.Network.MessageProtocol;
 
-import MinTFramework.Network.RecvMSG;
-import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.NetworkProfile;
+import java.util.TreeMap;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface MessageTransfer {
-    public SendMSG sendREsponse(PacketDatagram rv_packet, SendMessage ret);
-    public void send(SendMSG sendmsg);
-    public void receive(RecvMSG recvmsg);
+public class ReceiveAttribute {
+    private TreeMap<PacketDatagram.ROUTE, NetworkProfile> routelist = null;
+    private String message = null;
+    
+    public ReceiveAttribute(TreeMap<PacketDatagram.ROUTE, NetworkProfile> rlist, String msg){
+        routelist = rlist;
+        message = msg;
+    }
+    
+    public TreeMap<PacketDatagram.ROUTE, NetworkProfile> getRouteList(){
+        return routelist;
+    }
+    
+    public String getMessage(){
+        return message;
+    }
 }

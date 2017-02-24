@@ -20,6 +20,7 @@ import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
@@ -95,7 +96,7 @@ public class SystemHandler{
                 }
             }
             
-            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
+            nmanager.SEND_RESPONSE(rv_packet, ret.addResponseCode(MinTMessageCode.CONTENT));
             /**
              * @TODO seperate ack and response procedure for when piggyback is not possible
              */
@@ -103,16 +104,16 @@ public class SystemHandler{
         //FIX it! : 아래 명령어에 대한 명령들이 Set Instruction에 제대로 구현되어 있지 않음!!!!    
         }else if(rv_packet.getHeader_Code().isPut()){
             resStorage.setInstruction(recvmsg);
-            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CREATED);
+            nmanager.SEND_RESPONSE(rv_packet, new SendMessage(null,null).addResponseCode(MinTMessageCode.CREATED));
 //            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CHANGED);
         }else if(rv_packet.getHeader_Code().isPost()){
             resStorage.setInstruction(recvmsg);
-            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CREATED);
+            nmanager.SEND_RESPONSE(rv_packet, new SendMessage(null,null).addResponseCode(MinTMessageCode.CREATED));
 //            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.CHANGED);
 //            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.DELETED);
         }else if(rv_packet.getHeader_Code().isDelete()){
             resStorage.setInstruction(recvmsg);
-            nmanager.SEND_RESPONSE(rv_packet, null, CoAPPacket.HEADER_CODE.DELETED);
+            nmanager.SEND_RESPONSE(rv_packet, new SendMessage(null,null).addResponseCode(MinTMessageCode.DELETED));
         }
     }
     

@@ -16,17 +16,27 @@
  */
 package MinTFramework.Network.MessageProtocol;
 
-import MinTFramework.Network.RecvMSG;
-import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.MessageProtocol.coap.CoAPManager;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface MessageTransfer {
-    public SendMSG sendREsponse(PacketDatagram rv_packet, SendMessage ret);
-    public void send(SendMSG sendmsg);
-    public void receive(RecvMSG recvmsg);
+public enum ApplicationProtocol {
+    COAP(new CoAPManager()),
+    MQTT(null);
+    
+    private MessageTransfer msg;
+    
+    ApplicationProtocol(MessageTransfer _msg){
+        msg = _msg;
+    }
+    
+    public MessageTransfer getMessageManager(){
+        return msg;
+    }
+    
+    public boolean isCOAP(){ return this == COAP;}
+    public boolean isMQTT(){ return this == MQTT;}
 }

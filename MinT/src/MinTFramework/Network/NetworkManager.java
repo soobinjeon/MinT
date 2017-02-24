@@ -20,7 +20,6 @@ import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.*;
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.MessageProtocol.coap.CoAPManager;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
@@ -50,6 +49,7 @@ public class NetworkManager {
     private ResourceStorage resourceStorage = null;
     private final ArrayList<NetworkType> networkList;
     private final ConcurrentHashMap<NetworkType, Network> networks;
+//    private final ConcurrentHashMap<MessageProtocol, MessageTransfer> msgprotocols;
     private String NodeName = null;
 
     private RoutingProtocol routing = null;
@@ -74,6 +74,7 @@ public class NetworkManager {
         this.dl = new DebugLog("NetworkManager", true);
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
+//        this.msgprotocols = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
         sysSched = frame.getSystemScheduler();
         resourceStorage = frame.getResStorage();
@@ -89,7 +90,14 @@ public class NetworkManager {
         }
 
         makeBytebuffer();
+//        initMessageProtocol();
     }
+    
+//    private void initMessageProtocol(){
+//        for(ApplicationProtocol mp : ApplicationProtocol.values()){
+//            msgprotocols.put(mp, mp.getMessageManager());
+//        }
+//    }
 
     /**
      * Init Routing Algorithm
@@ -214,14 +222,6 @@ public class NetworkManager {
             System.err.println("SEND MESSAGE null");
     }
     
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret, PacketDatagram.MessageProtocol mesprotocol){
-        SEND_RESPONSE(rv_packet,ret,mesprotocol,null);
-    }
-    
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret, PacketDatagram.MessageProtocol mesprotocol, CoAPPacket.HEADER_CODE hcode){
-        MessageTransfer tr = new CoAPManager();
-        SEND(tr.sendREsponse(rv_packet, ret, hcode));
-    }
     
     /** @deprecated 
      * 
@@ -236,6 +236,19 @@ public class NetworkManager {
         sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
     }
 
+    /**
+     * Send for Response
+     * @param rv_packet
+     * @param ret 
+     */
+    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
+        MessageTransfer tr = rv_packet.getMessageProtocolType().getMessageManager();
+        if(tr == null)
+            System.err.println("Message Transfer is null - "+rv_packet.getMessageProtocolType());
+        else
+            SEND(tr.sendREsponse(rv_packet, ret));
+    }
+    
     /**
      * set Node Name
      *

@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.ApplicationProtocol;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
@@ -28,6 +28,9 @@ import java.util.concurrent.ScheduledFuture;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class SendMSG implements Runnable{
+    private ApplicationProtocol appprotocolType = null;
+    
+    //for CoAP
     private int head_version;
     private CoAPPacket.HEADER_TYPE head_type;
     private int head_tokenLength;
@@ -40,6 +43,8 @@ public class SendMSG implements Runnable{
     private long currentTimeout = 0;
     private short resKey;
     private int SendHit = 0;
+    
+    //transmit
     private boolean isUDPMulticast = false;
     private NetworkProfile FinalDestination;
     private NetworkProfile nextNode;
@@ -60,42 +65,12 @@ public class SendMSG implements Runnable{
             this.msg = "";
         else
             this.msg = msg.getMessageString();
-        this.resHandle = resHandle;
+        this.resHandle = resHandle; //token number
         this.resKey = resKey;
         this.retransmissionHandle = null;
-    }
-    
-    /**
-     * Response
-     * @param ht
-     * @param tkl Token length
-     * @param hd Direction (Request, Response)
-     * @param hi for Instruction (GET, SET, POST, PUT, DELETE, DISCOVERY)
-     * @param dst Destination profile
-     * @param msg Resource and request
-     * @param resKey 
-     */
-    public SendMSG(CoAPPacket.HEADER_TYPE ht, int tkl
-            , CoAPPacket.HEADER_CODE hc, NetworkProfile dst
-            , Request msg, short token){
-        this(ht, tkl, hc, dst,msg,null,token);
-    }
-    
-    /**
-     * Response
-     * @param msgid
-     * @param ht
-     * @param tkl
-     * @param hc
-     * @param token
-     * @param dst
-     * @param msg 
-     */
-    public SendMSG(short msgid, CoAPPacket.HEADER_TYPE ht, int tkl, 
-            CoAPPacket.HEADER_CODE hc, NetworkProfile dst, 
-            Request msg, short token){
-        this(ht, tkl, hc, dst, msg, null, token);
-        this.messageId = msgid;
+        
+        //fixme - set Only CoAP message protocol
+        appprotocolType = ApplicationProtocol.COAP;
     }
     
     /***
@@ -138,7 +113,6 @@ public class SendMSG implements Runnable{
             , CoAPPacket.HEADER_CODE hc
             , NetworkProfile dst, Request msg, ResponseHandler resHandle){
         this(ht, tkl, hc,dst,msg,resHandle,CoAPPacket.HEADER_MSGID_INITIALIZATION);
-        messageId = MinT.getInstance().getNetworkManager().getIDMaker().makeMessageID();
     }
     
     @Override
@@ -165,8 +139,9 @@ public class SendMSG implements Runnable{
     public short getMessageID(){
         return messageId;
     }
-    public void setMessageID(short msgid){
-        this.messageId = msgid;
+    
+    public void setMessageID(short mid){
+        messageId = mid;
     }
     
     public CoAPPacket.HEADER_TYPE getHeader_Type(){
@@ -209,7 +184,7 @@ public class SendMSG implements Runnable{
         SendHit ++;
     }
 
-    void setResKey(short makePacketID) {
+    public void setResKey(short makePacketID) {
         resKey = makePacketID;
     }
 
@@ -268,6 +243,10 @@ public class SendMSG implements Runnable{
     
     public ScheduledFuture<?> getRetransmissionHandle(){
         return this.retransmissionHandle;
+    }
+
+    public ApplicationProtocol getApplicationProtocol() {
+        return appprotocolType;
     }
     
 }

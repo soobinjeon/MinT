@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.sharing.routingprotocol;
 
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.NetworkType;
@@ -166,7 +167,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
                     .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.HE_CLIENTRESPONSE.getValue());
 
             //response client info to header
-            networkmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
+            networkmanager.SEND_RESPONSE(rv_packet, ret.addResponseCode(MinTMessageCode.CONTENT));
 //            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
 //                    , rv_packet.getSource(), ret, rv_packet.getMSGID()));
             doneIndentify();

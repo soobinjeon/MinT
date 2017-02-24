@@ -18,6 +18,7 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.ReceiveMessage;
@@ -202,7 +203,7 @@ public abstract class SharingResponse implements Runnable{
         
         //Response MSG
         if(sendmsg != null){
-            networkmanager.SEND_RESPONSE(rv_packet, sendmsg, CoAPPacket.HEADER_CODE.CONTENT);
+            networkmanager.SEND_RESPONSE(rv_packet, sendmsg.addResponseCode(MinTMessageCode.CONTENT));
 //            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
 //                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
         }

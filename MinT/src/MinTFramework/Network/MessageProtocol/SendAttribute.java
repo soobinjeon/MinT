@@ -16,17 +16,19 @@
  */
 package MinTFramework.Network.MessageProtocol;
 
-import MinTFramework.Network.RecvMSG;
-import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.SendMSG;
-
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public interface MessageTransfer {
-    public SendMSG sendREsponse(PacketDatagram rv_packet, SendMessage ret);
-    public void send(SendMSG sendmsg);
-    public void receive(RecvMSG recvmsg);
+public class SendAttribute {
+    private byte[] packetmsg = null;
+    
+    public SendAttribute(byte[] packetmessage){
+        packetmsg = packetmessage;
+    }
+    
+    public byte[] getPacketMessage(){
+        return packetmsg;
+    }
 }

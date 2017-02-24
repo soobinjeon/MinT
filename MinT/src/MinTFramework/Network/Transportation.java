@@ -18,9 +18,9 @@ package MinTFramework.Network;
 
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -73,11 +73,11 @@ public class Transportation implements NetworkLayers {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
             
-            if(packet.getHeader_Code().isRequest()){
-                
-            }else if(packet.getHeader_Code().isResponse()){
-                
-            }
+//            if(packet.getHeader_Code().isRequest()){
+//                
+//            }else if(packet.getHeader_Code().isResponse()){
+//                
+//            }
              
             if (isRouting(receivemsg)) {
                 routing.routingHandle(packet, receivemsg);
@@ -87,19 +87,8 @@ public class Transportation implements NetworkLayers {
                 syshandle.startHandle(packet, receivemsg);
             }
             
-            if(packet.getHeader_Type().isACK()){
-                networkManager.checkAck(packet.getMSGID());
-            }
+            packet.getMessageProtocolType().getMessageManager().receive(recvMsg);
             
-            //Run Response Handler for Response Mode
-            if (packet.getHeader_Code().isResponse()) {
-                //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
-                ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getToken());
-                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
-                if (reshandle != null) {
-                    reshandle.Response(resdata);
-                }
-            }
         } else {
             stopOver(packet);
         }
@@ -140,28 +129,14 @@ public class Transportation implements NetworkLayers {
     }
 
     @Override
-    public CoAPPacket EndPointSend(SendMSG sendmsg) {
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
         CoAPPacket npacket = null;
         
-        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
-            //check resend information
-            sendmsg.setResKey(networkManager.getIDMaker().makeToken());
-            networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
-        }
-
-        /**
-         * Message Retransmit control
-         */
-        if (sendmsg.getHeader_Type().isCON()){
-            if(sendmsg.getSendHit() == 0){
-                networkManager.putCONMessage(sendmsg.getMessageID(), sendmsg);
-            }
-            //Start retransmit procedure
-            networkManager.getCoAPRetransmit().activeRetransmission(sendmsg);
-        }
+        //Process for each Application Protocol
+        sendmsg.getApplicationProtocol().getMessageManager().send(sendmsg);
         
         npacket = serialization.EndPointSend(sendmsg);
         
@@ -211,7 +186,7 @@ public class Transportation implements NetworkLayers {
      * @param packet
      */
     @Override
-    public void Send(CoAPPacket packet) {
+    public void Send(PacketDatagram packet) {
         try {
             //For Group Message
             if (packet.getSendMSG().isUDPMulticastMode()) {
@@ -231,7 +206,7 @@ public class Transportation implements NetworkLayers {
         }
     }
 
-    private void MakeSourceProfile(CoAPPacket packet, Network sendNetwork) {
+    private void MakeSourceProfile(PacketDatagram packet, Network sendNetwork) {
         //Send Message
         if (sendNetwork != null) {
             //set Source Node

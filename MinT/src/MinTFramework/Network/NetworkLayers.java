@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 
 /**
  * Network Layer Interface
@@ -55,7 +55,7 @@ public interface NetworkLayers {
      * Layer Implements
      * @param packet 
      */
-    public void Send(CoAPPacket packet);
+    public void Send(PacketDatagram packet);
     
-    public CoAPPacket EndPointSend(SendMSG sendmsg);
+    public PacketDatagram EndPointSend(SendMSG sendmsg);
 }

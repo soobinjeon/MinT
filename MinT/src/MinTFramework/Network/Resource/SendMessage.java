@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.Resource;
 
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.storage.datamap.Information;
 import org.json.simple.JSONObject;
 
@@ -24,7 +25,8 @@ import org.json.simple.JSONObject;
  * @author soobin
  */
 public class SendMessage extends Request{
-    
+    protected MinTMessageCode messagecode = null;
+
     /**
      * set Request for Sender
      * @param res Resource Name for requesting
@@ -51,5 +53,14 @@ public class SendMessage extends Request{
         resources.put(attr, new Information(value));
         setMessagetoJSON();
         return this;
+    }
+    
+    public SendMessage addResponseCode(MinTMessageCode minTMessageCode) {
+        messagecode = minTMessageCode;
+        return this;
+    }
+    
+    public MinTMessageCode getMessageCode(){
+        return messagecode;
     }
 }

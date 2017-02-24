@@ -18,6 +18,7 @@ package MinTFramework.Network;
 
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -59,10 +60,10 @@ public class MatcherAndSerialization implements NetworkLayers{
     @Override
     public void EndPointReceive(RecvMSG recvmsg) {
         try{
-        CoAPPacket matchedPacket = new CoAPPacket(recvmsg);
-        recvmsg.setReceivedPacketDatagram(matchedPacket);
-        transportation.Receive(recvmsg);
-        }catch(Exception e){
+            CoAPPacket matchedPacket = new CoAPPacket(recvmsg);
+            recvmsg.setReceivedPacketDatagram(matchedPacket);
+            transportation.Receive(recvmsg);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -73,7 +74,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Send(CoAPPacket packet) {
+    public void Send(PacketDatagram packet) {
     }
 
     /**
