@@ -186,7 +186,6 @@ public class PhaseHeaderElection extends Phase implements Callable{
     public void responseHandle(PacketDatagram rv_packet, Request req) {
         if(!routing.isHeaderNode() && !isWorkingPhase())
             return;
-        System.out.println("responsed from Client");
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         //Header Node Operation

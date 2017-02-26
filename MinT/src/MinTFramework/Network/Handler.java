@@ -19,6 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResourceStorage;
 
@@ -45,8 +46,16 @@ public abstract class Handler {
         
         if(packet.getRoleDirection().isRequest())
             HandleRequest(packet, receivemsg);
-        else
+        else{
             HandleResponse(packet, receivemsg);
+            
+            //Response Handle
+            ResponseHandler reshandle = packet.getRecvHandler();
+            if (reshandle != null) {
+                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
+                reshandle.Response(resdata);
+            }
+        }
     }
     
     protected abstract void HandleRequest(PacketDatagram packet, ReceiveMessage receivemsg);

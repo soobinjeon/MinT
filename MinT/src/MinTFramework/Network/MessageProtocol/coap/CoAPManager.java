@@ -130,7 +130,6 @@ public class CoAPManager implements MessageTransfer{
     @Override
     public ResponseHandler receive(RecvMSG recvmsg) {
         CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
-
         if (packet.getHeader_Type().isACK()) {
             checkAck(packet.getMSGID());
         }
@@ -139,7 +138,6 @@ public class CoAPManager implements MessageTransfer{
         //Run Response Handler for Response Mode
         if (packet.getHeader_Code().isResponse())
             reshandle = getResponseDataMatchbyID(packet.getToken());
-        
         return reshandle;
     }
     

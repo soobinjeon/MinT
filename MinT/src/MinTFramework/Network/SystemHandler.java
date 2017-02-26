@@ -110,13 +110,6 @@ public class SystemHandler extends Handler{
                 e.printStackTrace();
             }
         }
-        
-        //Response Handle
-        ResponseHandler reshandle = rv_packet.getRecvHandler();
-        if (reshandle != null) {
-            ResponseData resdata = new ResponseData(rv_packet, receivemsg.getResourceData().getResource());
-            reshandle.Response(resdata);
-        }
     }
     
     /**
