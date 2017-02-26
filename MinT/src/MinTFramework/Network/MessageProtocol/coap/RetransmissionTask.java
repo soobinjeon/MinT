@@ -41,8 +41,9 @@ public class RetransmissionTask implements Runnable{
     @Override
     public void run() {
 //        System.out.println("####################  Retransmission  #######################");
-        System.err.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed!");
         transmissionCount = msg.getSendHit();
+        System.err.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed! ("+transmissionCount+")");
+//        System.err.println("msg: "+msg.Message());
         if(transmissionCount <= CoAPPacket.CoAPConfig.MAX_RETRANSMIT){
 //            System.out.println("#   Message ID : "+ msg.getMessageID());
 //            System.out.println("#   Reransmission Count : "+msg.getSendHit());

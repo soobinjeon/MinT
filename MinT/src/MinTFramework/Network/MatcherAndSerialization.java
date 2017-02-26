@@ -16,8 +16,8 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Util.DebugLog;
 
 /**
@@ -59,10 +59,11 @@ public class MatcherAndSerialization implements NetworkLayers{
     @Override
     public void EndPointReceive(RecvMSG recvmsg) {
         try{
-        CoAPPacket matchedPacket = new CoAPPacket(recvmsg);
-        recvmsg.setReceivedPacketDatagram(matchedPacket);
-        transportation.Receive(recvmsg);
-        }catch(Exception e){
+            PacketDatagram matchedPacket = recvmsg.getApplicationProtocol()
+                    .newPacketDatagram(recvmsg);
+            recvmsg.setReceivedPacketDatagram(matchedPacket);
+            transportation.Receive(recvmsg);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -73,7 +74,7 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param packet 
      */
     @Override
-    public void Send(CoAPPacket packet) {
+    public void Send(PacketDatagram packet) {
     }
 
     /**
@@ -88,12 +89,9 @@ public class MatcherAndSerialization implements NetworkLayers{
      * @param sendmsg 
      */
     @Override
-    public CoAPPacket EndPointSend(SendMSG sendmsg) {
-        CoAPPacket packet = null;
-        packet = new CoAPPacket(sendmsg);
-//        CoAPPacket packet = new CoAPPacket(sendmsg.getResponseKey(), sendmsg.getHeader_Direction()
-//        ,sendmsg.getHeader_Instruction(), null, null, sendmsg.getNextNode()
-//        ,sendmsg.getFinalDestination(), sendmsg.Message());
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
+        PacketDatagram packet = null;
+        packet = sendmsg.getApplicationProtocol().newPacketDatagram(sendmsg);
         return packet;
     }
 }

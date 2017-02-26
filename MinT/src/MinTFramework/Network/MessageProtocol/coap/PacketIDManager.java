@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.MessageProtocol.coap;
 
+import MinTFramework.Network.SendMSG;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,7 +41,6 @@ public class PacketIDManager {
             tkn = DEFAULT_ID;
             tkncycled = true;
         }
-        
         if(!idcycled)
             return tkn++;
         else{
@@ -57,7 +57,6 @@ public class PacketIDManager {
             id = DEFAULT_ID;
             idcycled = true;
         }
-        
         if(!tkncycled)
             return id++;
         else{

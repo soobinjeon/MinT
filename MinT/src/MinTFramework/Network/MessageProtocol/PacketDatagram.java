@@ -16,27 +16,192 @@
  */
 package MinTFramework.Network.MessageProtocol;
 
+import MinTFramework.Network.NetworkProfile;
+import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.SendMSG;
+import java.util.TreeMap;
+
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class PacketDatagram {
-    private MessageProtocol ptype;
-
-    public static enum MessageProtocol{
-        COAP, MQTT;
+public abstract class PacketDatagram {
+    private ApplicationProtocol ptype;
+    private byte[] packetmessages = null;
+    private boolean isReceivedPacket = false;
+    private boolean isUDPMulticast = false;
+    protected String message="";
+    
+    protected TreeMap<ROUTE, NetworkProfile> routelist= null;
+    
+    protected ROLE_DIRECTION role_direction = null;
+    protected MinTMessageCode messageCode = null;
+    protected ResponseHandler reshandler = null;
+    
+    public static enum ROUTE{
+        SOURCE, PREV, NEXT, DESTINATION;
     }
+    
+    public static enum ROLE_DIRECTION{
+        REQUEST, RESPONSE;
 
-    public PacketDatagram(PacketDatagram.MessageProtocol ptype){
+        public boolean isRequest() { return this == REQUEST; }
+        public boolean isResponse() { return this == RESPONSE; }
+    }
+    
+    protected SendMSG sendMsg = null;
+    
+    public PacketDatagram(NetworkProfile src, NetworkProfile prev, NetworkProfile next, NetworkProfile dest
+            ,boolean isMulticast, String msg, ApplicationProtocol ptype){
+        routelist = new TreeMap<>();
+        routelist.put(ROUTE.SOURCE,src);
+        routelist.put(ROUTE.PREV,prev);
+        routelist.put(ROUTE.NEXT,next);
+        routelist.put(ROUTE.DESTINATION,dest);
         this.ptype = ptype;
+        isUDPMulticast = isMulticast;
+        message = msg;
     }
+    
+    /**
+     * initialization Received Packet
+     * @param recvmsg
+     * @param ptype 
+     */
+    public PacketDatagram(RecvMSG recvmsg, ApplicationProtocol ptype){
+        this.ptype = ptype;
+        packetmessages = recvmsg.getRecvBytes();
+        isReceivedPacket = true;
+        isUDPMulticast = recvmsg.isUDPMulticast();
+        
+        ReceiveAttribute ratt = makeReceivedPacket(recvmsg);
+        routelist = ratt.getRouteList();
+        message = ratt.getMessage();
+    }
+    
+    protected abstract ReceiveAttribute makeReceivedPacket(RecvMSG recvmsg); 
+    protected abstract SendAttribute makeSendedPacket(); 
+    protected abstract ROLE_DIRECTION setRoleDirection();
+    protected abstract MinTMessageCode setRoleClass();
+    
+    public void setRole() {
+        role_direction = setRoleDirection();
+        messageCode = setRoleClass();
+    }
+    
+    /**
+     * Fix me
+     * Recognize Application Protocol from packet
+     * @param recvbytes
+     * @return 
+     */
+    public static ApplicationProtocol recognizeAP(byte[] recvbytes) {
+        return ApplicationProtocol.COAP;
+    }
+    
+    /**
+     * Make Data Packet
+     * this method is only used in Network Send Method
+     */
+    public void makeBytes() {
+        SendAttribute sattr = makeSendedPacket();
+        packetmessages = sattr.getPacketMessage();
+    }
+    
     /***
      * Get Message Protocol Types
      * e.g.) COAP, MQTT, and so on
      * @return Message protocol type
      */
-    public MessageProtocol getMessageProtocolType(){
+    public ApplicationProtocol getApplicationProtocol(){
         return ptype;
+    }
+    
+    /**
+     * return byte Packet Data
+     * @return 
+     */
+    public byte[] getPacket(){
+        return packetmessages;
+    }
+    
+    public String getPacketString(){
+        return String.valueOf(packetmessages);
+    }
+    
+    public NetworkProfile getSource(){
+        return routelist.get(ROUTE.SOURCE);
+    }
+    
+    public NetworkProfile getPreviosNode(){
+        return routelist.get(ROUTE.PREV);
+    }
+    
+    public NetworkProfile getNextNode(){
+        return routelist.get(ROUTE.NEXT);
+    }
+    
+    public NetworkProfile getDestinationNode(){
+        return routelist.get(ROUTE.DESTINATION);
+    }
+    
+    public void setSource(NetworkProfile src){
+        routelist.put(ROUTE.SOURCE, src);
+//        makePacketData(this.HEADER_MSGID,this.h_direction, this.h_instruction, data);
+    }
+    
+    public void setPrevNode(NetworkProfile prev){
+        routelist.put(ROUTE.PREV, prev);
+//        makePacketData(this.HEADER_MSGID, this.h_direction, this.h_instruction, data);
+    }
+    
+    public String getMsgData(){
+        return message;
+    }
+    
+    public ROLE_DIRECTION getRoleDirection(){
+        return role_direction;
+    }
+    
+    public MinTMessageCode getMessageCode(){
+        return messageCode;
+    }
+    
+    /**
+     * is this packet is received from other node.
+     * @return true if, false else
+     */
+    public boolean isReceivedPacket(){
+        return isReceivedPacket;
+    }
+    
+    /**
+     * Will this packet send to other node ?
+     * @return true if, false else
+     */
+    public boolean isSendPacket(){
+        return !isReceivedPacket;
+    }
+    
+    public boolean hasMulticast(){
+        return isUDPMulticast;
+    }
+    
+    public boolean hasUnicast(){
+        return !isUDPMulticast;
+    }
+    
+    public SendMSG getSendMSG(){
+        return sendMsg;
+    }
+    
+    public void setRecvHandler(ResponseHandler _resHandler) {
+        reshandler = _resHandler;
+    }
+    
+    public ResponseHandler getRecvHandler(){
+        return reshandler;
     }
 }

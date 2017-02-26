@@ -16,11 +16,10 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -66,32 +65,20 @@ public class Transportation implements NetworkLayers {
 
     @Override
     public void Receive(RecvMSG recvMsg) {
-        CoAPPacket packet = recvMsg.getPacketDatagram();
-//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getMSGID());
+        PacketDatagram packet = recvMsg.getPacketDatagram();
+//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getPacketString());
 //            System.out.println(", sender IP : "+packet.getSource().getAddress());
         if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
-//            System.out.println("PayLoad: "+packet.getMsgData());
+            
+            recvMsg.setRecvHandler(recvMsg.getApplicationProtocol().getMessageManager().receive(recvMsg));
+             
             if (isRouting(receivemsg)) {
-                routing.routingHandle(packet, receivemsg);
+                routing.routingHandle(recvMsg);
             } else if (isSharing(receivemsg)) {
-                sharing.sharingHandle(packet, receivemsg);
+                sharing.sharingHandle(recvMsg);
             } else {
-                syshandle.startHandle(packet, receivemsg);
-            }
-            
-            if(packet.getHeader_Type().isACK()){
-                networkManager.checkAck(packet.getMSGID());
-            }
-            
-            //Run Response Handler for Response Mode
-            if (packet.getHeader_Code().isResponse()) {
-                //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
-                ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getToken());
-                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
-                if (reshandle != null) {
-                    reshandle.Response(resdata);
-                }
+                syshandle.startHandle(recvMsg);
             }
         } else {
             stopOver(packet);
@@ -123,64 +110,32 @@ public class Transportation implements NetworkLayers {
         return false;//currnetProfile.equals(destinationNode);
     }
 
-//    /**
-//     * is Multicast Packet with CoAP or UDP
-//     *
-//     * @param destinationNode
-//     * @return
-//     */
-//    private boolean isMulticast(NetworkProfile destinationNode) {
-//        if (destinationNode.getAddress().equals("")) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-
     /**
      * Stop Over Method
      *
      * @param packet
      */
-    private void stopOver(CoAPPacket packet) {
+    private void stopOver(PacketDatagram packet) {
 
     }
 
     @Override
-    public CoAPPacket EndPointSend(SendMSG sendmsg) {
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
-        CoAPPacket npacket = null;
-        if (sendmsg.isResponse()) {
-        } else if (sendmsg.isRequest()) {
-        } else if (sendmsg.isRequestGET()) {
-            //check resend information
-            if (sendmsg.getSendHit() == 0) {
-                sendmsg.setResKey(networkManager.getIDMaker().makeToken());
-                networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
-            }            
-        }
-
-        npacket = serialization.EndPointSend(sendmsg);
+        PacketDatagram npacket = null;
         
-        /**
-         * Message Retransmit control
-         */
-        if (sendmsg.getHeader_Type().isCON()){
-            if(sendmsg.getSendHit() == 0){
-                networkManager.putCONMessage(sendmsg.getMessageID(), sendmsg);
-            }
-            //Start retransmit procedure
-            networkManager.getCoAPRetransmit().activeRetransmission(sendmsg);
-        }
+        //Process for each Application Protocol
+        sendmsg.getApplicationProtocol().getMessageManager().send(sendmsg);
+        
+        npacket = serialization.EndPointSend(sendmsg);
         
         if (npacket != null) {
             //send packet
             Send(npacket);
-        } else{
+        } else
             System.out.println("TRANSPOTATION.JAVA: Send error, npacket is null");
-        }
 
         return npacket;
     }
@@ -221,7 +176,7 @@ public class Transportation implements NetworkLayers {
      * @param packet
      */
     @Override
-    public void Send(CoAPPacket packet) {
+    public void Send(PacketDatagram packet) {
         try {
             //For Group Message
             if (packet.getSendMSG().isUDPMulticastMode()) {
@@ -241,7 +196,7 @@ public class Transportation implements NetworkLayers {
         }
     }
 
-    private void MakeSourceProfile(CoAPPacket packet, Network sendNetwork) {
+    private void MakeSourceProfile(PacketDatagram packet, Network sendNetwork) {
         //Send Message
         if (sendNetwork != null) {
             //set Source Node

@@ -16,50 +16,31 @@
  */
 package MinTFramework.Network.sharing;
 
-import MinTFramework.MinT;
-import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
+import MinTFramework.Network.Handler;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
-import MinTFramework.storage.ResourceStorage;
 
 /**
  *
  * @author soobin
  */
-public class SharingHandler {
-    private MinT frame = null;
-    private NetworkManager networkManager = null;
-    private ResourceStorage resStorage = null;
+public class SharingHandler extends Handler{
     private Sharing sharing = null;
     private RoutingProtocol routing = null;
     
     public SharingHandler(Sharing _sharing) {
-        frame = MinT.getInstance();
-        networkManager = frame.getNetworkManager();
-        resStorage = frame.getResStorage();
         sharing = _sharing;
-        routing = networkManager.getRoutingProtocol();
+        routing = nmanager.getRoutingProtocol();
     }
-
-    /**
-     * 
-     * @param rv_packet
-     * @param recvmsg 
-     */
-    public void receiveHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
-        if(rv_packet.getHeader_Code().isRequest())
-            requestHandle(rv_packet, recvmsg);
-        else if(rv_packet.getHeader_Code().isResponse())
-            responsehandle(rv_packet, recvmsg);
-    }
-
+    
     /**
      * handler for response to child or header node
-     * @param rv_packet
-     * @param req 
+     * @param packet
+     * @param receivemsg 
      */
-    private void requestHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
+    @Override
+    protected void HandleRequest(PacketDatagram rv_packet, ReceiveMessage recvmsg) {
         //request analysis ( child node or other header)
         System.out.println("request for Header");
         if(routing.hasChildNode(rv_packet.getSource()))
@@ -68,7 +49,7 @@ public class SharingHandler {
             sharing.executeResponse(new HeaderReponse(rv_packet, recvmsg));
     }
 
-    private void responsehandle(CoAPPacket rv_packet, ReceiveMessage req) {
-//        Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
+    @Override
+    protected void HandleResponse(PacketDatagram packet, ReceiveMessage receivemsg) {
     }
 }

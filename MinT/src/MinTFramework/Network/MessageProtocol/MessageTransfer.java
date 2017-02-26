@@ -14,26 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.MessageProtocol;
 
-import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.SendMSG;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class HeaderReponse extends SharingResponse{
-
-    public HeaderReponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
-        super(_rv_packet, _recvmsg);
-    }
-
-    @Override
-    public void getResource() {
-        //get Group Resource
-        getGroupResource();
-    }
-    
+public interface MessageTransfer {
+    /**
+     * Send for Response
+     * @param rv_packet Received Packet
+     * @param ret Response Message
+     * @param responseCode MinT Response Code
+     * @return Send MSG
+     */
+    public SendMSG sendResponse(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode);
+    public void send(SendMSG sendmsg);
+    public ResponseHandler receive(RecvMSG recvmsg);
 }

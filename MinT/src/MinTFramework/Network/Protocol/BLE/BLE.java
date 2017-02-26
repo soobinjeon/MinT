@@ -17,9 +17,9 @@
 package MinTFramework.Network.Protocol.BLE;
 
 import MinTFramework.ExternalDevice.DeviceBLE;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Util.DebugLog;
 
@@ -119,7 +119,7 @@ public class BLE extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(CoAPPacket packet) {
+    protected void sendProtocol(PacketDatagram packet) {
         //System.out.println(packet);
         String dst = setDestination(packet.getNextNode());
         sender.SendMsg(packet, dst);     //send, disconnect, setrole(0)
@@ -133,7 +133,7 @@ public class BLE extends Network {
     }
 
     @Override
-    protected void sendMulticast(CoAPPacket packet) {
+    protected void sendMulticast(PacketDatagram packet) {
         //Do Something
     }
 }

@@ -14,26 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.MessageProtocol;
 
-import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.NetworkProfile;
+import java.util.TreeMap;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class HeaderReponse extends SharingResponse{
-
-    public HeaderReponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
-        super(_rv_packet, _recvmsg);
-    }
-
-    @Override
-    public void getResource() {
-        //get Group Resource
-        getGroupResource();
+public class ReceiveAttribute {
+    private TreeMap<PacketDatagram.ROUTE, NetworkProfile> routelist = null;
+    private String message = null;
+    
+    public ReceiveAttribute(TreeMap<PacketDatagram.ROUTE, NetworkProfile> rlist, String msg){
+        routelist = rlist;
+        message = msg;
     }
     
+    public TreeMap<PacketDatagram.ROUTE, NetworkProfile> getRouteList(){
+        return routelist;
+    }
+    
+    public String getMessage(){
+        return message;
+    }
 }

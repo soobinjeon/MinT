@@ -17,9 +17,9 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
@@ -67,8 +67,8 @@ public class UDP extends Network {
     
     private final DebugLog log = new DebugLog("UDP.java");
     
-    private BlockingQueue<CoAPPacket> sendPacketQueue;
-    private BlockingQueue<CoAPPacket> sendMultiCastQueue;
+    private BlockingQueue<PacketDatagram> sendPacketQueue;
+    private BlockingQueue<PacketDatagram> sendMultiCastQueue;
 
     /**
      * UDP communication structure
@@ -168,7 +168,7 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(CoAPPacket packet) throws IOException {
+    protected void sendProtocol(PacketDatagram packet) throws IOException {
         sendPacketQueue.add(packet);
 
         //if Data Packet
@@ -183,7 +183,7 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendMulticast(CoAPPacket packet) {
+    protected void sendMulticast(PacketDatagram packet) {
         sendMultiCastQueue.add(packet);
 //        try {
 //            //send to CoAP Group Address with CoAP port
@@ -263,11 +263,11 @@ public class UDP extends Network {
     protected void interrupt() {
     }
     
-    public BlockingQueue<CoAPPacket> getSendPacketQueue(){
+    public BlockingQueue<PacketDatagram> getSendPacketQueue(){
         return sendPacketQueue;
     }
     
-    public BlockingQueue<CoAPPacket> getSendMulticastQueue(){
+    public BlockingQueue<PacketDatagram> getSendMulticastQueue(){
         return sendMultiCastQueue;
     }
 }
