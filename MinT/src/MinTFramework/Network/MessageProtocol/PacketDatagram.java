@@ -18,6 +18,7 @@ package MinTFramework.Network.MessageProtocol;
 
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
 import java.util.TreeMap;
 
@@ -35,8 +36,19 @@ public abstract class PacketDatagram {
     
     protected TreeMap<ROUTE, NetworkProfile> routelist= null;
     
-    protected enum ROUTE{
+    protected ROLE_DIRECTION role_direction = null;
+    protected MinTMessageCode messageCode = null;
+    protected ResponseHandler reshandler = null;
+    
+    public static enum ROUTE{
         SOURCE, PREV, NEXT, DESTINATION;
+    }
+    
+    public static enum ROLE_DIRECTION{
+        REQUEST, RESPONSE;
+
+        public boolean isRequest() { return this == REQUEST; }
+        public boolean isResponse() { return this == RESPONSE; }
     }
     
     protected SendMSG sendMsg = null;
@@ -71,6 +83,23 @@ public abstract class PacketDatagram {
     
     protected abstract ReceiveAttribute makeReceivedPacket(RecvMSG recvmsg); 
     protected abstract SendAttribute makeSendedPacket(); 
+    protected abstract ROLE_DIRECTION setRoleDirection();
+    protected abstract MinTMessageCode setRoleClass();
+    
+    public void setRole() {
+        role_direction = setRoleDirection();
+        messageCode = setRoleClass();
+    }
+    
+    /**
+     * Fix me
+     * Recognize Application Protocol from packet
+     * @param recvbytes
+     * @return 
+     */
+    public static ApplicationProtocol recognizeAP(byte[] recvbytes) {
+        return ApplicationProtocol.COAP;
+    }
     
     /**
      * Make Data Packet
@@ -86,7 +115,7 @@ public abstract class PacketDatagram {
      * e.g.) COAP, MQTT, and so on
      * @return Message protocol type
      */
-    public ApplicationProtocol getMessageProtocolType(){
+    public ApplicationProtocol getApplicationProtocol(){
         return ptype;
     }
     
@@ -132,6 +161,14 @@ public abstract class PacketDatagram {
         return message;
     }
     
+    public ROLE_DIRECTION getRoleDirection(){
+        return role_direction;
+    }
+    
+    public MinTMessageCode getMessageCode(){
+        return messageCode;
+    }
+    
     /**
      * is this packet is received from other node.
      * @return true if, false else
@@ -158,5 +195,13 @@ public abstract class PacketDatagram {
     
     public SendMSG getSendMSG(){
         return sendMsg;
+    }
+    
+    public void setRecvHandler(ResponseHandler _resHandler) {
+        reshandler = _resHandler;
+    }
+    
+    public ResponseHandler getRecvHandler(){
+        return reshandler;
     }
 }

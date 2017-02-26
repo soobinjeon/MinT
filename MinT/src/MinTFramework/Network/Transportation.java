@@ -16,7 +16,6 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
@@ -66,29 +65,22 @@ public class Transportation implements NetworkLayers {
 
     @Override
     public void Receive(RecvMSG recvMsg) {
-        CoAPPacket packet = recvMsg.getPacketDatagram();
+        PacketDatagram packet = recvMsg.getPacketDatagram();
 //        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getMSGID());
 //            System.out.println(", sender IP : "+packet.getSource().getAddress());
         if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
 //            System.out.println("PayLoad: "+packet.getMsgData());
             
-//            if(packet.getHeader_Code().isRequest()){
-//                
-//            }else if(packet.getHeader_Code().isResponse()){
-//                
-//            }
+            recvMsg.setRecvHandler(recvMsg.getApplicationProtocol().getMessageManager().receive(recvMsg));
              
             if (isRouting(receivemsg)) {
-                routing.routingHandle(packet, receivemsg);
+                routing.routingHandle(recvMsg);
             } else if (isSharing(receivemsg)) {
-                sharing.sharingHandle(packet, receivemsg);
+                sharing.sharingHandle(recvMsg);
             } else {
-                syshandle.startHandle(packet, receivemsg);
+                syshandle.startHandle(recvMsg);
             }
-            
-            packet.getMessageProtocolType().getMessageManager().receive(recvMsg);
-            
         } else {
             stopOver(packet);
         }
@@ -124,7 +116,7 @@ public class Transportation implements NetworkLayers {
      *
      * @param packet
      */
-    private void stopOver(CoAPPacket packet) {
+    private void stopOver(PacketDatagram packet) {
 
     }
 
@@ -133,7 +125,7 @@ public class Transportation implements NetworkLayers {
         //Find Final Destination from Routing
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
-        CoAPPacket npacket = null;
+        PacketDatagram npacket = null;
         
         //Process for each Application Protocol
         sendmsg.getApplicationProtocol().getMessageManager().send(sendmsg);
@@ -143,9 +135,8 @@ public class Transportation implements NetworkLayers {
         if (npacket != null) {
             //send packet
             Send(npacket);
-        } else{
+        } else
             System.out.println("TRANSPOTATION.JAVA: Send error, npacket is null");
-        }
 
         return npacket;
     }

@@ -21,13 +21,14 @@ import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.util.concurrent.ScheduledFuture;
+import MinTFramework.Network.MessageProtocol.APImpl;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class SendMSG implements Runnable{
+public class SendMSG implements Runnable, APImpl{
     private ApplicationProtocol appprotocolType = null;
     
     //for CoAP
@@ -245,8 +246,19 @@ public class SendMSG implements Runnable{
         return this.retransmissionHandle;
     }
 
+    @Override
     public ApplicationProtocol getApplicationProtocol() {
         return appprotocolType;
+    }
+
+    @Override
+    public SendMSG getSendMSG() {
+        return this;
+    }
+
+    @Override
+    public RecvMSG getRecvMSG() {
+        return null;
     }
     
 }

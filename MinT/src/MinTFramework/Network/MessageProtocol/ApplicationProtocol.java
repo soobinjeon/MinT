@@ -17,6 +17,7 @@
 package MinTFramework.Network.MessageProtocol;
 
 import MinTFramework.Network.MessageProtocol.coap.CoAPManager;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 
 /**
  *
@@ -39,4 +40,29 @@ public enum ApplicationProtocol {
     
     public boolean isCOAP(){ return this == COAP;}
     public boolean isMQTT(){ return this == MQTT;}
+
+    /**
+     * 아 sendmsg recvmsg를 고치지 않는 이상 해결되지 않겠다...
+     * get Datagram from Send Message
+     * @param sendmsg
+     * @return 
+     */
+    public PacketDatagram newPacketDatagram(APImpl ap_protocol) {
+        PacketDatagram packet = null;
+        switch(ap_protocol.getApplicationProtocol()){
+            case COAP:
+                if (ap_protocol.getSendMSG() != null)
+                    packet = new CoAPPacket(ap_protocol.getSendMSG());
+                else
+                    packet = new CoAPPacket(ap_protocol.getRecvMSG());
+                break;
+            case MQTT:
+                packet = null;
+                break;
+            default:
+                packet = null;
+                break;
+        }
+        return packet;
+    }
 }

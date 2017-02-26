@@ -16,7 +16,7 @@
  */
 package MinTFramework.Network.sharing.routingprotocol;
 
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.Resource;
@@ -82,13 +82,13 @@ public class ExecuteRouting extends Phase implements Callable{
     }
 
     @Override
-    public void requestHandle(CoAPPacket rv_packet, Request req) {
+    public void requestHandle(PacketDatagram rv_packet, Request req) {
         if(!isWorkingPhase())
             return;
     }
 
     @Override
-    public void responseHandle(CoAPPacket rv_packet, Request req) {
+    public void responseHandle(PacketDatagram rv_packet, Request req) {
         if(!isWorkingPhase())
             return;
     }

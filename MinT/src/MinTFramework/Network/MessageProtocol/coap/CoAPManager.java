@@ -17,10 +17,9 @@
 package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.RecvMSG;
-import MinTFramework.Network.Resource.ReceiveMessage;
-import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
@@ -49,10 +48,10 @@ public class CoAPManager implements MessageTransfer{
     }
     
     @Override
-    public SendMSG sendREsponse(PacketDatagram rv_pkt, SendMessage ret) {
+    public SendMSG sendResponse(PacketDatagram rv_pkt, SendMessage ret, MinTMessageCode responseCode) {
         SendMSG res_msg = null;
         CoAPPacket rvpacket = (CoAPPacket)rv_pkt;
-        CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(ret.getMessageCode().getCode());
+        CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode());
         
         if (rvpacket.getHeader_Type().isCON()) {
             res_msg = SEND_PIGGYBACK_ACK(rvpacket, (SendMessage) ret, hcode);
@@ -102,6 +101,46 @@ public class CoAPManager implements MessageTransfer{
 //            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
 //                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
         return new SendMSG(rv_packet, CoAPPacket.HEADER_TYPE.NON, hcode, ret);
+    }
+    
+    @Override
+    public void send(SendMSG sendmsg) {
+        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
+            //check resend information
+            sendmsg.setResKey(getIDMaker().makeToken());
+            
+            //message id
+            sendmsg.setMessageID(getIDMaker().makeMessageID());
+
+            putResponse(sendmsg.getResponseKey(), sendmsg);
+        }
+
+        /**
+         * Message Retransmit control
+         */
+        if (sendmsg.getHeader_Type().isCON()){
+            if(sendmsg.getSendHit() == 0){
+                putCONMessage(sendmsg.getMessageID(), sendmsg);
+            }
+            //Start retransmit procedure
+            getCoAPRetransmit().activeRetransmission(sendmsg);
+        }
+    }
+
+    @Override
+    public ResponseHandler receive(RecvMSG recvmsg) {
+        CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
+
+        if (packet.getHeader_Type().isACK()) {
+            checkAck(packet.getMSGID());
+        }
+
+        ResponseHandler reshandle = null;
+        //Run Response Handler for Response Mode
+        if (packet.getHeader_Code().isResponse())
+            reshandle = getResponseDataMatchbyID(packet.getToken());
+        
+        return reshandle;
     }
     
     /**
@@ -166,48 +205,5 @@ public class CoAPManager implements MessageTransfer{
     
     public Retransmission getCoAPRetransmit(){
         return coapretransmit;
-    }
-
-    @Override
-    public void send(SendMSG sendmsg) {
-        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
-            //check resend information
-            sendmsg.setResKey(getIDMaker().makeToken());
-            
-            //message id
-            sendmsg.setMessageID(getIDMaker().makeMessageID());
-
-            putResponse(sendmsg.getResponseKey(), sendmsg);
-        }
-
-        /**
-         * Message Retransmit control
-         */
-        if (sendmsg.getHeader_Type().isCON()){
-            if(sendmsg.getSendHit() == 0){
-                putCONMessage(sendmsg.getMessageID(), sendmsg);
-            }
-            //Start retransmit procedure
-            getCoAPRetransmit().activeRetransmission(sendmsg);
-        }
-    }
-
-    @Override
-    public void receive(RecvMSG recvmsg) {
-        CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
-        ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvmsg);
-        if(packet.getHeader_Type().isACK()){
-            checkAck(packet.getMSGID());
-        }
-        
-        //Run Response Handler for Response Mode
-            if (packet.getHeader_Code().isResponse()) {
-                //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
-                ResponseHandler reshandle = getResponseDataMatchbyID(packet.getToken());
-                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
-                if (reshandle != null) {
-                    reshandle.Response(resdata);
-                }
-            }
     }
 }

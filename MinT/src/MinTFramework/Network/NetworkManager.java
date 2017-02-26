@@ -19,6 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.*;
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
@@ -240,13 +241,14 @@ public class NetworkManager {
      * Send for Response
      * @param rv_packet
      * @param ret 
+     * @param responseCode MinT Response Code
      */
-    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret){
-        MessageTransfer tr = rv_packet.getMessageProtocolType().getMessageManager();
+    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode){
+        MessageTransfer tr = rv_packet.getApplicationProtocol().getMessageManager();
         if(tr == null)
-            System.err.println("Message Transfer is null - "+rv_packet.getMessageProtocolType());
+            System.err.println("Message Transfer is null - "+rv_packet.getApplicationProtocol());
         else
-            SEND(tr.sendREsponse(rv_packet, ret));
+            SEND(tr.sendResponse(rv_packet, ret, responseCode));
     }
     
     /**

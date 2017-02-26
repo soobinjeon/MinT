@@ -18,6 +18,7 @@ package MinTFramework.Network.MessageProtocol;
 
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
 
 /**
@@ -26,7 +27,14 @@ import MinTFramework.Network.SendMSG;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public interface MessageTransfer {
-    public SendMSG sendREsponse(PacketDatagram rv_packet, SendMessage ret);
+    /**
+     * Send for Response
+     * @param rv_packet Received Packet
+     * @param ret Response Message
+     * @param responseCode MinT Response Code
+     * @return Send MSG
+     */
+    public SendMSG sendResponse(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode);
     public void send(SendMSG sendmsg);
-    public void receive(RecvMSG recvmsg);
+    public ResponseHandler receive(RecvMSG recvmsg);
 }

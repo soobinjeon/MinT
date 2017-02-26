@@ -17,6 +17,7 @@
 package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.Network.MessageProtocol.ApplicationProtocol;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.MessageProtocol.ReceiveAttribute;
 import MinTFramework.Network.MessageProtocol.SendAttribute;
@@ -101,7 +102,6 @@ public class CoAPPacket extends PacketDatagram {
         if(this.h_tkl != 0){
             tkn = _smsg.getResponseKey();
         }
-        
     }
     
 //    /**
@@ -300,6 +300,35 @@ public class CoAPPacket extends PacketDatagram {
 //        System.out.println("DEST : "+routelist.get(ROUTE.DESTINATION).getProfile());
 //        System.out.println("msg : "+data);
         return new ReceiveAttribute(routelist, data);
+    }
+    
+    @Override
+    protected ROLE_DIRECTION setRoleDirection() {
+        if(getHeader_Code().isRequest())
+            return ROLE_DIRECTION.REQUEST;
+        else
+            return ROLE_DIRECTION.RESPONSE;
+    }
+
+    @Override
+    protected MinTMessageCode setRoleClass() {
+        return MinTMessageCode.getHeaderCode(h_code.getCode());
+//        switch(h_code){
+//            case GET:
+//                return MinTMessageCode.GET;
+//            case POST:
+//                return MinTMessageCode.POST;
+//            case PUT:
+//                return MinTMessageCode.PUT;
+//            case DELETE:
+//                return MinTMessageCode.DELETE;
+//            case CONTENT:
+//                return MinTMessageCode.CONTENT;
+//            case CHANGED:
+//                return MinTMessageCode.CHANGED;
+//            default :
+//                return MinTMessageCode.EMPTY;
+//        }
     }
     
     public int getHeader_Version(){

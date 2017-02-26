@@ -14,13 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.MessageProtocol.coap;
+package MinTFramework.Network.MessageProtocol;
+
+import MinTFramework.Network.RecvMSG;
+import MinTFramework.Network.SendMSG;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class CoAPResponseHandler {
-    
+public interface APImpl {
+    public ApplicationProtocol getApplicationProtocol();
+    //fix me 아 고치기 개귀찮....
+    public SendMSG getSendMSG();
+    public RecvMSG getRecvMSG();
 }
