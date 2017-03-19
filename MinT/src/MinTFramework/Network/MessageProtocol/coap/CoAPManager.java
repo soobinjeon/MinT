@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.MessageProtocol.coap;
 
+import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
@@ -32,8 +33,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CoAPManager implements MessageTransfer{
     //Message Response List
-    private final ConcurrentHashMap<Short, SendMSG> ResponseList = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<Short, SendMSG> ResponseList = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
+    //private final ConcurrentHashMap<String,ConcurrentHashMap<Short,SendMSG>> nodeidlist = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,SendMSG> idlist = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,SendMSG> tknlist = new ConcurrentHashMap<>();
+//    private final ConcurrentHashMap<String,ConcurrentHashMap<Short,SendMSG>> tknlist = new ConcurrentHashMap<>();
+    private final String MULTICAST_NODE_NAME = "MULTICASTNODE";
     private PacketIDManager idmaker;
 
     //CoAP Protocol
@@ -41,7 +47,8 @@ public class CoAPManager implements MessageTransfer{
     private Retransmission coapretransmit = null;
     
     public CoAPManager(){
-        idmaker = new PacketIDManager(IDList, ResponseList);
+        //idmaker = new PacketIDManager(IDList, ResponseList);
+        idmaker = new PacketIDManager(idlist, tknlist);
         
         coapleisure = new CoAPLeisure();
         coapretransmit = new Retransmission();
@@ -51,6 +58,7 @@ public class CoAPManager implements MessageTransfer{
     public SendMSG sendResponse(PacketDatagram rv_pkt, SendMessage ret, MinTMessageCode responseCode) {
         SendMSG res_msg = null;
         CoAPPacket rvpacket = (CoAPPacket)rv_pkt;
+        System.out.println("CODE : "+CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode()));
         CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode());
         
         if (rvpacket.getHeader_Type().isCON()) {
@@ -58,8 +66,8 @@ public class CoAPManager implements MessageTransfer{
         } else {
             res_msg = SEND_SEPERATED_RESPONSE(rvpacket, (SendMessage) ret, hcode);
         }
-        
-        if(res_msg != null){
+        System.out.println("CoAPManager / sendresponse : "+rv_pkt.getSource().getAddress()+"//"+(MinT.getInstance().getNodeName()));
+        if(res_msg != null && !rv_pkt.getSource().getAddress().equals(MinT.getInstance().getNodeName())){
             if(res_msg.isResponseforMulticast()){
                 coapleisure.putLeisureScheduler(res_msg);
                 return null;
@@ -105,25 +113,41 @@ public class CoAPManager implements MessageTransfer{
     
     @Override
     public void send(SendMSG sendmsg) {
-        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
-            //check resend information
-            sendmsg.setResKey(getIDMaker().makeToken());
+        if (sendmsg.isUDPMulticastMode()){
+            sendmsg.setResKey(getIDMaker().makeToken(MULTICAST_NODE_NAME));
             
             //message id
-            sendmsg.setMessageID(getIDMaker().makeMessageID());
-
+            //sendmsg.setMessageID(getIDMaker().makeMessageID());
+            sendmsg.setMessageID(getIDMaker().makeMessageID(MULTICAST_NODE_NAME));
+            
             putResponse(sendmsg.getResponseKey(), sendmsg);
+        }
+        else if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
+            //check resend information
+            sendmsg.setResKey(getIDMaker().makeToken(sendmsg.getDestination().getAddress()));
+            
+            //message id
+            //sendmsg.setMessageID(getIDMaker().makeMessageID());
+            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg.getDestination().getAddress()));
+            
+            putResponse(sendmsg.getResponseKey(), sendmsg);
+            
         }
 
         /**
          * Message Retransmit control
          */
-        if (sendmsg.getHeader_Type().isCON()){
-            if(sendmsg.getSendHit() == 0){
+        if (sendmsg.getHeader_Type().isCON()) {
+
+            if (sendmsg.getSendHit() == 0) {
                 putCONMessage(sendmsg.getMessageID(), sendmsg);
             }
+
             //Start retransmit procedure
             getCoAPRetransmit().activeRetransmission(sendmsg);
+        }
+        else if(sendmsg.getHeader_Type().isNON()){
+            putCONMessage(sendmsg.getMessageID(), sendmsg);
         }
     }
 
@@ -131,13 +155,14 @@ public class CoAPManager implements MessageTransfer{
     public ResponseHandler receive(RecvMSG recvmsg) {
         CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
         if (packet.getHeader_Type().isACK()) {
-            checkAck(packet.getMSGID());
+            //checkAck(packet.getMSGID());
+            checkAck(packet);
         }
 
         ResponseHandler reshandle = null;
         //Run Response Handler for Response Mode
         if (packet.getHeader_Code().isResponse())
-            reshandle = getResponseDataMatchbyID(packet.getToken());
+            reshandle = getResponseDataMatchbyID(packet.getSource().getAddress(), packet.getToken());
         return reshandle;
     }
     
@@ -153,54 +178,83 @@ public class CoAPManager implements MessageTransfer{
     /**
      * get Response Data matched by Response ID
      *
-     * @param num
+     * @param src
+     * @param tkn
      * @return
      */
-    public ResponseHandler getResponseDataMatchbyID(short num) {
-        SendMSG smsg = ResponseList.get(num);
-        if (smsg == null) {
+    public ResponseHandler getResponseDataMatchbyID(String src, short tkn) {
+        if (tknlist.containsKey(src+"#"+tkn)) {
+            SendMSG smsg = tknlist.get(src+"#"+tkn);
+            if (smsg == null) {
+                return null;
+            }
+            ResponseHandler resd = smsg.getResponseHandler();
+            if (resd != null) {
+                System.out.println("Token removed : "+tkn);
+                tknlist.remove(src+"#"+tkn);
+            }
+            return resd;
+            
+        } else if (tknlist.containsKey(MULTICAST_NODE_NAME+"#"+tkn)) {
+            System.out.println("Multicast response received!");
+            SendMSG smsg = tknlist.get(MULTICAST_NODE_NAME+"#"+tkn);
+            if (smsg == null) {
+                return null;
+            }
+            ResponseHandler resd = smsg.getResponseHandler();
+            return resd;
+        } else {
             return null;
         }
-        ResponseHandler resd = smsg.getResponseHandler();
-        if (resd != null) {
-            ResponseList.remove(num);
-        }
-        return resd;
     }
 
-    public void checkAck(short id) {
-        SendMSG smsg = IDList.get(id);
-        if (smsg == null) {
-            System.out.println("There is No message ID: "+id);
-            return;
+    public void checkAck(CoAPPacket recvpkt){
+        SendMSG smsg;
+        String key = recvpkt.getSource().getAddress()+"#"+recvpkt.getMSGID();
+        
+        if (idlist.containsKey(key)) {
+
+            smsg = idlist.get(key);
+            if (smsg == null) {
+                System.out.println("There is No Key value : "+ key);
+                return;
+            }
+            smsg.setRetransmissionHandle(null);
+            //@FIXME ACK나 RESPONSE를 받으면 지워지도록 수정되어야 하나?
+            //tmpidlist.remove(id);
+        } else {
+            System.out.println("There is No Key value : "+ key);
         }
-        smsg.setRetransmissionHandle(null);
-        IDList.remove(id);
     }
-    
+
     /**
      * get Response Msg List
      *
      * @return
      */
-    public ConcurrentHashMap<Short, SendMSG> getResponseList() {
-        synchronized (ResponseList) {
-            return ResponseList;
+    public ConcurrentHashMap<String, SendMSG> getResponseList() {
+        synchronized (tknlist) {
+            return tknlist;
         }
     }
     
     public void putResponse(short responseKey, SendMSG sendmsg) {
-        ResponseList.put(responseKey, sendmsg);
+        if (sendmsg.isUDPMulticastMode()) { //멀티케스트일경우 노드의 이름을 멀티케스트 노드로 고정
+            tknlist.put(MULTICAST_NODE_NAME + "#" + responseKey, sendmsg);
+        } else {
+            tknlist.put(sendmsg.getDestination().getAddress() + "#" + responseKey, sendmsg);
+        }
+
 //        System.out.println("size : "+ResponseList.size());
     }
     public void putCONMessage(short msgID, SendMSG sendmsg){
-        IDList.put(msgID, sendmsg);
+        if(sendmsg.isUDPMulticastMode()){
+            idlist.put(MULTICAST_NODE_NAME+"#"+msgID, sendmsg);
+        } else {
+            idlist.put(sendmsg.getDestination().getAddress()+"#"+msgID, sendmsg);
+        }
     }
 
-    public int getResponseSize() {
-        return ResponseList.size();
-    }
-    
     public Retransmission getCoAPRetransmit(){
         return coapretransmit;
     }

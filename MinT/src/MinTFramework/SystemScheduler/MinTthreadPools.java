@@ -51,7 +51,8 @@ public enum MinTthreadPools {
             , new RejectedExecutionHandlerImpl())),
     ROUTING_PROTOCOL(Executors.newSingleThreadExecutor()), 
     RETRANSMISSION_HANDLE(Executors.newSingleThreadScheduledExecutor()),
-    MULTICAST_LEISURE_HANDLE(Executors.newSingleThreadScheduledExecutor())
+    MULTICAST_LEISURE_HANDLE(Executors.newSingleThreadScheduledExecutor()),
+    PACKETLIFETIME_HANDLE(Executors.newSingleThreadScheduledExecutor()),
     ;
 
     ExecutorService es;

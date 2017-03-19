@@ -43,10 +43,10 @@ public class RecvMSG implements Runnable, APImpl {
     private ResponseHandler resHandler;
     
     public RecvMSG(byte[] recvb, String address, NetworkType type){
-        recvbytes = recvb;
-        address = address;
-        ntype = type;
-        aprotocol = PacketDatagram.recognizeAP(recvbytes);
+        this.recvbytes = recvb;
+        this.address = address;
+        this.ntype = type;
+        this.aprotocol = PacketDatagram.recognizeAP(recvbytes);
     }
     
     public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type, boolean _isMulticast){

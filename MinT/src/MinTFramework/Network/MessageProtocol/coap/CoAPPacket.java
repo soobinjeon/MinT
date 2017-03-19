@@ -505,5 +505,11 @@ public class CoAPPacket extends PacketDatagram {
         static public final float ACK_TIMEOUT_SCALE = 2.0f;
         static public final int MAX_RETRANSMIT = 4;
         static public final float DEFAULT_LEISURE = 5;
+        static public final int MAX_TRANSMIT_SPAN = 45;
+        static public final int MAX_TRANSMIT_WAIT = 93;
+        static public final int MAX_LATENCY = 100;
+        static public final int PROCESSING_DELAY = 2000;
+        static public final int EXCHANGE_LIFETIME = 247;
+        static public final int NON_LIFETIME = 145;
     }
 }

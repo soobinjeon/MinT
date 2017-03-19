@@ -220,7 +220,7 @@ public class NetworkManager {
         if(smsg != null)
             sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
         else
-            System.err.println("SEND MESSAGE null");
+            System.err.println("SEND MESSAGE null or Multicast response!");
     }
     
     
