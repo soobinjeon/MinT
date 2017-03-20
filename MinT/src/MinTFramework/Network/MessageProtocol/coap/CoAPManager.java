@@ -114,21 +114,21 @@ public class CoAPManager implements MessageTransfer{
     @Override
     public void send(SendMSG sendmsg) {
         if (sendmsg.isUDPMulticastMode()){
-            sendmsg.setResKey(getIDMaker().makeToken(MULTICAST_NODE_NAME));
+            sendmsg.setResKey(getIDMaker().makeToken(MULTICAST_NODE_NAME, sendmsg.isUDPMulticastMode()));
             
             //message id
             //sendmsg.setMessageID(getIDMaker().makeMessageID());
-            sendmsg.setMessageID(getIDMaker().makeMessageID(MULTICAST_NODE_NAME));
+            sendmsg.setMessageID(getIDMaker().makeMessageID(MULTICAST_NODE_NAME, sendmsg.getHeader_Type()));
             
             putResponse(sendmsg.getResponseKey(), sendmsg);
         }
         else if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
             //check resend information
-            sendmsg.setResKey(getIDMaker().makeToken(sendmsg.getDestination().getAddress()));
+            sendmsg.setResKey(getIDMaker().makeToken(sendmsg.getDestination().getAddress(), sendmsg.isUDPMulticastMode()));
             
             //message id
             //sendmsg.setMessageID(getIDMaker().makeMessageID());
-            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg.getDestination().getAddress()));
+            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg.getDestination().getAddress(), sendmsg.getHeader_Type()));
             
             putResponse(sendmsg.getResponseKey(), sendmsg);
             

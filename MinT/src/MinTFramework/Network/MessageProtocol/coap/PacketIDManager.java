@@ -17,7 +17,6 @@
 package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
@@ -54,21 +53,25 @@ public class PacketIDManager {
      * @param dst
      * @return 
      */
-    public synchronized short makeToken(String dst) {
+    public synchronized short makeToken(String dst, boolean isMulticast) {
         String key;
         
         do {
             tkn = (short) rand.nextInt(Short.MAX_VALUE);
             key = dst+"#"+tkn;
         } while (tknlist.containsKey(key));
-        
-        System.out.println("Get Destination " + dst + " Make Token : " + tkn);
-        scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new TokenRemoveTask(key), CoAPPacket.CoAPConfig.MAX_TRANSMIT_WAIT*1000);
+        if(isMulticast){
+            System.out.println("MulticastToken Generated!: " + dst + " Make Token : " + tkn);
+            scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new TokenRemoveTask(key), CoAPPacket.CoAPConfig.NON_LIFETIME * 1000);
+        } else {
+            System.out.println("Get Destination " + dst + " Make Token : " + tkn);
+            scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new TokenRemoveTask(key), CoAPPacket.CoAPConfig.MAX_TRANSMIT_WAIT * 1000);
+        }
         
         return tkn;
     }
     
-    public synchronized short makeMessageID(String dst) {
+    public synchronized short makeMessageID(String dst, CoAPPacket.HEADER_TYPE ht) {
         idcycled = false;
         String key;
         
@@ -97,10 +100,15 @@ public class PacketIDManager {
             }
             //return id++;
         }
-        
         idlength.put(dst, id);
-        System.out.println("Get Destination " + dst + " make message ID : " + id);
-        scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.EXCHANGE_LIFETIME*1000);
+        
+        if (ht.isCON()) {
+            System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
+            scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.EXCHANGE_LIFETIME * 1000);
+        } else if(ht.isNON()){
+            System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
+            scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.NON_LIFETIME * 1000);
+        }
         
         return id;
     }
