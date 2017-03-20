@@ -58,7 +58,6 @@ public class CoAPManager implements MessageTransfer{
     public SendMSG sendResponse(PacketDatagram rv_pkt, SendMessage ret, MinTMessageCode responseCode) {
         SendMSG res_msg = null;
         CoAPPacket rvpacket = (CoAPPacket)rv_pkt;
-        System.out.println("CODE : "+CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode()));
         CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode());
         
         if (rvpacket.getHeader_Type().isCON()) {
@@ -66,8 +65,7 @@ public class CoAPManager implements MessageTransfer{
         } else {
             res_msg = SEND_SEPERATED_RESPONSE(rvpacket, (SendMessage) ret, hcode);
         }
-        System.out.println("CoAPManager / sendresponse : "+rv_pkt.getSource().getAddress()+"//"+(MinT.getInstance().getNodeName()));
-        if(res_msg != null && !rv_pkt.getSource().getAddress().equals(MinT.getInstance().getNodeName())){
+        if(res_msg != null){
             if(res_msg.isResponseforMulticast()){
                 coapleisure.putLeisureScheduler(res_msg);
                 return null;

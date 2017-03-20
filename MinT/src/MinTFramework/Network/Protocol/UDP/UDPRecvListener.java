@@ -6,6 +6,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.RecvMSG;
@@ -106,7 +107,13 @@ public class UDPRecvListener extends Thread{
             fwdbyte = new byte[req.limit()];
             req.get(fwdbyte, 0, req.limit());
             //System.out.println("recv: "+new String(fwdbyte) + ", "+fwdbyte.length+", key: "+key.toString());
-            udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP, isUDPMulticast(key)));
+            String addr = rd.toString().substring(1);
+            String[] ipaddr = addr.split(":");
+            if(!ipaddr[0].equals(MinTConfig.IP_ADDRESS)){
+                udp.putReceiveHandler(new RecvMSG(fwdbyte,rd, NetworkType.UDP, isUDPMulticast(key)));
+            } else {
+                //System.out.println("Source of receved Packet is from me!");
+            }
         }catch(ClosedByInterruptException e){
             System.out.println("Thread Stop Interrupt - ClosedByInterruptException");
             e.printStackTrace();

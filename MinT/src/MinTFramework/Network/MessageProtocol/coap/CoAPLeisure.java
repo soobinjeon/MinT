@@ -17,6 +17,7 @@
 package MinTFramework.Network.MessageProtocol.coap;
 
 import MinTFramework.MinT;
+import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.MinTthreadPools;
@@ -37,9 +38,14 @@ public class CoAPLeisure {
     private float default_leisure = CoAPPacket.CoAPConfig.DEFAULT_LEISURE;
     private long leisure = 0;
     private Random rand;
+    private int seed = 0;
     
-    public CoAPLeisure(){
-        rand = new Random(LocalTime.now().getSecond());
+    public CoAPLeisure(){    
+        String[] n = MinTConfig.IP_ADDRESS.split("\\.");
+        for(String tmp : n){
+            seed+=Integer.parseInt(tmp);
+        }
+        rand = new Random(seed);
         leisure = (long)(default_leisure*1000);
     }
     
