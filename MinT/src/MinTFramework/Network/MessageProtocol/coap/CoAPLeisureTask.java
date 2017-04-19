@@ -14,26 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.MessageProtocol.coap;
 
-import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.MinT;
+import MinTFramework.Network.NetworkManager;
+import MinTFramework.Network.SendMSG;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class HeaderReponse extends SharingResponse{
-
-    public HeaderReponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
-        super(_rv_packet, _recvmsg);
+public class CoAPLeisureTask implements Runnable{
+    private SendMSG sendmsg = null;
+    private MinT mint = MinT.getInstance();
+    private NetworkManager nmanager = null;
+    
+    public CoAPLeisureTask(SendMSG _msg){
+        sendmsg = _msg;
+        nmanager = mint.getNetworkManager();
     }
 
     @Override
-    public void getResource() {
-        //get Group Resource
-        getGroupResource();
+    public void run() {
+        System.out.println("send leisure Data to "+sendmsg.getDestination().getAddress());
+        
+        nmanager.SEND(sendmsg);
     }
     
 }

@@ -14,26 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
-
-import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.Resource.ReceiveMessage;
+package MinTFramework.Network.MessageProtocol;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class HeaderReponse extends SharingResponse{
-
-    public HeaderReponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg) {
-        super(_rv_packet, _recvmsg);
-    }
-
-    @Override
-    public void getResource() {
-        //get Group Resource
-        getGroupResource();
+public class SendAttribute {
+    private byte[] packetmsg = null;
+    
+    public SendAttribute(byte[] packetmessage){
+        packetmsg = packetmessage;
     }
     
+    public byte[] getPacketMessage(){
+        return packetmsg;
+    }
 }

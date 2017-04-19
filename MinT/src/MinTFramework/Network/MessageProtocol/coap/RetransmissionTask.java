@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network;
+package MinTFramework.Network.MessageProtocol.coap;
 
-import MinTFramework.MinTConfig;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
+import MinTFramework.Network.SendMSG;
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.Date;
 
 /**
  *
@@ -29,29 +29,31 @@ import java.util.Date;
  */
 public class RetransmissionTask implements Runnable{
     private SendMSG msg;
-    private Transportation translayer;
     int transmissionCount;
+    private MinT mint = MinT.getInstance();
+    
     public RetransmissionTask(){}
-    public RetransmissionTask(SendMSG msg, Transportation translayer){
+    public RetransmissionTask(SendMSG msg){
         this.msg = msg;
-        this.translayer = translayer;
         this.transmissionCount = 0;
     }
     
     @Override
     public void run() {
 //        System.out.println("####################  Retransmission  #######################");
-//        System.out.println("#  "+Time.valueOf(LocalTime.now())+" / ID: "+msg.getMessageID()+" transmission failed!");
         transmissionCount = msg.getSendHit();
+        System.err.println("#  "+Time.valueOf(LocalTime.now())+" / Dst: "+msg.getDestination().getAddress()+" , ID: "+msg.getMessageID()+" transmission failed! ("+transmissionCount+")");
+//        System.err.println("msg: "+msg.Message());
         if(transmissionCount <= CoAPPacket.CoAPConfig.MAX_RETRANSMIT){
 //            System.out.println("#   Message ID : "+ msg.getMessageID());
 //            System.out.println("#   Reransmission Count : "+msg.getSendHit());
 //            System.out.println("#   Current Timeout : "+msg.getCurrentTimeout()/1000.0f);
             
-            translayer.EndPointSend(msg);
+            
+            mint.getNetworkManager().SEND(msg);
             
         } else{
-//            System.out.println("# "+msg.getMessageID()+" message is abandonced");
+            System.out.println("# "+msg.getMessageID()+" message is abandonced");
         }
 //        System.out.println("#############################################################");        
 //        System.out.println(".");

@@ -17,9 +17,9 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkType;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.ThreadsPool.RejectedExecutionHandlerImpl;
 import MinTFramework.Util.DebugLog;
@@ -57,7 +57,7 @@ public class UDP extends Network {
     
     private UDPSender sender;
     private InetSocketAddress isa;
-    private DatagramChannel channel;
+    private DatagramChannel multichannel, unichannel;
     private final int NUMofRecv_Listener_Threads = UDP_NUM_OF_LISTENER_THREADS;
     
     //Group Communication (Multicast)
@@ -67,8 +67,8 @@ public class UDP extends Network {
     
     private final DebugLog log = new DebugLog("UDP.java");
     
-    private BlockingQueue<CoAPPacket> sendPacketQueue;
-    private BlockingQueue<CoAPPacket> sendMultiCastQueue;
+    private BlockingQueue<PacketDatagram> sendPacketQueue;
+    private BlockingQueue<PacketDatagram> sendMultiCastQueue;
 
     /**
      * UDP communication structure
@@ -129,13 +129,20 @@ public class UDP extends Network {
         interf= NetworkInterface.getByInetAddress(inetaddress);
         mulAddress = InetAddress.getByName(MinTConfig.CoAP_MULTICAST_ADDRESS);
         isa = new InetSocketAddress(PORT);
-        channel = DatagramChannel.open(StandardProtocolFamily.INET)
+        //make multicast channel
+        multichannel = DatagramChannel.open(StandardProtocolFamily.INET)
                 .setOption(StandardSocketOptions.SO_REUSEADDR, true)
                 .bind(isa)
                 .setOption(StandardSocketOptions.IP_MULTICAST_IF, interf)
                 .setOption(StandardSocketOptions.IP_MULTICAST_LOOP, false);
-        channel.configureBlocking(false);
-        channel.join(mulAddress, interf);
+        multichannel.configureBlocking(false);
+        multichannel.join(mulAddress, interf);
+        
+        //make unicast channel
+        unichannel = DatagramChannel.open(StandardProtocolFamily.INET)
+                .setOption(StandardSocketOptions.SO_REUSEADDR, true)
+                .bind(isa);
+        unichannel.configureBlocking(false);
         
 //        channel.setOption(StandardSocketOptions.SO_RCVBUF, UDP_RECV_BUFF_SIZE);
     }
@@ -161,7 +168,7 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendProtocol(CoAPPacket packet) throws IOException {
+    protected void sendProtocol(PacketDatagram packet) throws IOException {
         sendPacketQueue.add(packet);
 
         //if Data Packet
@@ -176,7 +183,7 @@ public class UDP extends Network {
      * @param packet 
      */
     @Override
-    protected void sendMulticast(CoAPPacket packet) {
+    protected void sendMulticast(PacketDatagram packet) {
         sendMultiCastQueue.add(packet);
 //        try {
 //            //send to CoAP Group Address with CoAP port
@@ -240,7 +247,7 @@ public class UDP extends Network {
         for(int i=0;i<NUMofRecv_Listener_Threads;i++){
             try {
                 sysSched.submitProcess(UDP_Thread_Pools.UDP_RECV_LISTENER.toString()
-                        , new UDPRecvListener(channel, this));
+                        , new UDPRecvListener(multichannel,unichannel, this));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -256,11 +263,11 @@ public class UDP extends Network {
     protected void interrupt() {
     }
     
-    public BlockingQueue<CoAPPacket> getSendPacketQueue(){
+    public BlockingQueue<PacketDatagram> getSendPacketQueue(){
         return sendPacketQueue;
     }
     
-    public BlockingQueue<CoAPPacket> getSendMulticastQueue(){
+    public BlockingQueue<PacketDatagram> getSendMulticastQueue(){
         return sendMultiCastQueue;
     }
 }

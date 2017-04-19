@@ -16,137 +16,100 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Util.DebugLog;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
-import MinTFramework.storage.ResourceStorage;
 
 /**
  *
  * @author soobisooba
  */
-public class SystemHandler{
-    protected MinT frame;
-    protected ResourceStorage resStorage;
-    protected NetworkManager nmanager;
+public class SystemHandler extends Handler{
     protected RoutingProtocol rout;
     DebugLog dl = new DebugLog("SystemHandler");
     
     public SystemHandler(){
-        this.frame = MinT.getInstance();
-        resStorage = this.frame.getResStorage();
-        nmanager = frame.getNetworkManager();
         rout = nmanager.getRoutingProtocol();
-    }
-    
-    public void startHandle(CoAPPacket recv_pk, ReceiveMessage recvmsg){
-        SystemHandler(recv_pk, recvmsg);
-    }
-    
-    /**
-     * System Handler can handle navigator for 
-     * discovering searched sensor nodes (?) <- would need to routing protocol,
-     * information searching <- need to storages,
-     * ,and so on
-     * @param src
-     * @param msg 
-     */
-    private void SystemHandler(CoAPPacket recv_packet, ReceiveMessage recvmsg){
-        /**
-         * get, post using resource storage
-         */
-        if(recv_packet.getHeader_Code().isRequest()){
-            SystemHandleRequest(recv_packet, recvmsg);
-        }else if(recv_packet.getHeader_Code().isResponse()){
-            SystemHandleResponse(recv_packet, recvmsg);
-        } 
     }
     
     /**
      * Request handle by requesting from other node
+     * @param receivemsg
      * @param rv_packet 
      */
-    private void SystemHandleRequest(CoAPPacket rv_packet, ReceiveMessage recvmsg){
-        if(rv_packet.getHeader_Code().isGet()){
+    @Override
+    protected void HandleRequest(PacketDatagram rv_packet, ReceiveMessage receivemsg){
+        MinTMessageCode responsecode = null;
+        SendMessage ret = null;
+        if(rv_packet.getMessageCode().isGet()){
 //            dl.printMessage("set get");
-            System.out.print("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+//            System.out.print("Catched (GET) by System Handler, " + rv_packet.getSource().getProfile()+", "+rv_packet.getMSGID());
+//            System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("Catched (GET) by System Handler, " + rv_packet.getMsgData());
-            System.out.println(", sender IP : "+rv_packet.getSource().getAddress());
 //            System.out.println("rname: " + req.getResourceName() + ", rd: " + req.getResourceData().getResourceString());
-            SendMessage ret = null;
+            
             //Temporary Routing Discover Mode
-            if (isDiscover(recvmsg)) {
+            if (isDiscover(receivemsg)) {
                 Network cnet = frame.getNetworkManager().getNetwork(rv_packet.getSource().getNetworkType());
                 String redata = resStorage.DiscoverLocalResource(cnet.getProfile()).toJSONString();
                 ret = new SendMessage(null, redata)
                         .AddAttribute(Request.MSG_ATTR.WellKnown, null);
             } else {
                 //Directly
-                ResData res = resStorage.getProperty(recvmsg, Resource.StoreCategory.Local);
+                ResData res = resStorage.getProperty(receivemsg, Resource.StoreCategory.Local);
                 if (res != null) {
                     ret = new SendMessage(null, res.getResourceString());
                 }
             }
-            
-            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
-            /**
-             * @TODO seperate ack and response procedure for when piggyback is not possible
-             */
-            
-            
-        }else if(rv_packet.getHeader_Code().isPut()){
-            resStorage.setInstruction(recvmsg);
-            SendMessage ret = new SendMessage(null, null);
-            //if create -> header create
-            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CREATED);
-            
-            //if changed
-            //nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CHANGED);
-            
-        }else if(rv_packet.getHeader_Code().isPost()){
-            resStorage.setInstruction(recvmsg);
-            SendMessage ret = new SendMessage(null, null);
-            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CREATED);
-        }else if(rv_packet.getHeader_Code().isDelete()){
-            SendMessage ret = new SendMessage(null, null);
-            nmanager.SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.DELETED);
+            if(ret != null)
+                responsecode = MinTMessageCode.CONTENT;
+            else
+                responsecode = MinTMessageCode.EMPTY;
+
+        //FIX it! : 아래 명령어에 대한 명령들이 Set Instruction에 제대로 구현되어 있지 않음!!!!    
+        }else if(rv_packet.getMessageCode().isPut()){
+            resStorage.setInstruction(receivemsg);
+            responsecode = MinTMessageCode.CREATED;
+//            responsecode = MinTMessageCode.CHANGED;
+            ret = new SendMessage(null, responsecode.toString());
+        }else if(rv_packet.getMessageCode().isPost()){
+            resStorage.setInstruction(receivemsg);
+            responsecode = MinTMessageCode.CREATED;
+//            responsecode = MinTMessageCode.CHANGED;
+//            responsecode = MinTMessageCode.DELETED;
+            ret = new SendMessage(null, responsecode.toString());
+        }else if(rv_packet.getMessageCode().isDelete()){
+            resStorage.setInstruction(receivemsg);
+            responsecode = MinTMessageCode.DELETED;
+            ret = new SendMessage(null, responsecode.toString());
         }
+        
+        nmanager.SEND_RESPONSE(rv_packet, ret, responsecode);
     }
     
     /**
      * Response handler when this node receives a response message from other node what is requested by this node.
-     * @param rv_packet 
+     * @param packet
+     * @param receivemsg
      */
-    private void SystemHandleResponse(CoAPPacket rv_packet, ReceiveMessage recvmsg){
-//        ResponseHandler reshandle = nmanager.getResponseDataMatchbyID(rv_packet.getMSGID());
-        if(rv_packet.getHeader_Code().isContent()){
-            if(isDiscover(recvmsg)){
-                try {
-                    ResponseData resdata = new ResponseData(rv_packet, recvmsg.getResourceData().getResource());
-                    resStorage.updateDiscoverData(resdata);
-//                    if (reshandle != null) {
-//                        reshandle.Response(resdata);
-//                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    @Override
+    protected void HandleResponse(PacketDatagram rv_packet, ReceiveMessage receivemsg){
+        //Handle for Discovery action
+        if (isDiscover(receivemsg)) {
+            ResponseData resdata = new ResponseData(rv_packet, receivemsg.getResourceData().getResource());
+            try {
+                resStorage.updateDiscoverData(resdata);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }else if(rv_packet.getHeader_Code().isDeleted()){
-        }else if(rv_packet.getHeader_Code().isValid()){
-        }else if(rv_packet.getHeader_Code().isChanged()){
-        }else if(rv_packet.getHeader_Code().isCreated()){
-        }else if(rv_packet.getHeader_Code().isContinue()){
         }
-        
-//        if(!isDiscover(recvmsg) && reshandle != null)
-//            reshandle.Response(new ResponseData(rv_packet, recvmsg.getResourceData().getResource()));
     }
     
     /**

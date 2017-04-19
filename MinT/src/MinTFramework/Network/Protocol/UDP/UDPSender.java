@@ -17,9 +17,9 @@
 package MinTFramework.Network.Protocol.UDP;
 import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.Util.Benchmarks.Performance;
 import MinTFramework.Util.ByteBufferPool;
 import MinTFramework.Util.DebugLog;
@@ -56,7 +56,7 @@ public class UDPSender implements Runnable {
         ust.checkBench();
         
         while (!Thread.currentThread().isInterrupted()) {
-            CoAPPacket packet = ust.getDatafromQueue();
+            PacketDatagram packet = ust.getDatafromQueue();
             
             if(packet == null){
                 continue;

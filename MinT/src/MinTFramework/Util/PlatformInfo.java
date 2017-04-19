@@ -26,29 +26,29 @@ import java.io.File;
 public class PlatformInfo {
     /**
      * get Usage of Heap Mem
-     * @return SIZE (MB)
+     * @return SIZE (KBytes)
      */
     public static double getUsageMemory(){
         long total = Runtime.getRuntime().totalMemory();
-        return (double) total / (1024 * 1024);
+        return (double) total / Math.pow(1024, 1);
     }
     
     /**
      * get Free of Heap Mem
-     * @return SIZE (MB)
+     * @return SIZE (KBytes)
      */
     public static double getFreeMemory(){
         long free = Runtime.getRuntime().freeMemory();
-        return (double) free / (1024 * 1024);
+        return (double) free / Math.pow(1024, 1);
     }
     
     /**
      * get Max of Heap Mem
-     * @return SIZE (MB)
+     * @return SIZE (KBytes)
      */
     public static double getMaxMemory(){
         long max = Runtime.getRuntime().maxMemory();
-        return (double) max / (1024 * 1024);
+        return (double) max / Math.pow(1024, 1);
     }
     
     /**

@@ -16,8 +16,10 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.APImpl;
+import MinTFramework.Network.MessageProtocol.ApplicationProtocol;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.net.SocketAddress;
 import org.json.simple.parser.JSONParser;
@@ -28,23 +30,30 @@ import org.json.simple.parser.JSONParser;
  *  - 
  * @author soobin
  */
-public class RecvMSG implements Runnable {
+public class RecvMSG implements Runnable, APImpl {
     private NetworkType ntype;
     private byte[] recvbytes;
     private SocketAddress addr;
     private String address;
     private JSONParser jparser;
-    private CoAPPacket receivedPacket = null;
+    private PacketDatagram receivedPacket = null;
+    private boolean isMulticast = false;
+    
+    private ApplicationProtocol aprotocol;
+    private ResponseHandler resHandler;
+    
     public RecvMSG(byte[] recvb, String address, NetworkType type){
-        recvbytes = recvb;
-        address = address;
-        ntype = type;
+        this.recvbytes = recvb;
+        this.address = address;
+        this.ntype = type;
+        this.aprotocol = PacketDatagram.recognizeAP(recvbytes);
     }
     
-    public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type){
+    public RecvMSG(byte[] recvb, SocketAddress prevsocket, NetworkType type, boolean _isMulticast){
         this(recvb, "", type);
         addr = prevsocket;
         address = getIPAddress(addr);
+        isMulticast = _isMulticast;
     }
     
     @Override
@@ -108,15 +117,49 @@ public class RecvMSG implements Runnable {
         return this.address;
     }
     
-    public void setReceivedPacketDatagram(CoAPPacket _packet){
+    public void setReceivedPacketDatagram(PacketDatagram _packet){
         receivedPacket = _packet;
+        receivedPacket.setRole();
     }
     
-    public CoAPPacket getPacketDatagram(){
+    public PacketDatagram getPacketDatagram(){
         return receivedPacket;
     }
     
     public JSONParser getJSONParser(){
         return jparser;
+    }
+    
+    /**
+     * Check for receiving data to multi-cast or uni-cast
+     * @return , true if, false else
+     */
+    public boolean isUDPMulticast(){
+        return isMulticast;
+    }
+
+    @Override
+    public ApplicationProtocol getApplicationProtocol() {
+        return aprotocol;
+    }
+
+    @Override
+    public SendMSG getSendMSG() {
+        return null;
+    }
+
+    @Override
+    public RecvMSG getRecvMSG() {
+        return this;
+    }
+
+    public void setRecvHandler(ResponseHandler receive) {
+        resHandler = receive;
+        if(receivedPacket != null)
+            receivedPacket.setRecvHandler(resHandler);
+    }
+    
+    public ResponseHandler getResponseHandler(){
+        return resHandler;
     }
 }

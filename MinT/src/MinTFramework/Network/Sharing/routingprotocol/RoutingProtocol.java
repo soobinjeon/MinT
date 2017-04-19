@@ -19,8 +19,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
-import MinTFramework.Network.Resource.ReceiveMessage;
+import MinTFramework.Network.RecvMSG;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -142,8 +141,8 @@ public class RoutingProtocol implements Runnable{
         }
     }
 
-    public void routingHandle(CoAPPacket rv_packet, ReceiveMessage recvmsg) {
-        rhandle.receiveHandle(rv_packet, recvmsg);
+    public void routingHandle(RecvMSG recvmsg) {
+        rhandle.startHandle(recvmsg);
     }
 
     private void registPhaseScheduler() {

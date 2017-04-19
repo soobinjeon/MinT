@@ -16,7 +16,8 @@
  */
 package MinTFramework.Network.sharing.routingprotocol;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -52,7 +53,7 @@ public class PhaseDiscover extends Phase{
         try {
             while (!super.isInturrupted() && !Thread.currentThread().isInterrupted()) {
 //                networkmanager.SEND_UDP_Multicast(new SendMessage()
-                frame.REQUEST_POST_MULTICAST(CoAPPacket.HEADER_TYPE.NON, new SendMessage()
+                frame.REQUEST_POST_MULTICAST(new SendMessage()
                         .AddAttribute(Request.MSG_ATTR.Routing, RT_MSG.DIS_BROADCAST.getValue())
                         .AddAttribute(Request.MSG_ATTR.RoutingGroup, routing.getCurrentRoutingGroup())
                         .AddAttribute(Request.MSG_ATTR.RoutingWeight, routing.getCurrentNode().getSpecWeight())
@@ -74,7 +75,7 @@ public class PhaseDiscover extends Phase{
     }
     
     @Override
-    public void requestHandle(CoAPPacket rv_packet, Request req) {
+    public void requestHandle(PacketDatagram rv_packet, Request req) {
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         Information gdata = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         String gn = gdata != null ? gdata.getResourceString() : "";
@@ -96,7 +97,7 @@ public class PhaseDiscover extends Phase{
                         disRole.interrupt();
 
                         SendMessage ret = new SendMessage(null,RT_MSG.DIS_BROADCAST_STOP.getValue());
-                        networkmanager.SEND_RESPONSE(rv_packet, ret);
+                        networkmanager.SEND_RESPONSE(rv_packet, ret, MinTMessageCode.CONTENT);
 //                        networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0, CoAPPacket.HEADER_CODE.CONTENT
 //                                , rv_packet.getSource(), ret, rv_packet.getMSGID()));
                     }
@@ -139,7 +140,7 @@ public class PhaseDiscover extends Phase{
     }
 
     @Override
-    public void responseHandle(CoAPPacket rv_packet, Request req) {
+    public void responseHandle(PacketDatagram rv_packet, Request req) {
     }
     
     private boolean isSameGroup(String gname){

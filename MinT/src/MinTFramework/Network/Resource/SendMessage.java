@@ -24,7 +24,6 @@ import org.json.simple.JSONObject;
  * @author soobin
  */
 public class SendMessage extends Request{
-    
     /**
      * set Request for Sender
      * @param res Resource Name for requesting

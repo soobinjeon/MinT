@@ -17,7 +17,7 @@
 package MinTFramework.Network.Protocol.UDP;
 
 import MinTFramework.MinT;
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Util.Benchmarks.Performance;
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
@@ -91,7 +91,7 @@ public class UDPSendThread extends Thread{
         return isMulticast;
     }
 
-    public CoAPPacket getDatafromQueue() {
+    public PacketDatagram getDatafromQueue() {
         try {
             if (!isMulticast)
                 return udp.getSendPacketQueue().take();

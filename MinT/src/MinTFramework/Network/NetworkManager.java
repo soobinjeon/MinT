@@ -16,8 +16,10 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.*;
+import MinTFramework.Network.MessageProtocol.MessageTransfer;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
@@ -48,6 +50,7 @@ public class NetworkManager {
     private ResourceStorage resourceStorage = null;
     private final ArrayList<NetworkType> networkList;
     private final ConcurrentHashMap<NetworkType, Network> networks;
+//    private final ConcurrentHashMap<MessageProtocol, MessageTransfer> msgprotocols;
     private String NodeName = null;
 
     private RoutingProtocol routing = null;
@@ -57,11 +60,6 @@ public class NetworkManager {
 
     //for Network Recv ByteBuffer
     private ByteBufferPool bytepool = null;
-
-    //Message Response List
-    private final ConcurrentHashMap<Short, SendMSG> ResponseList = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
-    private PacketIDManager idmaker;
 
     //Temporary properties for check
     private Integer tempHandlerCnt = 0;
@@ -77,6 +75,7 @@ public class NetworkManager {
         this.dl = new DebugLog("NetworkManager", true);
         this.networkList = new ArrayList<>();
         this.networks = new ConcurrentHashMap<>();
+//        this.msgprotocols = new ConcurrentHashMap<>();
         this.frame = MinT.getInstance();
         sysSched = frame.getSystemScheduler();
         resourceStorage = frame.getResStorage();
@@ -92,8 +91,14 @@ public class NetworkManager {
         }
 
         makeBytebuffer();
-        idmaker = new PacketIDManager(IDList, ResponseList);
+//        initMessageProtocol();
     }
+    
+//    private void initMessageProtocol(){
+//        for(ApplicationProtocol mp : ApplicationProtocol.values()){
+//            msgprotocols.put(mp, mp.getMessageManager());
+//        }
+//    }
 
     /**
      * Init Routing Algorithm
@@ -212,71 +217,19 @@ public class NetworkManager {
      * @param smsg
      */
     public void SEND(SendMSG smsg) {
-        sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
-    }
-    
-    /**
-     * Send Response Messages
-     * @param rv_packet
-     * @param ret 
-     */
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode) {
-        if (rv_packet.getHeader_Type().isCON()) {
-            SEND_PIGGYBACK_ACK(rv_packet, (SendMessage) ret, headerCode);
-        } else {
-            SEND_SEPERATED_RESPONSE(rv_packet, (SendMessage) ret, headerCode);
-        }
-    }
-    
-    public void SEND_RESPONSE(CoAPPacket rv_packet, SendMessage ret) {
-        SEND_RESPONSE(rv_packet, ret, CoAPPacket.HEADER_CODE.CONTENT);
-    }
-    
-    /**
-     * *
-     * For piggyback acknowledge
-     *
-     * @param rv_packet Receved packet
-     * @param ret
-     */
-    private void SEND_PIGGYBACK_ACK(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode) {
-        // CoAP Piggyback procedure
-        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
-            CoAPPacket cp = (CoAPPacket)rv_packet;
-//            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
-//                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
-            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
-                    headerCode, cp.getSource(), ret, cp.getToken()));
-        } else {
-            //non-CoAP Piggyback procedure
-        }
+        if(smsg != null)
+            sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
+        else
+            System.err.println("SEND MESSAGE null or Multicast response!");
     }
 
-    /**
-     * @TODO implemantation
-     * For separate ack for when piggyback is not possible
-     * @param rv_packet received packet
-     */
-    public void SEND_ACK(CoAPPacket rv_packet) {
-
-    }
-    
-    private void SEND_SEPERATED_RESPONSE(PacketDatagram rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE headerCode){
-        if (rv_packet.getMessageProtocolType() == PacketDatagram.MessageProtocol.COAP) {
-            CoAPPacket cp = (CoAPPacket)rv_packet;
-            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
-                                headerCode, cp.getSource(), ret, cp.getToken()));
-        } else {
-            //For Non-CoAP Procedure
-        }
-    }
-    
     /** @deprecated 
      * 
      * @param requestdata 
      */
     public void SEND_UDP_Multicast(SendMessage requestdata) {
-        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2, CoAPPacket.HEADER_CODE.POST, null, requestdata, true));
+        SEND_Multicast(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 2
+                , CoAPPacket.HEADER_CODE.POST, null, requestdata, null, true));
     }
     
     public void SEND_Multicast(SendMSG smsg) {
@@ -284,14 +237,19 @@ public class NetworkManager {
     }
 
     /**
-     * get PacketID
-     *
-     * @return
+     * Send for Response
+     * @param rv_packet
+     * @param ret 
+     * @param responseCode MinT Response Code
      */
-    public PacketIDManager getIDMaker() {
-        return idmaker;
+    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode){
+        MessageTransfer tr = rv_packet.getApplicationProtocol().getMessageManager();
+        if(tr == null)
+            System.err.println("Message Transfer is null - "+rv_packet.getApplicationProtocol());
+        else
+            SEND(tr.sendResponse(rv_packet, ret, responseCode));
     }
-
+    
     /**
      * set Node Name
      *
@@ -329,33 +287,6 @@ public class NetworkManager {
     }
 
     /**
-     * get Response Data matched by Response ID
-     *
-     * @param num
-     * @return
-     */
-    public ResponseHandler getResponseDataMatchbyID(short num) {
-        SendMSG smsg = ResponseList.get(num);
-        if (smsg == null) {
-            return null;
-        }
-        ResponseHandler resd = smsg.getResponseHandler();
-        if (resd != null) {
-            ResponseList.remove(num);
-        }
-        return resd;
-    }
-
-    public void checkAck(short id) {
-        SendMSG smsg = IDList.get(id);
-        if (smsg == null) {
-            System.out.println("There is No message ID: "+id);
-            return;
-        }
-        smsg.setRetransmissionHandle(null);
-        IDList.remove(id);
-    }
-    /**
      * Temporary Method
      */
     public void setHandlerCount() {
@@ -376,17 +307,6 @@ public class NetworkManager {
 
     public int getSendHandlercnt() {
         return sendHandlerCnt;
-    }
-
-    /**
-     * get Response Msg List
-     *
-     * @return
-     */
-    public ConcurrentHashMap<Short, SendMSG> getResponseList() {
-        synchronized (ResponseList) {
-            return ResponseList;
-        }
     }
 
     /**
@@ -454,17 +374,5 @@ public class NetworkManager {
         } else {
             return false;
         }
-    }
-
-    public void putResponse(short responseKey, SendMSG sendmsg) {
-        ResponseList.put(responseKey, sendmsg);
-//        System.out.println("size : "+ResponseList.size());
-    }
-    public void putCONMessage(short msgID, SendMSG sendmsg){
-        IDList.put(msgID, sendmsg);
-    }
-
-    public int getResponseSize() {
-        return ResponseList.size();
     }
 }

@@ -16,20 +16,14 @@
  */
 package MinTFramework.Network;
 
-import MinTFramework.Network.MessageProtocol.CoAPPacket;
 import MinTFramework.MinT;
+import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.sharing.Sharing;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
-import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.DebugLog;
-import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -45,11 +39,6 @@ public class Transportation implements NetworkLayers {
     private Sharing sharing = null;
     private SystemScheduler scheduler;
     private MatcherAndSerialization serialization = null;
-    private Random rand; //for random timeout
-    private int ack_timeout; //for timeout
-    private float ack_random_factor; //for timeout
-    private float ack_timeout_scale;
-    private ScheduledExecutorService executor;
     
     DebugLog dl = new DebugLog("Transportation");
 //    private Performance bench_send = null;
@@ -59,11 +48,6 @@ public class Transportation implements NetworkLayers {
         this.networkManager = frame.getNetworkManager();
         this.scheduler = frame.getSystemScheduler();
         
-        rand = new Random(CoAPPacket.CoAPConfig.RANDOM_SEED);
-        ack_timeout = CoAPPacket.CoAPConfig.ACK_TIMEOUT;
-        ack_random_factor = CoAPPacket.CoAPConfig.ACK_RANDOM_FACTOR;
-        ack_timeout_scale = CoAPPacket.CoAPConfig.ACK_TIMEOUT_SCALE;
-        
         if (layerDirection == NetworkLayers.LAYER_DIRECTION.RECEIVE) {
             syshandle = new SystemHandler();
             routing = networkManager.getRoutingProtocol();
@@ -72,7 +56,6 @@ public class Transportation implements NetworkLayers {
 
         if (layerDirection == NetworkLayers.LAYER_DIRECTION.SEND) {
             serialization = new MatcherAndSerialization(layerDirection);
-            executor = (ScheduledExecutorService) frame.getSystemScheduler().getRegisteredThread(MinTthreadPools.RETRANSMISSION_HANDLE.toString());
 //            if(frame.isBenchMode()){
 //                bench_send = new PacketPerform("Trans-sender");
 //                frame.addPerformance(MinT.PERFORM_METHOD.Trans_Sender, bench_send);
@@ -82,31 +65,20 @@ public class Transportation implements NetworkLayers {
 
     @Override
     public void Receive(RecvMSG recvMsg) {
-        CoAPPacket packet = recvMsg.getPacketDatagram();
-        if (isMulticast(packet.getDestinationNode()) || isFinalDestination(packet.getDestinationNode())) {
+        PacketDatagram packet = recvMsg.getPacketDatagram();
+//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getPacketString());
+//            System.out.println(", sender IP : "+packet.getSource().getAddress());
+        if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
-//            System.out.println("PayLoad: "+packet.getMsgData());
+            
+            recvMsg.setRecvHandler(recvMsg.getApplicationProtocol().getMessageManager().receive(recvMsg));
+             
             if (isRouting(receivemsg)) {
-                routing.routingHandle(packet, receivemsg);
+                routing.routingHandle(recvMsg);
             } else if (isSharing(receivemsg)) {
-                sharing.sharingHandle(packet, receivemsg);
+                sharing.sharingHandle(recvMsg);
             } else {
-                syshandle.startHandle(packet, receivemsg);
-            }
-            
-            if(packet.getHeader_Type().isACK()){
-                networkManager.checkAck(packet.getMSGID());
-            }
-            
-            //Run Response Handler for Response Mode
-            if (packet.getHeader_Code().isResponse()) {
-                //ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getMSGID());
-                ResponseHandler reshandle = networkManager.getResponseDataMatchbyID(packet.getToken());
-                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
-
-                if (reshandle != null) {
-                    reshandle.Response(resdata);
-                }
+                syshandle.startHandle(recvMsg);
             }
         } else {
             stopOver(packet);
@@ -139,103 +111,33 @@ public class Transportation implements NetworkLayers {
     }
 
     /**
-     * is Multicast Packet with CoAP or UDP
-     *
-     * @param destinationNode
-     * @return
-     */
-    private boolean isMulticast(NetworkProfile destinationNode) {
-        if (destinationNode.getAddress().equals("")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Stop Over Method
      *
      * @param packet
      */
-    private void stopOver(CoAPPacket packet) {
+    private void stopOver(PacketDatagram packet) {
 
     }
 
     @Override
-    public CoAPPacket EndPointSend(SendMSG sendmsg) {
+    public PacketDatagram EndPointSend(SendMSG sendmsg) {
         //Find Final Destination from Routing
         sendmsg.setFinalDestination(getFinalDestination(sendmsg.getDestination()));
         sendmsg.setNextNode(getNextNode(sendmsg.getDestination()));
-        CoAPPacket npacket = null;
-        if (sendmsg.isResponse()) {
-        } else if (sendmsg.isRequest()) {
-        } else if (sendmsg.isRequestGET()) {
-            //check resend information
-            if (sendmsg.getSendHit() == 0) {
-                sendmsg.setResKey(networkManager.getIDMaker().makeToken());
-                networkManager.putResponse(sendmsg.getResponseKey(), sendmsg);
-            }            
-        }
-
-        npacket = serialization.EndPointSend(sendmsg);
+        PacketDatagram npacket = null;
         
-        if (sendmsg.getHeader_Type().isCON()){
-            if(sendmsg.getSendHit() == 0){
-                networkManager.putCONMessage(sendmsg.getMessageID(), sendmsg);
-            }
-            //Start retransmit procedure
-            RetransmissionTask task = new RetransmissionTask(sendmsg, this);
-            prepareRetransmission(sendmsg, task);
-            sendmsg.Sended();
-            //prepareRetransmission(sendmsg, )
-        }
+        //Process for each Application Protocol
+        sendmsg.getApplicationProtocol().getMessageManager().send(sendmsg);
+        
+        npacket = serialization.EndPointSend(sendmsg);
         
         if (npacket != null) {
             //send packet
             Send(npacket);
-        } else{
+        } else
             System.out.println("TRANSPOTATION.JAVA: Send error, npacket is null");
-        }
 
         return npacket;
-    }
-    /***
-     * Register retransmission task to the MinT scheduler and SendMSG
-     * @param msg CON msg
-     * @param task Retransmission task
-     */
-    private void prepareRetransmission(SendMSG msg, RetransmissionTask task){
-        //scheduler.submitProcess(MinTthreadPools.RETRANSMISSION_HANDLE, task);
-        if(executor.isShutdown()){
-//            System.out.println("Transpotation.java : Retransmission executor is shutdown!");
-            return;
-        }
-        
-        long timeout;
-
-        if (msg.getSendHit() == 0) {
-            timeout = getRandomTimeout(ack_timeout, (int) (ack_timeout * ack_random_factor));
-        } else {
-            timeout = (int) ack_timeout_scale * msg.getCurrentTimeout();
-        }
-        
-        msg.setCurrentTimeout(timeout);
-        ScheduledFuture<?> f = executor.schedule(task, timeout, TimeUnit.MILLISECONDS);
-        msg.setRetransmissionHandle(f);
-    }
-
-    /***
-     * Get Random value between min and max
-     *
-     * @param min
-     * @param max
-     * @return Random value between min and max
-     */
-    private long getRandomTimeout(final int min, final int max) {
-        if (min == max) {
-            return min;
-        }
-        return min + rand.nextInt(max - min);                
     }
     
     /**
@@ -274,7 +176,7 @@ public class Transportation implements NetworkLayers {
      * @param packet
      */
     @Override
-    public void Send(CoAPPacket packet) {
+    public void Send(PacketDatagram packet) {
         try {
             //For Group Message
             if (packet.getSendMSG().isUDPMulticastMode()) {
@@ -294,7 +196,7 @@ public class Transportation implements NetworkLayers {
         }
     }
 
-    private void MakeSourceProfile(CoAPPacket packet, Network sendNetwork) {
+    private void MakeSourceProfile(PacketDatagram packet, Network sendNetwork) {
         //Send Message
         if (sendNetwork != null) {
             //set Source Node
@@ -317,4 +219,5 @@ public class Transportation implements NetworkLayers {
     @Override
     public void EndPointReceive(RecvMSG packet) {
     }
+
 }
