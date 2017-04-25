@@ -130,6 +130,7 @@ public class Sharing {
             Node header = routingprotocol.getHeaderNodeofCurrentNode();
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
             frame.REQUEST_GET(header.gettoAddr().setCON(true), requestdata, resHandle);
+//            frame.REQUEST_GET_MULTICAST(requestdata, resHandle);
         }
     }
     

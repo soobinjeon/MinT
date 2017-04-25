@@ -26,6 +26,7 @@ import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.CurrentNode;
 import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.sharing.node.NodeSpecify;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResourceStorage;
@@ -69,7 +70,7 @@ public class RoutingProtocol implements Runnable{
         routingtable = new RoutingTable();
         phases = new ConcurrentHashMap<>();
         if(currentNode == null)
-            currentNode = new CurrentNode(null, null, false, Platforms.NONE, groupName);
+            currentNode = new CurrentNode(null, null, false, new NodeSpecify(Platforms.NONE), groupName);
         registPhaseScheduler();
         if(resStorage == null)
             System.out.println("res Storage null");
@@ -115,9 +116,9 @@ public class RoutingProtocol implements Runnable{
         return isHeaderNode;
     }
     
-    public void setRoutingProtocol(String _groupName, Platforms platforms){
+    public void setRoutingProtocol(String _groupName, NodeSpecify ns){
         setRoutingProtocol(_groupName);
-        currentNode = new CurrentNode(platforms, groupName);
+        currentNode = new CurrentNode(ns, groupName);
         isActiveRouting = true;
     }
     
@@ -130,7 +131,7 @@ public class RoutingProtocol implements Runnable{
         try {
             if(isActiveRouting){
                 System.out.println("Running Router!");
-                System.out.println("--- Current Node("+groupName+")-"+currentNode.toString());
+                System.out.println("--- Current Node("+groupName+")-");//+currentNode.toString());
                 ExecutePhase();
             }
         }catch(InterruptedException e){

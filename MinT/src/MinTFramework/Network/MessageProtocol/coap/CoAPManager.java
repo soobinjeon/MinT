@@ -16,7 +16,6 @@
  */
 package MinTFramework.Network.MessageProtocol.coap;
 
-import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
@@ -188,13 +187,13 @@ public class CoAPManager implements MessageTransfer{
             }
             ResponseHandler resd = smsg.getResponseHandler();
             if (resd != null) {
-                System.out.println("Token removed : "+tkn);
+//                System.out.println("Token removed : "+tkn);
                 tknlist.remove(src+"#"+tkn);
             }
             return resd;
             
         } else if (tknlist.containsKey(MULTICAST_NODE_NAME+"#"+tkn)) {
-            System.out.println("Multicast response received!");
+//            System.out.println("Multicast response received!");
             SendMSG smsg = tknlist.get(MULTICAST_NODE_NAME+"#"+tkn);
             if (smsg == null) {
                 return null;

@@ -24,32 +24,18 @@ import MinTFramework.Network.NetworkProfile;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class CurrentNode extends Node{
-    private Platforms platforms;
-    private NodeSpecify nodeSpec;
-    public CurrentNode(NetworkProfile _toAddr, NetworkProfile _nextAddr, boolean Hd, Platforms ns, String _gn) {
-        super(_toAddr, _nextAddr, Hd, new NodeSpecify(ns).getSpecWeight(), _gn);
-        platforms = ns;
-        nodeSpec = new NodeSpecify(ns);
+    public CurrentNode(NetworkProfile _toAddr, NetworkProfile _nextAddr, boolean Hd, NodeSpecify ns, String _gn) {
+        super(_toAddr, _nextAddr, Hd, ns, _gn);
     }
     
-    public CurrentNode(Platforms ns, String _gn){
-        super(null, null, false, new NodeSpecify(ns).getSpecWeight(), _gn);
-        platforms = ns;
-        nodeSpec = new NodeSpecify(ns);
+    public CurrentNode(NodeSpecify ns, String _gn){
+        super(null, null, false, ns, _gn);
     }
     
-    public NodeSpecify getNodeSpecify(){
-        return nodeSpec;
-    }
-    
-    public Platforms getNodePlatforms(){
-        return platforms;
-    }
-    
-    @Override
-    public String toString(){
-        return platforms.getCPU().toString()+", "+platforms.getNetwork().toString()
-                +", "+platforms.getPower().getPowerCategory().toString()+"("+platforms.getPower().getRemaining()+")"
-                +", wt: "+super.getSpecWeight();
-    }
+//    @Override
+//    public String toString(){
+//        return platforms.getCPU().toString()+", "+platforms.getNetwork().toString()
+//                +", "+platforms.getPower().getPowerCategory().toString()+"("+platforms.getPower().getRemaining()+")"
+//                +", wt: "+super.getSpecWeight();
+//    }
 }

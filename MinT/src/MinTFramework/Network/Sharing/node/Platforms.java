@@ -30,6 +30,7 @@ public enum Platforms {
     BEAGLEBONEBLACK_WIRED(3, SpecCPU.ARM_CORETEX_A8, SpecNetwork.WIRED, new SpecPower(POWER_CATE.POWER, 0), 500),
     INTEL_EDISON(4, SpecCPU.INTEL_ATOM_2_CORE, SpecNetwork.WIRELESS, new SpecPower(POWER_CATE.POWER, 0), 1000),
     COMPUTER(4, SpecCPU.INTEL_I7_G7, SpecNetwork.WIRED, new SpecPower(POWER_CATE.POWER, 0), 16000),
+    GETCONFIG(0, SpecCPU.NONE, SpecNetwork.WIRELESS, new SpecPower(POWER_CATE.BATTERY,0), 0),
     NONE(0, SpecCPU.NONE, SpecNetwork.WIRELESS, new SpecPower(POWER_CATE.BATTERY,0), 0);
 
     private SpecCPU cpu = null;

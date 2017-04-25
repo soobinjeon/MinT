@@ -16,14 +16,16 @@
  */
 package MinTFramework.Network.sharing.node;
 
+import MinTFramework.Util.PlatformInfo;
+
 /**
  * Node's spec for elect header
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class NodeSpecify {
-    private SpecCPU cpu = null;
-    private SpecNetwork network = null;
+//    private SpecCPU cpu = null;
+//    private SpecNetwork network = null;
     private SpecPower power = null;
     private double Storage_Amount = 0;
     private double Weight = 0;
@@ -35,22 +37,47 @@ public class NodeSpecify {
      * @param _pamount Battery Power Amount
      * @param _samount Storage Amount
      */
-    public NodeSpecify(SpecCPU _cpu, SpecNetwork _netSRC, SpecPower _pSRC, double _samount){
-        network = _netSRC;
-        power = _pSRC;
-        Storage_Amount = _samount;
-        cpu = _cpu;
+    public NodeSpecify(SpecPower _pSRC, double _samount){
+        if(_pSRC != null)
+            power = _pSRC;
+        else
+            power = new SpecPower(PlatformInfo.getPowerCategory(), PlatformInfo.getRemainingBaterry());
+                    
+        if(_samount == 0)
+            Storage_Amount = PlatformInfo.getCurrentDiskUsableSpace();
+        else
+            Storage_Amount = _samount;
+        
+        Storage_Amount = Storage_Amount == 0 ? 0 : Storage_Amount / 1000; //convert to GB
         CaculateWeight();
     }
     
     public NodeSpecify(Platforms _spec){
-        this(_spec.getCPU(), _spec.getNetwork(), _spec.getPower(), _spec.getStorageAmount());
+        this(_spec.getPower(), _spec.getStorageAmount());
     }
     
+    /**
+     * set only Weight
+     * @param _weight 
+     */
+    public NodeSpecify(double _weight){
+        power = new SpecPower(SpecPower.POWER_CATE.BATTERY, 0);
+        Weight = _weight;
+    }
+    
+    /**
+     * Calculate Header Election Weight
+     */
     private void CaculateWeight(){
-        Weight = ((cpu.getCORE() * cpu.getHZ()) / 1000) 
-                + network.getValue()
-                + (Storage_Amount * 0.5);
+        
+        double vi = (power.getInitialPower() - power.getRemaining()) / 1;
+        double pi = (power.getPowerCategory().getValue() + vi) / Storage_Amount;
+        System.out.println("powerv: "+power.getPowerCategory().getValue());
+        System.out.println("curMem: "+Storage_Amount+", vi: "+vi+", pi: "+pi);
+//        Weight = ((cpu.getCORE() * cpu.getHZ()) / 1000) 
+//                + network.getValue()
+//                + (Storage_Amount * 0.5);
+        Weight = pi;
     }
     
     public void setPowerRemaining(double _pamount){
@@ -63,13 +90,17 @@ public class NodeSpecify {
         CaculateWeight();
     }
     
-    public SpecCPU getCPU(){
+    public double getPowerRemaining(){
+        return power.getRemaining();
+    }
+    
+    /*public SpecCPU getCPU(){
         return cpu;
     }
     
     public SpecNetwork getNetwork(){
         return network;
-    }
+    }*/
     
     public SpecPower getPower(){
         return power;

@@ -16,6 +16,8 @@
  */
 package MinTFramework;
 
+import MinTFramework.Network.sharing.node.SpecNetwork;
+import MinTFramework.Network.sharing.node.SpecPower;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -51,6 +53,8 @@ public class MinTConfig {
     //for Sharing
     private String GROUP_NAME = "";
     private int TOTAL_BATTERY = 1000;
+    private SpecPower nodepower = new SpecPower(SpecPower.POWER_CATE.POWER, 0);
+    private SpecNetwork network = SpecNetwork.WIRED;
     
     //for Android
     static public String ANDROID_FILE_PATH = "";
@@ -99,6 +103,7 @@ public class MinTConfig {
         System.out.println("USER_PORT : "+USER_PORT);
         System.out.println("GROUP_NAME : "+GROUP_NAME);
         System.out.println("TOTAL_BATTERY : "+TOTAL_BATTERY);
+        System.out.println("POWER STATUS : "+nodepower.getPowerCategory()+", "+nodepower.getRemaining());
     }
 
     private void setConfig(String[] value) {
@@ -126,7 +131,12 @@ public class MinTConfig {
                     break;
                 case 3:
                     TOTAL_BATTERY = Integer.parseInt(value[1].trim());
+                    nodepower.setRemaining(TOTAL_BATTERY);
                     break;
+                case 4:
+                    String p = value[1].trim();
+                    if(p != null)
+                        nodepower.setPowerCategory(p);
                 default:
                     break;
             }
@@ -150,15 +160,29 @@ public class MinTConfig {
         return USER_PORT;
     }
     
+    /**
+     * set Virtual Battery Size
+     * @return 
+     */
     public int getTotalBattery(){
         return TOTAL_BATTERY;
+    }
+    
+    /**
+     * get Virtual Power Data
+     * @return 
+     */
+    public SpecPower getSpecPower(){
+        return nodepower;
     }
     
     public enum ConfigFile {
         IP_ADDR(0, "IP_ADDR"),
         PORT(1, "PORT"),
         GROUP_NAME(2, "GROUP_NAME"),
-        TOTAL_BATTERY(3, "TOTAL_BATTERY");
+        TOTAL_BATTERY(3, "TOTAL_BATTERY"),
+        POWER(4, "POWER"),
+        NETWORK(5, "NETWORK_STATUS");
         
         private String name;
         private int num;

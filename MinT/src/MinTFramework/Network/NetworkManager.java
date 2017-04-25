@@ -25,8 +25,8 @@ import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.Sharing;
+import MinTFramework.Network.sharing.node.NodeSpecify;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
-import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
@@ -203,8 +203,8 @@ public class NetworkManager {
         return routing;
     }
 
-    public void activeRoutingProtocol(String groupName, Platforms platforms) {
-        routing.setRoutingProtocol(groupName, platforms);
+    public void activeRoutingProtocol(String groupName, NodeSpecify ns) {
+        routing.setRoutingProtocol(groupName, ns);
     }
 
     public Sharing getSharing() {

@@ -32,10 +32,10 @@ import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.Network.sharing.ResourceOption;
 import MinTFramework.Network.sharing.Sharing;
+import MinTFramework.Network.sharing.node.NodeSpecify;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.Benchmarks.MinTBenchmark;
@@ -358,9 +358,28 @@ public abstract class MinT {
      * @param groupName Routing Group Name
      * @param platforms <Platforms> Operating Platform
      */
-    public void activateRoutingProtocol(String groupName, Platforms platforms) {
-        NTWmanager.activeRoutingProtocol(groupName, platforms);
+    public void activateRoutingProtocol(String groupName, NodeSpecify ns){
+        NTWmanager.activeRoutingProtocol(groupName, ns);
     }
+    
+    public void activateRoutingProtocol(){
+        activateRoutingProtocol(false);
+    }
+    
+    public void activateRoutingProtocol(boolean isVirtualPower){
+        if(getConfig().getGroupName().isEmpty())
+            System.err.println("Sharing Group Name is Empty - Routing Protocol is not activated");
+        else{
+            if(isVirtualPower)
+                NTWmanager.activeRoutingProtocol(getConfig().getGroupName()
+                    , new NodeSpecify(getConfig().getSpecPower(), 0));
+            else
+                NTWmanager.activeRoutingProtocol(getConfig().getGroupName()
+                    , new NodeSpecify(null, 0));
+        }
+    }
+    
+    
     
     /**
      * GET Resource Data matched to filled Resource

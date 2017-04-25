@@ -106,7 +106,7 @@ public class PacketIDManager {
             System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.EXCHANGE_LIFETIME * 1000);
         } else if(ht.isNON()){
-            System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
+            System.out.println("NON Message generated: Destination: " + dst + " / message ID: " + id);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.NON_LIFETIME * 1000);
         }
         

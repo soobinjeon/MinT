@@ -16,6 +16,7 @@
  */
 package MinTFramework.Util;
 
+import MinTFramework.Network.sharing.node.SpecPower;
 import java.io.File;
 
 /**
@@ -80,5 +81,21 @@ public class PlatformInfo {
         File cdisk = new File(".");
         double size = cdisk.getFreeSpace()/ Math.pow(1024, 2);
         return size;
+    }
+    
+    /**
+     * Temporary Option
+     * @return 
+     */
+    public static double getRemainingBaterry(){
+        return 0;
+    }
+    
+    /**
+     * Temporary Option
+     * @return 
+     */
+    public static SpecPower.POWER_CATE getPowerCategory(){
+        return SpecPower.POWER_CATE.POWER;
     }
 }

@@ -40,7 +40,7 @@ public class ChildResponce extends SharingResponse{
     public void getResource() {
         System.out.println("child Response Activated!");
         
-//get Group Resource
+        //get Group Resource
         getGroupResource();
         
         //get other Header Resource

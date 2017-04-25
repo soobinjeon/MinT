@@ -36,22 +36,27 @@ public class Node {
     private Network network = null;
     private boolean Header = false;
     private boolean Client = false;
-    private double SpecWeight = 0;
+    NodeSpecify nodespec = null;
     private String GroupName = "";
     
     private HashMap<String,ThingProperty> properties;
     private HashMap<String,ThingInstruction> instructions;
     
     public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr
-            , boolean Hd, double _specWeight, String _gn){
+            , boolean Hd, NodeSpecify ns, String _gn){
         toAddr = _toAddr;
         Header = Hd;
         nextAddr = _nextAddr;
-        SpecWeight = _specWeight;
+        nodespec = ns;
         GroupName = _gn;
         
         properties = new HashMap<>();
         instructions = new HashMap<>();
+    }
+    
+    public Node(NetworkProfile _toAddr, NetworkProfile _nextAddr
+            , boolean Hd, double weight, String _gn){
+        this(_toAddr, _nextAddr, Hd, new NodeSpecify(weight), _gn);
     }
     
     public NetworkProfile gettoAddr(){
@@ -70,8 +75,12 @@ public class Node {
         return Header;
     }
     
+    public NodeSpecify getNodeSpecify(){
+        return nodespec;
+    }
+    
     public double getSpecWeight(){
-        return SpecWeight;
+        return nodespec.getSpecWeight();
     }
     
     public String getGroupName(){

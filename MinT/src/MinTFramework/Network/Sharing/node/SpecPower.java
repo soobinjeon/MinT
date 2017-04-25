@@ -23,6 +23,7 @@ package MinTFramework.Network.sharing.node;
  */
 public class SpecPower {
         private POWER_CATE power = null;
+        private double initial = 0;
         private double remaining = 0;
         
         /**
@@ -33,6 +34,7 @@ public class SpecPower {
         public SpecPower(int cate_src, double _remaining){
             power = POWER_CATE.getPowerbyValue(cate_src);
             remaining = _remaining;
+            initial = _remaining;
         }
         
         public SpecPower(int cate_src){
@@ -47,8 +49,17 @@ public class SpecPower {
             return power;
         }
         
+        public void setPowerCategory(String ps){
+            power = POWER_CATE.getPowerbyValue(ps);
+        }
+        
         public void setRemaining(double rem){
             remaining = rem;
+            initial = remaining;
+        }
+        
+        public double getInitialPower(){
+            return initial;
         }
         
         public double getRemaining(){
@@ -56,15 +67,17 @@ public class SpecPower {
         }
         
         public enum POWER_CATE {
-            POWER(0, 0.0),
-            BATTERY(1, 0.0);
+            POWER(0,"P", 0.0),
+            BATTERY(1,"B", 100.0);
 
             private double value = 0;
             private int src = 0;
+            private String ps;
 
-            POWER_CATE(int _src, double v) {
+            POWER_CATE(int _src, String _ps, double v) {
                 value = v;
                 src = _src;
+                ps = _ps;
             }
 
             public double getValue() {
@@ -78,6 +91,14 @@ public class SpecPower {
             public static POWER_CATE getPowerbyValue(int src){
                 for(POWER_CATE pc : POWER_CATE.values()){
                     if(pc.src == src)
+                        return pc;
+                }
+                return POWER_CATE.POWER;
+            }
+            
+            public static POWER_CATE getPowerbyValue(String src){
+                for(POWER_CATE pc : POWER_CATE.values()){
+                    if(pc.ps.equals(src))
                         return pc;
                 }
                 return POWER_CATE.POWER;

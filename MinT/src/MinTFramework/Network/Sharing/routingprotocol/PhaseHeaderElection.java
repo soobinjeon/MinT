@@ -226,15 +226,17 @@ public class PhaseHeaderElection extends Phase implements Callable{
     private void doElectHeader(){
         //get Node that has the highest weight value
         Node hn = routing.getCurrentNode();
-        double highvalue = hn.getSpecWeight();
-      
-        //Select a header, which has high weight value.
+        double lowvalue = hn.getSpecWeight();
+        System.out.println("current node weight: "+lowvalue);
+        //Select a header, which has lowest weight value.
         for(Node cn : rtable.getRoutingTable().values()){
-            if(cn.getSpecWeight() > highvalue){
+            System.out.println("cn: "+cn.getSpecWeight());
+            if(cn.getSpecWeight() < lowvalue){
                 hn = cn;
-                highvalue = hn.getSpecWeight();
-            }else if(cn.getSpecWeight() == highvalue){
+                lowvalue = hn.getSpecWeight();
+            }else if(cn.getSpecWeight() == lowvalue){
                 //if weight is same with high, do something
+                System.out.println("Header Weight Same values! cn="+cn.getSpecWeight()+", lowvalue="+lowvalue);
             }
         }
         
