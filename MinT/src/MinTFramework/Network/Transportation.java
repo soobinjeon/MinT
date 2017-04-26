@@ -66,10 +66,10 @@ public class Transportation implements NetworkLayers {
     @Override
     public void Receive(RecvMSG recvMsg) {
         PacketDatagram packet = recvMsg.getPacketDatagram();
-        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getPacketString());
-            System.out.println(", sender IP : "+packet.getSource().getAddress());
+//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getPacketString());
+//            System.out.println(", sender IP : "+packet.getSource().getAddress());
         if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
-            System.out.println("recvMsg: "+recvMsg.getAddress()+", "+recvMsg.isUDPMulticast()+", "+recvMsg.getPacketDatagram().getPacketString());
+//            System.out.println("recvMsg: "+recvMsg.getAddress()+", "+recvMsg.isUDPMulticast()+", "+recvMsg.getPacketDatagram().getPacketString());
             ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvMsg);
             
             recvMsg.setRecvHandler(recvMsg.getApplicationProtocol().getMessageManager().receive(recvMsg));

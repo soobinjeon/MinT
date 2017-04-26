@@ -108,7 +108,7 @@ public class CoAPManager implements MessageTransfer{
          * Both Unicast and Multicast are accepted with
          * register message id and tokenid with response handler
          */
-        if (sendmsg.getSendHit() == 0) {
+        if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
             //check resend information
 //            sendmsg.setResKey(getIDMaker().makeToken(dstName, sendmsg.isUDPMulticastMode()));
             sendmsg.setResKey(getIDMaker().makeToken(sendmsg));
@@ -147,7 +147,6 @@ public class CoAPManager implements MessageTransfer{
 
         ResponseHandler reshandle = null;
         //Run Response Handler for Response Mode
-        System.out.println("is response: "+packet.getHeader_Code().isResponse());
         if (packet.getHeader_Code().isResponse())
             reshandle = getResponseDataMatchbyID(packet.getSource().getAddress(), packet.getToken());
         return reshandle;
@@ -170,7 +169,6 @@ public class CoAPManager implements MessageTransfer{
      * @return
      */
     public ResponseHandler getResponseDataMatchbyID(String src, short tkn) {
-        System.out.println("recvToken: "+tkn);
         if (tknlist.containsKey(src+"#"+tkn)) {
             SendMSG smsg = tknlist.get(src+"#"+tkn);
             if (smsg == null) {
@@ -184,7 +182,7 @@ public class CoAPManager implements MessageTransfer{
             return resd;
             
         } else if (tknlist.containsKey(MULTICAST_NODE_NAME+"#"+tkn)) {
-            System.out.println("Multicast response received!");
+//            System.out.println("Multicast response received!");
             SendMSG smsg = tknlist.get(MULTICAST_NODE_NAME+"#"+tkn);
             if (smsg == null) {
                 return null;
@@ -228,7 +226,6 @@ public class CoAPManager implements MessageTransfer{
     
     public void putResponse(short responseKey, SendMSG sendmsg) {
         tknlist.put(getListKey(responseKey,sendmsg), sendmsg);
-        System.out.println("putToken : "+responseKey);
     }
     public void putMessageID(short msgID, SendMSG sendmsg){
         idlist.put(getListKey(msgID,sendmsg), sendmsg);
