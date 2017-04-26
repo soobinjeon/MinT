@@ -38,8 +38,21 @@ public enum MinTMessageCode {
         VALID(2, 3),
         CHANGED(2, 4),
         CONTENT(2, 5),
-        CONTINUE(2, 31);
+        CONTINUE(2, 31),
 
+            //Client Error
+        BAD_REQUEST(4, 0),
+        UNAUTHORIZED(4, 1),
+        BAD_OPTION(4, 2),
+        FORBIDDEN(4, 3),
+        NOT_FOUND(4, 4),
+        METHOD_NOT_ALLOWED(4, 5),
+        NOT_ACCEPTABLE(4, 6),
+        REQUEST_ENTITY_INCOMPLETE(4, 8),
+        PRECONDITION_FAILED(4, 12),
+        REQUEST_ENTITY_TOO_LARGE(4, 13),
+        UNSUPPORTED_CONTENT_FORMAT(4, 15);
+        
         int code;
         int classCode;
         int detailCode;

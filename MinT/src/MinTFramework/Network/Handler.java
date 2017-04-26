@@ -43,7 +43,6 @@ public abstract class Handler {
     public void startHandle(RecvMSG recvmsg){
         PacketDatagram packet = recvmsg.getPacketDatagram();
         ReceiveMessage receivemsg = new ReceiveMessage(packet.getMsgData(), packet.getSource(), recvmsg);
-        
         if(packet.getRoleDirection().isRequest())
             HandleRequest(packet, receivemsg);
         else{

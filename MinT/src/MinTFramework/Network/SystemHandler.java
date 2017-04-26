@@ -71,7 +71,7 @@ public class SystemHandler extends Handler{
             if(ret != null)
                 responsecode = MinTMessageCode.CONTENT;
             else
-                responsecode = MinTMessageCode.EMPTY;
+                responsecode = MinTMessageCode.CONTENT;
             
         //FIX it! : 아래 명령어에 대한 명령들이 Set Instruction에 제대로 구현되어 있지 않음!!!!    
         }else if(rv_packet.getMessageCode().isPut()){

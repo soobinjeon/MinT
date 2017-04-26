@@ -49,7 +49,7 @@ public class CoAPLeisure {
     
     public void putLeisureScheduler(SendMSG smsg){
         leisure = rand.nextInt((int)default_leisure*1000);
-//        System.out.println("input leisure, leisure time is "+leisure+"ms");
+        System.out.println(smsg.getDestination().getAddress()+"("+smsg.getResponseKey()+") leisure time is "+leisure+"ms");
         sysSched.submitSchedule(MinTthreadPools.MULTICAST_LEISURE_HANDLE, new CoAPLeisureTask(smsg), leisure);
     }
     public void setLeisure(int Gsize){
