@@ -118,6 +118,8 @@ public class CoAPManager implements MessageTransfer{
             sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg));
             
             putResponse(sendmsg.getResponseKey(), sendmsg);
+        }else if(sendmsg.isUDPMulticastMode()){
+            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg));
         }
 
         /**
