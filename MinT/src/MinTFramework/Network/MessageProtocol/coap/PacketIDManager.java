@@ -61,10 +61,10 @@ public class PacketIDManager {
             key = dst+"#"+tkn;
         } while (tknlist.containsKey(key));
         if(isMulticast){
-            System.out.println("MulticastToken Generated!: " + dst + " Make Token : " + tkn);
+//            System.out.println("MulticastToken Generated!: " + dst + " Make Token : " + tkn);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new TokenRemoveTask(key), CoAPPacket.CoAPConfig.NON_LIFETIME * 1000);
         } else {
-            System.out.println("Get Destination " + dst + " Make Token : " + tkn);
+//            System.out.println("Get Destination " + dst + " Make Token : " + tkn);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new TokenRemoveTask(key), CoAPPacket.CoAPConfig.MAX_TRANSMIT_WAIT * 1000);
         }
         
@@ -103,10 +103,10 @@ public class PacketIDManager {
         idlength.put(dst, id);
         
         if (ht.isCON()) {
-            System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
+//            System.out.println("CON Message generated: Destination: " + dst + " / message ID: " + id);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.EXCHANGE_LIFETIME * 1000);
         } else if(ht.isNON()){
-            System.out.println("NON Message generated: Destination: " + dst + " / message ID: " + id);
+//            System.out.println("NON Message generated: Destination: " + dst + " / message ID: " + id);
             scheduler.submitSchedule(MinTthreadPools.PACKETLIFETIME_HANDLE, new MessageIDRemoveTask(key), CoAPPacket.CoAPConfig.NON_LIFETIME * 1000);
         }
         
@@ -125,7 +125,7 @@ public class PacketIDManager {
         @Override
         public void run() {
             if(idlist.containsKey(msgid)){
-                System.out.println("Remove message ID : "+msgid);
+//                System.out.println("Remove message ID : "+msgid);
                 idlist.remove(msgid);
             }
         }
@@ -141,7 +141,7 @@ public class PacketIDManager {
         @Override
         public void run() {
             if(tknlist.containsKey(tkn)){
-                System.out.println("Remove token :"+tkn);
+//                System.out.println("Remove token :"+tkn);
                 tknlist.remove(tkn);
             }
         }

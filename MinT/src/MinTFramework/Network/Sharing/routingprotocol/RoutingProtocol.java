@@ -29,7 +29,9 @@ import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Network.sharing.node.NodeSpecify;
 import MinTFramework.Network.sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
+import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.ThingProperty;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -238,6 +240,26 @@ public class RoutingProtocol implements Runnable{
      */
     public List<Node> getHeaderNodes(){
         return routingtable.getHeaderNodes();
+    }
+    
+    public void printRoutingInfo() {
+        System.out.println("\n--Routing Table");
+        for (Node n : routingtable.getRoutingTable().values()) {
+            System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName()
+                    + ", sw: " + n.getSpecWeight() + ", hd: " + n.isHeaderNode() + " client: " + n.isClientNode());
+            for (ThingProperty tp : n.getProperties().values()) {
+                System.out.println("----------" + tp.getID() + ", " + tp.getName() + ", " + tp.getGroup() + ", " + tp.getDeviceType().getDeviceTypeString()
+                        + ", " + tp.getStorageCategory().toString()
+                        + ", data: " + tp.getResourceData().getResourceString());
+            }
+        }
+
+        System.out.println("--Thing property lists");
+        for (Resource tp : frame.getProperties(null)) {
+            System.out.println("-----" + tp.getID() + ", " + tp.getName() + ", " + tp.getGroup() + ", " + tp.getDeviceType().getDeviceTypeString()
+                    + ", " + tp.getStorageCategory().toString()
+                    + ", data: " + tp.getResourceData().getResourceString());
+        }
     }
     
     /**

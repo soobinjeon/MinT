@@ -18,9 +18,6 @@ package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.storage.Resource;
-import MinTFramework.storage.ThingProperty;
 import java.util.concurrent.Callable;
 
 /**
@@ -53,26 +50,8 @@ public class ExecuteRouting extends Phase implements Callable{
 //                System.out.println("get All Clients Resources");
 //                routing.getAllClientsResource();
 //            }
-            
-            while(!Thread.currentThread().isInterrupted()){
-                System.out.println("\n--Routing Table");
-                for (Node n : rtable.getRoutingTable().values()) {
-                    System.out.println("-----Node: " + n.gettoAddr().getAddress() + ", gr:" + n.getGroupName()
-                            + ", sw: " + n.getSpecWeight()+", hd: "+n.isHeaderNode() + " client: "+n.isClientNode());
-                    for(ThingProperty tp : n.getProperties().values()){
-                        System.out.println("----------"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
-                            +", "+tp.getStorageCategory().toString()
-                            +", data: "+tp.getResourceData().getResourceString());
-                    }
-                }
-                
-                System.out.println("--Thing property lists");
-                for(Resource tp : frame.getProperties(null)){
-                    System.out.println("-----"+tp.getID()+", "+tp.getName()+", "+tp.getGroup() + ", "+tp.getDeviceType().getDeviceTypeString()
-                            +", "+tp.getStorageCategory().toString()
-                            +", data: "+tp.getResourceData().getResourceString());
-                }
-                
+            routing.printRoutingInfo();
+            while (!Thread.currentThread().isInterrupted()) {
                 Thread.sleep(5000);
             }
         }catch(Exception e){

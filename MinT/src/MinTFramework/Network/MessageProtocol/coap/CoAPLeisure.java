@@ -22,8 +22,6 @@ import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.SendMSG;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.Random;
 
 /**
@@ -51,7 +49,7 @@ public class CoAPLeisure {
     
     public void putLeisureScheduler(SendMSG smsg){
         leisure = rand.nextInt((int)default_leisure*1000);
-        System.out.println("input leisure, leisure time is "+leisure+"ms");
+//        System.out.println("input leisure, leisure time is "+leisure+"ms");
         sysSched.submitSchedule(MinTthreadPools.MULTICAST_LEISURE_HANDLE, new CoAPLeisureTask(smsg), leisure);
     }
     public void setLeisure(int Gsize){
