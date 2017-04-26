@@ -32,13 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CoAPManager implements MessageTransfer{
     //Message Response List
-    //private final ConcurrentHashMap<Short, SendMSG> ResponseList = new ConcurrentHashMap<>();
-    //private final ConcurrentHashMap<Short, SendMSG> IDList = new ConcurrentHashMap<>();
-    //private final ConcurrentHashMap<String,ConcurrentHashMap<Short,SendMSG>> nodeidlist = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,SendMSG> idlist = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,SendMSG> tknlist = new ConcurrentHashMap<>();
-//    private final ConcurrentHashMap<String,ConcurrentHashMap<Short,SendMSG>> tknlist = new ConcurrentHashMap<>();
-    private final String MULTICAST_NODE_NAME = "MULTICASTNODE";
+    private static final String MULTICAST_NODE_NAME = "MULTICASTNODE";
     private PacketIDManager idmaker;
 
     //CoAP Protocol
@@ -46,7 +42,6 @@ public class CoAPManager implements MessageTransfer{
     private Retransmission coapretransmit = null;
     
     public CoAPManager(){
-        //idmaker = new PacketIDManager(IDList, ResponseList);
         idmaker = new PacketIDManager(idlist, tknlist);
         
         coapleisure = new CoAPLeisure();
@@ -110,25 +105,20 @@ public class CoAPManager implements MessageTransfer{
     
     @Override
     public void send(SendMSG sendmsg) {
-        if (sendmsg.isUDPMulticastMode()){
-            sendmsg.setResKey(getIDMaker().makeToken(MULTICAST_NODE_NAME, sendmsg.isUDPMulticastMode()));
-            
-            //message id
-            //sendmsg.setMessageID(getIDMaker().makeMessageID());
-            sendmsg.setMessageID(getIDMaker().makeMessageID(MULTICAST_NODE_NAME, sendmsg.getHeader_Type()));
-            
-            putResponse(sendmsg.getResponseKey(), sendmsg);
-        }
-        else if (sendmsg.isRequestGET() && sendmsg.getSendHit() == 0) {
+        /**
+         * Both Unicast and Multicast are accepted with
+         * register message id and tokenid with response handler
+         */
+        if (sendmsg.getSendHit() == 0) {
             //check resend information
-            sendmsg.setResKey(getIDMaker().makeToken(sendmsg.getDestination().getAddress(), sendmsg.isUDPMulticastMode()));
+//            sendmsg.setResKey(getIDMaker().makeToken(dstName, sendmsg.isUDPMulticastMode()));
+            sendmsg.setResKey(getIDMaker().makeToken(sendmsg));
             
             //message id
-            //sendmsg.setMessageID(getIDMaker().makeMessageID());
-            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg.getDestination().getAddress(), sendmsg.getHeader_Type()));
+//            sendmsg.setMessageID(getIDMaker().makeMessageID(dstName, sendmsg.getHeader_Type()));
+            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg));
             
             putResponse(sendmsg.getResponseKey(), sendmsg);
-            
         }
 
         /**
@@ -137,14 +127,14 @@ public class CoAPManager implements MessageTransfer{
         if (sendmsg.getHeader_Type().isCON()) {
 
             if (sendmsg.getSendHit() == 0) {
-                putCONMessage(sendmsg.getMessageID(), sendmsg);
+                putMessageID(sendmsg.getMessageID(), sendmsg);
             }
 
             //Start retransmit procedure
             getCoAPRetransmit().activeRetransmission(sendmsg);
         }
         else if(sendmsg.getHeader_Type().isNON()){
-            putCONMessage(sendmsg.getMessageID(), sendmsg);
+            putMessageID(sendmsg.getMessageID(), sendmsg);
         }
     }
 
@@ -236,23 +226,28 @@ public class CoAPManager implements MessageTransfer{
     }
     
     public void putResponse(short responseKey, SendMSG sendmsg) {
-        if (sendmsg.isUDPMulticastMode()) { //멀티케스트일경우 노드의 이름을 멀티케스트 노드로 고정
-            tknlist.put(MULTICAST_NODE_NAME + "#" + responseKey, sendmsg);
-        } else {
-            tknlist.put(sendmsg.getDestination().getAddress() + "#" + responseKey, sendmsg);
-        }
-
+        tknlist.put(getListKey(responseKey,sendmsg), sendmsg);
 //        System.out.println("size : "+ResponseList.size());
     }
-    public void putCONMessage(short msgID, SendMSG sendmsg){
-        if(sendmsg.isUDPMulticastMode()){
-            idlist.put(MULTICAST_NODE_NAME+"#"+msgID, sendmsg);
-        } else {
-            idlist.put(sendmsg.getDestination().getAddress()+"#"+msgID, sendmsg);
-        }
+    public void putMessageID(short msgID, SendMSG sendmsg){
+        idlist.put(getListKey(msgID,sendmsg), sendmsg);
     }
 
     public Retransmission getCoAPRetransmit(){
         return coapretransmit;
+    }
+    
+    public static String getListKey(short key, SendMSG sendmsg){
+        if(sendmsg.isUDPMulticastMode())
+            return MULTICAST_NODE_NAME + "#" + key;
+        else
+            return sendmsg.getDestination().getAddress()+"#"+key;
+    }
+    
+    public static String getDestinationKey(SendMSG sendmsg){
+        if(sendmsg.isUDPMulticastMode())
+            return MULTICAST_NODE_NAME;
+        else
+            return sendmsg.getDestination().getAddress();
     }
 }
