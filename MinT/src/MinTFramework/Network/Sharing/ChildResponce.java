@@ -18,12 +18,10 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
-import MinTFramework.Network.Resource.SendMessage;
+import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
 import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.storage.ResData;
 import MinTFramework.storage.ThingProperty;
 import java.util.List;
-import java.util.Queue;
 
 /**
  *
@@ -37,7 +35,7 @@ public class ChildResponce extends SharingResponse{
     }
 
     @Override
-    public void getResource() {
+    public void getNetworkResource() {
         System.out.println("child Response Activated!");
         
         //get Group Resource
@@ -48,24 +46,20 @@ public class ChildResponce extends SharingResponse{
     }
 
     private void getHeaderResource() {
+        System.out.println("get Header Resource");
         List<Node> cnodes = routing.getHeaderNodes();
-        ResponseWaiter waiter = new ResponseWaiter();
+        ResponseWaiter waiter = new ResponseWaiter(this, RESOURCE_TYPE.HEADERRESOURCE);
+        resWaiterList.add(waiter);
+        
         for(Node n : cnodes){
             for(ThingProperty p: n.getProperties().values()){
-//                System.out.println("RecvMsg: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
-                if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName()))
-                    sharing.getHeaderResource(new SendMessage(p.getDeviceType().getDeviceTypeString(),null)
-                            , waiter.putResponseHandler(p), n);
-//                    frame.REQUEST_GET(n.gettoAddr(), new SendMessage(p.getName(), null), waiter.putResponseHandler(p));
+                if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName())){
+                    System.out.println("setUP HEADER for send: "+n.gettoAddr().getAddress());
+                    waiter.putPacket(n, p);
+//                    sharing.getHeaderResource(new SendMessage(p.getDeviceType().getDeviceTypeString(),null)
+//                            , waiter.putResponseHandler(p), n);
+                }
             }
-        }
-        System.out.println("wait for Headers Resources");
-        //waiting and get resources
-        Queue<ResData> gr = waiter.get();
-        System.out.println("success gr: "+gr.size());
-        for(ResData rd : gr){
-            HeaderResources.add(rd);
-            System.out.println("--------gr: "+rd.getResourceString());
         }
     }
     

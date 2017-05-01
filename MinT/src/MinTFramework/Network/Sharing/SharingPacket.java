@@ -14,33 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.MessageProtocol.coap;
+package MinTFramework.Network.sharing;
 
-import MinTFramework.MinT;
-import MinTFramework.Network.NetworkManager;
-import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.storage.ThingProperty;
 
 /**
  *
  * @author soobin Jeon <j.soobin@gmail.com>, chungsan Lee <dj.zlee@gmail.com>,
  * youngtak Han <gksdudxkr@gmail.com>
  */
-public class CoAPLeisureTask implements Runnable{
-    private SendMSG sendmsg = null;
-    private MinT mint = MinT.getInstance();
-    private NetworkManager nmanager = null;
+public class SharingPacket {
+    private Node node = null;
+    private ThingProperty prop = null;
+    private ResponseHandler reshandler = null;
     
-    public CoAPLeisureTask(SendMSG _msg){
-        sendmsg = _msg;
-        nmanager = mint.getNetworkManager();
-    }
-
-    @Override
-    public void run() {
-        System.out.println("send leisure Data to "+sendmsg.getDestination().getAddress()
-        +sendmsg.Message()+", "+sendmsg.getHeader_Type());
-        
-        nmanager.SEND(sendmsg);
+    public SharingPacket(Node n, ThingProperty pr, ResponseHandler res){
+        node = n;
+        prop = pr;
+        reshandler = res;
     }
     
+    public ResponseHandler getResponseHandler(){
+        return reshandler;
+    }
+    
+    public Node getNodeInfo(){
+        return node;
+    }
+    
+    public ThingProperty getProperty(){
+        return prop;
+    }
 }

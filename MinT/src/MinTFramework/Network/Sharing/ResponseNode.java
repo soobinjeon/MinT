@@ -36,9 +36,27 @@ public class ResponseNode implements ResponseHandler{
 
     @Override
     public void Response(ResponseData resdata) {
-        ResData resd = new ResData(resdata.getResource(), SendedResource);
+        String recvAddr = resdata.getSourceInfo().getAddress();
+        String curAddr = SendedResource.getSourceProfile().getAddress();
+        ThingProperty tp = SendedResource;
+//        System.out.println("---ResponseData: RevAddr"+recvAddr+", "+resdata.getPacketProtocol().getMsgData());
+//        System.out.println("------ResponseData: CurAddr"+curAddr);
+        /**
+         * 멀티캐스트 일 때!! 같은 핸들러로 모든 리스폰스를 받기 때문에
+         * 각 핸들러에 데이터를 매칭 시켜줘야함
+         */ 
+        if(recvAddr != null && curAddr != null && !recvAddr.equals(curAddr)){
+            for(SharingPacket sp: resWaiter.getPackets()){
+                if(sp.getProperty().getSourceProfile().getAddress()
+                        .equals(recvAddr)){
+//                    System.out.println("----Find recvAddr");
+                    tp = sp.getProperty();
+                }
+            }
+        }
+        ResData resd = new ResData(resdata.getResource(), tp);
         //update current resource
-        SendedResource.put(resdata);
+        tp.put(resdata);
         //activating response event
         resWaiter.responsed(resd);
     }

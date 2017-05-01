@@ -53,6 +53,7 @@ public enum MinTthreadPools {
     RETRANSMISSION_HANDLE(Executors.newSingleThreadScheduledExecutor()),
     MULTICAST_LEISURE_HANDLE(Executors.newSingleThreadScheduledExecutor()),
     PACKETLIFETIME_HANDLE(Executors.newSingleThreadScheduledExecutor()),
+    SHARING_HANDLE(Executors.newSingleThreadScheduledExecutor())
     ;
 
     ExecutorService es;

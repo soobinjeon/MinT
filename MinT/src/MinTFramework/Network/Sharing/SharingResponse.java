@@ -26,12 +26,14 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.sharing.Sharing;
+import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.ThingProperty;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
+import java.util.concurrent.ScheduledFuture;
 /**
  * Sharing Response Class
  * fix : resource type 과 resource option을 여러 개 입력 받아 동시에 보내줄 수 있도록 변경 해야함
@@ -47,12 +49,17 @@ public abstract class SharingResponse implements Runnable{
     protected ReceiveMessage recvmsg = null;
     protected PacketDatagram rv_packet = null;
     
-    protected List<ResData> LocalResources = null;
-    protected List<ResData> ChildResources = null;
-    protected List<ResData> HeaderResources = null;
+//    protected List<ResData> LocalResources = null;
+//    protected List<ResData> ChildResources = null;
+//    protected List<ResData> HeaderResources = null;
+    protected HashMap<RESOURCE_TYPE, List<ResData>> resources = new HashMap<>();
     
     protected List<DeviceType> resourceTypes = null;
     protected List<ResourceOption> resourceOptions = null;
+    
+    protected ScheduledFuture<?> currentScheduler = null;
+    
+    protected List<ResponseWaiter> resWaiterList = null;
     
     public SharingResponse(PacketDatagram _rv_packet, ReceiveMessage _recvmsg){
         frame = MinT.getInstance();
@@ -61,12 +68,17 @@ public abstract class SharingResponse implements Runnable{
         routing = networkmanager.getRoutingProtocol();
         recvmsg = _recvmsg;
         rv_packet = _rv_packet;
-        LocalResources = new ArrayList<>();
-        ChildResources = new ArrayList<>();
-        HeaderResources = new ArrayList<>();
+//        LocalResources = new ArrayList<>();
+//        ChildResources = new ArrayList<>();
+//        HeaderResources = new ArrayList<>();
+        resources.put(RESOURCE_TYPE.LOCALRESOURCE, new ArrayList<ResData>());
+        resources.put(RESOURCE_TYPE.CHILDRESOURCE, new ArrayList<ResData>());
+        resources.put(RESOURCE_TYPE.HEADERRESOURCE, new ArrayList<ResData>());
         
         resourceTypes = new ArrayList<>();
         resourceOptions = new ArrayList<>();
+        
+        resWaiterList = new ArrayList<>();
         
         addPacketOption();
     }
@@ -89,17 +101,36 @@ public abstract class SharingResponse implements Runnable{
             resourceOptions.add(resopt);
         }
     }
-
-    @Override
-    public void run() {
+    
+    public void preRun() {
+        System.out.println("set PreRun for "+rv_packet.getSource().getAddress());
         //check cached resource in resource storage
         checkCachedResource();
         
+        //get Resource
+        getNetworkResource();
+        
+        //Peripheral Resources are clear,
+        if(completeWaiter()){
+            System.out.println("resource waiter clear");
+            finishRun();
+        }else
+            sharing.sendNetwork(resWaiterList);
+    }
+    
+    public void finishRun(){
+        System.out.println("-------------Finish Run");
+        cancelScheduler();
+        run();
+    }
+
+    @Override
+    public void run() {
+        System.out.println("----------------------after Run for "+rv_packet.getSource().getAddress());
+
+        
         //get localResource
         getLocalResource();
-        
-        //get Resource
-        getResource();
         
         //calculate resource
         Summary summary = calculateResource();
@@ -117,12 +148,12 @@ public abstract class SharingResponse implements Runnable{
     
     private Summary calculateResource(){
         Summary sum = new Summary();
-        PrintResources("Local", LocalResources);
-        AnalysisResource(LocalResources, sum);
-        PrintResources("ChildNodes", ChildResources);
-        AnalysisResource(ChildResources, sum);
-        PrintResources("HeaderNodes", HeaderResources);
-        AnalysisResource(HeaderResources, sum);
+        PrintResources("Local", resources.get(RESOURCE_TYPE.LOCALRESOURCE));
+        AnalysisResource(resources.get(RESOURCE_TYPE.LOCALRESOURCE), sum);
+        PrintResources("ChildNodes", resources.get(RESOURCE_TYPE.CHILDRESOURCE));
+        AnalysisResource(resources.get(RESOURCE_TYPE.CHILDRESOURCE), sum);
+        PrintResources("HeaderNodes", resources.get(RESOURCE_TYPE.HEADERRESOURCE));
+        AnalysisResource(resources.get(RESOURCE_TYPE.HEADERRESOURCE), sum);
         
         return sum;
     }
@@ -131,27 +162,49 @@ public abstract class SharingResponse implements Runnable{
      * get Child node resources in same group
      */
     protected void getGroupResource(){
+        System.out.println("get Group Resource");
         List<Node> cnodes = routing.getChildNodes();
-        ResponseWaiter waiter = new ResponseWaiter();
+        ResponseWaiter waiter = new ResponseWaiter(this, RESOURCE_TYPE.CHILDRESOURCE);
+        resWaiterList.add(waiter);
         
+        //Request for Unicast 
         for(Node n : cnodes){
             if(n.isSameNode(rv_packet.getSource()))
                 continue;
             for(ThingProperty p: n.getProperties().values()){
-                System.out.println("RecvMsg: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
-                if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName()))
-                    frame.REQUEST_GET(n.gettoAddr().setCON(true), new SendMessage(p.getName(), null), waiter.putResponseHandler(p));
+                if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName())){
+                    System.out.println("SetupMSG: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
+                    waiter.putPacket(n, p);
+                }
             }
         }
-        
-        System.out.println("wait for Group Resources");
-        //waiting and get resources
-        Queue<ResData> gr = waiter.get();
-        System.out.println("success gr: "+gr.size());
-        for(ResData rd : gr){
-            ChildResources.add(rd);
-            System.out.println("--------gr: "+rd.getProperty().getID()+", "+rd.getResourceString());
+    }
+    
+    /**
+     * Event Handler from network Resource
+     * GroupResource가 끝나고 HeaderResource 초기화 전에 이게 끝나버림 안됨
+     * 해결방법, getgroupresource 및 headerresource는 초기화 후에 전송하는 걸로 해야함
+     */
+    protected synchronized void networkResourceEventHandler(RESOURCE_TYPE src, ResData resdata){
+//        System.out.println("S Res Hndl - "+resdata.getProperty().getSourceProfile().getAddress()
+//                +", "+resdata.getResourceString()
+//                +", "+resdata.getProperty().getResourcetoJSON().toJSONString());
+        resources.get(src).add(resdata);
+        if(completeWaiter()){
+            System.out.println("Finish Waiter");
+            finishRun();
         }
+//            System.out.println("--------gr: "+rd.getProperty().getID()+", "+rd.getResourceString());
+    }
+    
+    protected boolean completeWaiter(){
+        boolean iscom = true;
+        for(ResponseWaiter wt : resWaiterList){
+            iscom = wt.completeAllResponse();
+            if(!iscom)
+                break;
+        }
+        return iscom;
     }
     
     /**
@@ -174,7 +227,7 @@ public abstract class SharingResponse implements Runnable{
         }
     }
     
-    public abstract void getResource();
+    public abstract void getNetworkResource();
     
     private List<ResData> getLocalResource() {
         System.out.println("get Loal Datas by DeviceType: "+recvmsg.getResourceName());
@@ -186,8 +239,9 @@ public abstract class SharingResponse implements Runnable{
         Request req = new Request(resourceTypes.get(0).getDeviceTypeString(), null, rv_packet.getSource());
         
         for(ResData rd: sharing.getLocalResource(req)){
-            System.out.println("local data: "+rd.getResourceString());
-            LocalResources.add(rd);
+            System.out.println("List of local data: "+rd.getResourceString());
+            resources.get(RESOURCE_TYPE.LOCALRESOURCE).add(rd);
+            //LocalResources.add(rd);
         }
 
         return null;
@@ -200,7 +254,7 @@ public abstract class SharingResponse implements Runnable{
         ResourceOption reso = resourceOptions.get(0);
         
         SendMessage sendmsg = new SendMessage(null,summary.getResponseData(reso));
-        
+        sendmsg.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_RESPONSE.getValue());
         //Response MSG
         if(sendmsg != null){
             networkmanager.SEND_RESPONSE(rv_packet, sendmsg, MinTMessageCode.CONTENT);
@@ -209,6 +263,14 @@ public abstract class SharingResponse implements Runnable{
         }
     }
 
+    public void setScheduleHandler(ScheduledFuture<?> f) {
+        currentScheduler = f;
+    }
+    
+    public void cancelScheduler(){
+        if(currentScheduler != null)
+            currentScheduler.cancel(false);
+    }
     
     class Summary{
         private List<Double> data;

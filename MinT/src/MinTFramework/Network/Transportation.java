@@ -66,7 +66,8 @@ public class Transportation implements NetworkLayers {
     @Override
     public void Receive(RecvMSG recvMsg) {
         PacketDatagram packet = recvMsg.getPacketDatagram();
-//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getPacketString());
+//        System.out.print("Catched (recvMSG) by Transportation, " + packet.getSource().getProfile()+", "+packet.getMsgData()
+//                +", M:"+packet.hasMulticast());
 //            System.out.println(", sender IP : "+packet.getSource().getAddress());
         if (recvMsg.isUDPMulticast() || isFinalDestination(packet.getDestinationNode())) {
 //            System.out.println("recvMsg: "+recvMsg.getAddress()+", "+recvMsg.isUDPMulticast()+", "+recvMsg.getPacketDatagram().getPacketString());
@@ -75,10 +76,13 @@ public class Transportation implements NetworkLayers {
             recvMsg.setRecvHandler(recvMsg.getApplicationProtocol().getMessageManager().receive(recvMsg));
              
             if (isRouting(receivemsg)) {
+//                System.out.println("----------------------is RoutingHandler");
                 routing.routingHandle(recvMsg);
             } else if (isSharing(receivemsg)) {
-                sharing.sharingHandle(recvMsg);
+//                System.out.println("----------------------is SharingHandler");
+                sharing.sharingHandle(recvMsg,syshandle);
             } else {
+//                System.out.println("----------------------is DefaultHandler");
                 syshandle.startHandle(recvMsg);
             }
         } else {

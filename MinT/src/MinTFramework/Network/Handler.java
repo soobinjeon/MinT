@@ -57,6 +57,6 @@ public abstract class Handler {
         }
     }
     
-    protected abstract void HandleRequest(PacketDatagram packet, ReceiveMessage receivemsg);
-    protected abstract void HandleResponse(PacketDatagram packet, ReceiveMessage receivemsg);
+    public abstract void HandleRequest(PacketDatagram packet, ReceiveMessage receivemsg);
+    public abstract void HandleResponse(PacketDatagram packet, ReceiveMessage receivemsg);
 }

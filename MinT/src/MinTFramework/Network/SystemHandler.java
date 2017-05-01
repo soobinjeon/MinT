@@ -45,7 +45,7 @@ public class SystemHandler extends Handler{
      * @param rv_packet 
      */
     @Override
-    protected void HandleRequest(PacketDatagram rv_packet, ReceiveMessage receivemsg){
+    public void HandleRequest(PacketDatagram rv_packet, ReceiveMessage receivemsg){
         MinTMessageCode responsecode = null;
         SendMessage ret = null;
         if(rv_packet.getMessageCode().isGet()){
@@ -100,7 +100,7 @@ public class SystemHandler extends Handler{
      * @param receivemsg
      */
     @Override
-    protected void HandleResponse(PacketDatagram rv_packet, ReceiveMessage receivemsg){
+    public void HandleResponse(PacketDatagram rv_packet, ReceiveMessage receivemsg){
         //Handle for Discovery action
         if (isDiscover(receivemsg)) {
             ResponseData resdata = new ResponseData(rv_packet, receivemsg.getResourceData().getResource());

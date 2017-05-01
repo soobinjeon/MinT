@@ -39,7 +39,7 @@ public class RoutHandler extends Handler{
     }
     
     @Override
-    protected void HandleRequest(PacketDatagram rv_packet, ReceiveMessage receivemsg) {
+    public void HandleRequest(PacketDatagram rv_packet, ReceiveMessage receivemsg) {
         Information data = receivemsg.getResourcebyName(Request.MSG_ATTR.Routing);
         /**
          * Operate a message according to routing phase
@@ -53,7 +53,7 @@ public class RoutHandler extends Handler{
     }
 
     @Override
-    protected void HandleResponse(PacketDatagram rv_packet, ReceiveMessage req) {
+    public void HandleResponse(PacketDatagram rv_packet, ReceiveMessage req) {
         Information rdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         for(Phase cp : routingPhase.values()){

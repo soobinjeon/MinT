@@ -79,7 +79,6 @@ public abstract class Phase implements Callable{
         String gn = rgroup != null ? rgroup.getResourceString() : "";
         double rw = rweight != null ? rweight.getResourceDouble() : 0;
         boolean rh = rheader != null ? rheader.getResourceBoolean() : false;
-        
         Node node = new Node(rv_packet.getSource(), rv_packet.getPreviosNode(), rh, rw, gn);
         //same network exeption
         Network cnetwork = networkmanager.getNetwork(rv_packet.getPreviosNode().getNetworkType());

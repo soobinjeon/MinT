@@ -18,23 +18,23 @@ package MinTFramework.Network.sharing;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
-import MinTFramework.MinTConfig;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket.CoAPConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.SystemHandler;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledFuture;
 
 /**
  *
@@ -47,6 +47,7 @@ public class Sharing {
     private NetworkManager networkManager = null;
     private RoutingProtocol routingprotocol = null;
     private SharingHandler shandle = null;
+    private SystemHandler syshandle = null;
     private static String SHARING_TP = "sharing_threadpool";
     private boolean isActivated = false;
     public Sharing(){
@@ -63,22 +64,25 @@ public class Sharing {
         networkManager = aThis;
         routingprotocol = networkManager.getRoutingProtocol();
         shandle = new SharingHandler(this);
-        initScheduler();
+//        initScheduler();
     }
     
-    public void initScheduler(){
-        if(sysSched != null){
-            sysSched.registerThreadPool(SHARING_TP, new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS
-                    ,new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)));
-        }
-    }
+//    public void initScheduler(){
+//        if(sysSched != null){
+//            sysSched.registerThreadPool(SHARING_TP, new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS
+//                    ,new ArrayBlockingQueue<Runnable>(MinTConfig.NETWORK_RECEIVE_WAITING_QUEUE)));
+//            sysSched.registerThreadPool(SHARING_TP, Executors.newSingleThreadScheduledExecutor());
+//        }
+//    }
     
     /**
      * execute Response operation
      * @param sr 
      */
     public void executeResponse(SharingResponse sr){
-        sysSched.executeProcess(SHARING_TP, sr);
+        sr.preRun();
+        ScheduledFuture<?> f = sysSched.submitSchedule(MinTthreadPools.SHARING_HANDLE, sr, CoAPConfig.NON_LIFETIME*1000);
+        sr.setScheduleHandler(f);
     }
     
     /**
@@ -103,8 +107,30 @@ public class Sharing {
      * @param packet
      * @param receivemsg 
      */
-    public void sharingHandle(RecvMSG recvmsg) {
+    public void sharingHandle(RecvMSG recvmsg, SystemHandler _syshandle) {
         shandle.startHandle(recvmsg);
+        syshandle = _syshandle;
+    }
+    
+    public void sendNetwork(List<ResponseWaiter> reswaiter){
+        boolean isMulticast = true; //temporary Multicast, unicast setup
+        for(ResponseWaiter wt : reswaiter){
+            if(isMulticast){
+                if (wt.getResourceType().isChildResource() && !wt.getPackets().isEmpty()) {
+                    sendtoMemberNode(wt.getPackets().peek(), isMulticast);
+                } else if (wt.getResourceType().isHeaderResource() && !wt.getPackets().isEmpty()) {
+                    sendtoHeaderNode(wt.getPackets().peek(), isMulticast);
+                }
+            }else{
+                //unicast
+                for(SharingPacket sp : wt.getPackets()){
+                    if(wt.getResourceType().isChildResource())
+                        sendtoMemberNode(sp,isMulticast);
+                    else if(wt.getResourceType().isHeaderResource())
+                        sendtoHeaderNode(sp,isMulticast);
+                }
+            }
+        }
     }
     
     /********************************************************
@@ -116,7 +142,7 @@ public class Sharing {
         getResource(new SendMessage(restype.getDeviceTypeString(),resOpt.toOption()), resHandle);
     }
     /**
-     * get Resource from Header Node
+     * Request Resource to Header node from Client
      * @param requestdata
      * @param resHandle 
      */
@@ -128,9 +154,23 @@ public class Sharing {
             //get child node resource -> use other method in here
         }else{
             Node header = routingprotocol.getHeaderNodeofCurrentNode();
-            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
             frame.REQUEST_GET(header.gettoAddr().setCON(true), requestdata, resHandle);
 //            frame.REQUEST_GET_MULTICAST(requestdata, resHandle);
+        }
+    }
+    
+    private void sendtoMemberNode(SharingPacket sp, boolean ismulticast){
+        if(!isActivated)
+            return;
+        SendMessage requestdata = new SendMessage(sp.getProperty().getName(), null);
+        requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
+        if(ismulticast){
+            frame.REQUEST_GET_MULTICAST(requestdata, sp.getResponseHandler());
+        }else{
+            frame.REQUEST_GET(sp.getNodeInfo().gettoAddr().setCON(true)
+                            , requestdata
+                            , sp.getResponseHandler());
         }
     }
     
@@ -143,6 +183,26 @@ public class Sharing {
         return resStorage.getPropertybyResourceType(recvmsg, Resource.StoreCategory.Local);
     }
     
+    public void sendtoHeaderNode(SharingPacket sp, boolean isMulticast){
+        if(!isActivated)
+            return;
+        
+        if(routingprotocol.isHeaderNode()){
+            SendMessage requestdata = new SendMessage(sp.getProperty().getDeviceType().getDeviceTypeString(),null);
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
+            if(!isMulticast)
+                frame.REQUEST_GET(sp.getNodeInfo().gettoAddr().setCON(true), requestdata, sp.getResponseHandler());
+            else
+                frame.REQUEST_GET_MULTICAST(requestdata, sp.getResponseHandler());
+        }
+    }
+    
+    /**
+     * @deprecated 
+     * @param requestdata
+     * @param resHandle
+     * @param header 
+     */
     public void getHeaderResource(SendMessage requestdata, ResponseHandler resHandle, Node header){
         if(!isActivated)
             return;
@@ -151,6 +211,10 @@ public class Sharing {
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
             frame.REQUEST_GET(header.gettoAddr().setCON(true), requestdata, resHandle);
         }
+    }
+    
+    public SystemHandler getSystemHandler(){
+        return syshandle;
     }
     
     /**
@@ -170,5 +234,18 @@ public class Sharing {
      */
     private void requestResource(String resource){
         
+    }
+    
+    public static enum RESOURCE_TYPE {
+        LOCALRESOURCE,
+        CHILDRESOURCE,
+        HEADERRESOURCE;
+        
+        RESOURCE_TYPE(){
+        }
+        
+        public boolean isLocalResource(){return this == LOCALRESOURCE;}
+        public boolean isChildResource(){return this == CHILDRESOURCE;}
+        public boolean isHeaderResource(){return this == HEADERRESOURCE;}
     }
 }

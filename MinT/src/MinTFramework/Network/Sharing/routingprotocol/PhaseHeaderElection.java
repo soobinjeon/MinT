@@ -126,6 +126,9 @@ public class PhaseHeaderElection extends Phase implements Callable{
             //헤더 정보 교환을 해야하나?
             //Notifying 메세지를 받은 후 반송 메세지로 리소스 정보들으 보내줘야하나? (선택!)
             //아니면 Notifying 시 리소스 정보들을 올려줘야하는가??
+            System.out.println("add other HeaderNode: "
+                    +rv_packet.getSource().getAddress()+", "
+                    +rv_packet.getPreviosNode().getAddress());
             addRoutingTable(rv_packet, req);
             addHeaderResource(rv_packet, req);
         }

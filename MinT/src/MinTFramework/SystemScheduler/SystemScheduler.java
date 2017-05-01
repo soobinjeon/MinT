@@ -54,6 +54,7 @@ public class SystemScheduler extends ThreadPoolScheduler{
         //register multicast leisure
         registerMinTSystemthreadPool(MinTthreadPools.MULTICAST_LEISURE_HANDLE);
         registerMinTSystemthreadPool(MinTthreadPools.PACKETLIFETIME_HANDLE);
+        registerMinTSystemthreadPool(MinTthreadPools.SHARING_HANDLE);
     }
     
     /**

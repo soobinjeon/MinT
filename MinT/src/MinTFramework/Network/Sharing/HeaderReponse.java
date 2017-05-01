@@ -31,7 +31,7 @@ public class HeaderReponse extends SharingResponse{
     }
 
     @Override
-    public void getResource() {
+    public void getNetworkResource() {
         //get Group Resource
         getGroupResource();
     }

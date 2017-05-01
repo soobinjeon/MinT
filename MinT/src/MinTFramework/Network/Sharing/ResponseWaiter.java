@@ -16,7 +16,8 @@
  */
 package MinTFramework.Network.sharing;
 
-import MinTFramework.Network.ResponseHandler;
+import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
+import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.ThingProperty;
 import java.util.Queue;
@@ -28,18 +29,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public class ResponseWaiter {
-    private Queue<ResponseHandler> reshandle = null;
+//    private Queue<ResponseHandler> reshandle = null;
+    private Queue<SharingPacket> spackets = null;
     private Queue<ResData> responseData;
     private int ResponseSize = 0;
     private int currentResponseSize = 0;
-    public ResponseWaiter(){
-        reshandle = new ConcurrentLinkedQueue<ResponseHandler>();
+    private SharingResponse parent = null;
+    private RESOURCE_TYPE sourceName = null;
+    public ResponseWaiter(SharingResponse _parent, Sharing.RESOURCE_TYPE srcname){
+        spackets = new ConcurrentLinkedQueue<SharingPacket>();
+//        reshandle = new ConcurrentLinkedQueue<ResponseHandler>();
         responseData = new ConcurrentLinkedQueue<ResData>();
+        parent = _parent;
+        sourceName = srcname;
         initHandler();
     }
     
     private void initHandler(){
-        if(reshandle == null)
+        if(spackets == null)
             return;
         
     }
@@ -51,39 +58,62 @@ public class ResponseWaiter {
     public synchronized void responsed(ResData resdata) {
         responseData.add(resdata);
         currentResponseSize ++;
-        notifyAll();
+        parent.networkResourceEventHandler(sourceName, resdata);
+        if(currentResponseSize == ResponseSize)
+            spackets.clear();
     }
     
     /**
      * get Response resources after waiting all response of request
      * @return 
      */
-    public synchronized Queue<ResData> get() {
-        try {
-            while (currentResponseSize < ResponseSize) {
-                wait();
-            }
-            reshandle.clear();
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
+    public Queue<ResData> getDatas() {
         return responseData;
     }
     
-    /**
-     * add ResponseHandler and return added handler
-     * @param res
-     * @return 
-     */
-    public ResponseHandler putResponseHandler(ThingProperty res){
-        ResponseNode resnode = new ResponseNode(this, res);
-        reshandle.add(resnode);
-        ResponseSize = reshandle.size();
-//        System.out.println("put ResponseHandler - RESSIZE: "+ResponseSize);
-        return resnode;
+    public void putPacket(Node n, ThingProperty res){
+        spackets.add(new SharingPacket(n, res, new ResponseNode(this, res)));
+        ResponseSize = spackets.size();
     }
+    
+//    /**
+//     * add ResponseHandler and return added handler
+//     * @param res
+//     * @return 
+//     */
+//    public ResponseHandler putResponseHandler(ThingProperty res){
+//        ResponseNode resnode = new ResponseNode(this, res);
+//        reshandle.add(resnode);
+//        ResponseSize = reshandle.size();
+////        System.out.println("put ResponseHandler - RESSIZE: "+ResponseSize);
+//        return resnode;
+//    }
     
     public void printResponseSize(){
         System.out.println("cur: "+currentResponseSize+", ResSize: "+ResponseSize);
+    }
+    
+    public RESOURCE_TYPE getResourceType(){
+        return sourceName;
+    }
+    
+    public Queue<SharingPacket> getPackets(){
+        return spackets;
+    }
+    
+    public int getResponseSize(){
+        return ResponseSize;
+    }
+    
+    public int getCurrentResponseSize(){
+        return currentResponseSize;
+    }
+    
+    public boolean completeAllResponse(){
+//        System.out.println("currentResponseSize: "+currentResponseSize+", resSize: "+ResponseSize);
+        if(currentResponseSize == ResponseSize)
+            return true;
+        else
+            return false;
     }
 }

@@ -23,7 +23,9 @@ package MinTFramework.Network.sharing;
  */
 public enum SharingMessage {
     CLIENT_REQUEST(0),
-    HEADER_REQUEST(1);
+    HEADER_REQUEST(1),
+    CLIENT_RESPONSE(2),
+    HEADER_RESPONSE(3);
     
     private int num;
     SharingMessage(int _num){

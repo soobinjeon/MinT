@@ -112,6 +112,7 @@ public class RoutingProtocol implements Runnable{
     
     protected void setHeaderNode(boolean setheader){
         isHeaderNode = setheader;
+        currentNode.setHeaderNode(isHeaderNode);
     }
     
     public boolean isHeaderNode(){
@@ -225,6 +226,21 @@ public class RoutingProtocol implements Runnable{
             return false;
         else
             return true;
+    }
+    
+    /**
+     * has Header Node
+     * @param source
+     * @return 
+     */
+    public boolean hasHeaderNode(NetworkProfile source) {
+        Node n = routingtable.getHeaderNodeofCurrentNode();
+        if(n == null || isHeaderNode())
+            return false;
+        else if(n.isHeaderNode() && n.isSameNode(source))
+            return true;
+        else
+            return false;
     }
 
     /**
