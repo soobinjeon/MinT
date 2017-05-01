@@ -203,8 +203,8 @@ public class NetworkManager {
         return routing;
     }
 
-    public void activeRoutingProtocol(String groupName, NodeSpecify ns) {
-        routing.setRoutingProtocol(groupName, ns);
+    public void activeRoutingProtocol(String groupName, NodeSpecify ns, boolean isMulticast) {
+        routing.setRoutingProtocol(groupName, ns, isMulticast);
     }
 
     public Sharing getSharing() {

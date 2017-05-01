@@ -18,6 +18,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
+import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -75,7 +76,7 @@ public class PhaseDiscover extends Phase{
     }
     
     @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
+    public void requestHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         Information gdata = req.getResourcebyName(Request.MSG_ATTR.RoutingGroup);
         String gn = gdata != null ? gdata.getResourceString() : "";
@@ -140,7 +141,7 @@ public class PhaseDiscover extends Phase{
     }
 
     @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
+    public void responseHandle(PacketDatagram rv_packet, ReceiveMessage req) {
     }
     
     private boolean isSameGroup(String gname){

@@ -103,7 +103,7 @@ public class SystemHandler extends Handler{
     public void HandleResponse(PacketDatagram rv_packet, ReceiveMessage receivemsg){
         //Handle for Discovery action
         if (isDiscover(receivemsg)) {
-            ResponseData resdata = new ResponseData(rv_packet, receivemsg.getResourceData().getResource());
+            ResponseData resdata = new ResponseData(rv_packet, receivemsg.getResourceData().getResource(),receivemsg);
             try {
                 resStorage.updateDiscoverData(resdata);
             } catch (Exception e) {

@@ -50,17 +50,17 @@ public class SharingHandler extends Handler{
 //            System.out.println(" REQUEST_info: "+svalue.getResourceInt());
         
         if(routing.hasChildNode(rv_packet.getSource())){ //Requested from Child Node
-            System.out.println("requrest from Client");
+//            System.out.println("request from Client");
             sharing.executeResponse(new ChildResponce(rv_packet, recvmsg));
         }//Requested from other Header
         else if(routing.getCurrentNode().isHeaderNode()
                 && svalue != null && svalue.getResourceInt() == SharingMessage.HEADER_REQUEST.getValue()){
-            System.out.println("requrest from Other Header");
+//            System.out.println("requrest from Other Header");
             sharing.executeResponse(new HeaderReponse(rv_packet, recvmsg));
         }else if(!routing.getCurrentNode().isHeaderNode()
                 && svalue != null && svalue.getResourceInt() == SharingMessage.CLIENT_REQUEST.getValue()
                 && routing.hasHeaderNode(rv_packet.getSource())){
-            System.out.println("request from Header for gathering child's resource");
+//            System.out.println("request from Header for gathering child's resource");
             if(sharing.getSystemHandler() != null)
                 sharing.getSystemHandler().HandleRequest(rv_packet, recvmsg);
             else

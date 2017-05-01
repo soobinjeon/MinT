@@ -17,7 +17,7 @@
 package MinTFramework.Network.sharing.routingprotocol;
 
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.Resource.Request;
+import MinTFramework.Network.Resource.ReceiveMessage;
 import java.util.concurrent.Callable;
 
 /**
@@ -61,13 +61,13 @@ public class ExecuteRouting extends Phase implements Callable{
     }
 
     @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
+    public void requestHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         if(!isWorkingPhase())
             return;
     }
 
     @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
+    public void responseHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         if(!isWorkingPhase())
             return;
     }

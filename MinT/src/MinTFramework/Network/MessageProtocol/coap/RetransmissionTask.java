@@ -19,7 +19,6 @@ package MinTFramework.Network.MessageProtocol.coap;
 import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.Network.SendMSG;
-import java.sql.Time;
 
 /**
  *

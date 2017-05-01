@@ -51,7 +51,7 @@ public abstract class Handler {
             //Response Handle
             ResponseHandler reshandle = packet.getRecvHandler();
             if (reshandle != null) {
-                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource());
+                ResponseData resdata = new ResponseData(packet, receivemsg.getResourceData().getResource(),receivemsg);
                 reshandle.Response(resdata);
             }
         }

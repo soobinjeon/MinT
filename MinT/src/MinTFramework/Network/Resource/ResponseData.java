@@ -18,7 +18,6 @@ package MinTFramework.Network.Resource;
 
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.NetworkProfile;
-import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
 import MinTFramework.storage.datamap.Information;
 
 /**
@@ -29,13 +28,15 @@ import MinTFramework.storage.datamap.Information;
 public class ResponseData extends Information{
     private PacketDatagram recv_packet;
     private NetworkProfile source;
-    public ResponseData(CoAPPacket recv_packet) {
-        this(recv_packet, recv_packet.getMsgData());
-    }
-    public ResponseData(PacketDatagram recv_packet, Object data) {
+    private ReceiveMessage recvmsg;
+//    public ResponseData(CoAPPacket recv_packet) {
+//        this(recv_packet, recv_packet.getMsgData());
+//    }
+    public ResponseData(PacketDatagram recv_packet, Object data, ReceiveMessage _recvmsg) {
         super(data);
         source = recv_packet.getSource();
         this.recv_packet = recv_packet;
+        recvmsg = _recvmsg;
     }
     
     @Override
@@ -53,5 +54,9 @@ public class ResponseData extends Information{
     
     public PacketDatagram getPacketProtocol(){
         return this.recv_packet;
+    }
+    
+    public ReceiveMessage getReceiveMessage(){
+        return recvmsg;
     }
 }

@@ -30,6 +30,7 @@ import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.ThingProperty;
+import MinTFramework.storage.datamap.Information;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,20 +91,20 @@ public abstract class SharingResponse implements Runnable{
         //add resource type
         DeviceType dt = DeviceType.getDeviceType(recvmsg.getResourceName());
         if(dt != null){
-            System.out.println("deviceType: "+dt.toString());
+//            System.out.println("deviceType: "+dt.toString());
             resourceTypes.add(dt);
         }
         
         //add resource option
         ResourceOption resopt = ResourceOption.getResourceOptionbyOpt(recvmsg.getResourceData().getResourceString());
         if(resopt != null){
-            System.out.println("resOpt: "+resopt.toString());
+//            System.out.println("resOpt: "+resopt.toString());
             resourceOptions.add(resopt);
         }
     }
     
     public void preRun() {
-        System.out.println("set PreRun for "+rv_packet.getSource().getAddress());
+//        System.out.println("set PreRun for "+rv_packet.getSource().getAddress());
         //check cached resource in resource storage
         checkCachedResource();
         
@@ -112,21 +113,21 @@ public abstract class SharingResponse implements Runnable{
         
         //Peripheral Resources are clear,
         if(completeWaiter()){
-            System.out.println("resource waiter clear");
+//            System.out.println("resource waiter clear");
             finishRun();
         }else
             sharing.sendNetwork(resWaiterList);
     }
     
     public void finishRun(){
-        System.out.println("-------------Finish Run");
+//        System.out.println("-------------Finish Run");
         cancelScheduler();
         run();
     }
 
     @Override
     public void run() {
-        System.out.println("----------------------after Run for "+rv_packet.getSource().getAddress());
+//        System.out.println("----------------------after Run for "+rv_packet.getSource().getAddress());
 
         
         //get localResource
@@ -135,7 +136,7 @@ public abstract class SharingResponse implements Runnable{
         //calculate resource
         Summary summary = calculateResource();
         
-        System.out.println("summary-------: "+summary.getSummary());
+//        System.out.println("summary-------: "+summary.getSummary());
         
         //response message
         
@@ -148,11 +149,11 @@ public abstract class SharingResponse implements Runnable{
     
     private Summary calculateResource(){
         Summary sum = new Summary();
-        PrintResources("Local", resources.get(RESOURCE_TYPE.LOCALRESOURCE));
+//        PrintResources("Local", resources.get(RESOURCE_TYPE.LOCALRESOURCE));
         AnalysisResource(resources.get(RESOURCE_TYPE.LOCALRESOURCE), sum);
-        PrintResources("ChildNodes", resources.get(RESOURCE_TYPE.CHILDRESOURCE));
+//        PrintResources("ChildNodes", resources.get(RESOURCE_TYPE.CHILDRESOURCE));
         AnalysisResource(resources.get(RESOURCE_TYPE.CHILDRESOURCE), sum);
-        PrintResources("HeaderNodes", resources.get(RESOURCE_TYPE.HEADERRESOURCE));
+//        PrintResources("HeaderNodes", resources.get(RESOURCE_TYPE.HEADERRESOURCE));
         AnalysisResource(resources.get(RESOURCE_TYPE.HEADERRESOURCE), sum);
         
         return sum;
@@ -162,7 +163,7 @@ public abstract class SharingResponse implements Runnable{
      * get Child node resources in same group
      */
     protected void getGroupResource(){
-        System.out.println("get Group Resource");
+//        System.out.println("get Group Resource");
         List<Node> cnodes = routing.getChildNodes();
         ResponseWaiter waiter = new ResponseWaiter(this, RESOURCE_TYPE.CHILDRESOURCE);
         resWaiterList.add(waiter);
@@ -173,8 +174,8 @@ public abstract class SharingResponse implements Runnable{
                 continue;
             for(ThingProperty p: n.getProperties().values()){
                 if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName())){
-                    System.out.println("SetupMSG: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
-                    waiter.putPacket(n, p);
+//                    System.out.println("SetupMSG: "+recvmsg.getResourceName()+", pdevice: "+p.getDeviceType());
+                    waiter.putPacket(n, p, recvmsg);
                 }
             }
         }
@@ -191,7 +192,7 @@ public abstract class SharingResponse implements Runnable{
 //                +", "+resdata.getProperty().getResourcetoJSON().toJSONString());
         resources.get(src).add(resdata);
         if(completeWaiter()){
-            System.out.println("Finish Waiter");
+//            System.out.println("Finish Waiter");
             finishRun();
         }
 //            System.out.println("--------gr: "+rd.getProperty().getID()+", "+rd.getResourceString());
@@ -230,7 +231,7 @@ public abstract class SharingResponse implements Runnable{
     public abstract void getNetworkResource();
     
     private List<ResData> getLocalResource() {
-        System.out.println("get Loal Datas by DeviceType: "+recvmsg.getResourceName());
+//        System.out.println("get Local Datas by DeviceType: "+recvmsg.getResourceName());
         if(sharing == null)
             System.out.println("sharing null");
         if(resourceTypes.size() <= 0)
@@ -239,7 +240,7 @@ public abstract class SharingResponse implements Runnable{
         Request req = new Request(resourceTypes.get(0).getDeviceTypeString(), null, rv_packet.getSource());
         
         for(ResData rd: sharing.getLocalResource(req)){
-            System.out.println("List of local data: "+rd.getResourceString());
+//            System.out.println("List of local data: "+rd.getResourceString());
             resources.get(RESOURCE_TYPE.LOCALRESOURCE).add(rd);
             //LocalResources.add(rd);
         }
@@ -253,8 +254,15 @@ public abstract class SharingResponse implements Runnable{
         
         ResourceOption reso = resourceOptions.get(0);
         
+
         SendMessage sendmsg = new SendMessage(null,summary.getResponseData(reso));
         sendmsg.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_RESPONSE.getValue());
+        
+        //for Experiment
+        Information svalue = recvmsg.getResourcebyName(Request.MSG_ATTR.Sharing_EX);
+        int v = svalue != null ? svalue.getResourceInt() : -1;
+        if(v != -1)
+            sendmsg.AddAttribute(Request.MSG_ATTR.Sharing_EX, v);
         //Response MSG
         if(sendmsg != null){
             networkmanager.SEND_RESPONSE(rv_packet, sendmsg, MinTMessageCode.CONTENT);

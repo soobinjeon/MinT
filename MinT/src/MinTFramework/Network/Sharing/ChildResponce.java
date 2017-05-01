@@ -36,7 +36,7 @@ public class ChildResponce extends SharingResponse{
 
     @Override
     public void getNetworkResource() {
-        System.out.println("child Response Activated!");
+//        System.out.println("child Response Activated!");
         
         //get Group Resource
         getGroupResource();
@@ -46,7 +46,7 @@ public class ChildResponce extends SharingResponse{
     }
 
     private void getHeaderResource() {
-        System.out.println("get Header Resource");
+//        System.out.println("get Header Resource");
         List<Node> cnodes = routing.getHeaderNodes();
         ResponseWaiter waiter = new ResponseWaiter(this, RESOURCE_TYPE.HEADERRESOURCE);
         resWaiterList.add(waiter);
@@ -54,8 +54,8 @@ public class ChildResponce extends SharingResponse{
         for(Node n : cnodes){
             for(ThingProperty p: n.getProperties().values()){
                 if(p.getDeviceType().isSameDeivce(recvmsg.getResourceName())){
-                    System.out.println("setUP HEADER for send: "+n.gettoAddr().getAddress());
-                    waiter.putPacket(n, p);
+//                    System.out.println("setUP HEADER for send: "+n.gettoAddr().getAddress());
+                    waiter.putPacket(n, p, recvmsg);
 //                    sharing.getHeaderResource(new SendMessage(p.getDeviceType().getDeviceTypeString(),null)
 //                            , waiter.putResponseHandler(p), n);
                 }

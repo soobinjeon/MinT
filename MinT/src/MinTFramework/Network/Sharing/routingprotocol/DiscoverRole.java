@@ -24,7 +24,7 @@ package MinTFramework.Network.sharing.routingprotocol;
 public class DiscoverRole {
     private boolean isNewDiscover = false;
     private int timetable = 0;
-    private int Default_Time_sec = 10; //sec
+    private int Default_Time_sec = 5; //sec
     
     public DiscoverRole(int dtime){
         timetable = 0;

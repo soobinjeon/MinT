@@ -32,6 +32,7 @@ import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResData;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;
+import MinTFramework.storage.datamap.Information;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
@@ -113,7 +114,7 @@ public class Sharing {
     }
     
     public void sendNetwork(List<ResponseWaiter> reswaiter){
-        boolean isMulticast = true; //temporary Multicast, unicast setup
+        boolean isMulticast = routingprotocol.isMulticastMode();
         for(ResponseWaiter wt : reswaiter){
             if(isMulticast){
                 if (wt.getResourceType().isChildResource() && !wt.getPackets().isEmpty()) {
@@ -123,11 +124,19 @@ public class Sharing {
                 }
             }else{
                 //unicast
-                for(SharingPacket sp : wt.getPackets()){
-                    if(wt.getResourceType().isChildResource())
-                        sendtoMemberNode(sp,isMulticast);
-                    else if(wt.getResourceType().isHeaderResource())
-                        sendtoHeaderNode(sp,isMulticast);
+                for(SharingPacket sp : wt.getPackets()) {
+//                    try {
+                        if (wt.getResourceType().isChildResource()) {
+                            sendtoMemberNode(sp, isMulticast);
+                        } else if (wt.getResourceType().isHeaderResource()) {
+                            sendtoHeaderNode(sp, isMulticast);
+                        }
+//                        Information info = sp.getReceiveMessage().getResourcebyName(Request.MSG_ATTR.Sharing_EX);
+//                        System.out.println(sp.getNodeInfo().gettoAddr().getAddress()+", sended ("+info.getResourceString()+")");
+//                        Thread.sleep(10);
+//                    } catch (InterruptedException ex) {
+//                        System.out.println("sleep Exception..");
+//                    }
                 }
             }
         }
@@ -136,10 +145,22 @@ public class Sharing {
     /********************************************************
      * CHILD NODE WORKING
      ********************************************************/
-    public void getResource(DeviceType restype, ResourceOption resOpt, ResponseHandler resHandle){
+    /**
+     * 
+     * @param restype
+     * @param resOpt
+     * @param resHandle
+     * @param checkvalue value for Experiment
+     */
+    public void getResource(DeviceType restype, ResourceOption resOpt, ResponseHandler resHandle, int checkvalue){
         if(resOpt == null)
-                resOpt = ResourceOption.LAST;
-        getResource(new SendMessage(restype.getDeviceTypeString(),resOpt.toOption()), resHandle);
+                resOpt = ResourceOption.LIST;
+        
+        SendMessage sendmsg = new SendMessage(restype.getDeviceTypeString(),resOpt.toOption());
+        
+        if(checkvalue != -1)
+            sendmsg.AddAttribute(Request.MSG_ATTR.Sharing_EX, checkvalue);
+        getResource(sendmsg, resHandle);
     }
     /**
      * Request Resource to Header node from Client
@@ -165,6 +186,11 @@ public class Sharing {
             return;
         SendMessage requestdata = new SendMessage(sp.getProperty().getName(), null);
         requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.CLIENT_REQUEST.getValue());
+        //for Experiments
+        Information exv = sp.getReceiveMessage().getResourcebyName(Request.MSG_ATTR.Sharing_EX);
+        if(exv != null)
+            requestdata.AddAttribute(Request.MSG_ATTR.Sharing_EX,exv.getResourceInt());
+        
         if(ismulticast){
             frame.REQUEST_GET_MULTICAST(requestdata, sp.getResponseHandler());
         }else{
@@ -178,7 +204,6 @@ public class Sharing {
     /********************************************************
      * HEADER WORKING
      ********************************************************/
-    
     public List<ResData> getLocalResource(Request recvmsg) {
         return resStorage.getPropertybyResourceType(recvmsg, Resource.StoreCategory.Local);
     }
@@ -190,6 +215,12 @@ public class Sharing {
         if(routingprotocol.isHeaderNode()){
             SendMessage requestdata = new SendMessage(sp.getProperty().getDeviceType().getDeviceTypeString(),null);
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
+            
+            Information exv = sp.getReceiveMessage().getResourcebyName(Request.MSG_ATTR.Sharing_EX);
+            if (exv != null) {
+                requestdata.AddAttribute(Request.MSG_ATTR.Sharing_EX, exv.getResourceInt());
+            }
+            
             if(!isMulticast)
                 frame.REQUEST_GET(sp.getNodeInfo().gettoAddr().setCON(true), requestdata, sp.getResponseHandler());
             else

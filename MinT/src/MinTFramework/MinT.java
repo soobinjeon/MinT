@@ -359,7 +359,7 @@ public abstract class MinT {
      * @param platforms <Platforms> Operating Platform
      */
     public void activateRoutingProtocol(String groupName, NodeSpecify ns){
-        NTWmanager.activeRoutingProtocol(groupName, ns);
+        NTWmanager.activeRoutingProtocol(groupName, ns, false);
     }
     
     public void activateRoutingProtocol(){
@@ -367,15 +367,19 @@ public abstract class MinT {
     }
     
     public void activateRoutingProtocol(boolean isVirtualPower){
+        activateRoutingProtocol(isVirtualPower, false);
+    }
+    
+    public void activateRoutingProtocol(boolean isVirtualPower, boolean isMulticast){
         if(getConfig().getGroupName().isEmpty())
             System.err.println("Sharing Group Name is Empty - Routing Protocol is not activated");
         else{
             if(isVirtualPower)
                 NTWmanager.activeRoutingProtocol(getConfig().getGroupName()
-                    , new NodeSpecify(getConfig().getSpecPower(), 0));
+                    , new NodeSpecify(getConfig().getSpecPower(), 0), isMulticast);
             else
                 NTWmanager.activeRoutingProtocol(getConfig().getGroupName()
-                    , new NodeSpecify(null, 0));
+                    , new NodeSpecify(null, 0), isMulticast);
         }
     }
     
@@ -494,9 +498,19 @@ public abstract class MinT {
      * @param resHandle 
      */
     public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle){
+        GET_SHARING_RESOURCE(dtype, resOpt, resHandle, -1);
+    }
+    
+    /**
+     * 
+     * @param dtype
+     * @param resOpt
+     * @param resHandle 
+     */
+    public void GET_SHARING_RESOURCE(DeviceType dtype, ResourceOption resOpt, ResponseHandler resHandle, int checkvalue){
         Sharing sharing = NTWmanager.getSharing();
         try{
-            sharing.getResource(dtype, resOpt, resHandle);
+            sharing.getResource(dtype, resOpt, resHandle, checkvalue);
         }catch(Exception e){
             e.printStackTrace();
         }

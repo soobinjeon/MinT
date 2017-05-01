@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.sharing;
 
+import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.ThingProperty;
@@ -29,11 +30,13 @@ public class SharingPacket {
     private Node node = null;
     private ThingProperty prop = null;
     private ResponseHandler reshandler = null;
+    private ReceiveMessage recvmsg = null;
     
-    public SharingPacket(Node n, ThingProperty pr, ResponseHandler res){
+    public SharingPacket(Node n, ThingProperty pr, ResponseHandler res, ReceiveMessage _recvmsg){
         node = n;
         prop = pr;
         reshandler = res;
+        recvmsg = _recvmsg;
     }
     
     public ResponseHandler getResponseHandler(){
@@ -46,5 +49,9 @@ public class SharingPacket {
     
     public ThingProperty getProperty(){
         return prop;
+    }
+    
+    public ReceiveMessage getReceiveMessage(){
+        return recvmsg;
     }
 }

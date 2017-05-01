@@ -36,7 +36,8 @@ public class Request {
         RoutingGroup("rog"),
         RoutingWeight("row"),
         RoutingisHeader("roh"),
-        Sharing("sh");
+        Sharing("sh"),
+        Sharing_EX("se");
         private String resName;
         
         // Reverse-lookup map for getting a MSG_ATTR from an resName

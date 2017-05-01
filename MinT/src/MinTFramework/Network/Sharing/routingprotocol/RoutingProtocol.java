@@ -65,6 +65,8 @@ public class RoutingProtocol implements Runnable{
     
     private boolean isActiveRouting = false;
     
+    private boolean isMulticast = false;
+    
     public RoutingProtocol(){
         frame = MinT.getInstance();
         resStorage = frame.getResStorage();
@@ -119,10 +121,11 @@ public class RoutingProtocol implements Runnable{
         return isHeaderNode;
     }
     
-    public void setRoutingProtocol(String _groupName, NodeSpecify ns){
+    public void setRoutingProtocol(String _groupName, NodeSpecify ns, boolean _isMulticast){
         setRoutingProtocol(_groupName);
         currentNode = new CurrentNode(ns, groupName);
         isActiveRouting = true;
+        isMulticast = _isMulticast;
     }
     
     public Node getHeaderNodeofCurrentNode(){
@@ -276,6 +279,14 @@ public class RoutingProtocol implements Runnable{
                     + ", " + tp.getStorageCategory().toString()
                     + ", data: " + tp.getResourceData().getResourceString());
         }
+    }
+    
+    /**
+     * is Multicast Mode
+     * @return 
+     */
+    public boolean isMulticastMode(){
+        return isMulticast;
     }
     
     /**

@@ -21,6 +21,7 @@ import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Network;
 import MinTFramework.Network.NetworkProfile;
 import MinTFramework.Network.NetworkType;
+import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
@@ -110,7 +111,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
     * @param req 
     */
     @Override
-    public void requestHandle(PacketDatagram rv_packet, Request req) {
+    public void requestHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);
         
         //process for broadcast of header node
@@ -126,19 +127,22 @@ public class PhaseHeaderElection extends Phase implements Callable{
             //헤더 정보 교환을 해야하나?
             //Notifying 메세지를 받은 후 반송 메세지로 리소스 정보들으 보내줘야하나? (선택!)
             //아니면 Notifying 시 리소스 정보들을 올려줘야하는가??
-            System.out.println("add other HeaderNode: "
-                    +rv_packet.getSource().getAddress()+", "
-                    +rv_packet.getPreviosNode().getAddress());
-            addRoutingTable(rv_packet, req);
+            Node cn = addRoutingTable(rv_packet, req);
             addHeaderResource(rv_packet, req);
+            if(cn != null){
+                System.out.println("\nadd other HeaderNode: "
+                        +rv_packet.getSource().getAddress()+", "
+                        +rv_packet.getPreviosNode().getAddress());
+                routing.printRoutingInfo();
+            }
         }
     }
     
-    private void addHeaderResource(PacketDatagram rv_packet, Request req) {
+    private void addHeaderResource(PacketDatagram rv_packet, ReceiveMessage req) {
         if (isDiscovery(req)) {
             System.out.println("update discovery data in Routing Handler");
             Information discoverdata = req.getResourcebyName(Request.MSG_ATTR.WellKnown);
-            ResponseData resdata = new ResponseData(rv_packet, discoverdata.getResource());
+            ResponseData resdata = new ResponseData(rv_packet, discoverdata.getResource(),req);
             frame.getResStorage().updateDiscoverData(resdata);
             Node hn = rtable.getNodebyAddress(rv_packet.getSource().getAddress());
             if(hn != null)
@@ -186,7 +190,7 @@ public class PhaseHeaderElection extends Phase implements Callable{
      * @param req 
      */
     @Override
-    public void responseHandle(PacketDatagram rv_packet, Request req) {
+    public void responseHandle(PacketDatagram rv_packet, ReceiveMessage req) {
         if(!routing.isHeaderNode() && !isWorkingPhase())
             return;
         Information resdata = req.getResourcebyName(Request.MSG_ATTR.Routing);

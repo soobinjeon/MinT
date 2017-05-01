@@ -22,7 +22,7 @@ package MinTFramework.Network.sharing;
  * youngtak Han <gksdudxkr@gmail.com>
  */
 public enum ResourceOption {
-    LAST("lst", 0),
+    LIST("lst", 0),
     AVERAGE("avg", 1),
     MIN("min", 2),
     MAX("max", 3),
@@ -51,7 +51,7 @@ public enum ResourceOption {
         return optvalue;
     }
 
-    public boolean isLast() { return this == LAST; }
+    public boolean isLast() { return this == LIST; }
     public boolean isAverage() { return this == AVERAGE; }
     public boolean isMinimum() { return this == MIN; }
     public boolean isMaximum() { return this == MAX; }

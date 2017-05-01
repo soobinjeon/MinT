@@ -16,6 +16,7 @@
  */
 package MinTFramework.Network.sharing;
 
+import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
 import MinTFramework.Network.sharing.node.Node;
 import MinTFramework.storage.ResData;
@@ -71,8 +72,8 @@ public class ResponseWaiter {
         return responseData;
     }
     
-    public void putPacket(Node n, ThingProperty res){
-        spackets.add(new SharingPacket(n, res, new ResponseNode(this, res)));
+    public void putPacket(Node n, ThingProperty res, ReceiveMessage rmsg){
+        spackets.add(new SharingPacket(n, res, new ResponseNode(this, res), rmsg));
         ResponseSize = spackets.size();
     }
     
