@@ -213,7 +213,10 @@ public class Sharing {
             return;
         
         if(routingprotocol.isHeaderNode()){
-            SendMessage requestdata = new SendMessage(sp.getProperty().getDeviceType().getDeviceTypeString(),null);
+            //fix me average가 안됨
+            ResourceOption resOpt = ResourceOption
+                    .getResourceOptionbyOpt(sp.getProperty().getResourceData().getResourceString());
+            SendMessage requestdata = new SendMessage(sp.getProperty().getDeviceType().getDeviceTypeString(),resOpt.toOption());
             requestdata.AddAttribute(Request.MSG_ATTR.Sharing, SharingMessage.HEADER_REQUEST.getValue());
             
             Information exv = sp.getReceiveMessage().getResourcebyName(Request.MSG_ATTR.Sharing_EX);

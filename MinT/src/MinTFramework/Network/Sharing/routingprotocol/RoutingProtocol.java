@@ -289,6 +289,10 @@ public class RoutingProtocol implements Runnable{
         return isMulticast;
     }
     
+    public boolean isActiveRouting(){
+        return isActiveRouting;
+    }
+    
     /**
      * Routing Phase ENUM
      */

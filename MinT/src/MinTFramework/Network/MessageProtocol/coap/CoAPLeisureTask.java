@@ -37,8 +37,8 @@ public class CoAPLeisureTask implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("send leisure Data to "+sendmsg.getDestination().getAddress()
-        +sendmsg.Message()+", "+sendmsg.getHeader_Type());
+//        System.out.println("send leisure Data to "+sendmsg.getDestination().getAddress()
+//        +sendmsg.Message()+", "+sendmsg.getHeader_Type());
         
         nmanager.SEND(sendmsg);
     }

@@ -19,6 +19,7 @@ package MinTFramework.Network.MessageProtocol.coap;
 import MinTFramework.Network.MessageProtocol.MessageTransfer;
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
+import MinTFramework.Network.MessageProtocol.coap.CoAPPacket.HEADER_TYPE;
 import MinTFramework.Network.RecvMSG;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
@@ -49,14 +50,14 @@ public class CoAPManager implements MessageTransfer{
     }
     
     @Override
-    public SendMSG sendResponse(PacketDatagram rv_pkt, SendMessage ret, MinTMessageCode responseCode) {
+    public SendMSG sendResponse(PacketDatagram rv_pkt, SendMessage ret, MinTMessageCode responseCode, boolean isACK) {
         SendMSG res_msg = null;
         CoAPPacket rvpacket = (CoAPPacket)rv_pkt;
         CoAPPacket.HEADER_CODE hcode = CoAPPacket.HEADER_CODE.getHeaderCode(responseCode.getCode());
         if (rvpacket.getHeader_Type().isCON()) {
-            res_msg = SEND_PIGGYBACK_ACK(rvpacket, (SendMessage) ret, hcode);
+            res_msg = SEND_PIGGYBACK_ACK(rvpacket, (SendMessage) ret, hcode, isACK);
         } else {
-            res_msg = SEND_SEPERATED_RESPONSE(rvpacket, (SendMessage) ret, hcode);
+            res_msg = SEND_NON_RESPONSE(rvpacket, (SendMessage) ret, hcode);
         }
         if(res_msg != null){
             if(res_msg.isResponseforMulticast()){
@@ -77,14 +78,18 @@ public class CoAPManager implements MessageTransfer{
      * @param rv_packet Receved packet
      * @param ret
      */
-    private SendMSG SEND_PIGGYBACK_ACK(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode) {
+    private SendMSG SEND_PIGGYBACK_ACK(CoAPPacket rv_packet, SendMessage ret
+            , CoAPPacket.HEADER_CODE hcode, boolean isACK) {
         // CoAP Piggyback procedure
         CoAPPacket cp = (CoAPPacket)rv_packet;
+        HEADER_TYPE ht = HEADER_TYPE.ACK;
+        if(!isACK)
+            ht = HEADER_TYPE.CON;
 //            SEND(new SendMSG(CoAPPacket.HEADER_TYPE.ACK, 0,
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getMSGID()));
 //            SEND(new SendMSG(cp.getMSGID(), CoAPPacket.HEADER_TYPE.ACK, cp.getHeader_TokenLength(),
 //                    CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
-        return new SendMSG(cp, CoAPPacket.HEADER_TYPE.ACK, hcode, ret);
+        return new SendMSG(cp, ht, hcode, ret);
     }
 
     /**
@@ -96,7 +101,7 @@ public class CoAPManager implements MessageTransfer{
 
     }
     
-    private SendMSG SEND_SEPERATED_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode){
+    private SendMSG SEND_NON_RESPONSE(CoAPPacket rv_packet, SendMessage ret, CoAPPacket.HEADER_CODE hcode){
 //            SEND(new SendMSG(idmaker.makeMessageID(), CoAPPacket.HEADER_TYPE.NON, cp.getHeader_TokenLength(),
 //                                CoAPPacket.HEADER_CODE.CONTENT, cp.getSource(), ret, cp.getToken()));
         return new SendMSG(rv_packet, CoAPPacket.HEADER_TYPE.NON, hcode, ret);
@@ -120,6 +125,10 @@ public class CoAPManager implements MessageTransfer{
             putResponse(sendmsg.getResponseKey(), sendmsg);
         }else if(sendmsg.isUDPMulticastMode()){
             sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg));
+        }else if(sendmsg.getHeader_Type().isCON() && sendmsg.getHeader_Code().isContent()
+                && sendmsg.getSendHit() == 0){
+            sendmsg.setMessageID(getIDMaker().makeMessageID(sendmsg));
+//            System.out.println("CON message and CONTENT response! "+sendmsg.Message());
         }
 
         /**
@@ -143,14 +152,17 @@ public class CoAPManager implements MessageTransfer{
     public ResponseHandler receive(RecvMSG recvmsg) {
         CoAPPacket packet = (CoAPPacket)recvmsg.getPacketDatagram();
         if (packet.getHeader_Type().isACK()) {
+//            System.out.println(packet.getMSGID()+"- ACK CHECK");
             //checkAck(packet.getMSGID());
             checkAck(packet);
         }
 
         ResponseHandler reshandle = null;
         //Run Response Handler for Response Mode
-        if (packet.getHeader_Code().isResponse())
+        if (packet.getHeader_Code().isResponse() && !packet.getHeader_Code().isEmpty()){
+//            System.out.println("Response Check");
             reshandle = getResponseDataMatchbyID(packet.getSource().getAddress(), packet.getToken());
+        }
         return reshandle;
     }
     

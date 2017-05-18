@@ -17,6 +17,7 @@
 package MinTFramework.Network.sharing;
 
 import MinTFramework.Network.Handler;
+import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
@@ -48,7 +49,14 @@ public class SharingHandler extends Handler{
         Information svalue = recvmsg.getResourcebyName(Request.MSG_ATTR.Sharing);
 //        if(svalue != null)
 //            System.out.println(" REQUEST_info: "+svalue.getResourceInt());
-        
+
+        //ACK to Sender, if Unicast
+        if(!routing.isMulticastMode() && svalue != null 
+                && svalue.getResourceInt() != SharingMessage.CLIENT_REQUEST.getValue()){
+//            System.out.println("(REQUEST)send Seperate ACK to sender - "+rv_packet.getSource().getAddress());
+            nmanager.SEND_RESPONSE(rv_packet, null, MinTMessageCode.EMPTY);
+        }
+
         if(routing.hasChildNode(rv_packet.getSource())){ //Requested from Child Node
 //            System.out.println("request from Client");
             sharing.executeResponse(new ChildResponce(rv_packet, recvmsg));
@@ -65,11 +73,18 @@ public class SharingHandler extends Handler{
                 sharing.getSystemHandler().HandleRequest(rv_packet, recvmsg);
             else
                 System.out.println("System Handler is Null");
-            //시스템 스케쥴러 가져와서 실행시켜줘야함......
         }
     }
 
     @Override
     public void HandleResponse(PacketDatagram packet, ReceiveMessage receivemsg) {
+//        System.out.println("Response Sharing");
+        Information svalue = receivemsg.getResourcebyName(Request.MSG_ATTR.Sharing);
+
+        if(!routing.isMulticastMode()){
+//            System.out.println("(RESPONSE)send Seperate ACK to sender - "+packet.getSource().getAddress()
+//                    +", id:"+packet.getSource().getId());
+            nmanager.SEND_RESPONSE(packet, null, MinTMessageCode.EMPTY);
+        }
     }
 }

@@ -33,6 +33,10 @@ public class ReceiveMessage extends Request{
         setJSONtoData(JSONString);
     }
     
+    public RecvMSG getRecvMSG(){
+        return receivemsg;
+    }
+     
     private void setJSONtoData(String JSONString) {
         try{
             messageString = JSONString;

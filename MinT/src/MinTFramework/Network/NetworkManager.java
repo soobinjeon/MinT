@@ -219,8 +219,9 @@ public class NetworkManager {
     public void SEND(SendMSG smsg) {
         if(smsg != null)
             sysSched.submitProcess(MinTthreadPools.NET_SEND, smsg);
-        else
-            System.err.println("SEND MESSAGE null or Multicast response!");
+        else{
+//            System.err.println("SEND MESSAGE null or Multicast response!");
+        }
     }
     
     
@@ -243,12 +244,16 @@ public class NetworkManager {
      * @param ret 
      * @param responseCode MinT Response Code
      */
-    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode){
+    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode, boolean isACK){
         MessageTransfer tr = rv_packet.getApplicationProtocol().getMessageManager();
         if(tr == null)
             System.err.println("Message Transfer is null - "+rv_packet.getApplicationProtocol());
         else
-            SEND(tr.sendResponse(rv_packet, ret, responseCode));
+            SEND(tr.sendResponse(rv_packet, ret, responseCode, isACK));
+    }
+    
+    public void SEND_RESPONSE(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode){
+        SEND_RESPONSE(rv_packet,ret,responseCode,true);
     }
     
     /**

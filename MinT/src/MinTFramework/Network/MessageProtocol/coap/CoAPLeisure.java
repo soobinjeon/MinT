@@ -20,6 +20,7 @@ import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.SendMSG;
+import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import java.util.Random;
@@ -33,6 +34,7 @@ public class CoAPLeisure {
     private MinT mint = MinT.getInstance();
     private NetworkManager nmanager = mint.getNetworkManager();
     private SystemScheduler sysSched = mint.getSystemScheduler();
+    private RoutingProtocol routing = nmanager.getRoutingProtocol();
     private float default_leisure = CoAPPacket.CoAPConfig.DEFAULT_LEISURE;
     private long leisure = 0;
     private Random rand;
@@ -45,18 +47,19 @@ public class CoAPLeisure {
         }
         rand = new Random(seed);
         leisure = (long)(default_leisure*1000);
+//        setLeisure();
     }
     
     public void putLeisureScheduler(SendMSG smsg){
+//        leisure = rand.nextInt((int)default_leisure);
         leisure = rand.nextInt((int)default_leisure*1000);
-        System.out.println(smsg.getDestination().getAddress()+"("+smsg.getResponseKey()+") leisure time is "+leisure+"ms");
         sysSched.submitSchedule(MinTthreadPools.MULTICAST_LEISURE_HANDLE, new CoAPLeisureTask(smsg), leisure);
     }
-    public void setLeisure(int Gsize){
+    public void setLeisure(){
         long les;
-        long G = Gsize;
+        long G = 5;
         long S = 40;
-        long R = 1000;
+        long R = 100000;
         
         /**
          * lb_Leisure = S * G / R
@@ -65,6 +68,7 @@ public class CoAPLeisure {
          * R : target data transfer rate
          */
         
-        leisure = S * G / R;
+        //leisure = S * G / R; default
+        default_leisure = S * G / (float)R * 3 * 1000;
     }
 }

@@ -265,7 +265,8 @@ public abstract class SharingResponse implements Runnable{
             sendmsg.AddAttribute(Request.MSG_ATTR.Sharing_EX, v);
         //Response MSG
         if(sendmsg != null){
-            networkmanager.SEND_RESPONSE(rv_packet, sendmsg, MinTMessageCode.CONTENT);
+//            System.out.println("SEND CALCULATED RESOURCE\n");
+            networkmanager.SEND_RESPONSE(rv_packet, sendmsg, MinTMessageCode.CONTENT, false);
 //            networkmanager.SEND(new SendMSG(CoAPPacket.HEADER_TYPE.NON, 0
 //                        , CoAPPacket.HEADER_CODE.CONTENT, rv_packet.getSource(), sendmsg, rv_packet.getMSGID()));
         }

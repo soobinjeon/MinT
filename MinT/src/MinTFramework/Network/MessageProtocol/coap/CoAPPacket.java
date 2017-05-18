@@ -473,8 +473,8 @@ public class CoAPPacket extends PacketDatagram {
             return null;
         }
                 
-        public boolean isRequest() {return classCode == 0;}
-        public boolean isResponse() {return classCode != 0;}
+        public boolean isRequest() {return classCode == 0 && this != EMPTY;}
+        public boolean isResponse() {return classCode != 0 || this == EMPTY;}
         
         public boolean isGet() {return this == GET;}
         public boolean isPost() {return this == POST;}
@@ -487,6 +487,7 @@ public class CoAPPacket extends PacketDatagram {
         public boolean isChanged() {return this == CHANGED;}
         public boolean isContent() {return this == CONTENT;}
         public boolean isContinue() {return this == CONTINUE;}
+        boolean isEmpty() { return this == EMPTY;}
         
         public boolean NeedResponse() {return (this == GET) || (this == PUT) || (this == DELETE);}
         
@@ -494,6 +495,7 @@ public class CoAPPacket extends PacketDatagram {
         public boolean isFailResponse() {return (classCode != 4) || (classCode != 5);}
         public boolean isClientError() {return classCode == 4;}
         public boolean isServerError() {return classCode == 5;}
+
     }
     
     public static class CoAPConfig {

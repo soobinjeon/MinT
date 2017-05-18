@@ -34,7 +34,7 @@ public interface MessageTransfer {
      * @param responseCode MinT Response Code
      * @return Send MSG
      */
-    public SendMSG sendResponse(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode);
+    public SendMSG sendResponse(PacketDatagram rv_packet, SendMessage ret, MinTMessageCode responseCode, boolean isACK);
     public void send(SendMSG sendmsg);
     public ResponseHandler receive(RecvMSG recvmsg);
 }
