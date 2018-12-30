@@ -1,0 +1,700 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="MinT:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="dacc6a5d-c688-48e6-b97f-76b6ac706398" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/MinT.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/MinT.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/MinTConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/MinTConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/MessageProtocol/coap/CoAPLeisure.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/MessageProtocol/coap/CoAPLeisure.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Network.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Network.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/NetworkManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/NetworkManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ChildResponce.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ChildResponce.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/HeaderReponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/HeaderReponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResourceOption.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResourceOption.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseWaiter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseWaiter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/Sharing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/Sharing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingPacket.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/CurrentNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/CurrentNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Node.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/NodeSpecify.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/NodeSpecify.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Platforms.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Platforms.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecCPU.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecCPU.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecNetwork.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecNetwork.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecPower.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecPower.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/DiscoverRole.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/DiscoverRole.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/ExecuteRouting.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/ExecuteRouting.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/Phase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/Phase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseDiscover.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseDiscover.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseHeaderElection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseHeaderElection.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RT_MSG.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RT_MSG.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingProtocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingProtocol.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingTable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingTable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/SystemHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/SystemHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Network/Transportation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Network/Transportation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/Util/PlatformInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/Util/PlatformInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MinTFramework/storage/Resource.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MinTFramework/storage/Resource.java" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/out/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1559607882">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="4" />
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.10" value="2" />
+          <entry key="project.open.time.12" value="1" />
+          <entry key="project.opened" value="4" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="iml" value="2" />
+          <entry key="java" value="34" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="IDEA_MODULE" value="2" />
+          <entry key="JAVA" value="34" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="java" value="52" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JAVA" value="52" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/MinT.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="182">
+              <caret line="52" column="3" lean-forward="true" selection-start-line="52" selection-start-column="3" selection-end-line="52" selection-end-column="3" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Network.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="930">
+              <caret line="88" column="21" selection-start-line="88" selection-start-column="21" selection-end-line="88" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/ExecuteRouting.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="435">
+              <caret line="48" column="28" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/NetworkManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1620">
+              <caret line="145" column="47" selection-start-line="145" selection-start-column="47" selection-end-line="145" selection-end-column="47" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseDiscover.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseHeaderElection.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingProtocol.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingTable.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RT_MSG.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="19" column="2" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>.sharing</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>.Sharing</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/NodeSpecify.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecPower.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/CurrentNode.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Node.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecCPU.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecNetwork.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Util/PlatformInfo.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Platforms.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/HeaderReponse.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResourceOption.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseNode.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingHandler.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingMessage.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingResponse.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingPacket.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/Sharing.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseWaiter.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ChildResponce.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/DiscoverRole.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/Phase.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseDiscover.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseHeaderElection.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutHandler.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingProtocol.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingTable.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RT_MSG.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/ExecuteRouting.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/NetworkManager.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/MinT.java" />
+        <option value="$PROJECT_DIR$/src/MinTFramework/Network/Network.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds" fullScreen="true">
+    <option name="width" value="1680" />
+    <option name="height" value="1050" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="PackagesPane" proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="AndroidView" />
+      <pane id="PackagesPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="MinT" type="58d84e3e:PackageViewProjectNode" />
+              <item name="MinT" type="616d4139:PackageViewModuleNode" />
+            </path>
+            <path>
+              <item name="MinT" type="58d84e3e:PackageViewProjectNode" />
+              <item name="MinT" type="616d4139:PackageViewModuleNode" />
+              <item name="MinTFramework" type="1f31426a:PackageElementNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="MinT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MinT" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MinT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MinT" type="462c0819:PsiDirectoryNode" />
+              <item name="out" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MinT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="MinT" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MinT" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1534570064353" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="dacc6a5d-c688-48e6-b97f-76b6ac706398" name="Default Changelist" comment="" />
+      <created>1534432099259</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1534432099259</updated>
+      <workItem from="1534432100709" duration="213000" />
+      <workItem from="1534569196594" duration="1009000" />
+      <workItem from="1534576197422" duration="1696000" />
+      <workItem from="1534863477366" duration="1477000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="4395000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <editor active="true" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21489622" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Designer" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Capture Tool" order="5" />
+      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4993895" weight="0.32959184" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4993895" weight="0.32959184" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.4981685" weight="0.32959184" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50183153" side_tool="true" visible="true" weight="0.32959184" />
+      <window_info anchor="bottom" id="Messages" order="11" sideWeight="0.4981685" weight="0.32959184" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="Database" order="5" />
+      <window_info anchor="right" id="Theme Preview" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Maven Projects" order="8" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/MinT.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/CurrentNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Node.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecCPU.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecNetwork.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="19" column="2" lean-forward="true" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/SpecPower.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="20" column="12" lean-forward="true" selection-start-line="20" selection-start-column="12" selection-end-line="20" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Util/PlatformInfo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="21" column="3" lean-forward="true" selection-start-line="21" selection-start-column="3" selection-end-line="21" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/NodeSpecify.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="43" column="54" lean-forward="true" selection-start-line="43" selection-start-column="54" selection-end-line="43" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/node/Platforms.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="20" column="3" selection-start-line="20" selection-end-line="20" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Handler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="30" column="22" selection-start-line="30" selection-start-column="22" selection-end-line="30" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingPacket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="26" column="18" selection-start-line="26" selection-start-column="18" selection-end-line="26" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="30" column="13" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/Sharing.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="25" column="16" selection-start-line="25" selection-start-column="16" selection-end-line="25" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseWaiter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="22" column="14" selection-start-line="22" selection-start-column="14" selection-end-line="22" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResponseNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="34" column="4" lean-forward="true" selection-start-line="34" selection-start-column="4" selection-end-line="34" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ResourceOption.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="18" column="3" lean-forward="true" selection-start-line="18" selection-start-column="3" selection-end-line="18" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/HeaderReponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/ChildResponce.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="44" column="28" lean-forward="true" selection-start-line="44" selection-start-column="28" selection-end-line="44" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/SharingResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="394">
+          <caret line="67" column="2" selection-start-line="67" selection-start-column="2" selection-end-line="67" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/DiscoverRole.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/Phase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/MinT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="52" column="3" lean-forward="true" selection-start-line="52" selection-start-column="3" selection-end-line="52" selection-end-column="3" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Network.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="930">
+          <caret line="88" column="21" selection-start-line="88" selection-start-column="21" selection-end-line="88" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/ExecuteRouting.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="48" column="28" selection-start-line="48" selection-start-column="28" selection-end-line="48" selection-end-column="28" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/NetworkManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1620">
+          <caret line="145" column="47" selection-start-line="145" selection-start-column="47" selection-end-line="145" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseDiscover.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/PhaseHeaderElection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RoutingTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="16" column="31" selection-start-line="16" selection-start-column="31" selection-end-line="16" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/MinTFramework/Network/Sharing/routingprotocol/RT_MSG.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="19" column="2" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>MinT:jar</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>No facets are configured</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>MinT</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>lib</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>
