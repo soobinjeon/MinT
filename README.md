@@ -1,4 +1,4 @@
-﻿# Middleware for Cooperative Interactions of Things (MinT)
+# Middleware for Cooperative Interactions of Things (MinT)
 
 ## Introduction
 We propose an IoT middleware platform to support the cooperative interaction of things called MINT (Middleware for Cooperative INteraction of Things). The characteristics of cooperative interaction can be used to effectively configure the IoT working environment. These are the goals of MINT:
@@ -20,10 +20,10 @@ Basically, the MinT platform uses CoAP because this protocol is well suited for 
 The MinT provides powerful development tools for service developers and clients. By using these tools, users can develop new service applications, those that are standalone in nature and those that cooperate with other services to implement a new service. Given the fact that the MinT platform is easy to learn and has a user-friendly interface, besides expert developers, even general users can rapidly take high-level business ideas from concept to implementation in an IoT environment. The reduced development time has a favorable effect on the ability of organizations to implement IoT systems with the latest sensor devices and service applications.
 
 ## Technical Notes 
-* [System Architecture](http://sn.kangwon.ac.kr/LabThings/MinT/post/22)
-* [MinT Performance Evaluation](http://sn.kangwon.ac.kr/LabThings/MinT/post/23)
-* [Flexible performance improvement](http://sn.kangwon.ac.kr/LabThings/MinT/post/24)
-* [Integration of Heterogeneous network](http://sn.kangwon.ac.kr/LabThings/MinT/post/25)
+* [System Architecture](http://sn.kangwon.ac.kr/MinT/MinT/post/22)
+* [MinT Performance Evaluation](http://sn.kangwon.ac.kr/MinT/MinT/post/23)
+* [Flexible performance improvement](http://sn.kangwon.ac.kr/MinT/MinT/post/24)
+* [Integration of Heterogeneous network](http://sn.kangwon.ac.kr/MinT/MinT/post/25)
 
 ## Development Environment
 * Available on
@@ -44,7 +44,7 @@ The MinT provides powerful development tools for service developers and clients.
 
 ## Get Clone with Git
 * Yobi
-	> git clone http://sn.kangwon.ac.kr/LabThings/MinT
+	> git clone http://sn.kangwon.ac.kr/MinT/MinT
 * Github
 	> git clone https://github.com/soobinjeon/MinT.git
 
@@ -67,23 +67,23 @@ The MinT provides powerful development tools for service developers and clients.
 
 # Getting Start
 ## 1. Install the MinT to Platform
-### [MinT Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/LabThings/MinT/post/11)
+### [MinT Installation Guide for Beagle Bone Black](http://sn.kangwon.ac.kr/MinT/MinT/post/11)
 ### [MinT Installation Guide for Raspberry Pi 3 - not ready but similar with beagle bone black]
 ### [MinT Installation Guide for Intel Edison - not ready but similar with beagle bone black]
 ## 2. Development Information
-### Link for [Framework Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/8)
-### Link for [Driver Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/9)
-### Link for [Application Developer](http://sn.kangwon.ac.kr/LabThings/MinT/post/10)
+### Link for [Framework Developer](http://sn.kangwon.ac.kr/MinT/MinT/post/8)
+### Link for [Driver Developer](http://sn.kangwon.ac.kr/MinT/MinT/post/9)
+### Link for [Application Developer](http://sn.kangwon.ac.kr/MinT/MinT/post/10)
 ## 3. Tutorial Projects
 ### 3.1 Driver Project
-1. DHT11 Sensor Driver Example Project -> [MinT_Example_driver-DHT11](http://sn.kangwon.ac.kr/LabThings/MinT_DHT11_Control)
-2. HT01SV Sensor Driver Example Project -> [MinT_Example_driver-HT01SV](http://sn.kangwon.ac.kr/LabThings/MinT_Example_Driver-HT01SV)
-3. SRF04 Sensor Driver Example Project -> [MinT_Example_driver-SRF04](http://sn.kangwon.ac.kr/LabThings/MinT_SRF04_Demo/settingform)
-4. HM10-BLE Sensor Driver Example Project -> [MinT_Example_driver-HM10-BLE](http://sn.kangwon.ac.kr/LabThings/HM10-BLE_MinT_DeviceDriver)
-5. You can see more example in -> [LabThings Projects](http://sn.kangwon.ac.kr/organizations/LabThings)
+1. DHT11 Sensor Driver Example Project -> [MinT_Example_driver-DHT11](http://sn.kangwon.ac.kr/MinT/MinT_DHT11_Control)
+2. HT01SV Sensor Driver Example Project -> [MinT_Example_driver-HT01SV](http://sn.kangwon.ac.kr/MinT/MinT_Example_Driver-HT01SV)
+3. SRF04 Sensor Driver Example Project -> [MinT_Example_driver-SRF04](http://sn.kangwon.ac.kr/MinT/MinT_SRF04_Demo/settingform)
+4. HM10-BLE Sensor Driver Example Project -> [MinT_Example_driver-HM10-BLE](http://sn.kangwon.ac.kr/MinT/HM10-BLE_MinT_DeviceDriver)
+5. You can see more example in -> [MinT Projects](http://sn.kangwon.ac.kr/organizations/MinT)
 
 ### 3.2 Application Project
-1. Application Example Project -> [MinT_Exam_Application](http://sn.kangwon.ac.kr/LabThings/MinT_Sharing)
+1. Application Example Project -> [MinT_Exam_Application](http://sn.kangwon.ac.kr/MinT/MinT_Sharing)
 
 ## 4 Latest Update - MinT version 2.8
 
@@ -121,13 +121,13 @@ The MinT provides powerful development tools for service developers and clients.
 	 * 
 	```
 
-* v2.8 Link - [Click Here](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
+* v2.8 Link - [Click Here](http://sn.kangwon.ac.kr/MinT/MinT/code/refs%252Ftags%252Fv2.8)
 
 ### 4.2 Version Information
-- [MinT v2.8-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/21), [MinT v2.8-releases](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.8)
-- [MinT v2.7-update](http://sn.kangwon.ac.kr/LabThings/MinT/post/19), [MinT v2.7](http://sn.kangwon.ac.kr/LabThings/MinT/code/refs%252Ftags%252Fv2.7)
-- [MinT v2.4](http://sn.kangwon.ac.kr/LabThings/MinT/post/18)
-- [MinT v2.3](http://sn.kangwon.ac.kr/LabThings/MinT/post/17)
+- [MinT v2.8-update](http://sn.kangwon.ac.kr/MinT/MinT/post/21), [MinT v2.8-releases](http://sn.kangwon.ac.kr/MinT/MinT/code/refs%252Ftags%252Fv2.8)
+- [MinT v2.7-update](http://sn.kangwon.ac.kr/MinT/MinT/post/19), [MinT v2.7](http://sn.kangwon.ac.kr/MinT/MinT/code/refs%252Ftags%252Fv2.7)
+- [MinT v2.4](http://sn.kangwon.ac.kr/MinT/MinT/post/18)
+- [MinT v2.3](http://sn.kangwon.ac.kr/MinT/MinT/post/17)
 
 ## Publications
 

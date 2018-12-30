@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.Network.Handler;
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.Resource.Request;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.storage.datamap.Information;
 
 /**

@@ -24,9 +24,9 @@ import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Protocol.BLE.BLE;
 import MinTFramework.Network.Protocol.UDP.UDP;
 import MinTFramework.Network.Resource.SendMessage;
-import MinTFramework.Network.sharing.Sharing;
-import MinTFramework.Network.sharing.node.NodeSpecify;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.Sharing;
+import MinTFramework.Network.Sharing.node.NodeSpecify;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.ByteBufferPool;
@@ -69,7 +69,6 @@ public class NetworkManager {
     /**
      * Auto Set Network Manager as possible
      *
-     * @param frame
      */
     public NetworkManager() {
         this.dl = new DebugLog("NetworkManager", true);
@@ -145,7 +144,6 @@ public class NetworkManager {
      * Set Up the networks Available Networks : UDP, BLE, COAP(asap)
      *
      * @param ntype type of Network NetworkType
-     * @param port Internet port for (UDP,TCP/IP,COAP), null for others
      */
     public void setOnNetwork(NetworkType ntype) {
         if (ntype == NetworkType.UDP && networks.get(ntype) == null) {

@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing.node;
+package MinTFramework.Network.Sharing.node;
 
-import MinTFramework.Network.sharing.node.SpecPower.POWER_CATE;
+import MinTFramework.Network.Sharing.node.SpecPower.POWER_CATE;
 
 /**
  *

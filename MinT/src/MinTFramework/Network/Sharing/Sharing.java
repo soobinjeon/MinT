@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.MinT;
@@ -25,8 +25,8 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SystemHandler;
-import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.node.Node;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.ResData;

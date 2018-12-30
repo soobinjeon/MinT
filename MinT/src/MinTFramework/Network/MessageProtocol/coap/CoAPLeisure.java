@@ -20,7 +20,7 @@ import MinTFramework.MinT;
 import MinTFramework.MinTConfig;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.SendMSG;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import java.util.Random;

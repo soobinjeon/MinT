@@ -16,8 +16,8 @@
  */
 package MinTFramework;
 
-import MinTFramework.Network.sharing.node.SpecNetwork;
-import MinTFramework.Network.sharing.node.SpecPower;
+import MinTFramework.Network.Sharing.node.SpecNetwork;
+import MinTFramework.Network.Sharing.node.SpecPower;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

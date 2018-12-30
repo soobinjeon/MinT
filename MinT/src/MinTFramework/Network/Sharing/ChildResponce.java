@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
 import MinTFramework.Network.Resource.ReceiveMessage;
-import MinTFramework.Network.sharing.Sharing.RESOURCE_TYPE;
-import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.Sharing.Sharing.RESOURCE_TYPE;
+import MinTFramework.Network.Sharing.node.Node;
 import MinTFramework.storage.ThingProperty;
 import java.util.List;
 

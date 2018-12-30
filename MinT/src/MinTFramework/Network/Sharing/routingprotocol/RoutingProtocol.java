@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing.routingprotocol;
+package MinTFramework.Network.Sharing.routingprotocol;
 
 import MinTFramework.MinT;
 import MinTFramework.Network.NetworkManager;
@@ -24,10 +24,10 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.sharing.node.CurrentNode;
-import MinTFramework.Network.sharing.node.Node;
-import MinTFramework.Network.sharing.node.NodeSpecify;
-import MinTFramework.Network.sharing.node.Platforms;
+import MinTFramework.Network.Sharing.node.CurrentNode;
+import MinTFramework.Network.Sharing.node.Node;
+import MinTFramework.Network.Sharing.node.NodeSpecify;
+import MinTFramework.Network.Sharing.node.Platforms;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.storage.Resource;
 import MinTFramework.storage.ResourceStorage;

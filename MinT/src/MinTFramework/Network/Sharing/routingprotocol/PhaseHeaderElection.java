@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing.routingprotocol;
+package MinTFramework.Network.Sharing.routingprotocol;
 
 import MinTFramework.Network.MessageProtocol.MinTMessageCode;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
@@ -26,8 +26,8 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.ResponseData;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.sharing.node.CurrentNode;
-import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.Sharing.node.CurrentNode;
+import MinTFramework.Network.Sharing.node.Node;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.storage.datamap.Information;
 import java.util.ArrayList;

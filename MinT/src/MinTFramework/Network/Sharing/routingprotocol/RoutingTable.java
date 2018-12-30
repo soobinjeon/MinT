@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing.routingprotocol;
+package MinTFramework.Network.Sharing.routingprotocol;
 
-import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.Sharing.node.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;

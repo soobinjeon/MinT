@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package MinTFramework.Network.sharing;
+package MinTFramework.Network.Sharing;
 
 import MinTFramework.Network.Resource.ReceiveMessage;
 import MinTFramework.Network.ResponseHandler;
-import MinTFramework.Network.sharing.node.Node;
+import MinTFramework.Network.Sharing.node.Node;
 import MinTFramework.storage.ThingProperty;
 
 /**

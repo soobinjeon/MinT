@@ -24,7 +24,7 @@ import MinTFramework.ExternalDevice.DeviceType;
 import MinTFramework.ExternalDevice.DeviceManager;
 import MinTFramework.ExternalDevice.Device;
 import MinTFramework.ExternalDevice.DeviceBLE;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.Network.NetworkManager;
 import MinTFramework.Network.NetworkType;
 import MinTFramework.Network.MessageProtocol.coap.CoAPPacket;
@@ -33,9 +33,9 @@ import MinTFramework.Network.Resource.Request;
 import MinTFramework.Network.Resource.SendMessage;
 import MinTFramework.Network.ResponseHandler;
 import MinTFramework.Network.SendMSG;
-import MinTFramework.Network.sharing.ResourceOption;
-import MinTFramework.Network.sharing.Sharing;
-import MinTFramework.Network.sharing.node.NodeSpecify;
+import MinTFramework.Network.Sharing.ResourceOption;
+import MinTFramework.Network.Sharing.Sharing;
+import MinTFramework.Network.Sharing.node.NodeSpecify;
 import MinTFramework.SystemScheduler.Service;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.Util.Benchmarks.MinTBenchmark;
@@ -282,7 +282,6 @@ public abstract class MinT {
      * Use setNetworkName
      * set network user configuration
      * @param name node Name
-     * @param nhandler User Handler
      */
     public void setNetwork(String name){
         NTWmanager.setNodeName(name);
@@ -356,7 +355,7 @@ public abstract class MinT {
     /**
      * Activate RoutingMode to join the region routing group
      * @param groupName Routing Group Name
-     * @param platforms <Platforms> Operating Platform
+     * @param ns <Platforms> Operating Platform
      */
     public void activateRoutingProtocol(String groupName, NodeSpecify ns){
         NTWmanager.activeRoutingProtocol(groupName, ns, false);
@@ -387,8 +386,7 @@ public abstract class MinT {
     
     /**
      * GET Resource Data matched to filled Resource
-     * @deprecated 
-     * @param msg 
+     * @deprecated
      */
     public void GET(String ResourceName){
         
@@ -439,7 +437,7 @@ public abstract class MinT {
     /**
      * Request directly Resource Data to other Node
      * @param dst destination Node Information
-     * @param resName Resource Name
+     * @param requestdata Resource Name
      * @param resHandle Response Handler
      */
     public void REQUEST_GET(NetworkProfile dst, Request requestdata, ResponseHandler resHandle){
@@ -449,7 +447,6 @@ public abstract class MinT {
     
     /**
      * Request get type Resource to other Node by Multicast
-     * @param htype
      * @param requestdata
      * @param resHandle 
      */
@@ -460,7 +457,6 @@ public abstract class MinT {
     
     /**
      * PUT Resource to other Node by Multicast
-     * @param htype
      * @param requestdata
      * @param resHandle 
      */
@@ -471,7 +467,6 @@ public abstract class MinT {
     
     /**
      * Post Resource to other Node by Multicast
-     * @param htype
      * @param requestdata
      * @param resHandle 
      */
@@ -482,7 +477,6 @@ public abstract class MinT {
     
     /**
      * Request delete  to other Node by Multicast
-     * @param htype
      * @param requestdata
      * @param resHandle 
      */

@@ -19,7 +19,7 @@ package MinTFramework.Network;
 import MinTFramework.Exception.*;
 import MinTFramework.MinT;
 import MinTFramework.Network.MessageProtocol.PacketDatagram;
-import MinTFramework.Network.sharing.routingprotocol.RoutingProtocol;
+import MinTFramework.Network.Sharing.routingprotocol.RoutingProtocol;
 import MinTFramework.SystemScheduler.SystemScheduler;
 import MinTFramework.SystemScheduler.MinTthreadPools;
 import MinTFramework.Util.Benchmarks.Performance;
@@ -53,7 +53,7 @@ public abstract class Network {
      * *
      * Constructor
      *
-     * @param frame MinT Framework Object
+     * @param npro MinT Framework Object
      */
     public Network(NetworkProfile npro) {
         this.frame = MinT.getInstance();
@@ -78,7 +78,7 @@ public abstract class Network {
  !!! Not Network Procotol !!! 
  Default: "MinTApplicationProtocol"
      *
-     * @param ap RoutingProtocol
+     * @param routing RoutingProtocol
      */
     public void setRoutingProtocol(RoutingProtocol routing) {
         this.routing = routing;
@@ -86,7 +86,7 @@ public abstract class Network {
     
     /**
      * call Receive Handler after Receiving data 
-     * @param packet 
+     * @param recvmsg
      */
     public void putReceiveHandler(RecvMSG recvmsg){
         sysSched.submitProcess(MinTthreadPools.NET_RECV_HANDLE, recvmsg);

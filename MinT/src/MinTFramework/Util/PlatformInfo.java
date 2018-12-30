@@ -16,7 +16,7 @@
  */
 package MinTFramework.Util;
 
-import MinTFramework.Network.sharing.node.SpecPower;
+import MinTFramework.Network.Sharing.node.SpecPower;
 import java.io.File;
 
 /**
